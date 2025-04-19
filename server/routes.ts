@@ -31,6 +31,9 @@ const spruceApi = axios.create({
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Register our API routers
+  app.use("/api/ai", aiRouter);
+  
   // Error handling middleware for Zod validation errors
   const handleZodError = (error: unknown, res: Response) => {
     if (error instanceof ZodError) {
