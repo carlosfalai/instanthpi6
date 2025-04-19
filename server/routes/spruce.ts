@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Patient, insertPatientSchema, Message } from '@shared/schema';
 import { storage } from '../storage';
 import { randomUUID } from 'crypto';
+import { ZodError } from 'zod';
 
 export const router = Router();
 
@@ -219,5 +220,79 @@ router.post('/patients/:patientId/archive', async (req, res) => {
   } catch (error) {
     console.error('Error archiving conversation:', error);
     res.status(500).json({ error: 'Failed to archive conversation' });
+  }
+});
+
+// Get patients from Spruce API
+router.get('/patients/spruce', async (req, res) => {
+  const { query } = req.query;
+  
+  try {
+    // Search parameters for the Spruce API
+    const params: Record<string, any> = {
+      limit: 10
+    };
+    
+    // Add search query if provided
+    if (query && typeof query === 'string') {
+      params.search = query;
+    }
+    
+    // Call Spruce API to get patients
+    const response = await spruceClient.get('/patients', { params });
+    
+    // Map Spruce patients to our format
+    const patients = response.data.patients.map((patient: any) => ({
+      id: parseInt(patient.id),
+      name: `${patient.first_name} ${patient.last_name}`.trim(),
+      gender: patient.gender || 'Not specified',
+      dateOfBirth: patient.dob || (new Date()).toISOString().split('T')[0],
+      email: patient.email || '',
+      phone: patient.phone || '',
+      lastVisit: patient.last_visit ? new Date(patient.last_visit) : null,
+      avatarUrl: patient.avatar_url || null,
+      healthCardNumber: null,
+      // Store the Spruce ID for reference
+      spruceId: patient.id
+    }));
+    
+    // Save these patients to our local storage for caching
+    for (const patient of patients) {
+      const existingPatient = await storage.getPatient(patient.id);
+      if (!existingPatient) {
+        try {
+          await storage.createPatient({
+            id: patient.id,
+            name: patient.name,
+            gender: patient.gender,
+            dateOfBirth: patient.dateOfBirth,
+            email: patient.email,
+            phone: patient.phone,
+            lastVisit: patient.lastVisit,
+            avatarUrl: patient.avatarUrl,
+            healthCardNumber: patient.healthCardNumber
+          });
+        } catch (error) {
+          if (error instanceof ZodError) {
+            console.error('Validation error while storing patient:', error.errors);
+          } else {
+            console.error('Error storing patient:', error);
+          }
+          // Continue even if we can't save this patient
+        }
+      }
+    }
+    
+    res.json(patients);
+  } catch (error) {
+    console.error('Error fetching patients from Spruce:', error);
+    
+    if (axios.isAxiosError(error) && error.response) {
+      res.status(error.response.status).json({ 
+        error: `Spruce API error: ${error.response.data}` 
+      });
+    } else {
+      res.status(500).json({ error: 'Failed to fetch patients from Spruce' });
+    }
   }
 });

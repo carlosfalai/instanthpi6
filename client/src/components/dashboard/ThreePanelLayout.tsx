@@ -1,99 +1,67 @@
-import { useState } from "react";
-import PendingItemsPanel from "./PendingItemsPanel";
-import AiAssistantPanel from "../ai/AiAssistantPanel";
-import PatientSearchPanel from "../patients/PatientSearchPanel";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
-import { Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import React, { useState, ReactNode } from 'react';
+import PendingItemsPanel from './PendingItemsPanel';
+import AiAssistantPanel from '../ai/AiAssistantPanel';
+import PatientSearchPanel from '../patients/PatientSearchPanel';
+import { Search, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface ThreePanelLayoutProps {
   patientId: number;
-  patientLanguage: "french" | "english";
-  children: React.ReactNode; // This will be the conversation component
-  onSendMessage: (message: string) => void;
-  onPatientSelect?: (patientId: number) => void;
+  patientLanguage?: string;
+  onSendMessage?: (message: string) => void;
+  onPatientSelect: (patientId: number) => void;
+  children: ReactNode;
 }
 
 export default function ThreePanelLayout({
   patientId,
-  patientLanguage,
-  children,
+  patientLanguage = 'english',
   onSendMessage,
-  onPatientSelect
+  onPatientSelect,
+  children
 }: ThreePanelLayoutProps) {
-  // Default layout proportions
-  const [layout, setLayout] = useState([20, 30, 50]); // left, middle, right
-  const [showingSearch, setShowingSearch] = useState(false);
-
+  const [showSearch, setShowSearch] = useState(false);
+  
   return (
-    <div className="h-[calc(100vh-4rem)] bg-[#121212]">
-      <ResizablePanelGroup
-        direction="horizontal"
-        className="min-h-full"
-        onLayout={(sizes) => {
-          setLayout(sizes);
-        }}
-      >
-        {/* Left Panel - Pending Items */}
-        <ResizablePanel 
-          defaultSize={layout[0]} 
-          minSize={15} 
-          maxSize={30} 
-          className="bg-[#1a1a1a]"
-        >
-          <PendingItemsPanel patientId={patientId} />
-        </ResizablePanel>
-        
-        <ResizableHandle withHandle />
-        
-        {/* Middle Panel - AI Assistant */}
-        <ResizablePanel 
-          defaultSize={layout[1]} 
-          minSize={20} 
-          maxSize={40} 
-          className="bg-[#1a1a1a]"
-        >
-          <AiAssistantPanel 
-            patientId={patientId} 
-            patientLanguage={patientLanguage}
-            onSendMessage={onSendMessage}
-          />
-        </ResizablePanel>
-        
-        <ResizableHandle withHandle />
-        
-        {/* Right Panel - Patient Conversation or Search */}
-        <ResizablePanel 
-          defaultSize={layout[2]} 
-          minSize={30} 
-          className="bg-[#121212] relative"
-        >
-          {/* Search toggle button */}
+    <div className="flex flex-1 overflow-hidden">
+      {/* Left Panel - Pending Items */}
+      <div className="w-1/4 border-r border-gray-800 overflow-y-auto">
+        <PendingItemsPanel patientId={patientId} />
+      </div>
+      
+      {/* Middle Panel - AI Assistant */}
+      <div className="w-1/3 border-r border-gray-800 overflow-y-auto">
+        <AiAssistantPanel 
+          patientId={patientId} 
+          patientLanguage={patientLanguage}
+          onSendMessage={onSendMessage}
+        />
+      </div>
+      
+      {/* Right Panel - Patient Conversation or Search */}
+      <div className="flex-1 flex flex-col">
+        {/* Search Toggle Button */}
+        <div className="absolute top-16 right-4 z-10">
           <Button
             variant="ghost"
-            size="sm"
-            className="absolute top-4 right-4 z-10 bg-gray-800/70 text-gray-300 hover:text-white"
-            onClick={() => setShowingSearch(prev => !prev)}
+            size="icon"
+            onClick={() => setShowSearch(!showSearch)}
+            className="bg-gray-800 text-gray-200 hover:bg-gray-700"
           >
-            <Search className="h-4 w-4 mr-2" />
-            {showingSearch ? 'Close Search' : 'Search Patients'}
+            {showSearch ? <X size={18} /> : <Search size={18} />}
           </Button>
-          
-          {/* Show either patient search or conversation */}
-          {showingSearch ? (
-            <PatientSearchPanel 
-              onSelectPatient={(selectedId) => {
-                if (onPatientSelect) {
-                  onPatientSelect(selectedId);
-                }
-                setShowingSearch(false);
-              }} 
-            />
-          ) : (
-            children
-          )}
-        </ResizablePanel>
-      </ResizablePanelGroup>
+        </div>
+        
+        {/* Show either Patient Search or Conversation */}
+        {showSearch ? (
+          <PatientSearchPanel onPatientSelect={(selectedId) => {
+            onPatientSelect(selectedId);
+            setShowSearch(false);
+          }} />
+        ) : (
+          children
+        )}
+      </div>
     </div>
   );
 }

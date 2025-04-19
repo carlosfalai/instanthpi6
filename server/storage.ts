@@ -92,7 +92,7 @@ export class MemStorage implements IStorage {
       avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=100&h=100&q=80"
     });
     
-    // Add a sample patient
+    // Add sample patients for testing
     this.createPatient({
       name: "Jessica Thompson",
       gender: "Female",
@@ -101,6 +101,42 @@ export class MemStorage implements IStorage {
       phone: "555-123-4567",
       lastVisit: new Date("2023-05-15"),
       avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=100&h=100&q=80"
+    });
+    
+    // Add more patients for search testing
+    this.createPatient({
+      name: "Nicolas Girard",
+      gender: "Male",
+      dateOfBirth: "1982-04-15",
+      email: "nicolas.girard@example.com",
+      phone: "555-234-5678",
+      healthCardNumber: "GIRN12345678"
+    });
+    
+    this.createPatient({
+      name: "Marie Tremblay",
+      gender: "Female",
+      dateOfBirth: "1990-06-22",
+      email: "marie.t@example.com",
+      phone: "555-345-6789",
+      healthCardNumber: "TREM98765432"
+    });
+    
+    this.createPatient({
+      name: "Robert Johnson",
+      gender: "Male",
+      dateOfBirth: "1975-11-30",
+      email: "robert.j@example.com",
+      phone: "555-456-7890"
+    });
+    
+    this.createPatient({
+      name: "Sophie Chen",
+      gender: "Female",
+      dateOfBirth: "1988-03-10",
+      email: "sophie.chen@example.com",
+      phone: "555-567-8901",
+      lastVisit: new Date("2023-04-01")
     });
   }
 
