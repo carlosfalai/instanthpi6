@@ -6,12 +6,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import PatientConsultation from "@/pages/PatientConsultation";
-import ChatPage from "@/pages/ChatPage";
+import SpruceChatPage from "@/pages/SpruceChatPage";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={ChatPage}/>
+      <Route path="/" component={SpruceChatPage}/>
       <Route path="/dashboard" component={Dashboard}/>
       <Route path="/patient/:id" component={PatientConsultation}/>
       {/* Fallback to 404 */}
