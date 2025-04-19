@@ -127,6 +127,24 @@ export const pendingItems = pgTable("pending_items", {
   notes: text("notes"),
 });
 
+// Preventative Care Suggestions model for billing optimization and patient follow-up
+export const preventativeCare = pgTable("preventative_care", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: integer("patient_id").notNull(),
+  category: text("category").notNull(), // 'vaccine', 'screening', 'counseling', 'checkup', 'other'
+  name: text("name").notNull(), // e.g., 'Hepatitis B Vaccine', 'Gardasil Shot', 'Pap Test'
+  description: text("description").notNull(),
+  relevantTo: text("relevant_to").array(), // array of conditions this is relevant to (e.g., ['STI', 'sexual health'])
+  messageTemplate: text("message_template").notNull(), // template message to send to patient
+  suggestedDate: timestamp("suggested_date"), // when AI suggests this should be scheduled
+  status: text("status").notNull().default("suggested"), // 'suggested', 'sent', 'completed', 'declined'
+  sentDate: timestamp("sent_date"), // when message was sent to patient
+  responseDate: timestamp("response_date"), // when patient responded
+  responseContent: text("response_content"), // patient's response
+  billingCode: text("billing_code"), // optional billing code for the service
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const insertPendingItemSchema = createInsertSchema(pendingItems).pick({
   patientId: true,
   type: true,
@@ -137,6 +155,18 @@ export const insertPendingItemSchema = createInsertSchema(pendingItems).pick({
   status: true,
   messageId: true,
   notes: true,
+});
+
+export const insertPreventativeCareSchema = createInsertSchema(preventativeCare).pick({
+  patientId: true,
+  category: true,
+  name: true,
+  description: true,
+  relevantTo: true,
+  messageTemplate: true, 
+  suggestedDate: true,
+  status: true,
+  billingCode: true,
 });
 
 // Export types for use in the application
@@ -157,3 +187,40 @@ export type InsertFormSubmission = z.infer<typeof insertFormSubmissionSchema>;
 
 export type PendingItem = typeof pendingItems.$inferSelect;
 export type InsertPendingItem = z.infer<typeof insertPendingItemSchema>;
+
+export type PreventativeCare = typeof preventativeCare.$inferSelect;
+export type InsertPreventativeCare = z.infer<typeof insertPreventativeCareSchema>;
+
+// AI Settings model
+export const aiSettings = pgTable("ai_settings", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(), // The doctor who owns these settings
+  hpiConfirmationEnabled: boolean("hpi_confirmation_enabled").default(true),
+  differentialDiagnosisEnabled: boolean("differential_diagnosis_enabled").default(true),
+  followUpQuestionsEnabled: boolean("follow_up_questions_enabled").default(true),
+  preventativeCareEnabled: boolean("preventative_care_enabled").default(true),
+  labworkSuggestionsEnabled: boolean("labwork_suggestions_enabled").default(true),
+  inPersonReferralEnabled: boolean("in_person_referral_enabled").default(true),
+  prescriptionSuggestionsEnabled: boolean("prescription_suggestions_enabled").default(true),
+  medicalNotesDraftEnabled: boolean("medical_notes_draft_enabled").default(true),
+  pendingItemsTrackingEnabled: boolean("pending_items_tracking_enabled").default(true),
+  billingOptimizationEnabled: boolean("billing_optimization_enabled").default(true),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAiSettingsSchema = createInsertSchema(aiSettings).pick({
+  userId: true,
+  hpiConfirmationEnabled: true,
+  differentialDiagnosisEnabled: true,
+  followUpQuestionsEnabled: true,
+  preventativeCareEnabled: true,
+  labworkSuggestionsEnabled: true,
+  inPersonReferralEnabled: true,
+  prescriptionSuggestionsEnabled: true,
+  medicalNotesDraftEnabled: true,
+  pendingItemsTrackingEnabled: true,
+  billingOptimizationEnabled: true,
+});
+
+export type AiSettings = typeof aiSettings.$inferSelect;
+export type InsertAiSettings = z.infer<typeof insertAiSettingsSchema>;

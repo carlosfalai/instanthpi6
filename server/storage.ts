@@ -3,7 +3,9 @@ import {
   patients, type Patient, type InsertPatient,
   messages, type Message, type InsertMessage,
   aiDocumentations, type AIDocumentation, type InsertAIDocumentation,
-  formSubmissions, type FormSubmission, type InsertFormSubmission
+  formSubmissions, type FormSubmission, type InsertFormSubmission,
+  pendingItems, type PendingItem, type InsertPendingItem,
+  preventativeCare, type PreventativeCare, type InsertPreventativeCare
 } from "@shared/schema";
 
 export interface IStorage {
@@ -33,6 +35,22 @@ export interface IStorage {
   getFormSubmissionsByPatientId(patientId: number): Promise<FormSubmission[]>;
   getFormSubmissionById(id: number): Promise<FormSubmission | undefined>;
   createFormSubmission(submission: InsertFormSubmission): Promise<FormSubmission>;
+  
+  // Pending Items operations
+  getPendingItemsByPatientId(patientId: number): Promise<PendingItem[]>;
+  getAllPendingItems(): Promise<PendingItem[]>;
+  getPendingItemById(id: string): Promise<PendingItem | undefined>;
+  createPendingItem(item: InsertPendingItem): Promise<PendingItem>;
+  updatePendingItem(id: string, item: Partial<InsertPendingItem>): Promise<PendingItem | undefined>;
+  deletePendingItem(id: string): Promise<boolean>;
+  
+  // Preventative Care operations
+  getPreventativeCareByPatientId(patientId: number): Promise<PreventativeCare[]>;
+  getPreventativeCareById(id: string): Promise<PreventativeCare | undefined>;
+  createPreventativeCare(item: InsertPreventativeCare): Promise<PreventativeCare>;
+  updatePreventativeCare(id: string, item: Partial<InsertPreventativeCare>): Promise<PreventativeCare | undefined>;
+  deletePreventativeCare(id: string): Promise<boolean>;
+  getNextPreventativeCareItem(patientId: number): Promise<PreventativeCare | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -41,6 +59,8 @@ export class MemStorage implements IStorage {
   private messages: Map<number, Message>;
   private aiDocumentations: Map<number, AIDocumentation>;
   private formSubmissions: Map<number, FormSubmission>;
+  private pendingItems: Map<string, PendingItem>;
+  private preventativeCare: Map<string, PreventativeCare>;
   
   private userId: number;
   private patientId: number;
@@ -54,6 +74,8 @@ export class MemStorage implements IStorage {
     this.messages = new Map();
     this.aiDocumentations = new Map();
     this.formSubmissions = new Map();
+    this.pendingItems = new Map();
+    this.preventativeCare = new Map();
     
     this.userId = 1;
     this.patientId = 1;
