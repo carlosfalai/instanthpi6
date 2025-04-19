@@ -9,10 +9,11 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-// The ID of the specific GPT we want to use - this is the medical transcriptionist GPT
+// The ID of the specific GPT we're emulating - this is the medical transcriptionist GPT
+// Note: Direct API access to custom GPTs isn't available, so we're using system prompts to emulate it
 const TRANSCRIPTIONER_GPT_ID = 'g-67e1a5d8bf6c81918158558379bdda17-ih-like-transcriptioner-enhanced';
 
-// This endpoint calls the specific ChatGPT 
+// This endpoint emulates the specific ChatGPT 
 // (g-67e1a5d8bf6c81918158558379bdda17-ih-like-transcriptioner-enhanced)
 // to generate sections for the AI assistant panel
 router.post('/generate-sections', async (req, res) => {
@@ -29,7 +30,8 @@ router.post('/generate-sections', async (req, res) => {
   try {
     // Prepare the system message that tells the GPT how to format its response
     const systemMessage = `
-      You are a medical transcription assistant that helps doctors communicate with patients.
+      You are a medical transcription assistant like the custom GPT g-67e1a5d8bf6c81918158558379bdda17-ih-like-transcriptioner-enhanced.
+      You help doctors communicate with patients by generating ready-to-use text snippets that can be directly sent to patients.
       Based on the patient data provided, generate communication options and follow-up questions.
       
       Format your response in JSON with the following structure:
@@ -75,7 +77,18 @@ router.post('/generate-sections', async (req, res) => {
       ${JSON.stringify(patientData, null, 2)}
       
       Previous messages in the conversation:
-      ${messageHistory.map(msg => `${msg.sender}: ${msg.content}`).join('\n')}
+      ${messageHistory.map((msg: {sender: string, content: string}) => `${msg.sender}: ${msg.content}`).join('\n')}
+      
+      Generate the following specific sections that will appear in the AI Assistant panel:
+      1. HPI Confirmation Summary - A brief confirmation of the patient's history that the doctor can send to verify details
+      2. Super Spartan SOAP Note - A very concise SOAP note in spartan style (brief and direct)
+      3. Plan – Bullet Points - A list of bulleted action items for the treatment plan
+      4. In Case of Telemedicine - Special notes if this is a telemedicine consultation
+      5. Follow-Up Questions - Organized by condition (Depression, Hypertension, etc.)
+      6. Medication Recommendation - Specific medication details if appropriate
+      
+      Use a spartan tone (brief, direct, professional) with maximum 5 phrases per section.
+      The language should be ${patientLanguage === 'french' ? 'French' : 'English'}.
     `;
     
     // Make the OpenAI API call to the specific GPT
@@ -89,7 +102,7 @@ router.post('/generate-sections', async (req, res) => {
     });
     
     // Parse the response content
-    const responseContent = response.choices[0].message.content;
+    const responseContent = response.choices[0].message.content || '';
     const parsedContent = JSON.parse(responseContent);
     
     res.json(parsedContent);
@@ -137,7 +150,8 @@ router.post('/generate', async (req, res) => {
     });
     
     // Send back the generated text
-    res.json({ text: response.choices[0].message.content.trim() });
+    const content = response.choices[0].message.content || '';
+    res.json({ text: content.trim() });
   } catch (error) {
     console.error('Error generating AI response:', error);
     res.status(500).json({ error: 'Failed to generate AI response' });
@@ -178,10 +192,11 @@ router.post('/analyze-transcript', async (req, res) => {
     
     // Send back the analysis result
     if (outputFormat === 'json') {
-      const content = response.choices[0].message.content;
+      const content = response.choices[0].message.content || '{}';
       res.json(JSON.parse(content));
     } else {
-      res.json({ text: response.choices[0].message.content });
+      const content = response.choices[0].message.content || '';
+      res.json({ text: content });
     }
   } catch (error) {
     console.error('Error analyzing transcript:', error);
