@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import { useState } from "react";
+import MainNavbar from "@/components/layout/MainNavbar";
+import ThreePanelLayout from "@/components/dashboard/ThreePanelLayout";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Send, Check, MessageSquare, MoreVertical } from "lucide-react";
-import MainNavbar from "@/components/layout/MainNavbar";
+import { Check, MessageSquare, Send } from "lucide-react";
+import { useRef, useEffect } from "react";
 
 // Use the actual patient ID from the screenshot
 const PATIENT_ID = 4; // Nicolas Girard
@@ -20,22 +20,21 @@ interface Message {
   sender?: string;
 }
 
-export default function SpruceChatPage() {
-  const queryClient = useQueryClient();
+export default function PatientDashboardPage() {
   const [messageText, setMessageText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Use a hardcoded patient for demonstration
-  const [patient, setPatient] = useState({
+  const [patient] = useState({
     id: PATIENT_ID,
     name: "Nicolas Girard",
     initials: "NG",
     gender: "Male",
     dateOfBirth: "1982-04-15",
     phone: "+1 (555) 123-4567",
-    email: "nicolas.girard@example.com"
+    email: "nicolas.girard@example.com",
+    language: "french" as "french" | "english"
   });
-  const patientLoading = false;
   
   // Use sample message data for demonstration
   const mockMessages: Message[] = [
@@ -79,26 +78,6 @@ export default function SpruceChatPage() {
   ];
   
   const [messages, setMessages] = useState<Message[]>(mockMessages);
-  const messagesLoading = false;
-  
-  // Send message mutation
-  const sendMessageMutation = useMutation({
-    mutationFn: async (content: string) => {
-      const response = await axios.post(`/api/spruce/messages`, {
-        patientId: PATIENT_ID,
-        message: content
-      });
-      return response.data;
-    },
-    onSuccess: (newMessage) => {
-      // Update the message list
-      queryClient.invalidateQueries({ queryKey: [`/api/patients/${PATIENT_ID}/messages`] });
-      setMessageText("");
-    },
-    onError: (error) => {
-      console.error("Error sending message:", error);
-    }
-  });
   
   // Scroll to bottom whenever messages change
   useEffect(() => {
@@ -106,9 +85,20 @@ export default function SpruceChatPage() {
   }, [messages]);
   
   // Handle sending a message
-  const handleSendMessage = () => {
-    if (!messageText.trim()) return;
-    sendMessageMutation.mutate(messageText);
+  const handleSendMessage = (content: string) => {
+    if (!content.trim()) return;
+    
+    const newMessage: Message = {
+      id: `${Date.now()}`,
+      patientId: PATIENT_ID,
+      content,
+      timestamp: new Date().toISOString(),
+      isFromPatient: false,
+      sender: DOCTOR_NAME
+    };
+    
+    setMessages([...messages, newMessage]);
+    setMessageText("");
   };
   
   // Format timestamp to display AM/PM time
@@ -151,19 +141,17 @@ export default function SpruceChatPage() {
     return new Date(b).getTime() - new Date(a).getTime();
   });
   
-  return (
-    <div className="flex flex-col h-screen bg-[#121212] text-white">
-      {/* Main Navigation */}
-      <MainNavbar />
-      
-      {/* Patient Conversation Header */}
+  // Conversation component that will be passed to the ThreePanelLayout
+  const Conversation = () => (
+    <div className="flex flex-col h-full">
+      {/* Conversation Header */}
       <header className="flex justify-between items-center p-4 border-b border-gray-800">
         <div className="flex items-center gap-3">
           <Avatar className="h-10 w-10 bg-blue-500">
-            <AvatarFallback>{patientLoading ? '' : patient?.name.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
+            <AvatarFallback>{patient.initials}</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="font-semibold">{patientLoading ? 'Loading...' : patient?.name || 'Nicolas Girard'}</h1>
+            <h1 className="font-semibold">{patient.name}</h1>
             <p className="text-sm text-gray-400">Last active: 07:34 AM</p>
           </div>
         </div>
@@ -198,11 +186,7 @@ export default function SpruceChatPage() {
       
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-6">
-        {messagesLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
-          </div>
-        ) : messages.length === 0 ? (
+        {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-gray-400">
             <MessageSquare size={40} className="mb-2" />
             <p>No messages yet</p>
@@ -223,7 +207,7 @@ export default function SpruceChatPage() {
                 >
                   {message.isFromPatient && (
                     <Avatar className="h-10 w-10 mt-1 bg-blue-500">
-                      <AvatarFallback>{patient?.name.split(' ').map((n: string) => n[0]).join('') || 'NG'}</AvatarFallback>
+                      <AvatarFallback>{patient.initials}</AvatarFallback>
                     </Avatar>
                   )}
                   
@@ -269,7 +253,7 @@ export default function SpruceChatPage() {
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  handleSendMessage();
+                  handleSendMessage(messageText);
                 }
               }}
             />
@@ -313,18 +297,30 @@ export default function SpruceChatPage() {
           </div>
           
           <Button 
-            onClick={handleSendMessage} 
-            disabled={!messageText.trim() || sendMessageMutation.isPending}
+            onClick={() => handleSendMessage(messageText)} 
+            disabled={!messageText.trim()}
             className="rounded-full h-10 w-10 p-0 flex items-center justify-center bg-blue-600 hover:bg-blue-700"
           >
-            {sendMessageMutation.isPending ? (
-              <div className="animate-spin h-4 w-4 border-2 border-white border-opacity-20 border-t-white rounded-full" />
-            ) : (
-              <Send size={16} />
-            )}
+            <Send size={16} />
           </Button>
         </div>
       </div>
+    </div>
+  );
+
+  return (
+    <div className="flex flex-col min-h-screen bg-[#121212] text-white">
+      {/* Main Navigation Bar */}
+      <MainNavbar />
+      
+      {/* Three Panel Layout */}
+      <ThreePanelLayout
+        patientId={patient.id}
+        patientLanguage={patient.language}
+        onSendMessage={handleSendMessage}
+      >
+        <Conversation />
+      </ThreePanelLayout>
     </div>
   );
 }

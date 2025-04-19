@@ -7,11 +7,13 @@ import NotFound from "@/pages/not-found";
 import Dashboard from "@/pages/Dashboard";
 import PatientConsultation from "@/pages/PatientConsultation";
 import SpruceChatPage from "@/pages/SpruceChatPage";
+import PatientDashboardPage from "@/pages/PatientDashboardPage";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={SpruceChatPage}/>
+      <Route path="/" component={PatientDashboardPage}/>
+      <Route path="/chat" component={SpruceChatPage}/>
       <Route path="/dashboard" component={Dashboard}/>
       <Route path="/patient/:id" component={PatientConsultation}/>
       {/* Fallback to 404 */}
