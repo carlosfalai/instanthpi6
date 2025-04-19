@@ -12,10 +12,11 @@ import PatientDashboardPage from "@/pages/PatientDashboardPage";
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={PatientDashboardPage}/>
-      <Route path="/chat" component={SpruceChatPage}/>
-      <Route path="/dashboard" component={Dashboard}/>
-      <Route path="/patient/:id" component={PatientConsultation}/>
+      <Route path="/" component={SpruceChatPage} />
+      <Route path="/patients/:patientId" component={SpruceChatPage} />
+      <Route path="/dashboard" component={PatientDashboardPage} />
+      {/* Legacy routes */}
+      <Route path="/patient/:id" component={PatientConsultation} />
       {/* Fallback to 404 */}
       <Route component={NotFound} />
     </Switch>

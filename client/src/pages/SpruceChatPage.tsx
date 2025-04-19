@@ -1,373 +1,94 @@
-import { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Send, Check, MessageSquare, MoreVertical } from "lucide-react";
-import MainNavbar from "@/components/layout/MainNavbar";
+import React, { useState } from 'react';
+import { useParams, useLocation } from 'wouter';
+import { useQuery } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
 
-// Use the actual patient ID from the screenshot
-const PATIENT_ID = 4; // Nicolas Girard
-const DOCTOR_NAME = "Dr. Carlos Faviel Font";
-
-interface Message {
-  id: string;
-  patientId: number;
-  content: string;
-  timestamp: string;
-  isFromPatient: boolean;
-  sender?: string;
-}
+import ThreePanelLayout from '@/components/dashboard/ThreePanelLayout';
+import SpruceConversation from '@/components/conversation/SpruceConversation';
 
 export default function SpruceChatPage() {
-  const queryClient = useQueryClient();
-  const [messageText, setMessageText] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [, setLocation] = useLocation();
+  const params = useParams<{ patientId: string }>();
+  const patientId = params?.patientId ? parseInt(params.patientId) : undefined;
   
-  // Patient state
-  const [currentPatientId, setCurrentPatientId] = useState(PATIENT_ID);
-  
-  // Fetch patient details
+  // Fetch patient data
   const { 
-    data: patient,
-    isLoading: patientLoading 
+    data: patient, 
+    isLoading, 
+    error 
   } = useQuery({
-    queryKey: [`/api/patients/${currentPatientId}`],
-    queryFn: async () => {
-      try {
-        const response = await axios.get(`/api/patients/${currentPatientId}`);
-        return response.data;
-      } catch (error) {
-        console.error("Error fetching patient:", error);
-        // Fallback to default patient if API fails
-        return {
-          id: PATIENT_ID,
-          name: "Nicolas Girard",
-          gender: "Male",
-          dateOfBirth: "1982-04-15",
-          phone: "+1 (555) 123-4567",
-          email: "nicolas.girard@example.com"
-        };
-      }
-    }
+    queryKey: [`/api/patients/${patientId}`],
+    enabled: !!patientId,
   });
   
-  // Use sample message data for demonstration
-  const mockMessages: Message[] = [
-    {
-      id: "1",
-      patientId: PATIENT_ID,
-      content: "Bonjour Dr. Font, je voudrais prendre un rendez-vous pour discuter de mes résultats de laboratoire récents.",
-      timestamp: "2025-04-19T07:30:00Z",
-      isFromPatient: true
-    },
-    {
-      id: "2",
-      patientId: PATIENT_ID,
-      content: "Bonjour M. Girard, bien sûr. J'ai consulté vos résultats. Quand seriez-vous disponible pour une consultation?",
-      timestamp: "2025-04-19T08:15:00Z",
-      isFromPatient: false,
-      sender: DOCTOR_NAME
-    },
-    {
-      id: "3",
-      patientId: PATIENT_ID,
-      content: "Je suis disponible demain après-midi, vers 14h, si cela vous convient?",
-      timestamp: "2025-04-19T08:22:00Z",
-      isFromPatient: true
-    },
-    {
-      id: "4",
-      patientId: PATIENT_ID,
-      content: "Parfait. Je vous ai réservé un créneau à 14h demain. Apportez votre carte RAMQ s'il vous plaît.",
-      timestamp: "2025-04-19T08:30:00Z",
-      isFromPatient: false,
-      sender: DOCTOR_NAME
-    },
-    {
-      id: "5",
-      patientId: PATIENT_ID,
-      content: "D'accord, merci beaucoup. À demain!",
-      timestamp: "2025-04-19T08:35:00Z",
-      isFromPatient: true
-    }
-  ];
-  
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
-  const messagesLoading = false;
-  
-  // Send message mutation
-  const sendMessageMutation = useMutation({
-    mutationFn: async (content: string) => {
-      const response = await axios.post(`/api/spruce/messages`, {
-        patientId: PATIENT_ID,
-        message: content
-      });
-      return response.data;
-    },
-    onSuccess: (newMessage) => {
-      // Update the message list
-      queryClient.invalidateQueries({ queryKey: [`/api/patients/${PATIENT_ID}/messages`] });
-      setMessageText("");
-    },
-    onError: (error) => {
-      console.error("Error sending message:", error);
-    }
-  });
-  
-  // Scroll to bottom whenever messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  // Handle patient selection
+  const handlePatientSelect = (selectedId: number) => {
+    setLocation(`/patients/${selectedId}`);
+  };
   
   // Handle sending a message
-  const handleSendMessage = () => {
-    if (!messageText.trim()) return;
-    sendMessageMutation.mutate(messageText);
+  const handleSendMessage = (message: string) => {
+    // This is handled by the SpruceConversation component directly
+    console.log('Message sent:', message);
   };
   
-  // Format timestamp to display AM/PM time
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-  
-  // Check if the message is from today
-  const isToday = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const today = new Date();
-    return date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear();
-  };
-  
-  // Group messages by date
-  const messagesByDate: Record<string, Message[]> = {};
-  
-  messages.forEach((message: Message) => {
-    const date = new Date(message.timestamp);
-    const dateKey = isToday(message.timestamp) ? 
-      'Today' : 
-      date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-    
-    if (!messagesByDate[dateKey]) {
-      messagesByDate[dateKey] = [];
-    }
-    messagesByDate[dateKey].push(message);
-  });
-  
-  const sortedDates = Object.keys(messagesByDate).sort((a, b) => {
-    if (a === 'Today') return 1;
-    if (b === 'Today') return -1;
-    return new Date(b).getTime() - new Date(a).getTime();
-  });
-  
-  // Function to handle patient selection from search
-  const handlePatientSelect = (selectedPatientId: number) => {
-    setCurrentPatientId(selectedPatientId);
-    // Invalidate queries to fetch new patient data
-    queryClient.invalidateQueries({
-      queryKey: [`/api/patients/${selectedPatientId}`],
-    });
-    queryClient.invalidateQueries({
-      queryKey: [`/api/patients/${selectedPatientId}/messages`],
-    });
-  };
-  
-  // Conversation component for the right panel
-  const ConversationPanel = () => (
-    <div className="flex flex-col h-full bg-[#121212] text-white">
-      {/* Patient Conversation Header */}
-      <header className="flex justify-between items-center p-4 border-b border-gray-800">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 bg-blue-500">
-            <AvatarFallback>{patientLoading ? '' : patient?.name.split(' ').map((n: string) => n[0]).join('')}</AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="font-semibold">{patientLoading ? 'Loading...' : patient?.name || 'Nicolas Girard'}</h1>
-            <p className="text-sm text-gray-400">Last active: 07:34 AM</p>
-          </div>
+  // If no patient is selected, show a placeholder
+  if (!patientId) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#121212] text-white">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-3">Select a Patient</h2>
+          <p className="text-gray-400 max-w-md">
+            Use the search button in the top right to find and select a patient to begin.
+          </p>
         </div>
-        <div className="flex gap-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-400">
-                  <MessageSquare size={20} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>New conversation</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-400">
-                  <Check size={20} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Mark as resolved</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      </header>
-      
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
-        {messagesLoading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="animate-spin h-8 w-8 border-4 border-blue-500 rounded-full border-t-transparent"></div>
-          </div>
-        ) : messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400">
-            <MessageSquare size={40} className="mb-2" />
-            <p>No messages yet</p>
-          </div>
-        ) : (
-          sortedDates.map(dateKey => (
-            <div key={dateKey} className="space-y-4">
-              <div className="flex justify-center">
-                <div className="bg-gray-800 text-gray-300 rounded-full px-4 py-1 text-sm">
-                  {dateKey}
-                </div>
-              </div>
-              
-              {messagesByDate[dateKey].map(message => (
-                <div 
-                  key={message.id} 
-                  className={`flex items-start gap-2 ${!message.isFromPatient ? 'justify-end' : 'justify-start'}`}
-                >
-                  {message.isFromPatient && (
-                    <Avatar className="h-10 w-10 mt-1 bg-blue-500">
-                      <AvatarFallback>{patient?.name.split(' ').map((n: string) => n[0]).join('') || 'NG'}</AvatarFallback>
-                    </Avatar>
-                  )}
-                  
-                  <div 
-                    className={`max-w-[75%] rounded-lg p-3 ${
-                      !message.isFromPatient 
-                        ? 'bg-[#1e3a50] text-white' 
-                        : 'bg-[#2a2a2a] text-white'
-                    }`}
-                  >
-                    {!message.isFromPatient && (
-                      <div className="text-xs text-gray-400 mb-1">{message.sender || DOCTOR_NAME}</div>
-                    )}
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    <div className="text-right text-xs text-gray-400 mt-1">
-                      {formatTimestamp(message.timestamp)}
-                    </div>
-                  </div>
-                  
-                  {!message.isFromPatient && (
-                    <Avatar className="h-10 w-10 mt-1 bg-blue-600">
-                      <AvatarFallback>CF</AvatarFallback>
-                    </Avatar>
-                  )}
-                </div>
-              ))}
-            </div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
       </div>
-      
-      {/* Message Input */}
-      <div className="p-4 border-t border-gray-800">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              placeholder="Type your message..."
-              className="w-full px-4 py-2 rounded-full bg-[#2a2a2a] border border-gray-700 text-white focus:outline-none focus:border-blue-500"
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-            />
-            
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-gray-400 h-8 w-8">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                      </svg>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Attach file</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-              
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-gray-400 h-8 w-8">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                      </svg>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Add emoji</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
-          
-          <Button 
-            onClick={handleSendMessage} 
-            disabled={!messageText.trim() || sendMessageMutation.isPending}
-            className="rounded-full h-10 w-10 p-0 flex items-center justify-center bg-blue-600 hover:bg-blue-700"
+    );
+  }
+  
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#121212] text-white">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+      </div>
+    );
+  }
+  
+  // Error state
+  if (error || !patient) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#121212] text-white">
+        <div className="text-center text-red-400">
+          <h2 className="text-xl font-semibold mb-3">Error Loading Patient</h2>
+          <p className="max-w-md">
+            Failed to load patient data. Please try again or select a different patient.
+          </p>
+          <button 
+            className="mt-4 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-md"
+            onClick={() => setLocation('/')}
           >
-            {sendMessageMutation.isPending ? (
-              <div className="animate-spin h-4 w-4 border-2 border-white border-opacity-20 border-t-white rounded-full" />
-            ) : (
-              <Send size={16} />
-            )}
-          </Button>
+            Go Back
+          </button>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+  
+  // Default to English if language is undefined
+  const patientLanguage = patient?.language === 'french' ? 'french' : 'english';
   
   return (
-    <div className="flex flex-col h-screen bg-[#121212] text-white">
-      {/* Main Navigation */}
-      <MainNavbar />
-      
-      {/* Three Panel Layout */}
-      <ThreePanelLayout
-        patientId={currentPatientId}
-        patientLanguage="french" // Default language, could be dynamic based on patient
-        onSendMessage={handleSendMessage}
-        onPatientSelect={handlePatientSelect}
-      >
-        <ConversationPanel />
-      </ThreePanelLayout>
-    </div>
+    <ThreePanelLayout
+      patientId={patientId}
+      patientLanguage={patientLanguage}
+      onSendMessage={handleSendMessage}
+      onPatientSelect={handlePatientSelect}
+    >
+      <SpruceConversation
+        patientId={patientId}
+        doctorName="Dr. Font"
+      />
+    </ThreePanelLayout>
   );
 }

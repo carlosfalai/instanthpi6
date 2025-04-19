@@ -32,6 +32,9 @@ export const patients = pgTable("patients", {
   lastVisit: timestamp("last_visit"),
   avatarUrl: text("avatar_url"),
   healthCardNumber: text("health_card_number"), // Added for RAMQ card verification
+  spruceId: text("spruce_id"), // External ID for Spruce Health API integration
+  language: text("language").default("english"), // Patient's preferred language
+  status: text("status").default("active"), // Status of the patient (active, archived, etc.)
 });
 
 export const insertPatientSchema = createInsertSchema(patients).pick({
@@ -42,7 +45,10 @@ export const insertPatientSchema = createInsertSchema(patients).pick({
   phone: true,
   lastVisit: true,
   avatarUrl: true,
-  healthCardNumber: true, // Added to schema
+  healthCardNumber: true,
+  spruceId: true,
+  language: true,
+  status: true,
 });
 
 // Message model for patient communications

@@ -1,66 +1,122 @@
 import React, { useState, ReactNode } from 'react';
-import PendingItemsPanel from './PendingItemsPanel';
-import AiAssistantPanel from '../ai/AiAssistantPanel';
-import PatientSearchPanel from '../patients/PatientSearchPanel';
-import { Search, X } from 'lucide-react';
+import { 
+  ResizableHandle, 
+  ResizablePanel, 
+  ResizablePanelGroup 
+} from '@/components/ui/resizable';
 import { Button } from '@/components/ui/button';
+import { Search, Menu, X } from 'lucide-react';
+import AiAssistantPanel from '@/components/ai/AiAssistantPanel';
+import PendingItemsPanel from '@/components/dashboard/PendingItemsPanel';
+import PatientSearchPanel from '@/components/patients/PatientSearchPanel';
 
-interface ThreePanelLayoutProps {
-  patientId: number;
-  patientLanguage?: string;
-  onSendMessage?: (message: string) => void;
-  onPatientSelect: (patientId: number) => void;
+export interface ThreePanelLayoutProps {
   children: ReactNode;
+  patientId: number;
+  patientLanguage: 'english' | 'french';
+  onSendMessage: (content: string) => void;
+  onPatientSelect: (patientId: number) => void;
 }
 
 export default function ThreePanelLayout({
+  children,
   patientId,
-  patientLanguage = 'english',
+  patientLanguage,
   onSendMessage,
-  onPatientSelect,
-  children
+  onPatientSelect
 }: ThreePanelLayoutProps) {
-  const [showSearch, setShowSearch] = useState(false);
+  const [leftPanelOpen, setLeftPanelOpen] = useState(true);
+  const [rightPanelOpen, setRightPanelOpen] = useState(false);
+  
+  const toggleLeftPanel = () => {
+    setLeftPanelOpen(!leftPanelOpen);
+  };
+  
+  const toggleRightPanel = () => {
+    setRightPanelOpen(!rightPanelOpen);
+  };
   
   return (
-    <div className="flex flex-1 overflow-hidden">
-      {/* Left Panel - Pending Items */}
-      <div className="w-1/4 border-r border-gray-800 overflow-y-auto">
-        <PendingItemsPanel patientId={patientId} />
-      </div>
-      
-      {/* Middle Panel - AI Assistant */}
-      <div className="w-1/3 border-r border-gray-800 overflow-y-auto">
-        <AiAssistantPanel 
-          patientId={patientId} 
-          patientLanguage={patientLanguage}
-          onSendMessage={onSendMessage}
-        />
-      </div>
-      
-      {/* Right Panel - Patient Conversation or Search */}
-      <div className="flex-1 flex flex-col">
-        {/* Search Toggle Button */}
-        <div className="absolute top-16 right-4 z-10">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setShowSearch(!showSearch)}
-            className="bg-gray-800 text-gray-200 hover:bg-gray-700"
+    <div className="h-screen flex flex-col bg-[#121212] text-white">
+      {/* Header */}
+      <header className="h-14 border-b border-gray-800 bg-[#1e1e1e] flex items-center justify-between px-4">
+        <div className="flex items-center">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={toggleLeftPanel}
+            className="mr-2"
           >
-            {showSearch ? <X size={18} /> : <Search size={18} />}
+            {leftPanelOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </Button>
+          <h1 className="text-lg font-semibold">Telemedicine Platform</h1>
         </div>
         
-        {/* Show either Patient Search or Conversation */}
-        {showSearch ? (
-          <PatientSearchPanel onPatientSelect={(selectedId) => {
-            onPatientSelect(selectedId);
-            setShowSearch(false);
-          }} />
-        ) : (
-          children
-        )}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleRightPanel}
+        >
+          {rightPanelOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+        </Button>
+      </header>
+      
+      {/* Main Content */}
+      <div className="flex-1 overflow-hidden">
+        <ResizablePanelGroup 
+          direction="horizontal" 
+          className="h-full"
+        >
+          {/* Left Panel - Pending Items */}
+          {leftPanelOpen && (
+            <>
+              <ResizablePanel 
+                defaultSize={20} 
+                minSize={15}
+                maxSize={30}
+                className="bg-[#121212]"
+              >
+                <PendingItemsPanel patientId={patientId} />
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+            </>
+          )}
+          
+          {/* Middle Panel - Main Content */}
+          <ResizablePanel defaultSize={leftPanelOpen ? (rightPanelOpen ? 50 : 80) : (rightPanelOpen ? 70 : 100)}>
+            <ResizablePanelGroup direction="vertical">
+              {/* Conversation Area */}
+              <ResizablePanel defaultSize={65}>
+                {children}
+              </ResizablePanel>
+              
+              <ResizableHandle withHandle />
+              
+              {/* AI Assistant Area */}
+              <ResizablePanel defaultSize={35}>
+                <AiAssistantPanel 
+                  patientId={patientId}
+                  language={patientLanguage}
+                  onSendMessage={onSendMessage}
+                />
+              </ResizablePanel>
+            </ResizablePanelGroup>
+          </ResizablePanel>
+          
+          {/* Right Panel - Patient Search */}
+          {rightPanelOpen && (
+            <>
+              <ResizableHandle withHandle />
+              <ResizablePanel 
+                defaultSize={25} 
+                minSize={20}
+                maxSize={40}
+              >
+                <PatientSearchPanel onPatientSelect={onPatientSelect} />
+              </ResizablePanel>
+            </>
+          )}
+        </ResizablePanelGroup>
       </div>
     </div>
   );

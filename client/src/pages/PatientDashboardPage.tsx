@@ -1,331 +1,88 @@
-import { useState } from "react";
-import MainNavbar from "@/components/layout/MainNavbar";
-import ThreePanelLayout from "@/components/dashboard/ThreePanelLayout";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Check, MessageSquare, Send } from "lucide-react";
-import { useRef, useEffect } from "react";
-import axios from "axios";
-import { useQuery } from "@tanstack/react-query";
-
-// Use the actual patient ID from the screenshot
-const PATIENT_ID = 4; // Nicolas Girard
-const DOCTOR_NAME = "Dr. Carlos Faviel Font";
-
-interface Message {
-  id: string;
-  patientId: number;
-  content: string;
-  timestamp: string;
-  isFromPatient: boolean;
-  sender?: string;
-}
+import React, { useState } from 'react';
+import { useLocation } from 'wouter';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Stethoscope, ChevronRight, UserRound, Calendar } from 'lucide-react';
+import PatientSearchPanel from '@/components/patients/PatientSearchPanel';
 
 export default function PatientDashboardPage() {
-  const [messageText, setMessageText] = useState("");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [, setLocation] = useLocation();
   
-  // Use a hardcoded patient for demonstration
-  const [patient] = useState({
-    id: PATIENT_ID,
-    name: "Nicolas Girard",
-    initials: "NG",
-    gender: "Male",
-    dateOfBirth: "1982-04-15",
-    phone: "+1 (555) 123-4567",
-    email: "nicolas.girard@example.com",
-    language: "french" as "french" | "english"
-  });
-  
-  // Fetch messages from the API
-  const { data: fetchedMessages = [], isLoading: messagesLoading } = useQuery({
-    queryKey: [`/api/patients/${PATIENT_ID}/messages`],
-    queryFn: async () => {
-      try {
-        const response = await axios.get(`/api/patients/${PATIENT_ID}/messages`);
-        return response.data;
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-        return [];
-      }
-    },
-    refetchOnWindowFocus: false
-  });
-  
-  // Default messages if API call returns empty
-  const defaultMessages: Message[] = [
-    {
-      id: "default-1",
-      patientId: PATIENT_ID,
-      content: "Bonjour Dr. Font, je voudrais prendre un rendez-vous pour discuter de mes résultats de laboratoire récents.",
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-      isFromPatient: true
-    },
-    {
-      id: "default-2",
-      patientId: PATIENT_ID,
-      content: "Bonjour M. Girard, j'ai consulté vos résultats. Quand seriez-vous disponible pour une consultation?",
-      timestamp: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString(), // 1.5 hours ago
-      isFromPatient: false,
-      sender: DOCTOR_NAME
-    }
-  ];
-  
-  // Use fetched messages if available, otherwise use defaults for demo purposes
-  const [messages, setMessages] = useState<Message[]>(
-    fetchedMessages.length > 0 ? fetchedMessages : defaultMessages
-  );
-  
-  // Update messages when fetchedMessages changes
-  useEffect(() => {
-    if (fetchedMessages.length > 0) {
-      setMessages(fetchedMessages);
-    }
-  }, [fetchedMessages]);
-  
-  // Scroll to bottom whenever messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-  
-  // Handle sending a message
-  const handleSendMessage = (content: string) => {
-    if (!content.trim()) return;
-    
-    const newMessage: Message = {
-      id: `${Date.now()}`,
-      patientId: PATIENT_ID,
-      content,
-      timestamp: new Date().toISOString(),
-      isFromPatient: false,
-      sender: DOCTOR_NAME
-    };
-    
-    setMessages([...messages, newMessage]);
-    setMessageText("");
+  // Handle patient selection
+  const handlePatientSelect = (patientId: number) => {
+    setLocation(`/patients/${patientId}`);
   };
   
-  // Format timestamp to display AM/PM time
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
-  
-  // Check if the message is from today
-  const isToday = (timestamp: string) => {
-    const date = new Date(timestamp);
-    const today = new Date();
-    return date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear();
-  };
-  
-  // Group messages by date
-  const messagesByDate: Record<string, Message[]> = {};
-  
-  messages.forEach((message: Message) => {
-    const date = new Date(message.timestamp);
-    const dateKey = isToday(message.timestamp) ? 
-      'Today' : 
-      date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-    
-    if (!messagesByDate[dateKey]) {
-      messagesByDate[dateKey] = [];
-    }
-    messagesByDate[dateKey].push(message);
-  });
-  
-  const sortedDates = Object.keys(messagesByDate).sort((a, b) => {
-    if (a === 'Today') return 1;
-    if (b === 'Today') return -1;
-    return new Date(b).getTime() - new Date(a).getTime();
-  });
-  
-  // Conversation component that will be passed to the ThreePanelLayout
-  const Conversation = () => (
-    <div className="flex flex-col h-full">
-      {/* Conversation Header */}
-      <header className="flex justify-between items-center p-4 border-b border-gray-800">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 bg-blue-500">
-            <AvatarFallback>{patient.initials}</AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="font-semibold">{patient.name}</h1>
-            <p className="text-sm text-gray-400">Last active: 07:34 AM</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-400">
-                  <MessageSquare size={20} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>New conversation</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-400">
-                  <Check size={20} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Mark as resolved</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+  return (
+    <div className="min-h-screen bg-[#121212] text-white p-4">
+      <header className="mb-8">
+        <h1 className="text-2xl font-bold mb-2">Telemedicine Dashboard</h1>
+        <p className="text-gray-400">Select a patient to start a consultation</p>
       </header>
       
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
-        {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-400">
-            <MessageSquare size={40} className="mb-2" />
-            <p>No messages yet</p>
-          </div>
-        ) : (
-          sortedDates.map(dateKey => (
-            <div key={dateKey} className="space-y-4">
-              <div className="flex justify-center">
-                <div className="bg-gray-800 text-gray-300 rounded-full px-4 py-1 text-sm">
-                  {dateKey}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Patient Search Panel */}
+        <div className="md:col-span-2 bg-[#1e1e1e] rounded-lg overflow-hidden border border-gray-800 shadow-lg h-[600px]">
+          <PatientSearchPanel onPatientSelect={handlePatientSelect} />
+        </div>
+        
+        {/* Quick Actions */}
+        <div className="space-y-4">
+          <Card className="bg-[#1e1e1e] border-gray-800 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button 
+                variant="outline" 
+                className="w-full justify-between bg-[#262626] hover:bg-[#333] border-gray-700"
+                onClick={() => setLocation('/')}
+              >
+                <div className="flex items-center">
+                  <Stethoscope className="h-4 w-4 mr-2" />
+                  <span>Patient Consultation</span>
                 </div>
-              </div>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
               
-              {messagesByDate[dateKey].map(message => (
-                <div 
-                  key={message.id} 
-                  className={`flex items-start gap-2 ${!message.isFromPatient ? 'justify-end' : 'justify-start'}`}
-                >
-                  {message.isFromPatient && (
-                    <Avatar className="h-10 w-10 mt-1 bg-blue-500">
-                      <AvatarFallback>{patient.initials}</AvatarFallback>
-                    </Avatar>
-                  )}
-                  
-                  <div 
-                    className={`max-w-[75%] rounded-lg p-3 ${
-                      !message.isFromPatient 
-                        ? 'bg-[#1e3a50] text-white' 
-                        : 'bg-[#2a2a2a] text-white'
-                    }`}
-                  >
-                    {!message.isFromPatient && (
-                      <div className="text-xs text-gray-400 mb-1">{message.sender || DOCTOR_NAME}</div>
-                    )}
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    <div className="text-right text-xs text-gray-400 mt-1">
-                      {formatTimestamp(message.timestamp)}
-                    </div>
-                  </div>
-                  
-                  {!message.isFromPatient && (
-                    <Avatar className="h-10 w-10 mt-1 bg-blue-600">
-                      <AvatarFallback>CF</AvatarFallback>
-                    </Avatar>
-                  )}
+              <Button 
+                variant="outline" 
+                className="w-full justify-between bg-[#262626] hover:bg-[#333] border-gray-700"
+                onClick={() => window.open('https://spruce.care', '_blank')}
+              >
+                <div className="flex items-center">
+                  <UserRound className="h-4 w-4 mr-2" />
+                  <span>Spruce Dashboard</span>
                 </div>
-              ))}
-            </div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-      
-      {/* Message Input */}
-      <div className="p-4 border-t border-gray-800">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              placeholder="Type your message..."
-              className="w-full px-4 py-2 rounded-full bg-[#2a2a2a] border border-gray-700 text-white focus:outline-none focus:border-blue-500"
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage(messageText);
-                }
-              }}
-            />
-            
-            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-gray-400 h-8 w-8">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                      </svg>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Attach file</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
               
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-gray-400 h-8 w-8">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
-                        <line x1="9" y1="9" x2="9.01" y2="9"></line>
-                        <line x1="15" y1="9" x2="15.01" y2="9"></line>
-                      </svg>
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Add emoji</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          </div>
+              <Button 
+                variant="outline" 
+                className="w-full justify-between bg-[#262626] hover:bg-[#333] border-gray-700"
+              >
+                <div className="flex items-center">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  <span>Schedule Appointment</span>
+                </div>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </CardContent>
+          </Card>
           
-          <Button 
-            onClick={() => handleSendMessage(messageText)} 
-            disabled={!messageText.trim()}
-            className="rounded-full h-10 w-10 p-0 flex items-center justify-center bg-blue-600 hover:bg-blue-700"
-          >
-            <Send size={16} />
-          </Button>
+          {/* Recent Patients Section */}
+          <Card className="bg-[#1e1e1e] border-gray-800 shadow-lg">
+            <CardHeader>
+              <CardTitle className="text-lg">Recent Patients</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-gray-500 text-center py-6">
+                Recent patients will appear here
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
-    </div>
-  );
-
-  return (
-    <div className="flex flex-col min-h-screen bg-[#121212] text-white">
-      {/* Main Navigation Bar */}
-      <MainNavbar />
-      
-      {/* Three Panel Layout */}
-      <ThreePanelLayout
-        patientId={patient.id}
-        patientLanguage={patient.language}
-        onSendMessage={handleSendMessage}
-      >
-        <Conversation />
-      </ThreePanelLayout>
     </div>
   );
 }
