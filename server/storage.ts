@@ -225,6 +225,109 @@ export class MemStorage implements IStorage {
     this.formSubmissions.set(id, submission);
     return submission;
   }
+
+  // Pending Items operations
+  async getPendingItemsByPatientId(patientId: number): Promise<PendingItem[]> {
+    return Array.from(this.pendingItems.values())
+      .filter(item => item.patientId === patientId)
+      .sort((a, b) => {
+        // Sort by priority (high, medium, low)
+        const priorityOrder = { high: 0, medium: 1, low: 2 };
+        const priorityDiff = priorityOrder[a.priority as keyof typeof priorityOrder] - 
+                            priorityOrder[b.priority as keyof typeof priorityOrder];
+        
+        if (priorityDiff !== 0) return priorityDiff;
+        
+        // Then by due date if available
+        if (a.dueDate && b.dueDate) {
+          return a.dueDate.getTime() - b.dueDate.getTime();
+        }
+        
+        return 0;
+      });
+  }
+  
+  async getAllPendingItems(): Promise<PendingItem[]> {
+    return Array.from(this.pendingItems.values());
+  }
+  
+  async getPendingItemById(id: string): Promise<PendingItem | undefined> {
+    return this.pendingItems.get(id);
+  }
+  
+  async createPendingItem(item: InsertPendingItem): Promise<PendingItem> {
+    const id = crypto.randomUUID();
+    const pendingItem: PendingItem = {
+      ...item,
+      id,
+      createdAt: new Date(),
+      completedAt: null,
+    };
+    this.pendingItems.set(id, pendingItem);
+    return pendingItem;
+  }
+  
+  async updatePendingItem(id: string, itemUpdate: Partial<InsertPendingItem>): Promise<PendingItem | undefined> {
+    const existingItem = this.pendingItems.get(id);
+    if (!existingItem) return undefined;
+    
+    const updatedItem = { ...existingItem, ...itemUpdate };
+    this.pendingItems.set(id, updatedItem);
+    return updatedItem;
+  }
+  
+  async deletePendingItem(id: string): Promise<boolean> {
+    return this.pendingItems.delete(id);
+  }
+  
+  // Preventative Care operations
+  async getPreventativeCareByPatientId(patientId: number): Promise<PreventativeCare[]> {
+    return Array.from(this.preventativeCare.values())
+      .filter(item => item.patientId === patientId)
+      .sort((a, b) => {
+        if (a.suggestedDate && b.suggestedDate) {
+          return a.suggestedDate.getTime() - b.suggestedDate.getTime();
+        }
+        return 0;
+      });
+  }
+  
+  async getPreventativeCareById(id: string): Promise<PreventativeCare | undefined> {
+    return this.preventativeCare.get(id);
+  }
+  
+  async createPreventativeCare(item: InsertPreventativeCare): Promise<PreventativeCare> {
+    const id = crypto.randomUUID();
+    const preventativeCareItem: PreventativeCare = {
+      ...item,
+      id,
+      sentDate: null,
+      responseDate: null,
+      responseContent: null,
+      createdAt: new Date(),
+    };
+    this.preventativeCare.set(id, preventativeCareItem);
+    return preventativeCareItem;
+  }
+  
+  async updatePreventativeCare(id: string, itemUpdate: Partial<InsertPreventativeCare>): Promise<PreventativeCare | undefined> {
+    const existingItem = this.preventativeCare.get(id);
+    if (!existingItem) return undefined;
+    
+    const updatedItem = { ...existingItem, ...itemUpdate };
+    this.preventativeCare.set(id, updatedItem);
+    return updatedItem;
+  }
+  
+  async deletePreventativeCare(id: string): Promise<boolean> {
+    return this.preventativeCare.delete(id);
+  }
+  
+  async getNextPreventativeCareItem(patientId: number): Promise<PreventativeCare | undefined> {
+    const items = await this.getPreventativeCareByPatientId(patientId);
+    // Get the next suggested item that hasn't been sent yet
+    return items.find(item => item.status === "suggested");
+  }
 }
 
 export const storage = new MemStorage();

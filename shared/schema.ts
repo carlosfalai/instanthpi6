@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, uuid } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, uuid, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -224,3 +224,129 @@ export const insertAiSettingsSchema = createInsertSchema(aiSettings).pick({
 
 export type AiSettings = typeof aiSettings.$inferSelect;
 export type InsertAiSettings = z.infer<typeof insertAiSettingsSchema>;
+
+// Chronic Conditions model
+export const chronicConditions = pgTable("chronic_conditions", {
+  id: serial("id").primaryKey(),
+  patientId: integer("patient_id").notNull().references(() => patients.id),
+  name: text("name").notNull(),
+  status: text("status", { enum: ["active", "resolved", "managed"] }).notNull().default("active"),
+  diagnosisDate: timestamp("diagnosis_date"),
+  lastReviewDate: timestamp("last_review_date"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertChronicConditionSchema = createInsertSchema(chronicConditions).pick({
+  patientId: true,
+  name: true,
+  status: true,
+  diagnosisDate: true,
+  lastReviewDate: true,
+  notes: true,
+});
+
+export type ChronicCondition = typeof chronicConditions.$inferSelect;
+export type InsertChronicCondition = z.infer<typeof insertChronicConditionSchema>;
+
+// Medications model
+export const medications = pgTable("medications", {
+  id: serial("id").primaryKey(),
+  patientId: integer("patient_id").notNull().references(() => patients.id),
+  name: text("name").notNull(),
+  dosage: text("dosage").notNull(),
+  frequency: text("frequency").notNull(),
+  startDate: timestamp("start_date"),
+  endDate: timestamp("end_date"),
+  isActive: boolean("is_active").default(true),
+  renewalDate: timestamp("renewal_date"),
+  prescribedBy: text("prescribed_by"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertMedicationSchema = createInsertSchema(medications).pick({
+  patientId: true,
+  name: true,
+  dosage: true,
+  frequency: true,
+  startDate: true,
+  endDate: true,
+  isActive: true,
+  renewalDate: true,
+  prescribedBy: true,
+  notes: true,
+});
+
+export type Medication = typeof medications.$inferSelect;
+export type InsertMedication = z.infer<typeof insertMedicationSchema>;
+
+// Patient Documents model
+export const patientDocuments = pgTable("patient_documents", {
+  id: serial("id").primaryKey(),
+  patientId: integer("patient_id").notNull().references(() => patients.id),
+  title: text("title").notNull(),
+  documentType: text("document_type", { 
+    enum: ["lab_result", "imaging", "consultation", "prescription", "other"] 
+  }).notNull(),
+  fileUrl: text("file_url").notNull(),
+  fileContentType: text("file_content_type"),
+  uploadDate: timestamp("upload_date").defaultNow(),
+  documentDate: timestamp("document_date"),
+  sourceSystem: text("source_system"),
+  // AI-processed fields
+  interpretationSummary: text("interpretation_summary"),
+  verificationStatus: text("verification_status", { 
+    enum: ["unverified", "in_progress", "verified", "conflict"] 
+  }).default("unverified"),
+  keyFindings: text("key_findings"),
+  actionNeeded: boolean("action_needed").default(false),
+  aiProcessedAt: timestamp("ai_processed_at"),
+});
+
+export const insertPatientDocumentSchema = createInsertSchema(patientDocuments).pick({
+  patientId: true,
+  title: true,
+  documentType: true,
+  fileUrl: true,
+  fileContentType: true,
+  documentDate: true,
+  sourceSystem: true,
+  interpretationSummary: true,
+  verificationStatus: true,
+  keyFindings: true,
+  actionNeeded: true,
+});
+
+export type PatientDocument = typeof patientDocuments.$inferSelect;
+export type InsertPatientDocument = z.infer<typeof insertPatientDocumentSchema>;
+
+// AI Document Verification model
+export const aiDocumentVerifications = pgTable("ai_document_verifications", {
+  id: serial("id").primaryKey(),
+  documentId: integer("document_id").notNull().references(() => patientDocuments.id),
+  modelName: text("model_name").notNull(), // "openai", "anthropic", "xai"
+  modelVersion: text("model_version").notNull(),
+  interpretationSummary: text("interpretation_summary"),
+  keyFindings: text("key_findings"),
+  confidenceScore: text("confidence_score"),
+  actionRecommended: boolean("action_recommended").default(false),
+  processingTime: text("processing_time"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertAiDocumentVerificationSchema = createInsertSchema(aiDocumentVerifications).pick({
+  documentId: true,
+  modelName: true,
+  modelVersion: true,
+  interpretationSummary: true,
+  keyFindings: true,
+  confidenceScore: true,
+  actionRecommended: true,
+  processingTime: true,
+});
+
+export type AiDocumentVerification = typeof aiDocumentVerifications.$inferSelect;
+export type InsertAiDocumentVerification = z.infer<typeof insertAiDocumentVerificationSchema>;
