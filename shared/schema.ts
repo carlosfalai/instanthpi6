@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, uuid } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -111,6 +111,34 @@ export const insertFormSubmissionSchema = createInsertSchema(formSubmissions).pi
   submittedAt: true,
 });
 
+// Pending Items model for tracking medical tasks
+export const pendingItems = pgTable("pending_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientId: integer("patient_id").notNull(),
+  type: text("type").notNull(), // 'test', 'imaging', 'bloodwork', 'referral', 'other'
+  description: text("description").notNull(),
+  requestedDate: timestamp("requested_date"),
+  dueDate: timestamp("due_date"),
+  priority: text("priority").notNull().default("medium"), // 'high', 'medium', 'low'
+  status: text("status").notNull().default("pending"), // 'pending', 'completed', 'cancelled'
+  messageId: integer("message_id"), // Optional link to the message where this was mentioned
+  createdAt: timestamp("created_at").defaultNow(),
+  completedAt: timestamp("completed_at"),
+  notes: text("notes"),
+});
+
+export const insertPendingItemSchema = createInsertSchema(pendingItems).pick({
+  patientId: true,
+  type: true,
+  description: true,
+  requestedDate: true,
+  dueDate: true,
+  priority: true,
+  status: true,
+  messageId: true,
+  notes: true,
+});
+
 // Export types for use in the application
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -126,3 +154,6 @@ export type InsertAIDocumentation = z.infer<typeof insertAiDocumentationSchema>;
 
 export type FormSubmission = typeof formSubmissions.$inferSelect;
 export type InsertFormSubmission = z.infer<typeof insertFormSubmissionSchema>;
+
+export type PendingItem = typeof pendingItems.$inferSelect;
+export type InsertPendingItem = z.infer<typeof insertPendingItemSchema>;
