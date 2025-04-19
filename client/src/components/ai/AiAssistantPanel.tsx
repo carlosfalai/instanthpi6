@@ -1,291 +1,276 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { Loader2, Send, ChevronDown, ChevronUp, Bot } from 'lucide-react';
+import { SendHorizontal, Loader2, Sparkles, X, MessageSquare } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import { queryClient, apiRequest } from '@/lib/queryClient';
+import { Checkbox } from '@/components/ui/checkbox';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 
 interface AiAssistantPanelProps {
   patientId: number;
-  patientLanguage?: 'english' | 'french';
-  onSendMessage?: (message: string) => void;
+  language: 'english' | 'french';
+  onSendMessage: (content: string) => void;
 }
 
-interface AIDocumentation {
-  id: number;
-  patientId: number;
-  hpi: string | null;
-  subjective: string | null;
-  objective: string | null;
-  assessment: string | null;
-  plan: string | null;
-  followUpQuestions: {
-    questions: string[];
-  } | null;
-  prescription: {
-    medications: {
-      name: string;
-      dosage: string;
-      instructions: string;
-    }[];
-  } | null;
-  isApproved: boolean | null;
-}
-
-interface Suggestion {
+interface SuggestionItem {
   id: string;
-  content: string;
-  selected: boolean;
+  text: string;
+  type: string;
+  isSelected?: boolean;
 }
 
 export default function AiAssistantPanel({ 
   patientId, 
-  patientLanguage = 'english',
+  language, 
   onSendMessage 
 }: AiAssistantPanelProps) {
-  const [selectedFollowUp, setSelectedFollowUp] = useState<string[]>([]);
-  const [selectedPlans, setSelectedPlans] = useState<string[]>([]);
-  const [customMessage, setCustomMessage] = useState('');
+  const [customPrompt, setCustomPrompt] = useState('');
+  const [selectedSuggestions, setSelectedSuggestions] = useState<Record<string, boolean>>({});
   
-  // Fetch AI documentation for the patient
+  // Query for AI suggestions
   const { 
-    data: aiDoc, 
-    isLoading: docLoading,
-    error: docError
-  } = useQuery<AIDocumentation>({
-    queryKey: [`/api/ai/documentation/${patientId}`],
+    data: suggestions = [], 
+    isLoading: suggestionsLoading 
+  } = useQuery<SuggestionItem[]>({
+    queryKey: ['/api/ai/suggestions', patientId, language],
     enabled: !!patientId,
   });
-
-  // Send the selected options or custom message
-  const sendSuggestionsMutation = useMutation({
+  
+  // Group suggestions by type
+  const followUpSuggestions = suggestions.filter(s => s.type === 'followup');
+  const responseSuggestions = suggestions.filter(s => s.type === 'response');
+  const planSuggestions = suggestions.filter(s => s.type === 'plan');
+  
+  // Generate custom prompt mutation
+  const generateMutation = useMutation({
     mutationFn: async () => {
-      // Compile the selected options into a single message
-      let message = '';
-      
-      if (selectedFollowUp.length > 0) {
-        message += selectedFollowUp.join('\n\n') + '\n\n';
+      const res = await apiRequest('POST', '/api/ai/generate', {
+        prompt: customPrompt,
+        patientId,
+        patientLanguage: language,
+        maxLength: 5
+      });
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      if (data?.text) {
+        onSendMessage(data.text);
+        setCustomPrompt('');
       }
-      
-      if (selectedPlans.length > 0) {
-        message += selectedPlans.join('\n\n');
-      }
-      
-      if (customMessage) {
-        message += (message ? '\n\n' : '') + customMessage;
-      }
-      
-      if (onSendMessage && message) {
-        onSendMessage(message);
-        
-        // Reset selections after sending
-        setSelectedFollowUp([]);
-        setSelectedPlans([]);
-        setCustomMessage('');
-      }
-      
-      return message;
     },
   });
   
-  // Extract follow-up questions from AI documentation
-  const followUpQuestions = aiDoc?.followUpQuestions?.questions || [];
-  
-  // Extract plan suggestions
-  const planSuggestions = aiDoc?.plan 
-    ? aiDoc.plan.split('\n').filter(line => line.trim().length > 0)
-    : [];
-  
-  // Toggle a follow-up question selection
-  const toggleFollowUp = (question: string) => {
-    if (selectedFollowUp.includes(question)) {
-      setSelectedFollowUp(selectedFollowUp.filter(q => q !== question));
-    } else {
-      setSelectedFollowUp([...selectedFollowUp, question]);
-    }
-  };
-  
-  // Toggle a plan suggestion selection
-  const togglePlan = (plan: string) => {
-    if (selectedPlans.includes(plan)) {
-      setSelectedPlans(selectedPlans.filter(p => p !== plan));
-    } else {
-      setSelectedPlans([...selectedPlans, plan]);
-    }
-  };
-  
-  // Get any selected items to send
-  const hasSelections = selectedFollowUp.length > 0 || selectedPlans.length > 0 || customMessage.trim().length > 0;
-  
-  // Is the send mutation in progress
-  const isSending = sendSuggestionsMutation.isPending;
-  
-  // Helper for formatting SOAP sections
-  const formatSOAP = (title: string, content: string | null) => {
-    if (!content) return null;
+  // Send selected suggestions
+  const sendSelectedSuggestions = () => {
+    const selectedItems = suggestions.filter(s => selectedSuggestions[s.id]);
+    if (selectedItems.length === 0) return;
     
-    return (
-      <div className="mb-4">
-        <h3 className="font-medium text-lg mb-1">{title}</h3>
-        <div className="text-sm text-gray-300 whitespace-pre-line">
-          {content}
-        </div>
-      </div>
-    );
+    // Combine selected items into a single message
+    let message = '';
+    
+    const planItems = selectedItems.filter(s => s.type === 'plan');
+    if (planItems.length > 0) {
+      const planHeader = language === 'french' ? 'Plan:' : 'Plan:';
+      message += `${planHeader}\n`;
+      planItems.forEach(item => {
+        message += `• ${item.text}\n`;
+      });
+      message += '\n';
+    }
+    
+    const followUpItems = selectedItems.filter(s => s.type === 'followup');
+    if (followUpItems.length > 0) {
+      const followUpHeader = language === 'french' ? 'Questions de suivi:' : 'Follow-up questions:';
+      message += `${followUpHeader}\n`;
+      followUpItems.forEach(item => {
+        message += `• ${item.text}\n`;
+      });
+    }
+    
+    // Send the combined message
+    if (message) {
+      onSendMessage(message.trim());
+      // Clear selections
+      setSelectedSuggestions({});
+    }
+  };
+  
+  // Toggle suggestion selection
+  const toggleSuggestion = (id: string) => {
+    setSelectedSuggestions(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
   };
   
   return (
-    <div className="h-full flex flex-col bg-[#121212] text-white">
-      {/* Header */}
-      <div className="bg-[#1e1e1e] p-4 border-b border-gray-800 flex items-center">
-        <div className="flex items-center gap-2">
-          <Bot className="h-5 w-5 text-blue-500" />
-          <h2 className="font-semibold">AI Assistant</h2>
+    <div className="flex flex-col h-full bg-[#121212] text-white">
+      <Tabs defaultValue="suggestions" className="h-full flex flex-col">
+        <div className="p-3 bg-[#1e1e1e] border-b border-gray-800">
+          <h2 className="font-semibold mb-3">AI Assistant</h2>
+          <TabsList className="w-full bg-[#262626]">
+            <TabsTrigger value="suggestions" className="flex-1 data-[state=active]:bg-blue-600">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Suggestions
+            </TabsTrigger>
+            <TabsTrigger value="custom" className="flex-1 data-[state=active]:bg-blue-600">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Custom
+            </TabsTrigger>
+          </TabsList>
         </div>
-        <div className="ml-auto text-xs text-gray-400">
-          {patientLanguage === 'english' ? 'English' : 'Français'}
-        </div>
-      </div>
-      
-      {/* Content */}
-      <ScrollArea className="flex-1 p-4">
-        {docLoading && (
-          <div className="flex flex-col items-center justify-center h-40 text-gray-400">
-            <Loader2 className="h-8 w-8 animate-spin mb-2" />
-            <p className="text-sm">Analyzing patient data...</p>
-          </div>
-        )}
         
-        {docError && (
-          <div className="text-red-400 text-center p-4">
-            Failed to load AI documentation
-          </div>
-        )}
+        <TabsContent value="suggestions" className="flex-1 flex flex-col p-0 m-0">
+          <ScrollArea className="flex-1 p-4">
+            {suggestionsLoading ? (
+              <div className="flex justify-center items-center h-32">
+                <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+              </div>
+            ) : (
+              <>
+                {followUpSuggestions.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">
+                      {language === 'french' ? 'Questions de suivi' : 'Follow-up Questions'}
+                    </h3>
+                    <div className="space-y-2">
+                      {followUpSuggestions.map((suggestion) => (
+                        <div 
+                          key={suggestion.id}
+                          className="flex items-start p-2 rounded bg-[#1e1e1e] hover:bg-[#262626]"
+                        >
+                          <Checkbox
+                            checked={!!selectedSuggestions[suggestion.id]}
+                            onCheckedChange={() => toggleSuggestion(suggestion.id)}
+                            className="mr-3 mt-1"
+                          />
+                          <div>{suggestion.text}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {planSuggestions.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">
+                      {language === 'french' ? 'Plan' : 'Plan'}
+                    </h3>
+                    <div className="space-y-2">
+                      {planSuggestions.map((suggestion) => (
+                        <div 
+                          key={suggestion.id}
+                          className="flex items-start p-2 rounded bg-[#1e1e1e] hover:bg-[#262626]"
+                        >
+                          <Checkbox
+                            checked={!!selectedSuggestions[suggestion.id]}
+                            onCheckedChange={() => toggleSuggestion(suggestion.id)}
+                            className="mr-3 mt-1"
+                          />
+                          <div>{suggestion.text}</div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {responseSuggestions.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-400 mb-2">
+                      {language === 'french' ? 'Réponses proposées' : 'Suggested Responses'}
+                    </h3>
+                    <div className="space-y-2">
+                      {responseSuggestions.map((suggestion) => (
+                        <div 
+                          key={suggestion.id}
+                          className="p-2 rounded bg-[#1e1e1e] hover:bg-[#262626]"
+                        >
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start text-left font-normal h-auto whitespace-normal"
+                            onClick={() => onSendMessage(suggestion.text)}
+                          >
+                            {suggestion.text}
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                {suggestions.length === 0 && (
+                  <div className="text-gray-500 text-center">
+                    No suggestions available for this patient yet
+                  </div>
+                )}
+              </>
+            )}
+          </ScrollArea>
+          
+          {/* Send button for selected suggestions */}
+          {Object.values(selectedSuggestions).some(v => v) && (
+            <div className="p-3 bg-[#1e1e1e] border-t border-gray-800 flex justify-between items-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedSuggestions({})}
+                className="text-xs"
+              >
+                <X className="h-3 w-3 mr-1" /> Clear Selection
+              </Button>
+              
+              <Button
+                onClick={sendSelectedSuggestions}
+                size="sm"
+                className="text-xs"
+              >
+                <SendHorizontal className="h-3 w-3 mr-1" /> Send Selected
+              </Button>
+            </div>
+          )}
+        </TabsContent>
         
-        {aiDoc && (
-          <>
-            {/* SOAP Notes */}
-            <Accordion type="single" collapsible defaultValue="item-1" className="mb-6">
-              <AccordionItem value="item-1" className="border-gray-800">
-                <AccordionTrigger className="hover:no-underline hover:bg-[#262626] px-2 rounded-md">
-                  <span className="text-sm font-medium">SOAP Notes</span>
-                </AccordionTrigger>
-                <AccordionContent className="px-2 py-2">
-                  {formatSOAP("HPI", aiDoc.hpi)}
-                  {formatSOAP("Subjective", aiDoc.subjective)}
-                  {formatSOAP("Objective", aiDoc.objective)}
-                  {formatSOAP("Assessment", aiDoc.assessment)}
-                  {formatSOAP("Plan", aiDoc.plan)}
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
+        <TabsContent value="custom" className="flex-1 flex flex-col p-0 m-0">
+          <div className="flex-1 p-4">
+            <p className="text-sm text-gray-400 mb-4">
+              {language === 'french' 
+                ? "Générer une réponse personnalisée ou une documentation à l'aide de l'IA" 
+                : "Generate a custom response or documentation using AI"}
+            </p>
             
-            {/* Follow-up Questions */}
-            {followUpQuestions.length > 0 && (
-              <div className="mb-6">
-                <h3 className="font-medium mb-3">Suggested Follow-up Questions</h3>
-                <div className="space-y-2">
-                  {followUpQuestions.map((question, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <Checkbox 
-                        id={`question-${idx}`} 
-                        checked={selectedFollowUp.includes(question)}
-                        onCheckedChange={() => toggleFollowUp(question)}
-                        className="mt-1"
-                      />
-                      <label 
-                        htmlFor={`question-${idx}`}
-                        className="text-sm cursor-pointer hover:text-blue-400 transition-colors"
-                      >
-                        {question}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            <Textarea
+              placeholder={language === 'french' 
+                ? "Entrez votre requête ici (par exemple 'créer une note SOAP pour cette consultation')" 
+                : "Enter your prompt here (e.g. 'create a SOAP note for this consultation')"}
+              value={customPrompt}
+              onChange={(e) => setCustomPrompt(e.target.value)}
+              className="min-h-[200px] bg-[#1e1e1e] border-gray-700 text-white"
+            />
             
-            {/* Plan Suggestions */}
-            {planSuggestions.length > 0 && (
-              <div className="mb-6">
-                <h3 className="font-medium mb-3">Plan Suggestions</h3>
-                <div className="space-y-2">
-                  {planSuggestions.map((plan, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <Checkbox 
-                        id={`plan-${idx}`} 
-                        checked={selectedPlans.includes(plan)}
-                        onCheckedChange={() => togglePlan(plan)}
-                        className="mt-1"
-                      />
-                      <label 
-                        htmlFor={`plan-${idx}`}
-                        className="text-sm cursor-pointer hover:text-blue-400 transition-colors"
-                      >
-                        {plan}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {generateMutation.error && (
+              <p className="text-red-400 mt-2 text-sm">
+                Error generating response. Please try again.
+              </p>
             )}
-            
-            {/* Prescription Suggestions */}
-            {aiDoc.prescription && aiDoc.prescription.medications.length > 0 && (
-              <div className="mb-6">
-                <h3 className="font-medium mb-3">Prescription Suggestions</h3>
-                <div className="space-y-3">
-                  {aiDoc.prescription.medications.map((med, idx) => (
-                    <div 
-                      key={idx} 
-                      className="bg-[#1e1e1e] border border-gray-800 rounded-md p-3"
-                    >
-                      <div className="font-medium text-sm">{med.name}</div>
-                      <div className="text-sm text-gray-400">{med.dosage}</div>
-                      <div className="text-xs text-gray-500 mt-1">{med.instructions}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </ScrollArea>
-      
-      {/* Message input */}
-      <div className="p-3 bg-[#1e1e1e] border-t border-gray-800">
-        <Textarea
-          placeholder="Write a custom message..."
-          value={customMessage}
-          onChange={(e) => setCustomMessage(e.target.value)}
-          className="resize-none mb-3 bg-[#262626] border-gray-700 focus:border-blue-500 text-white"
-          rows={2}
-        />
-        <div className="flex justify-between">
-          <div className="text-xs text-gray-500">
-            {selectedFollowUp.length > 0 && <span>{selectedFollowUp.length} questions</span>}
-            {selectedFollowUp.length > 0 && selectedPlans.length > 0 && <span> • </span>}
-            {selectedPlans.length > 0 && <span>{selectedPlans.length} plans</span>}
           </div>
-          <Button
-            disabled={!hasSelections || isSending}
-            onClick={() => sendSuggestionsMutation.mutate()}
-            className="px-3 py-1"
-          >
-            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-            <span className="ml-2">Send</span>
-          </Button>
-        </div>
-      </div>
+          
+          <div className="p-3 bg-[#1e1e1e] border-t border-gray-800 flex justify-end">
+            <Button
+              onClick={() => generateMutation.mutate()}
+              disabled={!customPrompt.trim() || generateMutation.isPending}
+            >
+              {generateMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-1" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-1" />
+              )}
+              {language === 'french' ? 'Générer' : 'Generate'}
+            </Button>
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

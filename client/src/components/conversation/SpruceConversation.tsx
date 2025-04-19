@@ -1,187 +1,171 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { Send, Paperclip, Loader2 } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { format } from 'date-fns';
-import { apiRequest, queryClient } from '@/lib/queryClient';
-
-interface SpruceConversationProps {
-  patientId: number;
-  doctorName?: string;
-}
+import { SendHorizontal, Loader2, Paperclip, Image } from 'lucide-react';
+import { apiRequest } from '@/lib/queryClient';
 
 interface Message {
-  id: string;
+  id: number;
   patientId: number;
+  senderId: number;
   content: string;
   timestamp: string;
   isFromPatient: boolean;
-  sender: string;
-  attachmentUrl?: string | null;
+  spruceMessageId: string | null;
 }
 
-export default function SpruceConversation({ 
-  patientId, 
-  doctorName = 'Dr. Font'
+interface SpruceConversationProps {
+  messages: Message[];
+  onSendMessage: (content: string) => void;
+  patientName: string;
+}
+
+export default function SpruceConversation({
+  messages,
+  onSendMessage,
+  patientName
 }: SpruceConversationProps) {
   const [newMessage, setNewMessage] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
   
-  // Query for messages
-  const { 
-    data: messages = [], 
-    isLoading, 
-    error, 
-    refetch 
-  } = useQuery<Message[]>({
-    queryKey: [`/api/patients/${patientId}/messages`],
-    enabled: !!patientId,
-    refetchInterval: 10000, // Refetch every 10 seconds
-  });
-  
-  // Send message mutation
-  const sendMessageMutation = useMutation({
-    mutationFn: async () => {
-      if (!newMessage.trim()) return;
-      
-      const res = await apiRequest('POST', '/api/spruce/messages', {
-        patientId,
-        message: newMessage.trim(),
-        messageType: 'GENERAL'
-      });
-      
-      return await res.json();
-    },
-    onSuccess: () => {
-      setNewMessage('');
-      queryClient.invalidateQueries({ queryKey: [`/api/patients/${patientId}/messages`] });
-    },
-  });
-  
-  // Scroll to bottom when new messages arrive
+  // Scroll to bottom when messages change
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
   }, [messages]);
   
   // Format timestamp for display
-  const formatMessageTime = (timestamp: string) => {
+  const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
-    return format(date, 'MMM d, h:mm a');
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
   
-  // Get initials for avatar
-  const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: async (content: string) => {
+      onSendMessage(content);
+      return content;
+    },
+    onSuccess: () => {
+      // Clear input after sending
+      setNewMessage('');
+      
+      // Invalidate messages cache to show the new message
+      // This will be handled by the parent component and react-query
+    }
+  });
+  
+  // Handle message submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newMessage.trim()) return;
+    
+    sendMessageMutation.mutate(newMessage.trim());
+  };
+  
+  // Handle textarea key press (Ctrl+Enter to submit)
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      handleSubmit(e);
+    }
   };
   
   return (
     <div className="flex flex-col h-full bg-[#121212] text-white">
-      {/* Messages area */}
-      <ScrollArea className="flex-1 p-4">
-        {isLoading && (
-          <div className="flex justify-center items-center h-32">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-          </div>
-        )}
-        
-        {error && (
-          <div className="text-red-400 text-center p-4">
-            Failed to load messages. Please try again.
-          </div>
-        )}
-        
-        {!isLoading && messages.length === 0 && (
-          <div className="text-gray-500 text-center p-4">
-            No messages yet. Start the conversation!
-          </div>
-        )}
-        
+      <div className="p-4 bg-[#1e1e1e] border-b border-gray-800">
+        <h2 className="font-semibold">{patientName}</h2>
+      </div>
+      
+      {/* Messages Area */}
+      <ScrollArea 
+        className="flex-1 p-4"
+        ref={scrollAreaRef as any}
+      >
         <div className="space-y-4">
-          {messages.map((message) => (
-            <div 
-              key={message.id} 
-              className={`flex ${message.isFromPatient ? 'justify-start' : 'justify-end'}`}
-            >
-              <div className={`flex ${message.isFromPatient ? 'flex-row' : 'flex-row-reverse'} items-start gap-2 max-w-[80%]`}>
-                <Avatar className={`h-8 w-8 ${message.isFromPatient ? 'bg-green-800' : 'bg-blue-800'}`}>
-                  <AvatarFallback>
-                    {message.isFromPatient ? getInitials(message.sender || 'P') : getInitials(doctorName)}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex flex-col">
-                  <div className={`px-3 py-2 rounded-lg ${message.isFromPatient ? 'bg-[#1e1e1e]' : 'bg-blue-900'}`}>
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    {message.attachmentUrl && (
-                      <div className="mt-2">
-                        <a 
-                          href={message.attachmentUrl} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-xs text-blue-400 underline"
-                        >
-                          View Attachment
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className={`text-xs text-gray-500 mt-1 ${message.isFromPatient ? 'text-left' : 'text-right'}`}>
-                    {formatMessageTime(message.timestamp)}
+          {messages.length === 0 ? (
+            <div className="text-center text-gray-500">
+              No messages yet. Start the conversation!
+            </div>
+          ) : (
+            messages.map((message) => (
+              <div 
+                key={message.id}
+                className={`flex ${message.isFromPatient ? 'justify-start' : 'justify-end'}`}
+              >
+                <div 
+                  className={`max-w-[75%] rounded-lg p-3 ${
+                    message.isFromPatient 
+                      ? 'bg-[#1e1e1e] text-white' 
+                      : 'bg-blue-600 text-white'
+                  }`}
+                >
+                  <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+                  <div className={`text-xs mt-1 ${message.isFromPatient ? 'text-gray-400' : 'text-blue-200'}`}>
+                    {formatTimestamp(message.timestamp)}
                   </div>
                 </div>
               </div>
+            ))
+          )}
+          
+          {sendMessageMutation.isPending && (
+            <div className="flex justify-end">
+              <div className="bg-[#1e1e1e] rounded-lg p-3 max-w-[75%]">
+                <div className="flex items-center">
+                  <Loader2 className="h-4 w-4 animate-spin text-gray-400 mr-2" />
+                  <span className="text-sm text-gray-400">Sending...</span>
+                </div>
+              </div>
             </div>
-          ))}
-          <div ref={messagesEndRef} />
+          )}
         </div>
       </ScrollArea>
       
-      {/* Message input */}
-      <div className="p-3 bg-[#1e1e1e] border-t border-gray-800 flex items-end gap-2">
-        <Textarea
-          placeholder="Type a message..."
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              if (!sendMessageMutation.isPending) {
-                sendMessageMutation.mutate();
-              }
-            }
-          }}
-          className="resize-none bg-[#262626] border-gray-700 focus:border-blue-500 text-white min-h-[50px]"
-          rows={3}
-        />
-        
-        <div className="flex flex-col space-y-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            type="button"
-            className="rounded-full hover:bg-gray-700"
-          >
-            <Paperclip className="h-5 w-5" />
-          </Button>
+      {/* Message Input */}
+      <div className="p-3 bg-[#1e1e1e] border-t border-gray-800">
+        <form onSubmit={handleSubmit} className="flex items-end gap-2">
+          <div className="flex-1 relative">
+            <Textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Type your message..."
+              className="min-h-[80px] resize-none bg-[#262626] border-gray-700 text-white pr-8"
+            />
+            <div className="absolute bottom-2 right-2">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-6 w-6 rounded-full text-gray-400 hover:text-white"
+              >
+                <Paperclip className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
           
-          <Button
-            disabled={sendMessageMutation.isPending || !newMessage.trim()}
-            onClick={() => sendMessageMutation.mutate()}
+          <Button 
+            type="submit"
             size="icon"
-            className="rounded-full"
+            disabled={!newMessage.trim() || sendMessageMutation.isPending}
+            className="h-10 w-10"
           >
             {sendMessageMutation.isPending ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Send className="h-5 w-5" />
+              <SendHorizontal className="h-4 w-4" />
             )}
           </Button>
+        </form>
+        
+        <div className="text-xs text-gray-500 mt-1">
+          Press Ctrl+Enter to send
         </div>
       </div>
     </div>
