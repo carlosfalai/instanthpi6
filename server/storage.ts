@@ -154,7 +154,14 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userId++;
-    const user: User = { ...insertUser, id, createdAt: new Date() };
+    // Create user with defaults for nullable fields
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      role: insertUser.role || "doctor", 
+      avatarUrl: insertUser.avatarUrl || null,
+      createdAt: new Date() 
+    };
     this.users.set(id, user);
     return user;
   }
@@ -180,7 +187,16 @@ export class MemStorage implements IStorage {
   
   async createPatient(insertPatient: InsertPatient): Promise<Patient> {
     const id = this.patientId++;
-    const patient: Patient = { ...insertPatient, id };
+    const patient: Patient = { 
+      ...insertPatient, 
+      id,
+      avatarUrl: insertPatient.avatarUrl || null,
+      status: insertPatient.status || "active",
+      lastVisit: insertPatient.lastVisit || null,
+      healthCardNumber: insertPatient.healthCardNumber || null,
+      spruceId: insertPatient.spruceId || null,
+      language: insertPatient.language || "english"
+    };
     this.patients.set(id, patient);
     return patient;
   }
@@ -196,14 +212,26 @@ export class MemStorage implements IStorage {
   
   // Message operations
   async getMessagesByPatientId(patientId: number): Promise<Message[]> {
-    return Array.from(this.messages.values()).filter(
-      (message) => message.patientId === patientId,
-    ).sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    return Array.from(this.messages.values())
+      .filter((message) => message.patientId === patientId)
+      .sort((a, b) => {
+        // Handle null timestamps
+        if (!a.timestamp && !b.timestamp) return 0;
+        if (!a.timestamp) return 1;
+        if (!b.timestamp) return -1;
+        return a.timestamp.getTime() - b.timestamp.getTime();
+      });
   }
   
   async createMessage(insertMessage: InsertMessage): Promise<Message> {
     const id = this.messageId++;
-    const message: Message = { ...insertMessage, id, timestamp: new Date() };
+    const message: Message = { 
+      ...insertMessage, 
+      id, 
+      timestamp: new Date(),
+      attachmentUrl: insertMessage.attachmentUrl || null,
+      spruceMessageId: insertMessage.spruceMessageId || null
+    };
     this.messages.set(id, message);
     return message;
   }
@@ -219,7 +247,13 @@ export class MemStorage implements IStorage {
     // Return the most recent documentation for a patient
     const patientDocs = Array.from(this.aiDocumentations.values())
       .filter(doc => doc.patientId === patientId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .sort((a, b) => {
+        // Handle null createdAt
+        if (!a.createdAt && !b.createdAt) return 0;
+        if (!a.createdAt) return 1;
+        if (!b.createdAt) return -1;
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
     
     return patientDocs.length > 0 ? patientDocs[0] : undefined;
   }
@@ -231,6 +265,13 @@ export class MemStorage implements IStorage {
       id, 
       createdAt: new Date(),
       isApproved: insertDocumentation.isApproved || false,
+      hpi: insertDocumentation.hpi || null,
+      subjective: insertDocumentation.subjective || null,
+      objective: insertDocumentation.objective || null,
+      assessment: insertDocumentation.assessment || null,
+      plan: insertDocumentation.plan || null,
+      prescription: insertDocumentation.prescription || null,
+      followUpQuestions: insertDocumentation.followUpQuestions || null
     };
     this.aiDocumentations.set(id, documentation);
     return documentation;
@@ -247,9 +288,15 @@ export class MemStorage implements IStorage {
   
   // Form Submission operations
   async getFormSubmissionsByPatientId(patientId: number): Promise<FormSubmission[]> {
-    return Array.from(this.formSubmissions.values()).filter(
-      (submission) => submission.patientId === patientId,
-    ).sort((a, b) => b.submittedAt.getTime() - a.submittedAt.getTime());
+    return Array.from(this.formSubmissions.values())
+      .filter((submission) => submission.patientId === patientId)
+      .sort((a, b) => {
+        // Handle null submittedAt
+        if (!a.submittedAt && !b.submittedAt) return 0;
+        if (!a.submittedAt) return 1;
+        if (!b.submittedAt) return -1;
+        return b.submittedAt.getTime() - a.submittedAt.getTime();
+      });
   }
   
   async getFormSubmissionById(id: number): Promise<FormSubmission | undefined> {
@@ -302,7 +349,13 @@ export class MemStorage implements IStorage {
       ...item,
       id,
       createdAt: new Date(),
+      status: item.status || "pending",
+      requestedDate: item.requestedDate || null,
+      dueDate: item.dueDate || null,
+      priority: item.priority || "medium",
+      messageId: item.messageId || null,
       completedAt: null,
+      notes: item.notes || null
     };
     this.pendingItems.set(id, pendingItem);
     return pendingItem;

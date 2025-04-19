@@ -17,12 +17,11 @@ export async function seedDatabase() {
   const doctor = await storage.createUser({
     username: "doctor",
     password: "password123", // In production, this would be hashed
-    email: "doctor@example.com",
-    name: "Dr. Smith",
+    fullName: "Dr. Smith",
     role: "doctor"
   });
   
-  console.log("Created doctor user:", doctor.name);
+  console.log("Created doctor user:", doctor.fullName);
   
   // Create some patients
   const patients = [
@@ -33,7 +32,11 @@ export async function seedDatabase() {
       email: "robert.johnson@example.com",
       phone: "555-123-4567",
       language: "english",
-      spruceId: "spruce-1001"
+      spruceId: "spruce-1001",
+      status: "active",
+      avatarUrl: null,
+      lastVisit: null,
+      healthCardNumber: null
     },
     {
       name: "Marie Dupont",
@@ -42,7 +45,11 @@ export async function seedDatabase() {
       email: "marie.dupont@example.com",
       phone: "555-234-5678",
       language: "french",
-      spruceId: "spruce-1002"
+      spruceId: "spruce-1002",
+      status: "active",
+      avatarUrl: null,
+      lastVisit: null,
+      healthCardNumber: null
     },
     {
       name: "Jessica Thompson",
@@ -51,7 +58,11 @@ export async function seedDatabase() {
       email: "jessica.thompson@example.com",
       phone: "555-345-6789",
       language: "english",
-      spruceId: "spruce-1003"
+      spruceId: "spruce-1003",
+      status: "active",
+      avatarUrl: null,
+      lastVisit: null,
+      healthCardNumber: null
     },
     {
       name: "Carlos Rodriguez",
@@ -60,7 +71,11 @@ export async function seedDatabase() {
       email: "carlos.rodriguez@example.com",
       phone: "555-456-7890",
       language: "english",
-      spruceId: "spruce-1004"
+      spruceId: "spruce-1004",
+      status: "active",
+      avatarUrl: null,
+      lastVisit: null,
+      healthCardNumber: null
     }
   ];
   
@@ -90,43 +105,45 @@ async function createMessagesForPatient(patientId: number) {
       senderId: patientId,
       content: "Hello doctor, I've been having some abdominal pain for the past few days. It's mostly on my right side.",
       isFromPatient: true,
-      spruceMessageId: `mock-${Date.now()}-1`
+      spruceMessageId: `mock-${Date.now()}-1`,
+      attachmentUrl: null
     },
     {
       patientId,
       senderId: 1, // doctor
       content: "I'm sorry to hear that. Can you describe the pain? Is it sharp or dull, and does it come and go or is it constant?",
       isFromPatient: false,
-      spruceMessageId: `mock-${Date.now()}-2`
+      spruceMessageId: `mock-${Date.now()}-2`,
+      attachmentUrl: null
     },
     {
       patientId,
       senderId: patientId,
       content: "It's a dull pain, but sometimes it gets sharper, especially after eating. It's not constant but happens several times a day.",
       isFromPatient: true,
-      spruceMessageId: `mock-${Date.now()}-3`
+      spruceMessageId: `mock-${Date.now()}-3`,
+      attachmentUrl: null
     },
     {
       patientId,
       senderId: 1, // doctor
       content: "Thank you for the details. Have you noticed any changes in your bowel movements or appetite? Any nausea or vomiting?",
       isFromPatient: false,
-      spruceMessageId: `mock-${Date.now()}-4`
+      spruceMessageId: `mock-${Date.now()}-4`,
+      attachmentUrl: null
     },
     {
       patientId,
       senderId: patientId,
       content: "Yes, I've had some nausea but no vomiting. My appetite is lower than usual, and I've been having some constipation.",
       isFromPatient: true,
-      spruceMessageId: `mock-${Date.now()}-5`
+      spruceMessageId: `mock-${Date.now()}-5`,
+      attachmentUrl: null
     }
   ];
   
   for (const messageData of messages) {
-    const message = await storage.createMessage({
-      ...messageData,
-      timestamp: new Date(Date.now() - Math.floor(Math.random() * 24 * 60 * 60 * 1000)) // Random time in last 24 hours
-    });
+    await storage.createMessage(messageData);
     console.log("Created message for patient", patientId);
   }
 }
@@ -140,7 +157,9 @@ async function createPendingItems(patientId: number) {
       status: "pending",
       priority: "medium",
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      completedAt: null
+      requestedDate: new Date(),
+      notes: null,
+      messageId: null
     },
     {
       patientId,
@@ -149,7 +168,9 @@ async function createPendingItems(patientId: number) {
       status: "pending",
       priority: "high",
       dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-      completedAt: null
+      requestedDate: new Date(),
+      notes: null,
+      messageId: null
     },
     {
       patientId,
@@ -158,15 +179,14 @@ async function createPendingItems(patientId: number) {
       status: "completed",
       priority: "low",
       dueDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-      completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
+      requestedDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
+      notes: "Patient followed up as requested",
+      messageId: null
     }
   ];
   
   for (const itemData of pendingItems) {
-    const item = await storage.createPendingItem({
-      ...itemData,
-      id: `pending-${patientId}-${Date.now()}-${Math.floor(Math.random() * 1000)}`
-    });
+    await storage.createPendingItem(itemData);
     console.log("Created pending item for patient", patientId);
   }
 }
@@ -175,29 +195,30 @@ async function createPreventativeCare(patientId: number) {
   const preventativeCareItems = [
     {
       patientId,
-      type: "screening",
-      description: "Annual Physical Examination",
-      status: "scheduled",
-      priority: "medium",
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-      completedAt: null
+      name: "Annual Physical Examination",
+      category: "screening",
+      description: "Routine yearly physical examination",
+      status: "suggested",
+      messageTemplate: "It's time for your annual physical examination. Please schedule an appointment at your earliest convenience.",
+      suggestedDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+      relevantTo: ["general health", "preventative care"],
+      billingCode: "99395"
     },
     {
       patientId,
-      type: "vaccination",
-      description: "Flu Vaccine",
-      status: "due",
-      priority: "high",
-      dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
-      completedAt: null
+      name: "Flu Vaccine",
+      category: "vaccination",
+      description: "Annual influenza vaccination",
+      status: "suggested",
+      messageTemplate: "Flu season is approaching. Consider getting your flu vaccine to stay protected.",
+      suggestedDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
+      relevantTo: ["immunization", "respiratory health"],
+      billingCode: "90686"
     }
   ];
   
   for (const itemData of preventativeCareItems) {
-    const item = await storage.createPreventativeCare({
-      ...itemData,
-      id: `preventative-${patientId}-${Date.now()}-${Math.floor(Math.random() * 1000)}`
-    });
+    await storage.createPreventativeCare(itemData);
     console.log("Created preventative care item for patient", patientId);
   }
 }
