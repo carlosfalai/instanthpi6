@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Send, Check, Loader2, Copy, CheckSquare, FileText, ClipboardList, 
   PenSquare, BadgeCheck, Stethoscope, BrainCircuit, ChevronDown, ChevronUp, 
-  ChevronRight, FileQuestion, Languages, MessageSquare } from "lucide-react";
+  ChevronRight, FileQuestion, Languages, MessageSquare, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import axios from "axios";
 
 interface AiAssistantPanelProps {
@@ -39,6 +40,10 @@ export default function AiAssistantPanel({
   const [copiedText, setCopiedText] = useState(false);
   const responseRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  
+  // State to track selected content items
+  const [selectedSections, setSelectedSections] = useState<{[key: string]: boolean}>({});
+  const [selectedQuestions, setSelectedQuestions] = useState<{[key: string]: {[key: string]: boolean}}>({});
 
   // Sample AI sections that would be controlled by toggles in physician settings
   const [aiSections, setAiSections] = useState<AiSection[]>([

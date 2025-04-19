@@ -1,17 +1,13 @@
-import express, { Request, Response } from 'express';
+import { Router } from 'express';
 import axios from 'axios';
-import { z } from 'zod';
+import { Patient, insertPatientSchema, Message } from '@shared/schema';
 import { storage } from '../storage';
+import { randomUUID } from 'crypto';
 
-const router = express.Router();
-
-// Validate API key exists
-if (!process.env.SPRUCE_API_KEY) {
-  console.warn('SPRUCE_API_KEY not found in environment variables. Spruce API integration will not work.');
-}
+export const router = Router();
 
 // Configure Spruce API client
-const spruceApiClient = axios.create({
+const spruceClient = axios.create({
   baseURL: 'https://api.sprucehealth.com/v1',
   headers: {
     'Content-Type': 'application/json',
@@ -19,245 +15,209 @@ const spruceApiClient = axios.create({
   }
 });
 
-// Helper to format date range for Spruce API
-const getDateRange = (days = 30) => {
-  const now = new Date();
-  const dateTo = new Date(now).toISOString();
-  const dateFrom = new Date(now.setDate(now.getDate() - days)).toISOString();
-  return { dateFrom, dateTo };
-};
-
 // Get all conversations
-router.get('/conversations', async (req: Request, res: Response) => {
+router.get('/conversations', async (req, res) => {
   try {
-    // Validate API key exists
-    if (!process.env.SPRUCE_API_KEY) {
-      return res.status(503).json({ error: 'Spruce API not configured' });
-    }
-
-    const { dateFrom, dateTo } = getDateRange(30);
-    
-    const response = await spruceApiClient.get('/conversations', {
+    const response = await spruceClient.get('/conversations', {
       params: {
-        date_from: dateFrom,
-        date_to: dateTo,
-        include_archived: req.query.includeArchived === 'true'
+        // Add any needed parameters like date ranges
+        limit: 50
       }
     });
-    
-    // Save patients to our database if needed
-    if (response.data && Array.isArray(response.data.conversations)) {
-      // Process patients here
-      for (const conversation of response.data.conversations) {
-        if (conversation.patient) {
-          try {
-            const existingPatient = await storage.getPatientByEmail(conversation.patient.email);
-            
-            if (!existingPatient) {
-              // Create patient in our system
-              await storage.createPatient({
-                name: conversation.patient.name,
-                email: conversation.patient.email || 'unknown',
-                spruceId: conversation.patient.id.toString(),
-                language: conversation.patient.language || 'english',
-                dateOfBirth: conversation.patient.date_of_birth || null,
-                lastActive: new Date(conversation.last_message_timestamp || Date.now()),
-                status: 'active',
-                gender: conversation.patient.gender || 'unknown'
-              });
-            }
-          } catch (error) {
-            console.error('Error saving patient:', error);
-          }
-        }
-      }
-    }
-    
+
     res.json(response.data);
   } catch (error) {
     console.error('Error fetching Spruce conversations:', error);
-    res.status(error.response?.status || 500).json({ 
-      error: 'Failed to fetch conversations',
-      details: error.response?.data || error.message
-    });
+    
+    if (axios.isAxiosError(error) && error.response) {
+      res.status(error.response.status).json({ 
+        error: `Spruce API error: ${error.response.data}` 
+      });
+    } else {
+      res.status(500).json({ error: 'Failed to fetch conversations from Spruce' });
+    }
   }
 });
 
 // Get messages for a specific patient
-router.get('/patients/:patientId/messages', async (req: Request, res: Response) => {
+router.get('/patients/:patientId/messages', async (req, res) => {
+  const patientId = parseInt(req.params.patientId);
+  
   try {
-    // Validate API key exists
-    if (!process.env.SPRUCE_API_KEY) {
-      return res.status(503).json({ error: 'Spruce API not configured' });
+    // First check if patient exists
+    const patient = await storage.getPatient(patientId);
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
     }
     
-    const patientId = req.params.patientId;
-    const { dateFrom, dateTo } = getDateRange(req.query.days ? parseInt(req.query.days as string) : 30);
-    
-    // Using Spruce API to get messages
-    const response = await spruceApiClient.get(`/patients/${patientId}/messages`, {
-      params: {
-        date_from: dateFrom,
-        date_to: dateTo
-      }
-    });
-    
-    // Process and store messages in our database
-    if (response.data && response.data.messages) {
-      // Transform messages to our schema
-      const transformedMessages = response.data.messages.map(message => ({
-        id: message.id,
-        patientId: parseInt(patientId),
-        content: message.content,
-        timestamp: message.timestamp,
-        isFromPatient: message.sender_type === 'patient',
-        sender: message.sender.name,
-        spruceMessageId: message.id
-      }));
-      
-      // Store messages in our database
-      for (const message of transformedMessages) {
-        try {
+    // If we have a spruceId (external identifier for this patient), use it to get messages
+    if (patient.spruceId) {
+      try {
+        // Get today's date range for the query
+        const today = new Date();
+        const dateFrom = new Date(today.setHours(0, 0, 0, 0)).toISOString();
+        const dateTo = new Date(today.setHours(23, 59, 59, 999)).toISOString();
+        
+        const response = await spruceClient.get(`/patients/${patient.spruceId}/messages`, {
+          params: {
+            date_from: dateFrom,
+            date_to: dateTo
+          }
+        });
+        
+        // Map Spruce messages to our internal format
+        const messages = response.data.map((message: any) => ({
+          id: message.id,
+          patientId: patientId,
+          content: message.content,
+          timestamp: message.created_at,
+          isFromPatient: message.direction === 'INBOUND',
+          sender: message.sender_name
+        }));
+        
+        // Save messages to our database for caching
+        for (const message of messages) {
           const existingMessage = await storage.getMessageBySpruceId(message.id);
           if (!existingMessage) {
-            await storage.createMessage(message);
+            await storage.createMessage({
+              patientId: message.patientId,
+              content: message.content,
+              senderId: 1, // Default to doctor ID 1 for now
+              isFromPatient: message.isFromPatient,
+              spruceMessageId: message.id
+            });
           }
-        } catch (error) {
-          console.error('Error saving message:', error);
         }
+        
+        return res.json(messages);
+      } catch (error) {
+        console.error('Error fetching messages from Spruce:', error);
+        // If Spruce API fails, fall back to our local storage
       }
-      
-      res.json(transformedMessages);
-    } else {
-      res.json([]);
     }
-  } catch (error) {
-    console.error('Error fetching Spruce messages:', error);
     
-    // If the API call fails, try to get messages from our database as a fallback
-    try {
-      const messages = await storage.getMessagesByPatientId(parseInt(req.params.patientId));
-      res.json(messages);
-    } catch (dbError) {
-      res.status(error.response?.status || 500).json({ 
-        error: 'Failed to fetch messages',
-        details: error.response?.data || error.message
-      });
-    }
+    // Fall back to locally stored messages
+    const messages = await storage.getMessagesByPatientId(patientId);
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching patient messages:', error);
+    res.status(500).json({ error: 'Failed to fetch patient messages' });
   }
 });
 
 // Send a message to a patient
-router.post('/patients/:patientId/messages', async (req: Request, res: Response) => {
+router.post('/messages', async (req, res) => {
+  const { patientId, message, messageType = 'GENERAL' } = req.body;
+  
+  if (!patientId || !message) {
+    return res.status(400).json({ error: 'Patient ID and message are required' });
+  }
+  
   try {
-    // Validate API key exists
-    if (!process.env.SPRUCE_API_KEY) {
-      return res.status(503).json({ error: 'Spruce API not configured' });
+    // Get the patient
+    const patient = await storage.getPatient(parseInt(patientId));
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
     }
     
-    const patientId = req.params.patientId;
-    const messageSchema = z.object({
-      message: z.string().min(1),
-      attachments: z.array(z.string()).optional()
-    });
+    let spruceMessageId = null;
     
-    const validationResult = messageSchema.safeParse(req.body);
-    if (!validationResult.success) {
-      return res.status(400).json({ error: 'Invalid message format', details: validationResult.error });
-    }
-    
-    const { message, attachments } = validationResult.data;
-    
-    // Using Spruce API to send message
-    const response = await spruceApiClient.post(`/patients/${patientId}/messages`, {
-      content: message,
-      attachments: attachments || []
-    });
-    
-    // Store the message in our database
-    if (response.data && response.data.message) {
-      const newMessage = {
-        patientId: parseInt(patientId),
-        content: message,
-        timestamp: new Date().toISOString(),
-        isFromPatient: false,
-        sender: 'Doctor', // This should be dynamic based on the logged-in user
-        spruceMessageId: response.data.message.id
-      };
-      
+    // If patient has a Spruce ID, send message through Spruce API
+    if (patient.spruceId) {
       try {
-        const savedMessage = await storage.createMessage(newMessage);
-        res.status(201).json(savedMessage);
+        const response = await spruceClient.post('/messages', {
+          patient_id: patient.spruceId,
+          content: message,
+          type: messageType
+        });
+        
+        spruceMessageId = response.data.id;
       } catch (error) {
-        console.error('Error saving sent message:', error);
-        res.status(201).json(response.data);
+        console.error('Error sending message via Spruce:', error);
+        // Continue with local storage even if Spruce fails
       }
-    } else {
-      res.status(201).json(response.data);
     }
-  } catch (error) {
-    console.error('Error sending Spruce message:', error);
-    res.status(error.response?.status || 500).json({ 
-      error: 'Failed to send message',
-      details: error.response?.data || error.message
+    
+    // Always store message locally
+    const newMessage = await storage.createMessage({
+      patientId: parseInt(patientId),
+      content: message,
+      senderId: 1, // Default to doctor ID 1 for now
+      isFromPatient: false,
+      spruceMessageId
     });
+    
+    // Convert to Message type with timestamp
+    const formattedMessage = {
+      id: newMessage.id.toString(),
+      patientId: newMessage.patientId,
+      content: newMessage.content,
+      timestamp: newMessage.timestamp.toISOString(),
+      isFromPatient: newMessage.isFromPatient,
+      sender: "Dr. Font"  // Hardcoded for now
+    };
+    
+    res.status(201).json(formattedMessage);
+  } catch (error) {
+    console.error('Error sending message:', error);
+    res.status(500).json({ error: 'Failed to send message' });
   }
 });
 
-// Mark conversation as read
-router.post('/patients/:patientId/read', async (req: Request, res: Response) => {
+// Mark patient conversation as read
+router.post('/patients/:patientId/read', async (req, res) => {
+  const patientId = parseInt(req.params.patientId);
+  
   try {
-    // Validate API key exists
-    if (!process.env.SPRUCE_API_KEY) {
-      return res.status(503).json({ error: 'Spruce API not configured' });
+    const patient = await storage.getPatient(patientId);
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
     }
     
-    const patientId = req.params.patientId;
-    
-    // Using Spruce API to mark conversation as read
-    const response = await spruceApiClient.post(`/patients/${patientId}/read`);
-    
-    res.json(response.data);
-  } catch (error) {
-    console.error('Error marking Spruce conversation as read:', error);
-    res.status(error.response?.status || 500).json({ 
-      error: 'Failed to mark conversation as read',
-      details: error.response?.data || error.message
-    });
-  }
-});
-
-// Archive a conversation
-router.post('/patients/:patientId/archive', async (req: Request, res: Response) => {
-  try {
-    // Validate API key exists
-    if (!process.env.SPRUCE_API_KEY) {
-      return res.status(503).json({ error: 'Spruce API not configured' });
-    }
-    
-    const patientId = req.params.patientId;
-    
-    // Using Spruce API to archive conversation
-    const response = await spruceApiClient.post(`/patients/${patientId}/archive`);
-    
-    // Update patient status in our database
-    try {
-      const patient = await storage.getPatient(parseInt(patientId));
-      if (patient) {
-        await storage.updatePatient(parseInt(patientId), { status: 'archived' });
+    if (patient.spruceId) {
+      try {
+        await spruceClient.post(`/patients/${patient.spruceId}/read`);
+        return res.status(200).json({ success: true });
+      } catch (error) {
+        console.error('Error marking conversation as read in Spruce:', error);
+        // Fall through to local handling
       }
-    } catch (error) {
-      console.error('Error updating patient status:', error);
     }
     
-    res.json(response.data);
+    // Update local patient record to mark as read
+    await storage.updatePatient(patientId, { status: 'read' });
+    res.status(200).json({ success: true });
   } catch (error) {
-    console.error('Error archiving Spruce conversation:', error);
-    res.status(error.response?.status || 500).json({ 
-      error: 'Failed to archive conversation',
-      details: error.response?.data || error.message
-    });
+    console.error('Error marking conversation as read:', error);
+    res.status(500).json({ error: 'Failed to mark conversation as read' });
   }
 });
 
-export default router;
+// Archive a patient conversation
+router.post('/patients/:patientId/archive', async (req, res) => {
+  const patientId = parseInt(req.params.patientId);
+  
+  try {
+    const patient = await storage.getPatient(patientId);
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+    
+    if (patient.spruceId) {
+      try {
+        await spruceClient.post(`/patients/${patient.spruceId}/archive`);
+        return res.status(200).json({ success: true });
+      } catch (error) {
+        console.error('Error archiving conversation in Spruce:', error);
+        // Fall through to local handling
+      }
+    }
+    
+    // Update local patient record to mark as archived
+    await storage.updatePatient(patientId, { status: 'archived' });
+    res.status(200).json({ success: true });
+  } catch (error) {
+    console.error('Error archiving conversation:', error);
+    res.status(500).json({ error: 'Failed to archive conversation' });
+  }
+});
