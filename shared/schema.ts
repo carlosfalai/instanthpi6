@@ -31,6 +31,7 @@ export const patients = pgTable("patients", {
   phone: text("phone").notNull(),
   lastVisit: timestamp("last_visit"),
   avatarUrl: text("avatar_url"),
+  healthCardNumber: text("health_card_number"), // Added for RAMQ card verification
 });
 
 export const insertPatientSchema = createInsertSchema(patients).pick({
@@ -41,6 +42,7 @@ export const insertPatientSchema = createInsertSchema(patients).pick({
   phone: true,
   lastVisit: true,
   avatarUrl: true,
+  healthCardNumber: true, // Added to schema
 });
 
 // Message model for patient communications
@@ -106,6 +108,7 @@ export const insertFormSubmissionSchema = createInsertSchema(formSubmissions).pi
   formType: true,
   formData: true,
   submissionId: true,
+  submittedAt: true,
 });
 
 // Export types for use in the application

@@ -481,8 +481,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         patientId,
         formType: formResult.formType!,
         formData: formResult.formData!,
-        submissionId: pseudonym,
-        submittedAt: new Date().toISOString()
+        submissionId: pseudonym
       });
       
       // Send a message to the patient with the HPI summary via Spruce
@@ -581,8 +580,7 @@ Is this information correct? If not, please let us know what needs to be correct
         patientId,
         formType: formResult.formType!,
         formData: formResult.formData!,
-        submissionId: pseudonym,
-        submittedAt: new Date().toISOString()
+        submissionId: pseudonym
       });
       
       // Step 5: Send a message to the patient with the HPI summary via Spruce

@@ -141,61 +141,27 @@ export async function generateHPIConfirmationSummary(
     // Format variables from form data to match the expected template
     const variables = mapFormDataToTemplate(processedData, formType);
     
-    // Create the prompt following the specified format
-    const prompt = {
-      role: "system",
-      content: {
-        task: "You are a medical transcription AI. Output is in French. Your role is to generate five clearly separated sections based strictly on the variable values provided. You must not create or guess any additional information.",
-        instructions: {
-          data_source: "Use only the following variables as your input data. Do not add any symptoms, background, or interpretation not directly found in these values.",
-          variables: variables,
-          output_structure: [
-            {
-              section: "HPI Confirmation Summary",
-              description: "Generate a patient-friendly summary using only the variable content. Use natural language, but do not invent or assume any information not present in the inputs. Never ask their gender and age.",
-              format: "Label as 'HPI Confirmation Summary' followed by a line of dashes, then the content as one paragraph."
-            },
-            {
-              section: "Super Spartan SOAP Note",
-              description: "Create a compact clinical SOAP note (Subjective, Assessment, Plan), using only the variables. Do not add clinical reasoning or diagnostic suggestions not directly supported by the provided data.",
-              format: "Label as 'Super Spartan SOAP Note' followed by a line of dashes. Then list:\nS: ...\nA: ...\nP: ..."
-            },
-            {
-              section: "Plan – Bullet Points",
-              description: "Create a list of next steps using only relevant information based on the symptom, severity, and context. Include testing and realistic options, but do not speculate.",
-              format: "Label as 'Plan – Bullet Points' followed by a line of dashes, then 3–6 bullet points."
-            },
-            {
-              section: "In case this is a telemedicine consultation",
-              description: "If applicable, include a short disclaimer explaining when in-person care is required. Only include this if symptoms suggest in-person assessment (e.g., pain, neurological signs, etc.).",
-              format: "Label as 'In case this is a telemedicine consultation:' followed by a line of dashes, then 4–6 sentences explaining what features of the case require in-person diagnostics, which tests may be needed, and where the patient should go (clinic, urgent care, or ER)."
-            },
-            {
-              section: "Follow-Up Questions",
-              description: "Generate clear and conversational follow-up medical questions based on the patient's symptoms, chronic conditions, lifestyle, and treatments.",
-              format: "Label as 'Follow-Up Questions' followed by a line of dashes. Group questions per issue if more than one is identified. Each question should be written as a bullet point. Avoid clinical jargon, keep the tone conversational and patient-centered."
-            }
-          ],
-          key_points: [
-            "All messages prepared for communication with patients should be given in 1 paragraph output, 5-6 phrases long, in a spartan style.",
-            "Do not identify the pseudonym in the HPI confirmation summary, but write above that it's for him and end with a question, asking to verify if this paragraph is exact.",
-            "If Gelomyrtol is prescribed, mention: 'Je vous prescris un traitement à base de Gelomyrtol, un produit naturel composé de thym, eucalyptus, menthe et myrte, qui agit comme antimucolytique et possède un léger effet anti-infectieux.'",
-            "Avoid any formatting like bold, markdown, or indentation inside SOAP.",
-            "Super Spartan SOAP Note must remain extremely concise.",
-            "Plan – Bullet Points should include realistic clinical actions based only on the patient's data."
-          ]
-        }
-      }
-    };
+    // Create the system prompt
+    const systemPrompt = `You are a medical transcription AI. Output is in French. Your role is to generate a patient-friendly HPI Confirmation Summary based on the following variables:
+${JSON.stringify(variables, null, 2)}
+
+Guidelines:
+- Generate a patient-friendly summary using only the variable content
+- Use natural language, but do not invent or assume any information not present in the inputs
+- Never ask about their gender and age directly
+- Format your response as a single paragraph (5-6 phrases)
+- Keep the tone conversational and patient-centered
+- End with a question asking if this information is accurate
+- If Gelomyrtol is prescribed, mention: 'Je vous prescris un traitement à base de Gelomyrtol, un produit naturel composé de thym, eucalyptus, menthe et myrte, qui agit comme antimucolytique et possède un léger effet anti-infectieux.'`;
     
-    const userMessage = {
-      role: "user",
-      content: `Please generate an HPI confirmation summary for a patient who submitted a ${formType} form. I need only the first section (HPI Confirmation Summary) as a concise, single paragraph (5-6 phrases) that verifies the patient's information. End with a question asking if this information is accurate.`
-    };
+    const userMessage = `Please generate an HPI confirmation summary for a patient who submitted a ${formType} form. I need a concise, single paragraph (5-6 phrases) that verifies the patient's information. End with a question asking if this information is accurate.`;
     
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
-      messages: [prompt, userMessage]
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userMessage }
+      ]
     });
     
     const fullResponse = response.choices[0].message.content || 'Unable to generate HPI confirmation summary';
