@@ -45,55 +45,8 @@ export default function AiAssistantPanel({
   const [selectedSections, setSelectedSections] = useState<{[key: string]: boolean}>({});
   const [selectedQuestions, setSelectedQuestions] = useState<{[key: string]: {[key: string]: boolean}}>({});
 
-  // Sample AI sections that would be controlled by toggles in physician settings
+  // State for AI-generated sections
   const [aiSections, setAiSections] = useState<AiSection[]>([
-    {
-      id: "formsite-data",
-      title: "Formsite Form Data",
-      icon: <FileQuestion className="h-4 w-4" />,
-      enabled: true,
-      content: patientLanguage === 'french' 
-        ? `Information du formulaire - Pseudonyme "PATIENT2025":
-
-Gender: Femme
-Age: 38
-Chief Complaint: Dépression et tension artérielle élevée 
-Symptom Onset: 01/02/2024
-Trigger: Stress au travail et problèmes familiaux
-Location: Tête (maux de tête) et humeur générale
-Description: Humeur basse, irritabilité, maux de tête dus à la pression
-Aggravating Factors: Manque de sommeil, stress au travail, caféine
-Relieving Factors: Repos, parler à des amis, marcher
-Severity (0-10): 6
-Evolution: Aggravation progressive
-Associated Symptoms: Fatigue, difficulté à se concentrer, insomnie
-Treatments Tried: Essayer de mieux dormir, réduction de la caféine, méditation 
-Treatment Response: Soulagement modéré et temporaire
-Chronic Conditions: Hypertension
-Medication Allergies: Aucune connue
-Pregnancy/Breastfeeding: Non
-Other Notes: Souhaite des options non médicamenteuses si possible` 
-        : `Formsite Form Information - Pseudonym "PATIENT2025":
-
-Gender: Female
-Age: 38
-Chief Complaint: Depression and elevated blood pressure
-Symptom Onset: 01/02/2024
-Trigger: Work stress and family issues
-Location: Head (headaches) and general mood
-Description: Low mood, irritability, pressure headaches
-Aggravating Factors: Lack of sleep, work stress, caffeine
-Relieving Factors: Rest, talking to friends, walking
-Severity (0-10): 6
-Evolution: Getting worse gradually
-Associated Symptoms: Fatigue, difficulty concentrating, insomnia
-Treatments Tried: Trying to sleep better, reducing caffeine, meditation
-Treatment Response: Moderate and temporary relief
-Chronic Conditions: Hypertension
-Medication Allergies: None known
-Pregnancy/Breastfeeding: No
-Other Notes: Would like non-medication options if possible`
-    },
     {
       id: "hpi-confirmation",
       title: "HPI Confirmation Summary",
@@ -233,6 +186,88 @@ Standard questions
         : `I'm prescribing Gelomyrtol, a natural product made from thyme, eucalyptus, mint and myrtle, which acts as an antimucotyltic and has mild anti-infective properties. Studies have shown it can reduce antibiotic use by up to 50% in cases of sinusitis and bronchitis, of which approximately 97% are viral in origin and don't require antibiotics. Take 1 capsule four times daily for 7 days.`
     }
   ]);
+  
+  // State for loading AI content
+  const [isLoadingAIContent, setIsLoadingAIContent] = useState(false);
+  
+  // Load AI-generated sections when the component mounts or patientId changes
+  useEffect(() => {
+    const loadAIGeneratedSections = async () => {
+      if (!patientId) return;
+      
+      setIsLoadingAIContent(true);
+      try {
+        // Fetch patient data first
+        const patientResponse = await axios.get(`/api/patients/${patientId}`);
+        const patientData = patientResponse.data;
+        
+        // Fetch messages for conversation context
+        const messagesResponse = await axios.get(`/api/patients/${patientId}/messages`);
+        const messages = messagesResponse.data.slice(-5); // Get last 5 messages for context
+        
+        // Format message history for the AI
+        const messageHistory = messages.map((msg: any) => ({
+          sender: msg.isFromPatient ? 'patient' : 'doctor',
+          content: msg.content
+        }));
+        
+        // Fetch AI-generated sections
+        const response = await axios.post('/api/ai/generate-sections', {
+          patientData,
+          patientLanguage,
+          messageHistory
+        });
+        
+        if (response.data && response.data.sections) {
+          // Map the sections to our format with appropriate icons
+          const sectionIcons: {[key: string]: React.ReactNode} = {
+            "hpi-confirmation": <Languages className="h-4 w-4" />,
+            "soap-note": <FileText className="h-4 w-4" />,
+            "plan-bullets": <ClipboardList className="h-4 w-4" />,
+            "telemedicine-notes": <MessageSquare className="h-4 w-4" />,
+            "follow-up-questions": <PenSquare className="h-4 w-4" />,
+            "medication-recommendation": <Stethoscope className="h-4 w-4" />
+          };
+          
+          const formattedSections = response.data.sections.map((section: any) => ({
+            id: section.id,
+            title: section.title,
+            icon: sectionIcons[section.id] || <FileQuestion className="h-4 w-4" />,
+            enabled: true,
+            content: section.content
+          }));
+          
+          setAiSections(formattedSections);
+          
+          // Format follow-up questions if provided
+          if (response.data.followUpQuestions) {
+            const followUpSection = formattedSections.find(section => section.id === "follow-up-questions");
+            if (followUpSection) {
+              let content = `Follow-Up Questions\n────────────────────────────\n\n`;
+              
+              Object.entries(response.data.followUpQuestions).forEach(([category, questions]: [string, any]) => {
+                content += `${category}\n`;
+                questions.forEach((question: string) => {
+                  content += `• ${question}\n`;
+                });
+                content += '\n';
+              });
+              
+              // Update the follow-up questions section
+              followUpSection.content = content;
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error loading AI content:", error);
+        // We'll keep the default content in case of error
+      } finally {
+        setIsLoadingAIContent(false);
+      }
+    };
+    
+    loadAIGeneratedSections();
+  }, [patientId, patientLanguage]);
 
   // Function to generate AI response
   const generateResponse = async () => {
@@ -310,6 +345,221 @@ Standard questions
 
   return (
     <div className="flex flex-col h-full bg-[#1a1a1a] border-r border-gray-800">
+      {/* AI Assistant Header */}
+      <div className="p-4 border-b border-gray-800">
+        <h2 className="text-lg font-semibold">AI Assistant</h2>
+      </div>
+      
+      {/* AI Sections with Checkboxes */}
+      <div className="flex-1 overflow-y-auto p-4">
+        <ScrollArea className="h-full pr-4">
+          {aiSections
+            .filter(section => section.enabled)
+            .map(section => (
+              <div key={section.id} className="mb-6">
+                <div className="flex items-center mb-2">
+                  {section.id !== "follow-up-questions" && (
+                    <Checkbox 
+                      id={`section-${section.id}`}
+                      checked={!!selectedSections[section.id]}
+                      onCheckedChange={() => {
+                        setSelectedSections(prev => ({
+                          ...prev,
+                          [section.id]: !prev[section.id]
+                        }));
+                      }}
+                      className="mr-2 h-5 w-5 border-gray-500"
+                    />
+                  )}
+                  <div className="bg-blue-600 p-1 rounded mr-2">
+                    {section.icon}
+                  </div>
+                  <h3 className="text-base font-medium">{section.title}</h3>
+                </div>
+                
+                {section.id === "follow-up-questions" ? (
+                  // Special rendering for follow-up questions with individual checkboxes
+                  <div className="pl-7 mt-3">
+                    {section.content.split('\n\n').map((block, blockIndex) => {
+                      if (block.trim().startsWith('────────') || block.trim() === '' || block.trim() === 'Follow-Up Questions') {
+                        return null;
+                      }
+                      
+                      if (!block.includes('•')) {
+                        return (
+                          <h4 key={blockIndex} className="font-medium text-gray-300 mb-2 mt-4">{block}</h4>
+                        );
+                      }
+                      
+                      return (
+                        <div key={blockIndex} className="space-y-2 mb-4">
+                          {block.split('\n').map((line, lineIndex) => {
+                            if (!line.trim().startsWith('•')) return null;
+                            
+                            const questionKey = `${section.id}-${blockIndex}-${lineIndex}`;
+                            
+                            return (
+                              <div key={lineIndex} className="flex items-start">
+                                <Checkbox 
+                                  id={questionKey}
+                                  checked={!!(selectedQuestions[section.id]?.[questionKey])}
+                                  onCheckedChange={() => {
+                                    setSelectedQuestions(prev => {
+                                      const sectionQuestions = prev[section.id] || {};
+                                      return {
+                                        ...prev,
+                                        [section.id]: {
+                                          ...sectionQuestions,
+                                          [questionKey]: !sectionQuestions[questionKey]
+                                        }
+                                      };
+                                    });
+                                  }}
+                                  className="mr-2 mt-1 h-4 w-4 border-gray-500"
+                                />
+                                <Label 
+                                  htmlFor={questionKey}
+                                  className="text-sm text-gray-300 cursor-pointer"
+                                >
+                                  {line.trim()}
+                                </Label>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  // Regular rendering for other sections
+                  <Card className="bg-gray-900 border-gray-800 ml-7">
+                    <pre className="p-4 text-sm whitespace-pre-wrap font-mono text-gray-300">
+                      {section.content}
+                    </pre>
+                  </Card>
+                )}
+              </div>
+            ))}
+          <div ref={bottomRef} />
+        </ScrollArea>
+      </div>
+      
+      {/* Bottom Input Area */}
+      <div className="mt-auto p-4 border-t border-gray-800">
+        <div className="flex gap-2 mb-4">
+          <Textarea 
+            placeholder={`Type your message in ${patientLanguage === 'french' ? 'French' : 'English'}...`}
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            className="flex-1 bg-gray-900 border-gray-700 resize-none"
+            rows={2}
+          />
+        </div>
+        
+        {/* Send to Patient Button */}
+        <div className="flex justify-between gap-2">
+          <Button 
+            className="bg-green-600 hover:bg-green-700"
+            onClick={() => {
+              // Collect all selected content
+              const contentToSend: string[] = [];
+              
+              // Add selected whole sections
+              Object.entries(selectedSections).forEach(([sectionId, isSelected]) => {
+                if (isSelected) {
+                  const section = aiSections.find(s => s.id === sectionId);
+                  if (section) {
+                    contentToSend.push(section.content);
+                  }
+                }
+              });
+              
+              // Add selected individual questions
+              Object.entries(selectedQuestions).forEach(([sectionId, questions]) => {
+                const selectedQuestionTexts = Object.entries(questions)
+                  .filter(([_, isSelected]) => isSelected)
+                  .map(([key, _]) => {
+                    const [, blockIdx, lineIdx] = key.split('-');
+                    const section = aiSections.find(s => s.id === sectionId);
+                    if (!section) return '';
+                    
+                    const blocks = section.content.split('\n\n');
+                    const block = blocks[parseInt(blockIdx) + 2]; // +2 to skip header and separator
+                    if (!block) return '';
+                    
+                    const lines = block.split('\n');
+                    return lines[parseInt(lineIdx)];
+                  })
+                  .filter(Boolean);
+                
+                if (selectedQuestionTexts.length > 0) {
+                  contentToSend.push(selectedQuestionTexts.join('\n\n'));
+                }
+              });
+              
+              // Send to patient
+              if (contentToSend.length > 0) {
+                const messageToSend = contentToSend.join('\n\n');
+                onSendMessage(messageToSend);
+                
+                // Reset selections
+                setSelectedSections({});
+                setSelectedQuestions({});
+              }
+            }}
+            disabled={Object.values(selectedSections).every(v => !v) && 
+                      Object.keys(selectedQuestions).length === 0}
+          >
+            <Send className="mr-2 h-4 w-4" />
+            Send to Patient
+          </Button>
+          
+          {/* Generate Button */}
+          <Button
+            className="bg-blue-600 hover:bg-blue-700"
+            onClick={generateResponse}
+            disabled={!prompt.trim() || isGenerating}
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <BrainCircuit className="mr-2 h-4 w-4" />
+                Generate
+              </>
+            )}
+          </Button>
+        </div>
+        
+        {/* AI Generated Response */}
+        {generatedResponse && (
+          <div className="mt-4">
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium text-sm">Generated Response</h4>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => copyToClipboard(generatedResponse)}
+                disabled={copiedText}
+              >
+                {copiedText ? (
+                  <Check className="h-4 w-4" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <Card className="bg-gray-900 border-gray-800">
+              <div className="p-3 text-sm text-gray-300">
+                {generatedResponse}
+              </div>
+            </Card>
+          </div>
+        )}
+      </div>
       <div className="p-4 border-b border-gray-800">
         <h2 className="text-lg font-semibold text-white">AI Assistant</h2>
         <div className="flex justify-between items-center">
