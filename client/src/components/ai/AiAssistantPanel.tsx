@@ -44,6 +44,17 @@ export default function AiAssistantPanel({
   // State to track selected content items
   const [selectedSections, setSelectedSections] = useState<{[key: string]: boolean}>({});
   const [selectedQuestions, setSelectedQuestions] = useState<{[key: string]: {[key: string]: boolean}}>({});
+  
+  // Function to send response to patient
+  const sendResponseToPatient = () => {
+    if (!generatedResponse) return;
+    
+    setIsSending(true);
+    onSendMessage(generatedResponse);
+    
+    // Reset after sending
+    clearGeneratedResponse();
+  };
 
   // State for AI-generated sections
   const [aiSections, setAiSections] = useState<AiSection[]>([
@@ -241,7 +252,7 @@ Standard questions
           
           // Format follow-up questions if provided
           if (response.data.followUpQuestions) {
-            const followUpSection = formattedSections.find(section => section.id === "follow-up-questions");
+            const followUpSection = formattedSections.find((section: AiSection) => section.id === "follow-up-questions");
             if (followUpSection) {
               let content = `Follow-Up Questions\n────────────────────────────\n\n`;
               
@@ -300,14 +311,8 @@ Standard questions
     }
   };
 
-  // Function to send the generated response to the patient
-  const sendResponseToPatient = () => {
-    if (!generatedResponse) return;
-    
-    setIsSending(true);
-    onSendMessage(generatedResponse);
-    
-    // Clear the generated response after sending
+  // Clear the generated response after sending
+  const clearGeneratedResponse = () => {
     setTimeout(() => {
       setGeneratedResponse("");
       setPrompt("");
@@ -345,221 +350,7 @@ Standard questions
 
   return (
     <div className="flex flex-col h-full bg-[#1a1a1a] border-r border-gray-800">
-      {/* AI Assistant Header */}
-      <div className="p-4 border-b border-gray-800">
-        <h2 className="text-lg font-semibold">AI Assistant</h2>
-      </div>
-      
-      {/* AI Sections with Checkboxes */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <ScrollArea className="h-full pr-4">
-          {aiSections
-            .filter(section => section.enabled)
-            .map(section => (
-              <div key={section.id} className="mb-6">
-                <div className="flex items-center mb-2">
-                  {section.id !== "follow-up-questions" && (
-                    <Checkbox 
-                      id={`section-${section.id}`}
-                      checked={!!selectedSections[section.id]}
-                      onCheckedChange={() => {
-                        setSelectedSections(prev => ({
-                          ...prev,
-                          [section.id]: !prev[section.id]
-                        }));
-                      }}
-                      className="mr-2 h-5 w-5 border-gray-500"
-                    />
-                  )}
-                  <div className="bg-blue-600 p-1 rounded mr-2">
-                    {section.icon}
-                  </div>
-                  <h3 className="text-base font-medium">{section.title}</h3>
-                </div>
-                
-                {section.id === "follow-up-questions" ? (
-                  // Special rendering for follow-up questions with individual checkboxes
-                  <div className="pl-7 mt-3">
-                    {section.content.split('\n\n').map((block, blockIndex) => {
-                      if (block.trim().startsWith('────────') || block.trim() === '' || block.trim() === 'Follow-Up Questions') {
-                        return null;
-                      }
-                      
-                      if (!block.includes('•')) {
-                        return (
-                          <h4 key={blockIndex} className="font-medium text-gray-300 mb-2 mt-4">{block}</h4>
-                        );
-                      }
-                      
-                      return (
-                        <div key={blockIndex} className="space-y-2 mb-4">
-                          {block.split('\n').map((line, lineIndex) => {
-                            if (!line.trim().startsWith('•')) return null;
-                            
-                            const questionKey = `${section.id}-${blockIndex}-${lineIndex}`;
-                            
-                            return (
-                              <div key={lineIndex} className="flex items-start">
-                                <Checkbox 
-                                  id={questionKey}
-                                  checked={!!(selectedQuestions[section.id]?.[questionKey])}
-                                  onCheckedChange={() => {
-                                    setSelectedQuestions(prev => {
-                                      const sectionQuestions = prev[section.id] || {};
-                                      return {
-                                        ...prev,
-                                        [section.id]: {
-                                          ...sectionQuestions,
-                                          [questionKey]: !sectionQuestions[questionKey]
-                                        }
-                                      };
-                                    });
-                                  }}
-                                  className="mr-2 mt-1 h-4 w-4 border-gray-500"
-                                />
-                                <Label 
-                                  htmlFor={questionKey}
-                                  className="text-sm text-gray-300 cursor-pointer"
-                                >
-                                  {line.trim()}
-                                </Label>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  // Regular rendering for other sections
-                  <Card className="bg-gray-900 border-gray-800 ml-7">
-                    <pre className="p-4 text-sm whitespace-pre-wrap font-mono text-gray-300">
-                      {section.content}
-                    </pre>
-                  </Card>
-                )}
-              </div>
-            ))}
-          <div ref={bottomRef} />
-        </ScrollArea>
-      </div>
-      
-      {/* Bottom Input Area */}
-      <div className="mt-auto p-4 border-t border-gray-800">
-        <div className="flex gap-2 mb-4">
-          <Textarea 
-            placeholder={`Type your message in ${patientLanguage === 'french' ? 'French' : 'English'}...`}
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className="flex-1 bg-gray-900 border-gray-700 resize-none"
-            rows={2}
-          />
-        </div>
-        
-        {/* Send to Patient Button */}
-        <div className="flex justify-between gap-2">
-          <Button 
-            className="bg-green-600 hover:bg-green-700"
-            onClick={() => {
-              // Collect all selected content
-              const contentToSend: string[] = [];
-              
-              // Add selected whole sections
-              Object.entries(selectedSections).forEach(([sectionId, isSelected]) => {
-                if (isSelected) {
-                  const section = aiSections.find(s => s.id === sectionId);
-                  if (section) {
-                    contentToSend.push(section.content);
-                  }
-                }
-              });
-              
-              // Add selected individual questions
-              Object.entries(selectedQuestions).forEach(([sectionId, questions]) => {
-                const selectedQuestionTexts = Object.entries(questions)
-                  .filter(([_, isSelected]) => isSelected)
-                  .map(([key, _]) => {
-                    const [, blockIdx, lineIdx] = key.split('-');
-                    const section = aiSections.find(s => s.id === sectionId);
-                    if (!section) return '';
-                    
-                    const blocks = section.content.split('\n\n');
-                    const block = blocks[parseInt(blockIdx) + 2]; // +2 to skip header and separator
-                    if (!block) return '';
-                    
-                    const lines = block.split('\n');
-                    return lines[parseInt(lineIdx)];
-                  })
-                  .filter(Boolean);
-                
-                if (selectedQuestionTexts.length > 0) {
-                  contentToSend.push(selectedQuestionTexts.join('\n\n'));
-                }
-              });
-              
-              // Send to patient
-              if (contentToSend.length > 0) {
-                const messageToSend = contentToSend.join('\n\n');
-                onSendMessage(messageToSend);
-                
-                // Reset selections
-                setSelectedSections({});
-                setSelectedQuestions({});
-              }
-            }}
-            disabled={Object.values(selectedSections).every(v => !v) && 
-                      Object.keys(selectedQuestions).length === 0}
-          >
-            <Send className="mr-2 h-4 w-4" />
-            Send to Patient
-          </Button>
-          
-          {/* Generate Button */}
-          <Button
-            className="bg-blue-600 hover:bg-blue-700"
-            onClick={generateResponse}
-            disabled={!prompt.trim() || isGenerating}
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <BrainCircuit className="mr-2 h-4 w-4" />
-                Generate
-              </>
-            )}
-          </Button>
-        </div>
-        
-        {/* AI Generated Response */}
-        {generatedResponse && (
-          <div className="mt-4">
-            <div className="flex justify-between items-center mb-2">
-              <h4 className="font-medium text-sm">Generated Response</h4>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => copyToClipboard(generatedResponse)}
-                disabled={copiedText}
-              >
-                {copiedText ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            <Card className="bg-gray-900 border-gray-800">
-              <div className="p-3 text-sm text-gray-300">
-                {generatedResponse}
-              </div>
-            </Card>
-          </div>
-        )}
-      </div>
+      {/* AI Assistant Header with Patient Info */}
       <div className="p-4 border-b border-gray-800">
         <h2 className="text-lg font-semibold text-white">AI Assistant</h2>
         <div className="flex justify-between items-center">
