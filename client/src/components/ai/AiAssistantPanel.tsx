@@ -367,6 +367,17 @@ Standard questions
             <Collapsible key={section.id} className="w-full" defaultOpen={true}>
               <div className="flex items-center justify-between space-x-4 px-4 py-2 bg-[#232323] rounded-t-lg border border-gray-700">
                 <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id={`section-${section.id}`}
+                    checked={!!selectedSections[section.id]}
+                    onCheckedChange={() => {
+                      setSelectedSections(prev => ({
+                        ...prev,
+                        [section.id]: !prev[section.id]
+                      }));
+                    }}
+                    className="mr-2 h-5 w-5 border-gray-500 bg-gray-800"
+                  />
                   {section.icon}
                   <h3 className="font-medium text-white">{section.title}</h3>
                 </div>
@@ -377,11 +388,73 @@ Standard questions
                 </CollapsibleTrigger>
               </div>
               <CollapsibleContent>
-                <div className="p-4 bg-[#2a2a2a] border-x border-b border-gray-700 rounded-b-lg">
-                  <pre className="whitespace-pre-wrap text-sm text-white font-mono bg-[#1e1e1e] p-3 rounded-md">
-                    {section.content}
-                  </pre>
-                </div>
+                {section.id === "follow-up-questions" || section.id === "plan-bullets" ? (
+                  // Special rendering for follow-up questions and plan bullets with individual checkboxes
+                  <div className="p-4 bg-[#2a2a2a] border-x border-b border-gray-700 rounded-b-lg">
+                    {section.content.split('\n\n').map((block, blockIndex) => {
+                      // Skip header lines
+                      if (block.trim().startsWith('────────') || 
+                          block.trim() === '' || 
+                          block.trim() === 'Follow-Up Questions' ||
+                          block.trim() === 'Plan – Bullet Points') {
+                        return null;
+                      }
+                      
+                      // If this is a category header (no bullet points)
+                      if (!block.includes('•')) {
+                        return (
+                          <h4 key={blockIndex} className="font-medium text-gray-300 mb-2 mt-4">{block}</h4>
+                        );
+                      }
+                      
+                      // Render the bullet points with checkboxes
+                      return (
+                        <div key={blockIndex} className="space-y-2 mb-4">
+                          {block.split('\n').map((line, lineIndex) => {
+                            if (!line.trim().startsWith('•')) return null;
+                            
+                            const itemKey = `${section.id}-${blockIndex}-${lineIndex}`;
+                            
+                            return (
+                              <div key={lineIndex} className="flex items-start">
+                                <Checkbox 
+                                  id={itemKey}
+                                  checked={!!(selectedQuestions[section.id]?.[itemKey])}
+                                  onCheckedChange={() => {
+                                    setSelectedQuestions(prev => {
+                                      const sectionItems = prev[section.id] || {};
+                                      return {
+                                        ...prev,
+                                        [section.id]: {
+                                          ...sectionItems,
+                                          [itemKey]: !sectionItems[itemKey]
+                                        }
+                                      };
+                                    });
+                                  }}
+                                  className="mr-2 mt-1 h-4 w-4 border-gray-500 bg-gray-800"
+                                />
+                                <Label 
+                                  htmlFor={itemKey}
+                                  className="text-sm text-gray-300 cursor-pointer"
+                                >
+                                  {line.trim().substring(2)} {/* Remove bullet point • */}
+                                </Label>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  // Regular rendering for other sections
+                  <div className="p-4 bg-[#2a2a2a] border-x border-b border-gray-700 rounded-b-lg">
+                    <pre className="whitespace-pre-wrap text-sm text-white font-mono bg-[#1e1e1e] p-3 rounded-md">
+                      {section.content}
+                    </pre>
+                  </div>
+                )}
               </CollapsibleContent>
             </Collapsible>
           ))}
