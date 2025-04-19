@@ -81,12 +81,12 @@ export default function Sidebar() {
               const Icon = item.icon;
               return (
                 <Link key={item.name} href={item.href}>
-                  <a
+                  <div
                     className={`${
                       isActive(item.href)
                         ? 'bg-gray-100 text-gray-900'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
+                    } group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer`}
                   >
                     <Icon 
                       className={`${
@@ -94,7 +94,7 @@ export default function Sidebar() {
                       } mr-3 h-6 w-6`} 
                     />
                     {item.name}
-                  </a>
+                  </div>
                 </Link>
               );
             })}

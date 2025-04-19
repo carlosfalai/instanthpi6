@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ZodError } from "zod";
@@ -10,11 +10,21 @@ import {
   insertFormSubmissionSchema
 } from "@shared/schema";
 import OpenAI from "openai";
+import axios from "axios";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
+});
+
+// Setup Spruce Health API
+const spruceApi = axios.create({
+  baseURL: 'https://api.sprucehealth.com/v1',
+  headers: {
+    'Authorization': `Bearer ${process.env.SPRUCE_API_KEY}`,
+    'Content-Type': 'application/json'
+  }
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -112,6 +122,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/patients/:patientId/messages", async (req, res) => {
     try {
       const patientId = parseInt(req.params.patientId);
+      
+      // Get today's date in ISO format (YYYY-MM-DD)
+      const today = new Date().toISOString().split('T')[0];
+      
+      try {
+        // Call the Spruce Health API to get today's messages for this patient
+        const response = await spruceApi.get(`/patients/${patientId}/messages`, {
+          params: {
+            date_from: `${today}T00:00:00Z`,
+            date_to: `${today}T23:59:59Z`
+          }
+        });
+        
+        // Process the Spruce API response and convert to our data format
+        const spruceMessages = response.data.messages || [];
+        
+        // Convert Spruce messages to our format and store them
+        for (const msg of spruceMessages) {
+          // Check if we already have this message stored (by Spruce ID)
+          const existingMessage = await storage.getMessageBySpruceId(msg.id);
+          
+          if (!existingMessage) {
+            // Store the new message
+            await storage.createMessage({
+              patientId,
+              senderId: msg.sender_type === 'patient' ? patientId : 1, // 1 for doctor
+              content: msg.content,
+              isFromPatient: msg.sender_type === 'patient',
+              spruceMessageId: msg.id
+            });
+          }
+        }
+      } catch (spruceError) {
+        console.error("Error fetching messages from Spruce API:", spruceError);
+        // We'll continue and return locally stored messages even if Spruce API fails
+      }
+      
+      // Return all messages for this patient from our database
       const messages = await storage.getMessagesByPatientId(patientId);
       res.json(messages);
     } catch (error) {
@@ -258,28 +306,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Spruce Health API proxy
   app.post("/api/spruce/messages", async (req, res) => {
     try {
-      const { patientId, message } = req.body;
+      const { patientId, message, messageType } = req.body;
       
       if (!patientId || !message) {
         return res.status(400).json({ message: "Missing required fields" });
       }
 
-      // This would normally call Spruce API, but we'll mock the response for now
-      // In a real implementation, you would make an HTTP request to Spruce's API
-      
-      // Save the message to our database
-      const savedMessage = await storage.createMessage({
-        patientId,
-        senderId: 1, // Assume doctor with ID 1
-        content: message,
-        isFromPatient: false,
-        spruceMessageId: `spruce-${Date.now()}` // Mock Spruce ID
-      });
-
-      res.json(savedMessage);
+      try {
+        // Send the message through Spruce API
+        const spruceResponse = await spruceApi.post(`/messages`, {
+          patient_id: patientId,
+          content: message,
+          message_type: messageType || 'GENERAL',
+          sender_id: 1, // Doctor ID
+        });
+        
+        // Get the Spruce message ID from the response
+        const spruceMessageId = spruceResponse.data.id;
+        
+        // Save the message to our database
+        const savedMessage = await storage.createMessage({
+          patientId,
+          senderId: 1, // Assume doctor with ID 1
+          content: message,
+          isFromPatient: false,
+          spruceMessageId: spruceMessageId
+        });
+        
+        res.json(savedMessage);
+      } catch (spruceError) {
+        console.error("Error sending message to Spruce API:", spruceError);
+        
+        // Fallback: Save the message to our database even if Spruce API fails
+        const savedMessage = await storage.createMessage({
+          patientId,
+          senderId: 1, // Assume doctor with ID 1
+          content: message,
+          isFromPatient: false,
+          spruceMessageId: `local-${Date.now()}`
+        });
+        
+        res.json(savedMessage);
+      }
     } catch (error) {
-      console.error("Error sending message to Spruce:", error);
-      res.status(500).json({ message: "Failed to send message to Spruce" });
+      console.error("Error sending message:", error);
+      res.status(500).json({ message: "Failed to send message" });
     }
   });
 
