@@ -14,6 +14,7 @@ import axios from "axios";
 import { verifyRAMQCard, extractRAMQInfo } from "./utils/imageAnalysis";
 import { findSubmissionByPseudonym, generateHPIConfirmationSummary } from "./utils/formsiteApi";
 import { router as aiRouter } from "./routes/ai";
+import { router as patientsRouter } from "./routes/patients";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -33,6 +34,7 @@ const spruceApi = axios.create({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Register our API routers
   app.use("/api/ai", aiRouter);
+  app.use("/api/patients", patientsRouter);
   
   // Error handling middleware for Zod validation errors
   const handleZodError = (error: unknown, res: Response) => {

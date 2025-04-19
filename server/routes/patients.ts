@@ -5,6 +5,47 @@ import { randomUUID } from 'crypto';
 
 export const router = Router();
 
+// Get all patients
+router.get('/', async (req, res) => {
+  try {
+    const patients = await storage.getAllPatients();
+    res.json(patients);
+  } catch (error) {
+    console.error('Error fetching patients:', error);
+    res.status(500).json({ error: 'Failed to fetch patients' });
+  }
+});
+
+// Search patients
+router.get('/search', async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query) {
+      const patients = await storage.getAllPatients();
+      return res.json(patients);
+    }
+    
+    const patients = await storage.getAllPatients();
+    const searchQuery = query.toString().toLowerCase();
+    
+    const filteredPatients = patients.filter(patient => {
+      const fullName = patient.name.toLowerCase();
+      const email = patient.email.toLowerCase();
+      const phone = patient.phone.toLowerCase();
+      
+      return fullName.includes(searchQuery) || 
+             email.includes(searchQuery) || 
+             phone.includes(searchQuery);
+    });
+    
+    res.json(filteredPatients);
+  } catch (error) {
+    console.error('Error searching patients:', error);
+    res.status(500).json({ error: 'Failed to search patients' });
+  }
+});
+
 // Get patient details
 router.get('/:patientId', async (req, res) => {
   const patientId = parseInt(req.params.patientId);

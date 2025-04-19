@@ -25,17 +25,33 @@ export default function SpruceChatPage() {
   const [messageText, setMessageText] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
-  // Use a hardcoded patient for demonstration
-  const [patient, setPatient] = useState({
-    id: PATIENT_ID,
-    name: "Nicolas Girard",
-    initials: "NG",
-    gender: "Male",
-    dateOfBirth: "1982-04-15",
-    phone: "+1 (555) 123-4567",
-    email: "nicolas.girard@example.com"
+  // Patient state
+  const [currentPatientId, setCurrentPatientId] = useState(PATIENT_ID);
+  
+  // Fetch patient details
+  const { 
+    data: patient,
+    isLoading: patientLoading 
+  } = useQuery({
+    queryKey: [`/api/patients/${currentPatientId}`],
+    queryFn: async () => {
+      try {
+        const response = await axios.get(`/api/patients/${currentPatientId}`);
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching patient:", error);
+        // Fallback to default patient if API fails
+        return {
+          id: PATIENT_ID,
+          name: "Nicolas Girard",
+          gender: "Male",
+          dateOfBirth: "1982-04-15",
+          phone: "+1 (555) 123-4567",
+          email: "nicolas.girard@example.com"
+        };
+      }
+    }
   });
-  const patientLoading = false;
   
   // Use sample message data for demonstration
   const mockMessages: Message[] = [
@@ -151,11 +167,21 @@ export default function SpruceChatPage() {
     return new Date(b).getTime() - new Date(a).getTime();
   });
   
-  return (
-    <div className="flex flex-col h-screen bg-[#121212] text-white">
-      {/* Main Navigation */}
-      <MainNavbar />
-      
+  // Function to handle patient selection from search
+  const handlePatientSelect = (selectedPatientId: number) => {
+    setCurrentPatientId(selectedPatientId);
+    // Invalidate queries to fetch new patient data
+    queryClient.invalidateQueries({
+      queryKey: [`/api/patients/${selectedPatientId}`],
+    });
+    queryClient.invalidateQueries({
+      queryKey: [`/api/patients/${selectedPatientId}/messages`],
+    });
+  };
+  
+  // Conversation component for the right panel
+  const ConversationPanel = () => (
+    <div className="flex flex-col h-full bg-[#121212] text-white">
       {/* Patient Conversation Header */}
       <header className="flex justify-between items-center p-4 border-b border-gray-800">
         <div className="flex items-center gap-3">
@@ -325,6 +351,23 @@ export default function SpruceChatPage() {
           </Button>
         </div>
       </div>
+    </div>
+  );
+  
+  return (
+    <div className="flex flex-col h-screen bg-[#121212] text-white">
+      {/* Main Navigation */}
+      <MainNavbar />
+      
+      {/* Three Panel Layout */}
+      <ThreePanelLayout
+        patientId={currentPatientId}
+        patientLanguage="french" // Default language, could be dynamic based on patient
+        onSendMessage={handleSendMessage}
+        onPatientSelect={handlePatientSelect}
+      >
+        <ConversationPanel />
+      </ThreePanelLayout>
     </div>
   );
 }
