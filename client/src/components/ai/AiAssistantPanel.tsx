@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Check, Loader2, Copy, CheckSquare, FileText, ClipboardList, PenSquare, BadgeCheck, Stethoscope, BrainCircuit, ChevronDown, ChevronUp, ChevronRight } from "lucide-react";
+import { Send, Check, Loader2, Copy, CheckSquare, FileText, ClipboardList, 
+  PenSquare, BadgeCheck, Stethoscope, BrainCircuit, ChevronDown, ChevronUp, 
+  ChevronRight, FileQuestion, Languages, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
@@ -41,49 +43,189 @@ export default function AiAssistantPanel({
   // Sample AI sections that would be controlled by toggles in physician settings
   const [aiSections, setAiSections] = useState<AiSection[]>([
     {
+      id: "formsite-data",
+      title: "Formsite Form Data",
+      icon: <FileQuestion className="h-4 w-4" />,
+      enabled: true,
+      content: patientLanguage === 'french' 
+        ? `Information du formulaire - Pseudonyme "PATIENT2025":
+
+Gender: Femme
+Age: 38
+Chief Complaint: Dépression et tension artérielle élevée 
+Symptom Onset: 01/02/2024
+Trigger: Stress au travail et problèmes familiaux
+Location: Tête (maux de tête) et humeur générale
+Description: Humeur basse, irritabilité, maux de tête dus à la pression
+Aggravating Factors: Manque de sommeil, stress au travail, caféine
+Relieving Factors: Repos, parler à des amis, marcher
+Severity (0-10): 6
+Evolution: Aggravation progressive
+Associated Symptoms: Fatigue, difficulté à se concentrer, insomnie
+Treatments Tried: Essayer de mieux dormir, réduction de la caféine, méditation 
+Treatment Response: Soulagement modéré et temporaire
+Chronic Conditions: Hypertension
+Medication Allergies: Aucune connue
+Pregnancy/Breastfeeding: Non
+Other Notes: Souhaite des options non médicamenteuses si possible` 
+        : `Formsite Form Information - Pseudonym "PATIENT2025":
+
+Gender: Female
+Age: 38
+Chief Complaint: Depression and elevated blood pressure
+Symptom Onset: 01/02/2024
+Trigger: Work stress and family issues
+Location: Head (headaches) and general mood
+Description: Low mood, irritability, pressure headaches
+Aggravating Factors: Lack of sleep, work stress, caffeine
+Relieving Factors: Rest, talking to friends, walking
+Severity (0-10): 6
+Evolution: Getting worse gradually
+Associated Symptoms: Fatigue, difficulty concentrating, insomnia
+Treatments Tried: Trying to sleep better, reducing caffeine, meditation
+Treatment Response: Moderate and temporary relief
+Chronic Conditions: Hypertension
+Medication Allergies: None known
+Pregnancy/Breastfeeding: No
+Other Notes: Would like non-medication options if possible`
+    },
+    {
+      id: "hpi-confirmation",
+      title: "HPI Confirmation Summary",
+      icon: <Languages className="h-4 w-4" />,
+      enabled: true,
+      content: patientLanguage === 'french'
+        ? `HPI Confirmation Summary pour PATIENT2025:
+────────────────────────────
+Vous êtes ici aujourd'hui pour une dépression et une tension artérielle élevée. Vous avez mentionné que cela a commencé le 01/02/2024. Vous avez décrit les symptômes comme une humeur basse, de l'irritabilité et des maux de tête dus à la pression, localisés dans la tête et l'humeur générale, et aggravés par le manque de sommeil, le stress au travail et la caféine, mais soulagés par le repos, les conversations avec des amis et les promenades. Vous l'avez évalué à 6 sur 10. Vous avez remarqué que cela s'aggrave progressivement. Vous avez également essayé d'améliorer votre sommeil, de réduire la caféine et de pratiquer la méditation, avec un soulagement modéré et temporaire.
+
+Pouvez-vous vérifier si ce résumé est exact?`
+        : `HPI Confirmation Summary for PATIENT2025:
+────────────────────────────
+You're here today for depression and elevated blood pressure. You mentioned this started on 01/02/2024. You described the symptoms as low mood, irritability, and pressure headaches, located in the head and general mood, and made worse by lack of sleep, work stress, and caffeine, but relieved by rest, talking to friends, and going for walks. You rated it 6 out of 10. You've noticed that it has been getting worse gradually. You've also tried improving your sleep, reducing caffeine, and meditation, with moderate and temporary relief.
+
+Can you verify if this summary is accurate?`
+    },
+    {
       id: "soap-note",
-      title: "SOAP Note",
+      title: "Super Spartan SOAP Note",
       icon: <FileText className="h-4 w-4" />,
       enabled: true,
       content: patientLanguage === 'french' 
-        ? "S: Patient se plaint de douleur abdominale depuis 3 jours avec nausées occasionnelles.\nO: Abdomen sensible au quadrant inférieur droit. Température 37.8°C.\nA: Suspicion d'appendicite aiguë. Besoin d'examens complémentaires.\nP: Référer aux urgences pour évaluation chirurgicale. Analyses sanguines et scanner abdominal recommandés."
-        : "S: Patient complains of abdominal pain for 3 days with occasional nausea.\nO: Tender abdomen in right lower quadrant. Temperature 37.8°C.\nA: Suspected acute appendicitis. Further evaluation needed.\nP: Refer to ER for surgical evaluation. Blood tests and abdominal CT scan recommended."
+        ? `Super Spartan SOAP Note
+────────────────────────────
+S: Femme de 38 ans avec dépression et TA élevée depuis 01/02/2024, présentant une humeur basse, maux de tête, irritabilité. Aggravation avec stress, manque de sommeil.
+A: Dépression avec facteurs déclenchants liés au mode de vie; antécédents d'hypertension, mal surveillée.
+P: Réévaluer l'humeur, évaluer la TA, envisager des options médicamenteuses ou thérapeutiques, explorer les facteurs de stress/sommeil.`
+        : `Super Spartan SOAP Note
+────────────────────────────
+S: 38yo F with depression and elevated BP since 01/02/2024, presenting with low mood, headaches, irritability. Worse with stress, sleep loss.
+A: Depression with associated lifestyle triggers; history of hypertension, poorly monitored.
+P: Reassess mood, evaluate BP, consider medication or therapy options, explore stress/sleep contributors.`
     },
     {
-      id: "hpi-summary",
-      title: "HPI Summary",
+      id: "plan-bullets",
+      title: "Plan – Bullet Points",
       icon: <ClipboardList className="h-4 w-4" />,
       enabled: true,
       content: patientLanguage === 'french'
-        ? "Nicolas Girard, homme de 43 ans, présente des douleurs abdominales depuis 3 jours. La douleur a commencé dans la région péri-ombilicale et s'est déplacée vers le quadrant inférieur droit. Il rapporte des nausées sans vomissements et une perte d'appétit. Aucun antécédent d'intervention chirurgicale abdominale. Pas de fièvre signalée à domicile."
-        : "Nicolas Girard, a 43-year-old male, presents with abdominal pain for 3 days. Pain started in the periumbilical region and migrated to the right lower quadrant. He reports nausea without vomiting and loss of appetite. No history of abdominal surgeries. No fever reported at home."
+        ? `Plan – Bullet Points
+────────────────────────────
+• Recommander un dépistage de la santé mentale (ex. PHQ-9) pour évaluer la sévérité de la dépression
+• Suggérer une surveillance ambulatoire ou à domicile de la TA pour un meilleur contrôle
+• Envisager des analyses sanguines: NFS, TSH, électrolytes pour exclure des causes réversibles de fatigue
+• Discuter d'options de thérapie comportementale pour la dépression et la gestion du stress
+• Revoir les habitudes de sommeil et proposer des stratégies d'hygiène du sommeil`
+        : `Plan – Bullet Points
+────────────────────────────
+• Recommend mental health screening (e.g., PHQ-9) to assess depression severity
+• Suggest ambulatory or home BP monitoring for better control
+• Consider blood tests: CBC, TSH, electrolytes to rule out reversible causes of fatigue
+• Discuss behavioral therapy options for depression and stress management
+• Review sleep habits and propose sleep hygiene strategies`
     },
     {
-      id: "documentation",
-      title: "Recommended Documentation",
+      id: "telemedicine-notes",
+      title: "In Case of Telemedicine",
+      icon: <MessageSquare className="h-4 w-4" />,
+      enabled: true,
+      content: patientLanguage === 'french'
+        ? `In case this is a telemedicine consultation:
+────────────────────────────
+Comme vous présentez des symptômes d'humeur qui s'aggravent ainsi qu'un antécédent d'hypertension, une évaluation complète en personne est recommandée. Pour évaluer correctement votre état, des examens physiques, des mesures de tension artérielle dans des conditions contrôlées et des analyses sanguines peuvent être nécessaires. Ceux-ci aident à exclure des causes comme des problèmes thyroïdiens ou une anémie qui pourraient imiter la dépression ou aggraver la fatigue. L'évaluation précise de la tension artérielle et l'interprétation des analyses ne peuvent pas être faites à distance. Veuillez prendre rendez-vous pour une visite en cabinet dans les 7 jours.`
+        : `In case this is a telemedicine consultation:
+────────────────────────────
+Because you're experiencing worsening mood symptoms along with a history of hypertension, a full in-person evaluation is recommended. To properly assess your condition, physical exams, blood pressure readings under controlled conditions, and blood work may be necessary. These help rule out causes such as thyroid issues or anemia that could mimic depression or worsen fatigue. Accurate blood pressure assessment and lab interpretation cannot be done remotely. Please schedule an in-office visit within 7 days.`
+    },
+    {
+      id: "follow-up-questions",
+      title: "Follow-Up Questions",
       icon: <PenSquare className="h-4 w-4" />,
       enabled: true,
       content: patientLanguage === 'french'
-        ? "Documenter l'historique complet de la douleur, y compris la localisation, l'intensité et les facteurs aggravants. Noter les antécédents médicaux pertinents, en particulier les problèmes gastro-intestinaux antérieurs. Inclure l'évaluation complète de l'abdomen et les signes vitaux. Documenter le plan de traitement et les instructions données au patient."
-        : "Document complete pain history including location, intensity, and aggravating factors. Note relevant medical history, particularly previous gastrointestinal issues. Include complete abdominal assessment and vital signs. Document treatment plan and instructions given to patient."
+        ? `Follow-Up Questions
+────────────────────────────
+
+Dépression
+• Vous sentez-vous reposé(e) au réveil, ou vous sentez-vous encore épuisé(e) même après avoir dormi?
+• Avez-vous eu des difficultés à vous concentrer ou à rester focalisé(e) sur des tâches?
+• Votre appétit a-t-il changé récemment?
+• Avez-vous perdu de l'intérêt pour des activités que vous aimiez auparavant?
+• Avez-vous des pensées de vous faire du mal ou que la vie ne vaut pas la peine d'être vécue?
+• Comment qualifieriez-vous votre niveau d'énergie sur une échelle de 1 à 10?
+• Avez-vous remarqué des changements dans vos habitudes de sommeil?
+• Vous sentez-vous souvent dépassé(e) par des tâches quotidiennes simples?
+
+Hypertension
+• Surveillez-vous votre tension artérielle à la maison?
+• Quelle était votre dernière mesure de tension?
+• Prenez-vous actuellement des médicaments pour l'hypertension?
+• Avez-vous modifié votre consommation de sel récemment?
+• Avez-vous des antécédents familiaux d'hypertension ou de maladies cardiaques?
+• Combien d'activité physique faites-vous par semaine?
+• Consommez-vous de l'alcool, et si oui, combien par semaine?
+• Avez-vous ressenti des symptômes comme des maux de tête, une vision floue ou des vertiges?
+
+Questions standard
+• Avez-vous déjà consulté un médecin pour ce problème par le passé?
+• Avez-vous été traité(e) pour ce problème dans le passé?
+• Y a-t-il autre chose que vous aimeriez me dire sur votre santé actuelle?`
+        : `Follow-Up Questions
+────────────────────────────
+
+Depression
+• Do you feel rested when you wake up, or do you still feel drained even after sleeping?
+• Have you had any difficulty concentrating or staying focused on tasks?
+• Has your appetite changed recently?
+• Have you lost interest in activities you used to enjoy?
+• Do you have thoughts of harming yourself or that life is not worth living?
+• How would you rate your energy level on a scale of 1 to 10?
+• Have you noticed changes in your sleep patterns?
+• Do you often feel overwhelmed by simple daily tasks?
+
+Hypertension
+• Do you monitor your blood pressure at home?
+• What was your last blood pressure reading?
+• Are you currently taking any medications for hypertension?
+• Have you modified your salt intake recently?
+• Do you have a family history of hypertension or heart disease?
+• How much physical activity do you do per week?
+• Do you consume alcohol, and if so, how much per week?
+• Have you experienced symptoms like headaches, blurred vision, or dizziness?
+
+Standard questions
+• Have you seen a doctor for this in the past?
+• Have you been treated for this in the past?
+• Is there anything else you would like to tell me about your current health?`
     },
     {
-      id: "differential-diagnosis",
-      title: "Differential Diagnosis",
+      id: "medication-recommendation",
+      title: "Medication Recommendation",
       icon: <Stethoscope className="h-4 w-4" />,
       enabled: true,
       content: patientLanguage === 'french'
-        ? "1. Appendicite aiguë\n2. Diverticulite\n3. Calculs rénaux\n4. Gastro-entérite\n5. Colique biliaire\n6. Adénite mésentérique"
-        : "1. Acute appendicitis\n2. Diverticulitis\n3. Kidney stones\n4. Gastroenteritis\n5. Biliary colic\n6. Mesenteric adenitis"
-    },
-    {
-      id: "ai-analysis",
-      title: "AI Analysis",
-      icon: <BrainCircuit className="h-4 w-4" />,
-      enabled: true,
-      content: patientLanguage === 'french'
-        ? "Les symptômes du patient sont fortement évocateurs d'une appendicite aiguë. La migration de la douleur vers le quadrant inférieur droit est un signe classique (signe de Blumberg). La présence de nausées sans diarrhée importante soutient davantage ce diagnostic. Recommandation d'une évaluation chirurgicale urgente compte tenu de la durée des symptômes (3 jours), ce qui augmente le risque de perforation."
-        : "Patient's symptoms are highly suggestive of acute appendicitis. The migration of pain to the right lower quadrant is a classic sign (Blumberg's sign). The presence of nausea without significant diarrhea further supports this diagnosis. Recommendation for urgent surgical evaluation given the duration of symptoms (3 days), which increases the risk of perforation."
+        ? `Je vous prescris un traitement à base de Gelomyrtol, un produit naturel composé de thym, eucalyptus, menthe et myrte, qui agit comme antimucolytique et possède un léger effet anti-infectieux. Des études ont montré qu'il peut réduire jusqu'à 50% le recours aux antibiotiques dans les cas de sinusite et de bronchite, dont environ 97% sont d'origine virale et ne nécessitent pas d'antibiotiques. Prenez 1 gélule quatre fois par jour pendant 7 jours.`
+        : `I'm prescribing Gelomyrtol, a natural product made from thyme, eucalyptus, mint and myrtle, which acts as an antimucotyltic and has mild anti-infective properties. Studies have shown it can reduce antibiotic use by up to 50% in cases of sinusitis and bronchitis, of which approximately 97% are viral in origin and don't require antibiotics. Take 1 capsule four times daily for 7 days.`
     }
   ]);
 

@@ -304,6 +304,80 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to generate documentation" });
     }
   });
+  
+  // New AI Message Generation endpoint for patient communications
+  app.post("/api/ai/generate", async (req, res) => {
+    try {
+      const { prompt, patientId, patientLanguage = 'english', maxLength = 5 } = req.body;
+      
+      if (!prompt) {
+        return res.status(400).json({ message: "Missing prompt" });
+      }
+      
+      // Get patient information if patientId is provided
+      let patient = null;
+      if (patientId) {
+        try {
+          patient = await storage.getPatient(parseInt(patientId));
+        } catch (error) {
+          console.warn(`Could not fetch patient with ID ${patientId}:`, error);
+        }
+      }
+      
+      // Determine language based on patient preference if not explicitly specified
+      const language = patientLanguage || (patient?.language || 'english');
+      
+      // Create system prompt based on language
+      const systemMessage = language === 'french' 
+        ? `Vous êtes un assistant médical rédigeant des messages pour un médecin à ses patients. Répondez en français de manière professionnelle mais chaleureuse. Limitez votre réponse à ${maxLength} phrases maximum, dans un seul paragraphe. Utilisez un ton spartiate et direct. N'utilisez pas de formules de politesse excessives.`
+        : `You are a medical assistant crafting messages for a doctor to send to patients. Respond in English in a professional but warm manner. Limit your response to ${maxLength} sentences maximum, in a single paragraph. Use a spartan and direct tone. Do not use excessive politeness.`;
+      
+      // Use Anthropic if available (better multilingual abilities)
+      if (process.env.ANTHROPIC_API_KEY) {
+        try {
+          // Import Anthropic SDK dynamically
+          const Anthropic = require('@anthropic-ai/sdk');
+          const anthropic = new Anthropic({
+            apiKey: process.env.ANTHROPIC_API_KEY,
+          });
+          
+          // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
+          const response = await anthropic.messages.create({
+            model: 'claude-3-7-sonnet-20250219',
+            system: systemMessage,
+            max_tokens: 1024,
+            messages: [
+              { role: 'user', content: prompt }
+            ],
+          });
+          
+          return res.json({ text: response.content[0].text.trim() });
+        } catch (error) {
+          console.error("Error using Anthropic:", error);
+          // Fall back to OpenAI if Anthropic fails
+        }
+      }
+      
+      // Use OpenAI as fallback
+      if (process.env.OPENAI_API_KEY) {
+        const response = await openai.chat.completions.create({
+          model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+          messages: [
+            { role: "system", content: systemMessage },
+            { role: "user", content: prompt }
+          ],
+        });
+        
+        return res.json({ text: response.choices[0].message.content.trim() });
+      }
+      
+      // No API keys available, return error
+      return res.status(503).json({ message: "AI services not configured" });
+    } catch (error) {
+      console.error("Error generating AI response:", error);
+      res.status(500).json({ message: "Failed to generate AI response" });
+    }
+  });
 
   // Spruce Health API proxy
   app.post("/api/spruce/messages", async (req, res) => {

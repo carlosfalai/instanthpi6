@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Check, MessageSquare, Send } from "lucide-react";
 import { useRef, useEffect } from "react";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
 // Use the actual patient ID from the screenshot
 const PATIENT_ID = 4; // Nicolas Girard
@@ -36,48 +38,51 @@ export default function PatientDashboardPage() {
     language: "french" as "french" | "english"
   });
   
-  // Use sample message data for demonstration
-  const mockMessages: Message[] = [
+  // Fetch messages from the API
+  const { data: fetchedMessages = [], isLoading: messagesLoading } = useQuery({
+    queryKey: [`/api/patients/${PATIENT_ID}/messages`],
+    queryFn: async () => {
+      try {
+        const response = await axios.get(`/api/patients/${PATIENT_ID}/messages`);
+        return response.data;
+      } catch (error) {
+        console.error("Error fetching messages:", error);
+        return [];
+      }
+    },
+    refetchOnWindowFocus: false
+  });
+  
+  // Default messages if API call returns empty
+  const defaultMessages: Message[] = [
     {
-      id: "1",
+      id: "default-1",
       patientId: PATIENT_ID,
       content: "Bonjour Dr. Font, je voudrais prendre un rendez-vous pour discuter de mes résultats de laboratoire récents.",
-      timestamp: "2025-04-19T07:30:00Z",
+      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
       isFromPatient: true
     },
     {
-      id: "2",
+      id: "default-2",
       patientId: PATIENT_ID,
-      content: "Bonjour M. Girard, bien sûr. J'ai consulté vos résultats. Quand seriez-vous disponible pour une consultation?",
-      timestamp: "2025-04-19T08:15:00Z",
+      content: "Bonjour M. Girard, j'ai consulté vos résultats. Quand seriez-vous disponible pour une consultation?",
+      timestamp: new Date(Date.now() - 1.5 * 60 * 60 * 1000).toISOString(), // 1.5 hours ago
       isFromPatient: false,
       sender: DOCTOR_NAME
-    },
-    {
-      id: "3",
-      patientId: PATIENT_ID,
-      content: "Je suis disponible demain après-midi, vers 14h, si cela vous convient?",
-      timestamp: "2025-04-19T08:22:00Z",
-      isFromPatient: true
-    },
-    {
-      id: "4",
-      patientId: PATIENT_ID,
-      content: "Parfait. Je vous ai réservé un créneau à 14h demain. Apportez votre carte RAMQ s'il vous plaît.",
-      timestamp: "2025-04-19T08:30:00Z",
-      isFromPatient: false,
-      sender: DOCTOR_NAME
-    },
-    {
-      id: "5",
-      patientId: PATIENT_ID,
-      content: "D'accord, merci beaucoup. À demain!",
-      timestamp: "2025-04-19T08:35:00Z",
-      isFromPatient: true
     }
   ];
   
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
+  // Use fetched messages if available, otherwise use defaults for demo purposes
+  const [messages, setMessages] = useState<Message[]>(
+    fetchedMessages.length > 0 ? fetchedMessages : defaultMessages
+  );
+  
+  // Update messages when fetchedMessages changes
+  useEffect(() => {
+    if (fetchedMessages.length > 0) {
+      setMessages(fetchedMessages);
+    }
+  }, [fetchedMessages]);
   
   // Scroll to bottom whenever messages change
   useEffect(() => {
