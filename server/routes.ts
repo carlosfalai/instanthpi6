@@ -11,6 +11,8 @@ import {
 } from "@shared/schema";
 import OpenAI from "openai";
 import axios from "axios";
+import { verifyRAMQCard, extractRAMQInfo } from "./utils/imageAnalysis";
+import { findSubmissionByPseudonym, generateHPIConfirmationSummary } from "./utils/formsiteApi";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -363,36 +365,278 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Missing form type parameter" });
       }
 
-      // This would normally call Formsite API, but we'll return mock data for demonstration
-      // In a real implementation, you would make an HTTP request to Formsite's API
-      
-      // Mock form submission retrieval
-      // Would be replaced with actual API call to Formsite
-      const mockFormData = {
-        urgent_care: {
-          symptoms: "Sore throat, fever, fatigue",
-          duration: "3 days",
-          severity: "moderate",
-          temperature: "101.2°F",
-          allergies: "None",
-          medications: "Tylenol"
-        },
-        std_checkup: {
-          symptoms: "No symptoms",
-          lastTest: "6 months ago",
-          sexualHistory: "2 partners in last year",
-          protection: "Sometimes",
-          concerns: "Routine checkup"
-        }
-      };
-      
-      res.json({ 
-        formType, 
-        data: mockFormData[formType as keyof typeof mockFormData] || {} 
-      });
+      // Call Formsite API using the API key
+      try {
+        const formsiteClient = axios.create({
+          baseURL: 'https://fs3.formsite.com/api/v2',
+          headers: {
+            'Authorization': `Bearer ${process.env.FORMSITE_API_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        // This would be replaced with the actual form ID from your Formsite account
+        const formId = formType === 'urgent_care' ? 'form1' : 'form2';
+        
+        const response = await formsiteClient.get(`/forms/${formId}/results`, {
+          params: {
+            sort: 'date_desc',
+            limit: 10
+          }
+        });
+        
+        res.json({ 
+          formType, 
+          data: response.data 
+        });
+      } catch (formsiteError) {
+        console.error("Error connecting to Formsite API:", formsiteError);
+        res.status(500).json({ message: "Failed to fetch form data from Formsite" });
+      }
     } catch (error) {
       console.error("Error fetching form submissions:", error);
       res.status(500).json({ message: "Failed to fetch form submissions" });
+    }
+  });
+
+  // Patient verification endpoints
+  // 1. RAMQ Card verification endpoint
+  app.post("/api/verify/ramq-card", async (req, res) => {
+    try {
+      const { patientId, imageBase64 } = req.body;
+      
+      if (!patientId || !imageBase64) {
+        return res.status(400).json({ message: "Missing patient ID or image data" });
+      }
+      
+      // Verify the RAMQ card
+      const verificationResult = await verifyRAMQCard(imageBase64);
+      
+      if (!verificationResult.isValid || verificationResult.confidence < 0.7) {
+        return res.status(400).json({
+          success: false,
+          message: verificationResult.message || "The image does not appear to be a valid RAMQ health insurance card. Please provide a clear photo of the front of your RAMQ card."
+        });
+      }
+      
+      // Extract information from the RAMQ card
+      const extractionResult = await extractRAMQInfo(imageBase64);
+      
+      // Update patient record with RAMQ information if available
+      if (extractionResult.success && extractionResult.ramqNumber) {
+        await storage.updatePatient(patientId, {
+          healthCardNumber: extractionResult.ramqNumber
+        });
+      }
+      
+      // Return success response with extraction data
+      res.json({
+        success: true,
+        message: "RAMQ card verified successfully",
+        data: {
+          name: extractionResult.name,
+          cardNumber: extractionResult.ramqNumber,
+          expirationDate: extractionResult.expirationDate
+        }
+      });
+    } catch (error) {
+      console.error("Error verifying RAMQ card:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to process RAMQ card verification"
+      });
+    }
+  });
+  
+  // 2. Pseudonym verification and form submission retrieval
+  app.post("/api/verify/pseudonym", async (req, res) => {
+    try {
+      const { patientId, pseudonym } = req.body;
+      
+      if (!patientId || !pseudonym) {
+        return res.status(400).json({ 
+          success: false,
+          message: "Missing patient ID or pseudonym"
+        });
+      }
+      
+      // Find form submission by pseudonym
+      const formResult = await findSubmissionByPseudonym(pseudonym);
+      
+      if (!formResult.success) {
+        return res.status(404).json({
+          success: false,
+          message: formResult.message || "No form submission found with this pseudonym. Please check and try again."
+        });
+      }
+      
+      // Generate HPI confirmation summary
+      const hpiSummary = await generateHPIConfirmationSummary(
+        formResult.formType!, 
+        formResult.formData!
+      );
+      
+      // Save form submission to database
+      const submission = await storage.createFormSubmission({
+        patientId,
+        formType: formResult.formType!,
+        formData: formResult.formData!,
+        submissionId: pseudonym,
+        submittedAt: new Date().toISOString()
+      });
+      
+      // Send a message to the patient with the HPI summary via Spruce
+      try {
+        const welcomeMessage = `Thank you for providing your form information. Here's a summary of your health information:
+        
+${hpiSummary}
+
+Is this information correct? If not, please let us know what needs to be corrected.`;
+        
+        // Send the message through Spruce API
+        const spruceResponse = await spruceApi.post(`/messages`, {
+          patient_id: patientId,
+          content: welcomeMessage,
+          message_type: 'MEDICAL',
+          sender_id: 1, // Doctor ID
+        });
+        
+        // Save the message to our database
+        await storage.createMessage({
+          patientId,
+          senderId: 1, // Assume doctor with ID 1
+          content: welcomeMessage,
+          isFromPatient: false,
+          spruceMessageId: spruceResponse.data.id
+        });
+      } catch (spruceError) {
+        console.error("Error sending HPI summary to patient:", spruceError);
+        // Continue processing even if message sending fails
+      }
+      
+      // Return success response with form data
+      res.json({
+        success: true,
+        message: "Form submission verified and processed successfully",
+        data: {
+          formType: formResult.formType,
+          hpiSummary,
+          submissionId: submission.id
+        }
+      });
+    } catch (error) {
+      console.error("Error verifying pseudonym:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to process pseudonym verification"
+      });
+    }
+  });
+  
+  // 3. Combined verification endpoint (for automating the whole process)
+  app.post("/api/verify/patient", async (req, res) => {
+    try {
+      const { patientId, ramqImageBase64, pseudonym } = req.body;
+      
+      if (!patientId || !ramqImageBase64 || !pseudonym) {
+        return res.status(400).json({ 
+          success: false, 
+          message: "Missing required verification data" 
+        });
+      }
+      
+      // Step 1: Verify RAMQ card
+      const ramqResult = await verifyRAMQCard(ramqImageBase64);
+      
+      if (!ramqResult.isValid || ramqResult.confidence < 0.7) {
+        return res.status(400).json({
+          success: false,
+          step: "ramq",
+          message: ramqResult.message || "The image does not appear to be a valid RAMQ health insurance card."
+        });
+      }
+      
+      // Extract RAMQ information
+      const ramqInfo = await extractRAMQInfo(ramqImageBase64);
+      
+      // Step 2: Verify pseudonym and get form data
+      const formResult = await findSubmissionByPseudonym(pseudonym);
+      
+      if (!formResult.success) {
+        return res.status(404).json({
+          success: false,
+          step: "pseudonym",
+          message: formResult.message || "No form submission found with this pseudonym."
+        });
+      }
+      
+      // Step 3: Generate HPI confirmation summary
+      const hpiSummary = await generateHPIConfirmationSummary(
+        formResult.formType!, 
+        formResult.formData!
+      );
+      
+      // Step 4: Save form submission to database
+      const submission = await storage.createFormSubmission({
+        patientId,
+        formType: formResult.formType!,
+        formData: formResult.formData!,
+        submissionId: pseudonym,
+        submittedAt: new Date().toISOString()
+      });
+      
+      // Step 5: Send a message to the patient with the HPI summary via Spruce
+      try {
+        const welcomeMessage = `Thank you for completing your verification process. Here's a summary of the information you provided:
+        
+${hpiSummary}
+
+Is this information correct? If not, please let us know what needs to be corrected.`;
+        
+        // Send the message through Spruce API
+        const spruceResponse = await spruceApi.post(`/messages`, {
+          patient_id: patientId,
+          content: welcomeMessage,
+          message_type: 'MEDICAL',
+          sender_id: 1, // Doctor ID
+        });
+        
+        // Save the message to our database
+        await storage.createMessage({
+          patientId,
+          senderId: 1, // Assume doctor with ID 1
+          content: welcomeMessage,
+          isFromPatient: false,
+          spruceMessageId: spruceResponse.data.id
+        });
+      } catch (spruceError) {
+        console.error("Error sending HPI summary to patient:", spruceError);
+        // Continue processing even if message sending fails
+      }
+      
+      // Return success response with all verification data
+      res.json({
+        success: true,
+        message: "Patient verification completed successfully",
+        data: {
+          ramq: {
+            name: ramqInfo.name,
+            cardNumber: ramqInfo.ramqNumber,
+            expirationDate: ramqInfo.expirationDate
+          },
+          form: {
+            formType: formResult.formType,
+            submissionId: submission.id
+          },
+          hpiSummary
+        }
+      });
+    } catch (error) {
+      console.error("Error in patient verification process:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to complete patient verification process"
+      });
     }
   });
 
