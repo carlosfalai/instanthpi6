@@ -13,75 +13,94 @@ const spruceApi = axios.create({
   }
 });
 
-// Sync patients from Spruce Health API
+// Sync patients from Spruce Health API (or return existing local patients)
 router.post('/sync-patients', async (req, res) => {
   try {
     // Check if Spruce API key is available
     if (!process.env.SPRUCE_API_KEY) {
-      return res.status(400).json({ message: 'Spruce API key not configured' });
+      // If no API key, just return the existing patients
+      const localPatients = await storage.getAllPatients();
+      return res.json({ 
+        message: 'Using local patients (Spruce API key not configured)',
+        count: localPatients.length,
+        source: 'local'
+      });
     }
     
-    // Get patients from Spruce API
-    const response = await spruceApi.get('/patients');
-    const sprucePatients = response.data.patients || [];
-    
-    // Sync patients with our database
-    const syncedPatients = [];
-    
-    for (const sprucePatient of sprucePatients) {
-      // Check if patient already exists in our DB by Spruce ID
-      let existingPatient = null;
-      const localPatients = await storage.getAllPatients();
+    try {
+      // Get patients from Spruce API
+      const response = await spruceApi.get('/patients');
+      const sprucePatients = response.data.patients || [];
       
-      for (const patient of localPatients) {
-        if (patient.spruceId === sprucePatient.id) {
-          existingPatient = patient;
-          break;
-        }
-      }
+      // Sync patients with our database
+      const syncedPatients = [];
       
-      if (existingPatient) {
-        // Update existing patient
-        const updatedPatient = await storage.updatePatient(existingPatient.id, {
-          name: sprucePatient.name,
-          email: sprucePatient.email || existingPatient.email,
-          phone: sprucePatient.phone || existingPatient.phone,
-          dateOfBirth: sprucePatient.date_of_birth || existingPatient.dateOfBirth,
-          gender: sprucePatient.gender || existingPatient.gender,
-          lastVisit: sprucePatient.last_visit ? new Date(sprucePatient.last_visit) : existingPatient.lastVisit,
-          status: sprucePatient.status || existingPatient.status
-        });
+      for (const sprucePatient of sprucePatients) {
+        // Check if patient already exists in our DB by Spruce ID
+        let existingPatient = null;
+        const localPatients = await storage.getAllPatients();
         
-        if (updatedPatient) {
-          syncedPatients.push(updatedPatient);
+        for (const patient of localPatients) {
+          if (patient.spruceId === sprucePatient.id) {
+            existingPatient = patient;
+            break;
+          }
         }
-      } else {
-        // Create new patient
-        try {
-          const newPatient = await storage.createPatient({
+        
+        if (existingPatient) {
+          // Update existing patient
+          const updatedPatient = await storage.updatePatient(existingPatient.id, {
             name: sprucePatient.name,
-            gender: sprucePatient.gender || 'unknown',
-            dateOfBirth: sprucePatient.date_of_birth || '1970-01-01',
-            email: sprucePatient.email || `patient-${sprucePatient.id}@example.com`,
-            phone: sprucePatient.phone || '',
-            spruceId: sprucePatient.id,
-            language: sprucePatient.language || null
+            email: sprucePatient.email || existingPatient.email,
+            phone: sprucePatient.phone || existingPatient.phone,
+            dateOfBirth: sprucePatient.date_of_birth || existingPatient.dateOfBirth,
+            gender: sprucePatient.gender || existingPatient.gender,
+            lastVisit: sprucePatient.last_visit ? new Date(sprucePatient.last_visit) : existingPatient.lastVisit,
+            status: sprucePatient.status || existingPatient.status
           });
           
-          syncedPatients.push(newPatient);
-        } catch (createError) {
-          console.error(`Failed to create patient from Spruce: ${sprucePatient.id}`, createError);
+          if (updatedPatient) {
+            syncedPatients.push(updatedPatient);
+          }
+        } else {
+          // Create new patient
+          try {
+            const newPatient = await storage.createPatient({
+              name: sprucePatient.name,
+              gender: sprucePatient.gender || 'unknown',
+              dateOfBirth: sprucePatient.date_of_birth || '1970-01-01',
+              email: sprucePatient.email || `patient-${sprucePatient.id}@example.com`,
+              phone: sprucePatient.phone || '',
+              spruceId: sprucePatient.id,
+              language: sprucePatient.language || null
+            });
+            
+            syncedPatients.push(newPatient);
+          } catch (createError) {
+            console.error(`Failed to create patient from Spruce: ${sprucePatient.id}`, createError);
+          }
         }
       }
+      
+      res.json({ 
+        message: `Successfully synced ${syncedPatients.length} patients`,
+        count: syncedPatients.length,
+        source: 'spruce'
+      });
+    } catch (spruceError) {
+      console.error('Error connecting to Spruce API:', spruceError);
+      
+      // Fallback to local patients if Spruce API fails
+      const localPatients = await storage.getAllPatients();
+      return res.json({ 
+        message: 'Using local patients (Spruce API unavailable)',
+        count: localPatients.length,
+        source: 'local'
+      });
     }
-    
-    res.json({ 
-      message: `Successfully synced ${syncedPatients.length} patients`,
-      count: syncedPatients.length
-    });
   } catch (error) {
-    console.error('Error syncing patients from Spruce API:', error);
-    res.status(500).json({ message: 'Failed to sync patients from Spruce' });
+    console.error('Error in sync-patients endpoint:', error);
+    res.status(500).json({ message: 'Failed to sync patients' });
   }
 });
 

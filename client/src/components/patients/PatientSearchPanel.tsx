@@ -51,7 +51,7 @@ export default function PatientSearchPanel({
     }
   });
   
-  // Sync patients with Spruce API
+  // Sync patients with Spruce API (or fallback to fetching local patients when API is unavailable)
   const handleSyncPatients = async () => {
     setSyncingPatients(true);
     
@@ -61,13 +61,15 @@ export default function PatientSearchPanel({
       });
       
       if (!res.ok) {
-        throw new Error('Failed to sync patients');
+        console.log('Spruce API sync failed, using local patients instead');
       }
       
       // Refetch the patients list
       await refetch();
     } catch (error) {
       console.error('Error syncing patients:', error);
+      // Still refetch to ensure we have the local patients
+      await refetch();
     } finally {
       setSyncingPatients(false);
     }
