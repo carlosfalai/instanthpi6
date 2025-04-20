@@ -78,7 +78,10 @@ export default function ThreePanelLayout() {
     <div className="h-screen flex flex-col bg-[#121212] text-white">
       {/* Header */}
       <header className="h-14 flex items-center px-4 bg-[#1e1e1e] border-b border-gray-800">
-        <h1 className="text-xl font-semibold">MedAI Assistant</h1>
+        <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">InstantHPI</h1>
+        <div className="ml-6 flex-1">
+          <NavigationBar />
+        </div>
       </header>
       
       {/* Main Content */}
