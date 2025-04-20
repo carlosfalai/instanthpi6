@@ -76,6 +76,19 @@ export async function seedDatabase() {
       avatarUrl: null,
       lastVisit: null,
       healthCardNumber: null
+    },
+    {
+      name: "Carlos Faviel Font",
+      gender: "Male",
+      dateOfBirth: "1992-06-15",
+      email: "carlos.faviel.font@example.com",
+      phone: "555-987-6543",
+      language: "english",
+      spruceId: "spruce-1005",
+      status: "active",
+      avatarUrl: null,
+      lastVisit: null,
+      healthCardNumber: "RAMQ-123456789"
     }
   ];
   

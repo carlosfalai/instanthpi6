@@ -6,6 +6,7 @@ import PendingItemsPanel from './PendingItemsPanel';
 import AiAssistantPanel from '@/components/ai/AiAssistantPanel';
 import PatientSearchPanel from '@/components/patients/PatientSearchPanel';
 import SpruceConversation from '@/components/conversation/SpruceConversation';
+import NavigationBar from '@/components/navigation/NavigationBar';
 
 // Interfaces
 interface Patient {
