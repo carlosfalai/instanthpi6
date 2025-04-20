@@ -7,6 +7,7 @@ import NotFound from '@/pages/not-found';
 import ThreePanelLayout from '@/components/dashboard/ThreePanelLayout';
 import PatientsPage from '@/pages/patients-page';
 import DocumentsPage from '@/pages/documents-page';
+import EducationPage from '@/pages/education-page';
 
 function Router() {
   return (
@@ -14,6 +15,7 @@ function Router() {
       <Route path="/" component={ThreePanelLayout} />
       <Route path="/patients" component={PatientsPage} />
       <Route path="/documents" component={DocumentsPage} />
+      <Route path="/education" component={EducationPage} />
       <Route component={NotFound} />
     </Switch>
   );

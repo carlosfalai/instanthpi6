@@ -430,12 +430,20 @@ export class MemStorage implements IStorage {
   async createPreventativeCare(item: InsertPreventativeCare): Promise<PreventativeCare> {
     const id = crypto.randomUUID();
     const preventativeCareItem: PreventativeCare = {
-      ...item,
       id,
+      name: item.name,
+      patientId: item.patientId,
+      description: item.description,
+      category: item.category,
+      status: item.status,
+      relevantTo: item.relevantTo || null,
+      messageTemplate: item.messageTemplate,
+      suggestedDate: item.suggestedDate || null,
       sentDate: null,
       responseDate: null,
       responseContent: null,
       createdAt: new Date(),
+      billingCode: item.billingCode || null
     };
     this.preventativeCare.set(id, preventativeCareItem);
     return preventativeCareItem;
@@ -480,11 +488,15 @@ export class MemStorage implements IStorage {
     const now = new Date();
     
     const aiPrompt: AiPrompt = {
-      ...prompt,
       id,
+      name: prompt.name,
+      category: prompt.category,
+      order: prompt.order,
+      promptText: prompt.promptText,
+      userId: prompt.userId || null,
       createdAt: now,
       updatedAt: now,
-      enabled: prompt.enabled ?? true
+      enabled: prompt.enabled || true
     };
     
     this.aiPrompts.set(id, aiPrompt);
@@ -524,8 +536,15 @@ export class MemStorage implements IStorage {
     const now = new Date();
     
     const educationModule: EducationModule = {
-      ...module,
       id,
+      title: module.title,
+      description: module.description,
+      type: module.type,
+      content: module.content,
+      featuresUnlocked: module.featuresUnlocked,
+      prerequisiteModules: module.prerequisiteModules || null,
+      order: module.order,
+      estimatedMinutes: module.estimatedMinutes || 0,
       createdAt: now,
       updatedAt: now
     };
