@@ -23,6 +23,66 @@ export async function seedDatabase() {
   
   console.log("Created doctor user:", doctor.fullName);
   
+  // Create education modules
+  const educationModules = [
+    {
+      title: "Introduction to InstantHPI",
+      description: "Learn the basics of using InstantHPI to improve your medical documentation workflow.",
+      type: "video" as const,
+      content: "This module introduces the core features of InstantHPI, including the three-panel layout, patient search, and AI-assisted documentation.",
+      featuresUnlocked: ["BasicNavigation"],
+      prerequisiteModules: null,
+      order: 1,
+      estimatedMinutes: 5
+    },
+    {
+      title: "Patient Verification",
+      description: "Learn how to verify patient identity using RAMQ cards.",
+      type: "article" as const,
+      content: "This module covers how to request and verify patient health insurance cards, ensuring secure and accurate patient identification.",
+      featuresUnlocked: ["PatientVerification"],
+      prerequisiteModules: [1],
+      order: 2,
+      estimatedMinutes: 10
+    },
+    {
+      title: "Creating SOAP Notes",
+      description: "Generate comprehensive SOAP notes with AI assistance.",
+      type: "video" as const,
+      content: "Learn how to use InstantHPI to generate SOAP notes from patient conversations and form data, saving time while maintaining quality.",
+      featuresUnlocked: ["SOAPNoteGeneration"],
+      prerequisiteModules: [1, 2],
+      order: 3,
+      estimatedMinutes: 15
+    },
+    {
+      title: "Managing Pending Items",
+      description: "Track and manage patient follow-ups and pending items.",
+      type: "article" as const,
+      content: "This module teaches you how to use the pending items feature to track patient follow-ups, tests, and referrals.",
+      featuresUnlocked: ["PendingItemsManagement"],
+      prerequisiteModules: [1],
+      order: 4,
+      estimatedMinutes: 8
+    },
+    {
+      title: "Optimizing Preventative Care",
+      description: "Learn strategies for scheduling preventative care measures.",
+      type: "quiz" as const,
+      content: "This module covers how to use InstantHPI to strategically schedule preventative care for better patient outcomes and optimized billing.",
+      featuresUnlocked: ["PreventativeCareScheduling"],
+      prerequisiteModules: [3, 4],
+      order: 5,
+      estimatedMinutes: 20
+    }
+  ];
+  
+  for (const module of educationModules) {
+    await storage.createEducationModule(module);
+  }
+  
+  console.log(`Created ${educationModules.length} education modules`);
+  
   // Create some patients
   const patients = [
     {

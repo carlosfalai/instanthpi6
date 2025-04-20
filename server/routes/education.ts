@@ -101,8 +101,9 @@ router.delete("/modules/:id", async (req, res) => {
 // Get progress for current user
 router.get("/progress", async (req, res) => {
   try {
-    // Assuming authentication middleware sets req.user
-    const userId = req.user?.id || 1; // Fallback to user ID 1 for development
+    // For now we'll use the first user (doctor) as our default user
+    // In a real app, this would come from authentication
+    const userId = 1; // Doctor user ID
     const progress = await storage.getUserEducationProgress(userId);
     res.json(progress);
   } catch (error) {
@@ -114,8 +115,9 @@ router.get("/progress", async (req, res) => {
 // Update or create progress for a module
 router.post("/progress", async (req, res) => {
   try {
-    // Assuming authentication middleware sets req.user
-    const userId = req.user?.id || 1; // Fallback to user ID 1 for development
+    // For now we'll use the first user (doctor) as our default user
+    // In a real app, this would come from authentication
+    const userId = 1; // Doctor user ID
     
     const schema = z.object({
       moduleId: z.number(),
@@ -170,8 +172,9 @@ router.post("/progress", async (req, res) => {
 // Get unlocked features for current user
 router.get("/unlocked-features", async (req, res) => {
   try {
-    // Assuming authentication middleware sets req.user
-    const userId = req.user?.id || 1; // Fallback to user ID 1 for development
+    // For now we'll use the first user (doctor) as our default user
+    // In a real app, this would come from authentication
+    const userId = 1; // Doctor user ID
     const unlockedFeatures = await storage.getUserUnlockedFeatures(userId);
     res.json(unlockedFeatures);
   } catch (error) {
