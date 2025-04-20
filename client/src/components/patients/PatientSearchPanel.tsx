@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -17,6 +17,11 @@ interface Patient {
   spruceId: string | null;
 }
 
+interface PatientData {
+  patients: Patient[];
+  source: 'spruce' | 'local';
+}
+
 interface PatientSearchPanelProps {
   onSelectPatient: (patient: Patient) => void;
   selectedPatientId: number | null;
@@ -30,21 +35,32 @@ export default function PatientSearchPanel({
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
   const [syncingPatients, setSyncingPatients] = useState(false);
   
-  // Query patients with optional search filter
+  // Query patients with real-time search from Spruce API
   const { 
-    data: patients = [], 
+    data: patientData = { patients: [], source: 'local' }, 
     isLoading,
     refetch
-  } = useQuery<Patient[]>({
-    queryKey: ['/api/patients', debouncedSearchTerm],
+  } = useQuery<{ patients: Patient[], source: 'spruce' | 'local' }>({
+    queryKey: ['/api/spruce/search-patients', debouncedSearchTerm],
     queryFn: async () => {
-      const url = debouncedSearchTerm 
-        ? `/api/patients?query=${encodeURIComponent(debouncedSearchTerm)}`
-        : '/api/patients';
+      // If no search term, get all patients from the local database
+      if (!debouncedSearchTerm) {
+        const res = await fetch('/api/patients');
+        
+        if (!res.ok) {
+          throw new Error('Failed to fetch patients');
+        }
+        
+        const patients = await res.json();
+        return { patients, source: 'local' };
+      }
+      
+      // If there's a search term, use the real-time Spruce API search
+      const url = `/api/spruce/search-patients?query=${encodeURIComponent(debouncedSearchTerm)}`;
       const res = await fetch(url);
       
       if (!res.ok) {
-        throw new Error('Failed to fetch patients');
+        throw new Error('Failed to search patients');
       }
       
       return res.json();
@@ -114,9 +130,9 @@ export default function PatientSearchPanel({
           <div className="flex justify-center items-center h-32">
             <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
           </div>
-        ) : patients.length > 0 ? (
+        ) : patientData.patients.length > 0 ? (
           <div className="divide-y divide-gray-800">
-            {patients.map((patient) => (
+            {patientData.patients.map((patient) => (
               <div 
                 key={patient.id}
                 className={`p-3 cursor-pointer hover:bg-[#1e1e1e] ${selectedPatientId === patient.id ? 'bg-[#1e1e1e]' : ''}`}

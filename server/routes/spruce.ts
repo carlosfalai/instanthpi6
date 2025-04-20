@@ -2,7 +2,105 @@ import { Router } from 'express';
 import { storage } from '../storage';
 import axios from 'axios';
 
+// Define interface for Spruce patient data
+interface SprucePatient {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  date_of_birth?: string;
+  gender?: string;
+  language?: string;
+  last_visit?: string;
+  status?: string;
+}
+
 export const router = Router();
+
+// Search patients in real-time from Spruce API
+router.get('/search-patients', async (req, res) => {
+  try {
+    const { query } = req.query;
+    
+    if (!query || typeof query !== 'string') {
+      return res.status(400).json({ message: 'Search query is required' });
+    }
+    
+    // Check if Spruce API key is available
+    if (!process.env.SPRUCE_API_KEY) {
+      // If no API key, fall back to local search
+      const localPatients = await storage.getAllPatients();
+      const searchTerm = query.toLowerCase();
+      
+      const filteredPatients = localPatients.filter(patient => {
+        return (
+          patient.name.toLowerCase().includes(searchTerm) ||
+          patient.email.toLowerCase().includes(searchTerm) ||
+          patient.phone.includes(searchTerm)
+        );
+      });
+      
+      return res.json({
+        patients: filteredPatients,
+        source: 'local'
+      });
+    }
+    
+    try {
+      // Search patients in Spruce API directly
+      const response = await axios.create({
+        baseURL: 'https://api.sprucehealth.com/v1',
+        headers: {
+          'Authorization': `Bearer ${process.env.SPRUCE_API_KEY}`,
+          'Content-Type': 'application/json'
+        }
+      }).get('/patients/search', {
+        params: { query }
+      });
+      
+      const sprucePatients = response.data.patients || [];
+      
+      // Convert Spruce patients to our format
+      const mappedPatients = sprucePatients.map((sprucePatient: SprucePatient) => ({
+        id: sprucePatient.id,
+        name: sprucePatient.name,
+        email: sprucePatient.email || '',
+        phone: sprucePatient.phone || '',
+        dateOfBirth: sprucePatient.date_of_birth || '',
+        gender: sprucePatient.gender || 'unknown',
+        language: sprucePatient.language || null,
+        spruceId: sprucePatient.id
+      }));
+      
+      res.json({
+        patients: mappedPatients,
+        source: 'spruce'
+      });
+    } catch (spruceError) {
+      console.error('Error searching patients in Spruce API:', spruceError);
+      
+      // Fallback to local search if Spruce API fails
+      const localPatients = await storage.getAllPatients();
+      const searchTerm = query.toLowerCase();
+      
+      const filteredPatients = localPatients.filter(patient => {
+        return (
+          patient.name.toLowerCase().includes(searchTerm) ||
+          patient.email.toLowerCase().includes(searchTerm) ||
+          patient.phone.includes(searchTerm)
+        );
+      });
+      
+      return res.json({
+        patients: filteredPatients,
+        source: 'local'
+      });
+    }
+  } catch (error) {
+    console.error('Error in patient search:', error);
+    res.status(500).json({ message: 'Failed to search patients' });
+  }
+});
 
 // Setup Spruce Health API
 const spruceApi = axios.create({
@@ -35,7 +133,7 @@ router.post('/sync-patients', async (req, res) => {
       // Sync patients with our database
       const syncedPatients = [];
       
-      for (const sprucePatient of sprucePatients) {
+      for (const sprucePatient of sprucePatients as SprucePatient[]) {
         // Check if patient already exists in our DB by Spruce ID
         let existingPatient = null;
         const localPatients = await storage.getAllPatients();
