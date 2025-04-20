@@ -356,3 +356,28 @@ export const insertAiDocumentVerificationSchema = createInsertSchema(aiDocumentV
 
 export type AiDocumentVerification = typeof aiDocumentVerifications.$inferSelect;
 export type InsertAiDocumentVerification = z.infer<typeof insertAiDocumentVerificationSchema>;
+
+// AI Prompts model for customizing AI behavior
+export const aiPrompts = pgTable("ai_prompts", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  category: text("category", { enum: ["documentation", "response", "analysis"] }).notNull(),
+  promptText: text("prompt_text").notNull(),
+  enabled: boolean("enabled").default(true),
+  order: integer("order").notNull(),
+  userId: integer("user_id").references(() => users.id), // Optional reference to user who created it
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAiPromptSchema = createInsertSchema(aiPrompts).pick({
+  name: true,
+  category: true,
+  promptText: true,
+  enabled: true,
+  order: true,
+  userId: true,
+});
+
+export type AiPrompt = typeof aiPrompts.$inferSelect;
+export type InsertAiPrompt = z.infer<typeof insertAiPromptSchema>;

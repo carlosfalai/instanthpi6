@@ -5,7 +5,8 @@ import {
   aiDocumentations, type AIDocumentation, type InsertAIDocumentation,
   formSubmissions, type FormSubmission, type InsertFormSubmission,
   pendingItems, type PendingItem, type InsertPendingItem,
-  preventativeCare, type PreventativeCare, type InsertPreventativeCare
+  preventativeCare, type PreventativeCare, type InsertPreventativeCare,
+  aiPrompts, type AiPrompt, type InsertAiPrompt
 } from "@shared/schema";
 
 export interface IStorage {
@@ -52,6 +53,14 @@ export interface IStorage {
   updatePreventativeCare(id: string, item: Partial<InsertPreventativeCare>): Promise<PreventativeCare | undefined>;
   deletePreventativeCare(id: string): Promise<boolean>;
   getNextPreventativeCareItem(patientId: number): Promise<PreventativeCare | undefined>;
+  
+  // AI Prompts operations
+  getAllAiPrompts(): Promise<AiPrompt[]>;
+  getAiPromptsByCategory(category: string): Promise<AiPrompt[]>;
+  getAiPrompt(id: number): Promise<AiPrompt | undefined>;
+  createAiPrompt(prompt: InsertAiPrompt): Promise<AiPrompt>;
+  updateAiPrompt(id: number, prompt: Partial<InsertAiPrompt>): Promise<AiPrompt | undefined>;
+  deleteAiPrompt(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -62,12 +71,14 @@ export class MemStorage implements IStorage {
   private formSubmissions: Map<number, FormSubmission>;
   private pendingItems: Map<string, PendingItem>;
   private preventativeCare: Map<string, PreventativeCare>;
+  private aiPrompts: Map<number, AiPrompt>;
   
   private userId: number;
   private patientId: number;
   private messageId: number;
   private documentationId: number;
   private submissionId: number;
+  private promptId: number;
 
   constructor() {
     this.users = new Map();
@@ -77,12 +88,14 @@ export class MemStorage implements IStorage {
     this.formSubmissions = new Map();
     this.pendingItems = new Map();
     this.preventativeCare = new Map();
+    this.aiPrompts = new Map();
     
     this.userId = 1;
     this.patientId = 1;
     this.messageId = 1;
     this.documentationId = 1;
     this.submissionId = 1;
+    this.promptId = 1;
     
     // Add a default user for testing
     this.createUser({
