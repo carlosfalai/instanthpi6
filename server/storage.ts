@@ -6,7 +6,9 @@ import {
   formSubmissions, type FormSubmission, type InsertFormSubmission,
   pendingItems, type PendingItem, type InsertPendingItem,
   preventativeCare, type PreventativeCare, type InsertPreventativeCare,
-  aiPrompts, type AiPrompt, type InsertAiPrompt
+  aiPrompts, type AiPrompt, type InsertAiPrompt,
+  educationModules, type EducationModule, type InsertEducationModule,
+  userEducationProgress, type UserEducationProgress, type InsertUserEducationProgress
 } from "@shared/schema";
 
 export interface IStorage {
@@ -61,6 +63,20 @@ export interface IStorage {
   createAiPrompt(prompt: InsertAiPrompt): Promise<AiPrompt>;
   updateAiPrompt(id: number, prompt: Partial<InsertAiPrompt>): Promise<AiPrompt | undefined>;
   deleteAiPrompt(id: number): Promise<boolean>;
+  
+  // Education Module operations
+  getAllEducationModules(): Promise<EducationModule[]>;
+  getEducationModule(id: number): Promise<EducationModule | undefined>;
+  createEducationModule(module: InsertEducationModule): Promise<EducationModule>;
+  updateEducationModule(id: number, module: Partial<InsertEducationModule>): Promise<EducationModule | undefined>;
+  deleteEducationModule(id: number): Promise<boolean>;
+  
+  // User Education Progress operations
+  getUserEducationProgress(userId: number): Promise<UserEducationProgress[]>;
+  getModuleProgress(userId: number, moduleId: number): Promise<UserEducationProgress | undefined>;
+  createUserEducationProgress(progress: InsertUserEducationProgress): Promise<UserEducationProgress>;
+  updateUserEducationProgress(id: number, progress: Partial<InsertUserEducationProgress>): Promise<UserEducationProgress | undefined>;
+  getUserUnlockedFeatures(userId: number): Promise<string[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -72,6 +88,8 @@ export class MemStorage implements IStorage {
   private pendingItems: Map<string, PendingItem>;
   private preventativeCare: Map<string, PreventativeCare>;
   private aiPrompts: Map<number, AiPrompt>;
+  private educationModules: Map<number, EducationModule>;
+  private userEducationProgress: Map<number, UserEducationProgress>;
   
   private userId: number;
   private patientId: number;
@@ -79,6 +97,8 @@ export class MemStorage implements IStorage {
   private documentationId: number;
   private submissionId: number;
   private promptId: number;
+  private moduleId: number;
+  private progressId: number;
 
   constructor() {
     this.users = new Map();
@@ -89,6 +109,8 @@ export class MemStorage implements IStorage {
     this.pendingItems = new Map();
     this.preventativeCare = new Map();
     this.aiPrompts = new Map();
+    this.educationModules = new Map();
+    this.userEducationProgress = new Map();
     
     this.userId = 1;
     this.patientId = 1;
@@ -96,6 +118,8 @@ export class MemStorage implements IStorage {
     this.documentationId = 1;
     this.submissionId = 1;
     this.promptId = 1;
+    this.moduleId = 1;
+    this.progressId = 1;
     
     // Add a default user for testing
     this.createUser({
@@ -434,6 +458,161 @@ export class MemStorage implements IStorage {
     const items = await this.getPreventativeCareByPatientId(patientId);
     // Get the next suggested item that hasn't been sent yet
     return items.find(item => item.status === "suggested");
+  }
+  
+  // AI Prompts operations
+  async getAllAiPrompts(): Promise<AiPrompt[]> {
+    return Array.from(this.aiPrompts.values());
+  }
+  
+  async getAiPromptsByCategory(category: string): Promise<AiPrompt[]> {
+    return Array.from(this.aiPrompts.values())
+      .filter(prompt => prompt.category === category)
+      .sort((a, b) => a.order - b.order);
+  }
+  
+  async getAiPrompt(id: number): Promise<AiPrompt | undefined> {
+    return this.aiPrompts.get(id);
+  }
+  
+  async createAiPrompt(prompt: InsertAiPrompt): Promise<AiPrompt> {
+    const id = this.promptId++;
+    const now = new Date();
+    
+    const aiPrompt: AiPrompt = {
+      ...prompt,
+      id,
+      createdAt: now,
+      updatedAt: now,
+      enabled: prompt.enabled ?? true
+    };
+    
+    this.aiPrompts.set(id, aiPrompt);
+    return aiPrompt;
+  }
+  
+  async updateAiPrompt(id: number, promptUpdate: Partial<InsertAiPrompt>): Promise<AiPrompt | undefined> {
+    const existingPrompt = this.aiPrompts.get(id);
+    if (!existingPrompt) return undefined;
+    
+    const updatedPrompt = { 
+      ...existingPrompt, 
+      ...promptUpdate,
+      updatedAt: new Date() 
+    };
+    
+    this.aiPrompts.set(id, updatedPrompt);
+    return updatedPrompt;
+  }
+  
+  async deleteAiPrompt(id: number): Promise<boolean> {
+    return this.aiPrompts.delete(id);
+  }
+  
+  // Education Module operations
+  async getAllEducationModules(): Promise<EducationModule[]> {
+    return Array.from(this.educationModules.values())
+      .sort((a, b) => a.order - b.order);
+  }
+  
+  async getEducationModule(id: number): Promise<EducationModule | undefined> {
+    return this.educationModules.get(id);
+  }
+  
+  async createEducationModule(module: InsertEducationModule): Promise<EducationModule> {
+    const id = this.moduleId++;
+    const now = new Date();
+    
+    const educationModule: EducationModule = {
+      ...module,
+      id,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    this.educationModules.set(id, educationModule);
+    return educationModule;
+  }
+  
+  async updateEducationModule(id: number, moduleUpdate: Partial<InsertEducationModule>): Promise<EducationModule | undefined> {
+    const existingModule = this.educationModules.get(id);
+    if (!existingModule) return undefined;
+    
+    const updatedModule = {
+      ...existingModule,
+      ...moduleUpdate,
+      updatedAt: new Date()
+    };
+    
+    this.educationModules.set(id, updatedModule);
+    return updatedModule;
+  }
+  
+  async deleteEducationModule(id: number): Promise<boolean> {
+    return this.educationModules.delete(id);
+  }
+  
+  // User Education Progress operations
+  async getUserEducationProgress(userId: number): Promise<UserEducationProgress[]> {
+    return Array.from(this.userEducationProgress.values())
+      .filter(progress => progress.userId === userId);
+  }
+  
+  async getModuleProgress(userId: number, moduleId: number): Promise<UserEducationProgress | undefined> {
+    return Array.from(this.userEducationProgress.values())
+      .find(progress => progress.userId === userId && progress.moduleId === moduleId);
+  }
+  
+  async createUserEducationProgress(progress: InsertUserEducationProgress): Promise<UserEducationProgress> {
+    const id = this.progressId++;
+    const now = new Date();
+    
+    const userProgress: UserEducationProgress = {
+      ...progress,
+      id,
+      status: progress.status || "not_started",
+      completedAt: progress.completedAt || null,
+      quizScore: progress.quizScore || null,
+      notes: progress.notes || null,
+      createdAt: now,
+      updatedAt: now
+    };
+    
+    this.userEducationProgress.set(id, userProgress);
+    return userProgress;
+  }
+  
+  async updateUserEducationProgress(id: number, progressUpdate: Partial<InsertUserEducationProgress>): Promise<UserEducationProgress | undefined> {
+    const existingProgress = this.userEducationProgress.get(id);
+    if (!existingProgress) return undefined;
+    
+    const updatedProgress = {
+      ...existingProgress,
+      ...progressUpdate,
+      updatedAt: new Date()
+    };
+    
+    this.userEducationProgress.set(id, updatedProgress);
+    return updatedProgress;
+  }
+  
+  async getUserUnlockedFeatures(userId: number): Promise<string[]> {
+    // Get all completed modules for the user
+    const completedProgress = Array.from(this.userEducationProgress.values())
+      .filter(progress => progress.userId === userId && progress.status === "completed");
+    
+    // Map to module IDs
+    const completedModuleIds = completedProgress.map(progress => progress.moduleId);
+    
+    // Get the modules
+    const completedModules = completedModuleIds.map(moduleId => this.educationModules.get(moduleId))
+      .filter((module): module is EducationModule => module !== undefined);
+    
+    // Extract all features unlocked by these modules
+    const unlockedFeatures = completedModules.flatMap(module => module.featuresUnlocked);
+    
+    // Return unique features
+    return [...new Set(unlockedFeatures)];
   }
 }
 

@@ -381,3 +381,57 @@ export const insertAiPromptSchema = createInsertSchema(aiPrompts).pick({
 
 export type AiPrompt = typeof aiPrompts.$inferSelect;
 export type InsertAiPrompt = z.infer<typeof insertAiPromptSchema>;
+
+// Education Modules model for feature unlocking
+export const educationModules = pgTable("education_modules", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  type: text("type", { enum: ["video", "article", "quiz", "interactive"] }).notNull(),
+  content: text("content").notNull(), // Could be a URL or markdown content
+  featuresUnlocked: text("features_unlocked").array().notNull(), // Which features this module unlocks
+  prerequisiteModules: integer("prerequisite_modules").array(), // IDs of modules that must be completed first
+  order: integer("order").notNull(), // Display order in the learning path
+  estimatedMinutes: integer("estimated_minutes").notNull().default(10),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertEducationModuleSchema = createInsertSchema(educationModules).pick({
+  title: true,
+  description: true,
+  type: true,
+  content: true,
+  featuresUnlocked: true,
+  prerequisiteModules: true,
+  order: true,
+  estimatedMinutes: true,
+});
+
+export type EducationModule = typeof educationModules.$inferSelect;
+export type InsertEducationModule = z.infer<typeof insertEducationModuleSchema>;
+
+// User Education Progress model for tracking user progress
+export const userEducationProgress = pgTable("user_education_progress", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  moduleId: integer("module_id").notNull().references(() => educationModules.id),
+  status: text("status", { enum: ["not_started", "in_progress", "completed"] }).notNull().default("not_started"),
+  completedAt: timestamp("completed_at"),
+  quizScore: integer("quiz_score"), // If applicable
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertUserEducationProgressSchema = createInsertSchema(userEducationProgress).pick({
+  userId: true,
+  moduleId: true,
+  status: true,
+  completedAt: true,
+  quizScore: true,
+  notes: true,
+});
+
+export type UserEducationProgress = typeof userEducationProgress.$inferSelect;
+export type InsertUserEducationProgress = z.infer<typeof insertUserEducationProgressSchema>;
