@@ -233,8 +233,8 @@ export default function EducationPage() {
           </TabsList>
           
           <TabsContent value={activeTab} className="mt-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filteredModules.map(module => {
+            <div className="flex flex-col space-y-4 max-w-3xl mx-auto">
+              {filteredModules.map((module, index) => {
                 const status = getModuleStatus(module.id);
                 const isLocked = !canStartModule(module);
                 
@@ -244,6 +244,9 @@ export default function EducationPage() {
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
                           <CardTitle className="text-lg flex items-center space-x-2">
+                            <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center mr-2">
+                              {module.order}
+                            </div>
                             {module.type === "video" && <Video className="h-4 w-4" />}
                             {module.type === "article" && <Book className="h-4 w-4" />}
                             <span>{module.title}</span>
