@@ -312,11 +312,12 @@ const FormBuilder = () => {
   };
 
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-3xl font-bold mb-6">Form Builder</h1>
-      <p className="text-gray-500 mb-6">
-        Create custom forms for your patients instead of using external Formsite forms. These forms can be sent to patients and the responses will be saved directly in your system.
-      </p>
+    <BaseLayout>
+      <div className="container mx-auto py-6">
+        <h1 className="text-3xl font-bold mb-6">Form Builder</h1>
+        <p className="text-gray-500 mb-6">
+          Create custom forms for your patients instead of using external Formsite forms. These forms can be sent to patients and the responses will be saved directly in your system.
+        </p>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-6">
@@ -652,8 +653,9 @@ const FormBuilder = () => {
         </TabsContent>
       </Tabs>
     </div>
+    </BaseLayout>
   );
-}
+};
 
 export default function FormsPage() {
   return (
