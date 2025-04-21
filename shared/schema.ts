@@ -11,6 +11,11 @@ export const users = pgTable("users", {
   role: text("role").notNull().default("doctor"),
   avatarUrl: text("avatar_url"),
   createdAt: timestamp("created_at").defaultNow(),
+  navPreferences: jsonb("nav_preferences").default({
+    showChronicConditions: true,
+    showMedicationRefills: true,
+    showUrgentCare: true
+  }),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
@@ -19,6 +24,7 @@ export const insertUserSchema = createInsertSchema(users).pick({
   fullName: true,
   role: true,
   avatarUrl: true,
+  navPreferences: true,
 });
 
 // Patient model for storing patient information

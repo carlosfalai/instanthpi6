@@ -9,25 +9,57 @@ import {
   MessageSquare,
   User,
   GraduationCap,
-  ClipboardList
+  ClipboardList,
+  Heart,
+  PillIcon,
+  AlertCircle
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { User as UserType } from '@shared/schema';
 
 export default function NavigationBar() {
   const [location] = useLocation();
   
-  const navItems = [
+  // Fetch current user to get navigation preferences
+  const { data: currentUser } = useQuery<UserType>({
+    queryKey: ['/api/user'],
+  });
+  
+  // Default navigation preferences if user not loaded yet
+  const navPreferences = currentUser?.navPreferences || {
+    showChronicConditions: true,
+    showMedicationRefills: true,
+    showUrgentCare: true
+  };
+  
+  // Base navigation items always shown
+  const baseNavItems = [
     { path: '/', icon: <Home className="h-5 w-5" />, label: 'Home' },
     { path: '/patients', icon: <Users className="h-5 w-5" />, label: 'Patients' },
     { path: '/documents', icon: <FileText className="h-5 w-5" />, label: 'Documents' },
     { path: '/appointments', icon: <Calendar className="h-5 w-5" />, label: 'Appointments' },
     { path: '/messages', icon: <MessageSquare className="h-5 w-5" />, label: 'Messages' },
     { path: '/forms', icon: <ClipboardList className="h-5 w-5" />, label: 'Forms' },
+  ];
+  
+  // Optional navigation items based on user preferences
+  const optionalNavItems = [
+    ...(navPreferences.showChronicConditions ? [{ path: '/chronic-conditions', icon: <Heart className="h-5 w-5" />, label: 'Chronic Conditions' }] : []),
+    ...(navPreferences.showMedicationRefills ? [{ path: '/medication-refills', icon: <PillIcon className="h-5 w-5" />, label: 'Medication Refills' }] : []),
+    ...(navPreferences.showUrgentCare ? [{ path: '/urgent-care', icon: <AlertCircle className="h-5 w-5" />, label: 'Urgent Care' }] : []),
+  ];
+  
+  // Always show these items at the end
+  const endNavItems = [
     { path: '/education', icon: <GraduationCap className="h-5 w-5" />, label: 'Education' },
     { path: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Settings' },
   ];
   
+  // Combine all navigation items
+  const navItems = [...baseNavItems, ...optionalNavItems, ...endNavItems];
+  
   return (
-    <div className="flex items-center space-x-1 px-1">
+    <div className="flex items-center space-x-1 px-1 overflow-x-auto">
       {navItems.map((item) => (
         <Link 
           key={item.path} 

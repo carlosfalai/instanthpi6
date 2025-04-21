@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import NavigationBar from '@/components/navigation/NavigationBar';
-import { Loader2, Plus, Save, Trash2 } from 'lucide-react';
+import { Loader2, Plus, Save, Trash2, Heart, PillIcon, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { User } from '@shared/schema';
 
 // Define our AI settings interface
 interface AiSetting {
@@ -203,6 +204,7 @@ export default function SettingsPage() {
               <TabsTrigger value="documentation">Documentation</TabsTrigger>
               <TabsTrigger value="response">Patient Responses</TabsTrigger>
               <TabsTrigger value="analysis">Analysis</TabsTrigger>
+              <TabsTrigger value="navigation">Navigation</TabsTrigger>
               <TabsTrigger value="add">Add New Prompt</TabsTrigger>
             </TabsList>
             
