@@ -1,406 +1,335 @@
-import { useState } from "react";
-import { useParams, useLocation } from "wouter";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import React, { useState } from 'react';
+import { useRoute } from 'wouter';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ArrowLeft, Save, Loader2 } from "lucide-react";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "../lib/queryClient";
-import { FormTemplate } from "@shared/schema";
-
-// Define zod schema for form response
-const formResponseSchema = z.object({
-  formTemplateId: z.number(),
-  patientId: z.number(),
-  answers: z.record(z.string(), z.any()),
-  status: z.string().default("completed"),
-});
-
-type FormResponseValues = z.infer<typeof formResponseSchema>;
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { CalendarIcon, ArrowLeft, Loader2 } from "lucide-react";
+import { Link } from "wouter";
+import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export default function FormViewPage() {
-  const params = useParams();
-  const formId = params.id ? parseInt(params.id) : undefined;
-  const [, setLocation] = useLocation();
+  const [, params] = useRoute('/forms/:id');
+  const formId = params?.id ? parseInt(params.id) : undefined;
   const { toast } = useToast();
-  const queryClient = useQueryClient();
-  const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
-
-  // Fetch form data
-  const { data: formTemplate, isLoading: isLoadingForm } = useQuery<FormTemplate>({
-    queryKey: ["/api/forms/templates", formId],
-    enabled: Boolean(formId),
+  const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [patientId, setPatientId] = useState<number | null>(null);
+  
+  // Fetch the form template
+  const { data: formTemplate, isLoading: isLoadingTemplate, error } = useQuery({
+    queryKey: [`/api/forms/templates/${formId}`],
+    queryFn: async () => {
+      if (!formId) throw new Error("Form ID is required");
+      const res = await fetch(`/api/forms/templates/${formId}`);
+      if (!res.ok) throw new Error("Failed to fetch form template");
+      return res.json();
+    },
+    enabled: !!formId,
   });
-
-  // Fetch patients
-  const { data: patients, isLoading: isLoadingPatients } = useQuery({
+  
+  // Fetch patients for the patient selector
+  const { data: patients = [] } = useQuery({
     queryKey: ["/api/patients"],
-  });
-
-  // Setup form with react-hook-form and zod validation
-  const form = useForm<FormResponseValues>({
-    resolver: zodResolver(formResponseSchema),
-    defaultValues: {
-      formTemplateId: formId,
-      patientId: 0,
-      answers: {},
-      status: "completed",
+    queryFn: async () => {
+      const res = await fetch("/api/patients");
+      if (!res.ok) throw new Error("Failed to fetch patients");
+      return res.json();
     },
   });
-
-  // Create form response mutation
+  
+  // Submit form response mutation
   const submitFormMutation = useMutation({
-    mutationFn: async (formData: FormResponseValues) => {
-      const res = await apiRequest("POST", "/api/forms/responses", formData);
+    mutationFn: async (data: any) => {
+      const res = await apiRequest("POST", "/api/forms/responses", data);
       return await res.json();
     },
     onSuccess: () => {
       toast({
-        title: "Form submitted",
-        description: "Form has been successfully submitted.",
+        title: "Success",
+        description: "Form response submitted successfully",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/forms/responses"] });
-      setLocation("/forms");
+      // Reset the form
+      setAnswers({});
     },
     onError: (error: Error) => {
       toast({
-        title: "Failed to submit form",
-        description: error.message,
+        title: "Error",
+        description: `Failed to submit form: ${error.message}`,
         variant: "destructive",
       });
     },
   });
-
-  // Handle form submission
-  const onSubmit = (values: FormResponseValues) => {
-    if (!formId || !selectedPatientId) {
+  
+  const handleInputChange = (questionId: string, value: any) => {
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: value
+    }));
+  };
+  
+  const handleSubmit = () => {
+    if (!formId) {
       toast({
         title: "Error",
-        description: "Missing form ID or patient selection",
+        description: "Form ID is missing",
         variant: "destructive",
       });
       return;
     }
-
-    const submissionData = {
-      ...values,
+    
+    if (!patientId) {
+      toast({
+        title: "Error",
+        description: "Please select a patient",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Check if required questions are answered
+    const unansweredRequired = formTemplate.questions
+      .filter(q => q.required)
+      .filter(q => !answers[q.id] || 
+        (Array.isArray(answers[q.id]) && answers[q.id].length === 0) || 
+        answers[q.id] === "");
+    
+    if (unansweredRequired.length > 0) {
+      toast({
+        title: "Error",
+        description: `Please answer all required questions (${unansweredRequired.length} remaining)`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    submitFormMutation.mutate({
       formTemplateId: formId,
-      patientId: selectedPatientId,
-    };
-
-    submitFormMutation.mutate(submissionData);
+      patientId,
+      answers,
+      status: "completed",
+      completedAt: new Date()
+    });
   };
-
-  // Handle patient selection
-  const handlePatientSelect = (patientId: string) => {
-    const id = parseInt(patientId);
-    setSelectedPatientId(id);
-    form.setValue("patientId", id);
-  };
-
-  if (isLoadingForm || isLoadingPatients) {
+  
+  if (isLoadingTemplate) {
     return (
-      <div className="container mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-6">Loading Form...</h1>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
+      <div className="container mx-auto py-6 flex justify-center items-center min-h-[calc(100vh-10rem)]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+  
+  if (error || !formTemplate) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="mb-4">
+          <Link href="/forms">
+            <Button variant="ghost">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Forms
+            </Button>
+          </Link>
+        </div>
+        
+        <div className="p-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">Form Not Found</h2>
+          <p className="text-gray-500 mb-6">The form you're looking for doesn't exist or you don't have permission to view it.</p>
+          <Button asChild>
+            <Link href="/forms">View All Forms</Link>
+          </Button>
         </div>
       </div>
     );
   }
-
-  if (!formTemplate) {
-    return (
-      <div className="container mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-6">Form Not Found</h1>
-        <p>The requested form could not be found.</p>
-        <Button onClick={() => setLocation("/forms")} className="mt-4">
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Forms
-        </Button>
-      </div>
-    );
-  }
-
+  
   return (
-    <div className="container mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center">
-          <Button variant="ghost" size="sm" onClick={() => setLocation("/forms")} className="mr-2">
-            <ArrowLeft className="h-4 w-4 mr-1" />
+    <div className="container mx-auto py-6">
+      <div className="mb-4">
+        <Link href="/forms">
+          <Button variant="ghost">
+            <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Forms
           </Button>
-          <h1 className="text-2xl font-bold">Fill Form: {formTemplate.name}</h1>
-        </div>
+        </Link>
       </div>
-
-      <div className="mb-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>{formTemplate.name}</CardTitle>
-            <CardDescription>{formTemplate.description}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold mb-2">Select Patient</h3>
-              <Select onValueChange={handlePatientSelect}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a patient" />
-                </SelectTrigger>
-                <SelectContent>
-                  {patients?.map((patient) => (
-                    <SelectItem key={patient.id} value={patient.id.toString()}>
-                      {patient.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {selectedPatientId && (
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                  {Array.isArray(formTemplate.questions) && formTemplate.questions.map((question: any, index: number) => (
-                    <div key={question.id} className="border p-4 rounded-md">
-                      <FormLabel className="text-base mb-1 block">
-                        {question.label}
-                        {question.required && <span className="text-red-500 ml-1">*</span>}
-                      </FormLabel>
-                      
-                      {question.description && (
-                        <p className="text-sm text-muted-foreground mb-2">{question.description}</p>
-                      )}
-                      
-                      {question.type === "text" && (
-                        <FormField
-                          control={form.control}
-                          name={`answers.${question.id}`}
-                          rules={{ required: question.required }}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input placeholder={question.placeholder || ""} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                      
-                      {question.type === "textarea" && (
-                        <FormField
-                          control={form.control}
-                          name={`answers.${question.id}`}
-                          rules={{ required: question.required }}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Textarea placeholder={question.placeholder || ""} {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                      
-                      {question.type === "number" && (
-                        <FormField
-                          control={form.control}
-                          name={`answers.${question.id}`}
-                          rules={{ required: question.required }}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input 
-                                  type="number" 
-                                  placeholder={question.placeholder || ""} 
-                                  {...field} 
-                                  onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                      
-                      {question.type === "date" && (
-                        <FormField
-                          control={form.control}
-                          name={`answers.${question.id}`}
-                          rules={{ required: question.required }}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input 
-                                  type="date" 
-                                  {...field} 
-                                  value={field.value || ""}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                      
-                      {question.type === "radio" && question.options && (
-                        <FormField
-                          control={form.control}
-                          name={`answers.${question.id}`}
-                          rules={{ required: question.required }}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <RadioGroup
-                                  onValueChange={field.onChange}
-                                  value={field.value}
-                                  className="space-y-2"
-                                >
-                                  {question.options.map((option: any) => (
-                                    <div key={option.value} className="flex items-center space-x-2">
-                                      <RadioGroupItem id={`${question.id}-${option.value}`} value={option.value} />
-                                      <label htmlFor={`${question.id}-${option.value}`}>{option.label}</label>
-                                    </div>
-                                  ))}
-                                </RadioGroup>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                      
-                      {question.type === "checkbox" && question.options && (
-                        <div className="space-y-2">
-                          {question.options.map((option: any) => (
-                            <FormField
-                              key={option.value}
-                              control={form.control}
-                              name={`answers.${question.id}.${option.value}`}
-                              render={({ field }) => (
-                                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value}
-                                      onCheckedChange={field.onChange}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="text-sm font-normal">
-                                    {option.label}
-                                  </FormLabel>
-                                </FormItem>
-                              )}
-                            />
-                          ))}
+      
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle className="text-2xl">{formTemplate.name}</CardTitle>
+          <CardDescription>{formTemplate.description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6">
+            <Label htmlFor="patient">Select Patient</Label>
+            <Select value={patientId?.toString() || ""} onValueChange={(value) => setPatientId(parseInt(value))}>
+              <SelectTrigger className="w-full md:w-80">
+                <SelectValue placeholder="Select a patient" />
+              </SelectTrigger>
+              <SelectContent>
+                {patients.map((patient) => (
+                  <SelectItem key={patient.id} value={patient.id.toString()}>
+                    {patient.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <Separator className="my-6" />
+          
+          <div className="space-y-8">
+            {formTemplate.questions.map((question) => (
+              <div key={question.id} className="space-y-2">
+                <Label className="flex items-start">
+                  <span>{question.label}</span>
+                  {question.required && <span className="text-red-500 ml-1">*</span>}
+                </Label>
+                {question.description && (
+                  <p className="text-sm text-gray-500">{question.description}</p>
+                )}
+                
+                {/* Render different input types based on question type */}
+                {question.type === "text" && (
+                  <Input
+                    placeholder={question.placeholder}
+                    value={answers[question.id] || ""}
+                    onChange={(e) => handleInputChange(question.id, e.target.value)}
+                  />
+                )}
+                
+                {question.type === "textarea" && (
+                  <Textarea
+                    placeholder={question.placeholder}
+                    value={answers[question.id] || ""}
+                    onChange={(e) => handleInputChange(question.id, e.target.value)}
+                    rows={4}
+                  />
+                )}
+                
+                {question.type === "select" && (
+                  <Select 
+                    value={answers[question.id] || ""} 
+                    onValueChange={(value) => handleInputChange(question.id, value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {question.options?.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                )}
+                
+                {question.type === "radio" && (
+                  <RadioGroup
+                    value={answers[question.id] || ""}
+                    onValueChange={(value) => handleInputChange(question.id, value)}
+                    className="space-y-2"
+                  >
+                    {question.options?.map((option) => (
+                      <div key={option.value} className="flex items-center space-x-2">
+                        <RadioGroupItem id={`${question.id}-${option.value}`} value={option.value} />
+                        <Label htmlFor={`${question.id}-${option.value}`}>{option.label}</Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                )}
+                
+                {question.type === "checkbox" && (
+                  <div className="space-y-2">
+                    {question.options?.map((option) => {
+                      const selectedValues = answers[question.id] || [];
+                      return (
+                        <div key={option.value} className="flex items-center space-x-2">
+                          <Checkbox
+                            id={`${question.id}-${option.value}`}
+                            checked={selectedValues.includes(option.value)}
+                            onCheckedChange={(checked) => {
+                              const values = [...(answers[question.id] || [])];
+                              if (checked) {
+                                values.push(option.value);
+                              } else {
+                                const index = values.indexOf(option.value);
+                                if (index !== -1) values.splice(index, 1);
+                              }
+                              handleInputChange(question.id, values);
+                            }}
+                          />
+                          <Label htmlFor={`${question.id}-${option.value}`}>{option.label}</Label>
                         </div>
-                      )}
-                      
-                      {question.type === "select" && question.options && (
-                        <FormField
-                          control={form.control}
-                          name={`answers.${question.id}`}
-                          rules={{ required: question.required }}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Select
-                                  onValueChange={field.onChange}
-                                  value={field.value}
-                                >
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select an option" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {question.options.map((option: any) => (
-                                      <SelectItem key={option.value} value={option.value}>
-                                        {option.label}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                      
-                      {question.type === "file" && (
-                        <FormField
-                          control={form.control}
-                          name={`answers.${question.id}`}
-                          rules={{ required: question.required }}
-                          render={({ field: { value, onChange, ...field } }) => (
-                            <FormItem>
-                              <FormControl>
-                                <Input
-                                  type="file"
-                                  {...field}
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                      const reader = new FileReader();
-                                      reader.onload = (event) => {
-                                        if (event.target?.result) {
-                                          onChange(event.target.result);
-                                        }
-                                      };
-                                      reader.readAsDataURL(file);
-                                    }
-                                  }}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      )}
-                    </div>
-                  ))}
-                  
-                  <div className="flex justify-end">
-                    <Button
-                      type="submit" 
-                      disabled={submitFormMutation.isPending}
-                      className="min-w-[120px]"
-                    >
-                      {submitFormMutation.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Submitting
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          Submit Form
-                        </>
-                      )}
-                    </Button>
+                      );
+                    })}
                   </div>
-                </form>
-              </Form>
+                )}
+                
+                {question.type === "date" && (
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !answers[question.id] && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {answers[question.id] ? (
+                          format(new Date(answers[question.id]), "PPP")
+                        ) : (
+                          <span>Pick a date</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={answers[question.id] ? new Date(answers[question.id]) : undefined}
+                        onSelect={(date) => handleInputChange(question.id, date)}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+                
+                {question.type === "number" && (
+                  <Input
+                    type="number"
+                    placeholder={question.placeholder}
+                    value={answers[question.id] || ""}
+                    onChange={(e) => handleInputChange(question.id, e.target.value)}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+        <CardFooter className="flex justify-end">
+          <Button 
+            onClick={handleSubmit}
+            disabled={submitFormMutation.isPending || !patientId}
+          >
+            {submitFormMutation.isPending && (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             )}
-          </CardContent>
-        </Card>
-      </div>
+            Submit Form
+          </Button>
+        </CardFooter>
+      </Card>
     </div>
   );
 }

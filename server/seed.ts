@@ -1,297 +1,661 @@
 import { storage } from "./storage";
+import crypto from "crypto";
 
 /**
  * Seeds the database with initial data for testing
  */
 export async function seedDatabase() {
-  console.log("Seeding database with initial data...");
-  
   // Check if we already have users
-  const existingUsers = await storage.getAllUsers();
-  if (existingUsers.length > 0) {
+  const users = await storage.getAllUsers();
+  if (users.length > 0) {
     console.log("Database already has users, skipping seed");
     return;
   }
-  
-  // Create a doctor user
+
+  // Add a default doctor
   const doctor = await storage.createUser({
-    username: "doctor",
-    password: "password123", // In production, this would be hashed
-    fullName: "Dr. Smith",
-    role: "doctor"
+    username: "drjohnson",
+    password: "password123",
+    fullName: "Dr. Sarah Johnson",
+    role: "doctor",
+    avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=100&h=100&q=80"
+  });
+
+  // Create sample patients
+  const patient1 = await storage.createPatient({
+    name: "Jessica Thompson",
+    gender: "Female",
+    dateOfBirth: "1991-08-15",
+    email: "jessica.thompson@example.com",
+    phone: "555-123-4567",
+    lastVisit: new Date("2023-05-15"),
+    avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=100&h=100&q=80"
   });
   
-  console.log("Created doctor user:", doctor.fullName);
+  await storage.createPatient({
+    name: "Nicolas Girard",
+    gender: "Male",
+    dateOfBirth: "1982-04-15",
+    email: "nicolas.girard@example.com",
+    phone: "555-234-5678",
+    healthCardNumber: "GIRN12345678"
+  });
+  
+  await storage.createPatient({
+    name: "Marie Tremblay",
+    gender: "Female",
+    dateOfBirth: "1990-06-22",
+    email: "marie.t@example.com",
+    phone: "555-345-6789",
+    healthCardNumber: "TREM98765432"
+  });
+  
+  await storage.createPatient({
+    name: "Robert Johnson",
+    gender: "Male",
+    dateOfBirth: "1975-11-30",
+    email: "robert.j@example.com",
+    phone: "555-456-7890"
+  });
+  
+  await storage.createPatient({
+    name: "Sophie Chen",
+    gender: "Female",
+    dateOfBirth: "1988-03-10",
+    email: "sophie.chen@example.com",
+    phone: "555-567-8901",
+    lastVisit: new Date("2023-04-01")
+  });
+
+  // Create messages for a patient
+  await createMessagesForPatient(patient1.id);
+  
+  // Create pending items for a patient
+  await createPendingItems(patient1.id);
+  
+  // Create preventative care items
+  await createPreventativeCare(patient1.id);
   
   // Create education modules
-  const educationModules = [
-    {
-      title: "Introduction to InstantHPI",
-      description: "Learn the basics of using InstantHPI to improve your medical documentation workflow.",
-      type: "video" as const,
-      content: "This module introduces the core features of InstantHPI, including the three-panel layout, patient search, and AI-assisted documentation.",
-      featuresUnlocked: ["BasicNavigation"],
-      prerequisiteModules: null,
-      order: 1,
-      estimatedMinutes: 5
-    },
-    {
-      title: "Patient Verification",
-      description: "Learn how to verify patient identity using RAMQ cards.",
-      type: "article" as const,
-      content: "This module covers how to request and verify patient health insurance cards, ensuring secure and accurate patient identification.",
-      featuresUnlocked: ["PatientVerification"],
-      prerequisiteModules: [1],
-      order: 2,
-      estimatedMinutes: 10
-    },
-    {
-      title: "Creating SOAP Notes",
-      description: "Generate comprehensive SOAP notes with AI assistance.",
-      type: "video" as const,
-      content: "Learn how to use InstantHPI to generate SOAP notes from patient conversations and form data, saving time while maintaining quality.",
-      featuresUnlocked: ["SOAPNoteGeneration"],
-      prerequisiteModules: [1, 2],
-      order: 3,
-      estimatedMinutes: 15
-    },
-    {
-      title: "Managing Pending Items",
-      description: "Track and manage patient follow-ups and pending items.",
-      type: "article" as const,
-      content: "This module teaches you how to use the pending items feature to track patient follow-ups, tests, and referrals.",
-      featuresUnlocked: ["PendingItemsManagement"],
-      prerequisiteModules: [1],
-      order: 4,
-      estimatedMinutes: 8
-    },
-    {
-      title: "Optimizing Preventative Care",
-      description: "Learn strategies for scheduling preventative care measures.",
-      type: "quiz" as const,
-      content: "This module covers how to use InstantHPI to strategically schedule preventative care for better patient outcomes and optimized billing.",
-      featuresUnlocked: ["PreventativeCareScheduling"],
-      prerequisiteModules: [3, 4],
-      order: 5,
-      estimatedMinutes: 20
-    }
-  ];
+  await createEducationModules();
   
-  for (const module of educationModules) {
-    await storage.createEducationModule(module);
-  }
+  // Create form templates
+  await createSampleFormTemplates();
   
-  console.log(`Created ${educationModules.length} education modules`);
-  
-  // Create some patients
-  const patients = [
-    {
-      name: "Robert Johnson",
-      gender: "Male",
-      dateOfBirth: "1985-05-15",
-      email: "robert.johnson@example.com",
-      phone: "555-123-4567",
-      language: "english",
-      spruceId: "spruce-1001",
-      status: "active",
-      avatarUrl: null,
-      lastVisit: null,
-      healthCardNumber: null
-    },
-    {
-      name: "Marie Dupont",
-      gender: "Female",
-      dateOfBirth: "1990-10-22",
-      email: "marie.dupont@example.com",
-      phone: "555-234-5678",
-      language: "french",
-      spruceId: "spruce-1002",
-      status: "active",
-      avatarUrl: null,
-      lastVisit: null,
-      healthCardNumber: null
-    },
-    {
-      name: "Jessica Thompson",
-      gender: "Female",
-      dateOfBirth: "1978-03-08",
-      email: "jessica.thompson@example.com",
-      phone: "555-345-6789",
-      language: "english",
-      spruceId: "spruce-1003",
-      status: "active",
-      avatarUrl: null,
-      lastVisit: null,
-      healthCardNumber: null
-    },
-    {
-      name: "Carlos Rodriguez",
-      gender: "Male",
-      dateOfBirth: "1982-12-30",
-      email: "carlos.rodriguez@example.com",
-      phone: "555-456-7890",
-      language: "english",
-      spruceId: "spruce-1004",
-      status: "active",
-      avatarUrl: null,
-      lastVisit: null,
-      healthCardNumber: null
-    },
-    {
-      name: "Carlos Faviel Font",
-      gender: "Male",
-      dateOfBirth: "1992-06-15",
-      email: "carlos.faviel.font@example.com",
-      phone: "555-987-6543",
-      language: "english",
-      spruceId: "spruce-1005",
-      status: "active",
-      avatarUrl: null,
-      lastVisit: null,
-      healthCardNumber: "RAMQ-123456789"
-    }
-  ];
-  
-  for (const patientData of patients) {
-    const patient = await storage.createPatient(patientData);
-    console.log("Created patient:", patient.name);
-    
-    // Create some messages for this patient
-    if (patient.id === 1) { // Robert Johnson
-      await createMessagesForPatient(patient.id);
-    }
-    
-    // Create some pending items for this patient
-    await createPendingItems(patient.id);
-    
-    // Create preventative care items
-    await createPreventativeCare(patient.id);
-  }
-  
-  console.log("Database seeding completed");
+  console.log("Database seeded successfully");
 }
 
 async function createMessagesForPatient(patientId: number) {
-  const messages = [
-    {
-      patientId,
-      senderId: patientId,
-      content: "Hello doctor, I've been having some abdominal pain for the past few days. It's mostly on my right side.",
-      isFromPatient: true,
-      spruceMessageId: `mock-${Date.now()}-1`,
-      attachmentUrl: null
-    },
-    {
-      patientId,
-      senderId: 1, // doctor
-      content: "I'm sorry to hear that. Can you describe the pain? Is it sharp or dull, and does it come and go or is it constant?",
-      isFromPatient: false,
-      spruceMessageId: `mock-${Date.now()}-2`,
-      attachmentUrl: null
-    },
-    {
-      patientId,
-      senderId: patientId,
-      content: "It's a dull pain, but sometimes it gets sharper, especially after eating. It's not constant but happens several times a day.",
-      isFromPatient: true,
-      spruceMessageId: `mock-${Date.now()}-3`,
-      attachmentUrl: null
-    },
-    {
-      patientId,
-      senderId: 1, // doctor
-      content: "Thank you for the details. Have you noticed any changes in your bowel movements or appetite? Any nausea or vomiting?",
-      isFromPatient: false,
-      spruceMessageId: `mock-${Date.now()}-4`,
-      attachmentUrl: null
-    },
-    {
-      patientId,
-      senderId: patientId,
-      content: "Yes, I've had some nausea but no vomiting. My appetite is lower than usual, and I've been having some constipation.",
-      isFromPatient: true,
-      spruceMessageId: `mock-${Date.now()}-5`,
-      attachmentUrl: null
-    }
-  ];
+  // Create a conversation thread
+  await storage.createMessage({
+    patientId,
+    senderId: 1, // Doctor
+    content: "Hello Jessica, how are you feeling today? I noticed it's been a few weeks since your last check-up.",
+    isFromPatient: false,
+    timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 days ago
+  });
   
-  for (const messageData of messages) {
-    await storage.createMessage(messageData);
-    console.log("Created message for patient", patientId);
-  }
+  await storage.createMessage({
+    patientId,
+    senderId: patientId,
+    content: "Hi Dr. Johnson, I've been doing better. The medication you prescribed has helped with my symptoms, but I still have some questions about side effects.",
+    isFromPatient: true,
+    timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000) // 6 days ago
+  });
+  
+  await storage.createMessage({
+    patientId,
+    senderId: 1, // Doctor
+    content: "I'm glad to hear the medication is helping. What kind of side effects are you experiencing?",
+    isFromPatient: false,
+    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // 5 days ago
+  });
+  
+  await storage.createMessage({
+    patientId,
+    senderId: patientId,
+    content: "I've been feeling a bit dizzy in the mornings, and sometimes I have a slight headache that lasts for a few hours.",
+    isFromPatient: true,
+    timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000) // 4 days ago
+  });
+  
+  await storage.createMessage({
+    patientId,
+    senderId: 1, // Doctor
+    content: "Those can be common side effects. Try taking the medication with food in the morning, and ensure you're staying hydrated. Let's monitor these symptoms for another week. If they persist or worsen, we might need to adjust your dosage or try a different medication.",
+    isFromPatient: false,
+    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
+  });
+  
+  await storage.createMessage({
+    patientId,
+    senderId: patientId,
+    content: "Thank you, I'll try that. Should I schedule another appointment soon?",
+    isFromPatient: true,
+    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
+  });
+  
+  await storage.createMessage({
+    patientId,
+    senderId: 1, // Doctor
+    content: "Let's schedule a follow-up in two weeks. In the meantime, please keep track of any side effects in a diary - noting when they occur and their severity. This will help us determine if we need to make any adjustments to your treatment plan.",
+    isFromPatient: false,
+    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+  });
 }
 
 async function createPendingItems(patientId: number) {
-  const pendingItems = [
-    {
-      patientId,
-      type: "lab",
-      description: "CBC Blood Test Results",
-      status: "pending",
-      priority: "medium",
-      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      requestedDate: new Date(),
-      notes: null,
-      messageId: null
-    },
-    {
-      patientId,
-      type: "medication",
-      description: "Verify Prescription Renewal",
-      status: "pending",
-      priority: "high",
-      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days from now
-      requestedDate: new Date(),
-      notes: null,
-      messageId: null
-    },
-    {
-      patientId,
-      type: "followup",
-      description: "Schedule Follow-up Appointment",
-      status: "completed",
-      priority: "low",
-      dueDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
-      requestedDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
-      notes: "Patient followed up as requested",
-      messageId: null
-    }
-  ];
+  await storage.createPendingItem({
+    patientId,
+    name: "Blood Test",
+    description: "Complete blood count to check iron levels",
+    status: "pending",
+    requestedDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+    dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+    priority: "high",
+    category: "test"
+  });
   
-  for (const itemData of pendingItems) {
-    await storage.createPendingItem(itemData);
-    console.log("Created pending item for patient", patientId);
-  }
+  await storage.createPendingItem({
+    patientId,
+    name: "Medication Renewal",
+    description: "Renew prescription for allergy medication",
+    status: "in_progress",
+    requestedDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    dueDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000), // 4 days from now
+    priority: "medium",
+    category: "prescription"
+  });
+  
+  await storage.createPendingItem({
+    patientId,
+    name: "Follow-up Appointment",
+    description: "Schedule follow-up to discuss blood test results",
+    status: "pending",
+    requestedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+    dueDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000), // 21 days from now
+    priority: "low",
+    category: "appointment"
+  });
 }
 
 async function createPreventativeCare(patientId: number) {
-  const preventativeCareItems = [
-    {
-      patientId,
-      name: "Annual Physical Examination",
-      category: "screening",
-      description: "Routine yearly physical examination",
-      status: "suggested",
-      messageTemplate: "It's time for your annual physical examination. Please schedule an appointment at your earliest convenience.",
-      suggestedDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
-      relevantTo: ["general health", "preventative care"],
-      billingCode: "99395"
-    },
-    {
-      patientId,
-      name: "Flu Vaccine",
-      category: "vaccination",
-      description: "Annual influenza vaccination",
-      status: "suggested",
-      messageTemplate: "Flu season is approaching. Consider getting your flu vaccine to stay protected.",
-      suggestedDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days from now
-      relevantTo: ["immunization", "respiratory health"],
-      billingCode: "90686"
-    }
-  ];
+  await storage.createPreventativeCare({
+    patientId,
+    name: "Annual Physical Exam",
+    description: "Comprehensive yearly physical examination",
+    category: "examination",
+    status: "scheduled",
+    messageTemplate: "It's time for your annual physical exam. Please schedule an appointment at your convenience.",
+    suggestedDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+    relevantTo: "general health"
+  });
   
-  for (const itemData of preventativeCareItems) {
-    await storage.createPreventativeCare(itemData);
-    console.log("Created preventative care item for patient", patientId);
-  }
+  await storage.createPreventativeCare({
+    patientId,
+    name: "Flu Vaccination",
+    description: "Annual flu shot",
+    category: "vaccination",
+    status: "due",
+    messageTemplate: "Flu season is approaching. We recommend getting your annual flu shot to stay protected.",
+    suggestedDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+    relevantTo: "immune health"
+  });
+  
+  await storage.createPreventativeCare({
+    patientId,
+    name: "Cholesterol Screening",
+    description: "Blood test to check cholesterol levels",
+    category: "screening",
+    status: "upcoming",
+    messageTemplate: "It's time for your routine cholesterol screening. Please schedule a blood test at your convenience.",
+    suggestedDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000), // 60 days from now
+    relevantTo: "cardiovascular health"
+  });
+}
+
+async function createEducationModules() {
+  // Using AI Assistants Module
+  const aiAssistantModule = await storage.createEducationModule({
+    title: "Using AI Assistants",
+    description: "Learn how to effectively use AI assistants to improve patient care and streamline documentation.",
+    content: `
+# Using AI Assistants in Clinical Practice
+
+AI assistants can significantly enhance your clinical workflow by helping with documentation, patient communication, and medical decision support.
+
+## Benefits
+
+- Reduce documentation time
+- Improve accuracy of medical records
+- Provide evidence-based recommendations
+- Enhance patient communication
+
+## Best Practices
+
+1. Always review AI-generated content before approving
+2. Provide clear and specific prompts
+3. Use AI for initial drafts, then personalize
+4. Keep patient privacy in mind
+5. Regularly update your AI prompts based on feedback
+
+## Practical Application
+
+When a patient conversation occurs, the AI can help generate:
+- HPI (History of Present Illness) summaries
+- SOAP notes
+- Follow-up recommendations
+- Treatment plan documentation
+
+## Conclusion
+
+AI assistants are powerful tools that can save you time and improve care, but they require human oversight and clinical judgment.
+    `,
+    moduleType: "tutorial",
+    durationMinutes: 15,
+    difficulty: "beginner",
+    prerequisites: [],
+    featuresUnlocked: ["ai_documentation"],
+    quizQuestions: [
+      {
+        question: "What should you always do before approving AI-generated content?",
+        options: ["Delete it", "Review it", "Share it with patients", "Ignore it"],
+        correctAnswer: "Review it"
+      },
+      {
+        question: "Which of the following can AI help generate?",
+        options: ["Medical licenses", "HPI summaries", "Billing codes", "Scheduling"],
+        correctAnswer: "HPI summaries"
+      }
+    ]
+  });
+  
+  // Patient Communication Module
+  const patientCommunicationModule = await storage.createEducationModule({
+    title: "Effective Patient Communication",
+    description: "Learn techniques for clear and empathetic communication with patients through digital channels.",
+    content: `
+# Effective Digital Patient Communication
+
+Clear, empathetic communication is essential for building trust and ensuring quality care, especially when interacting through digital channels.
+
+## Key Principles
+
+1. Use clear, jargon-free language
+2. Express empathy and understanding
+3. Be concise but thorough
+4. Respect patient privacy
+5. Follow up appropriately
+
+## Digital Communication Channels
+
+Different channels require different approaches:
+- **Secure messaging**: Professional, clear, and concise
+- **Video consultations**: Maintain eye contact, minimize distractions
+- **Phone calls**: Speak clearly, confirm understanding
+
+## Templates and Efficiency
+
+While templates can improve efficiency, always personalize your communication to the individual patient's needs and concerns.
+
+## Documentation
+
+Ensure all digital communications are properly documented in the patient's medical record.
+    `,
+    moduleType: "tutorial",
+    durationMinutes: 20,
+    difficulty: "intermediate",
+    prerequisites: [],
+    featuresUnlocked: ["patient_messaging"],
+    quizQuestions: [
+      {
+        question: "What type of language should be used when communicating with patients?",
+        options: ["Technical medical jargon", "Clear, jargon-free language", "Formal academic writing", "Brief abbreviations"],
+        correctAnswer: "Clear, jargon-free language"
+      },
+      {
+        question: "What should you do with digital communications with patients?",
+        options: ["Delete them after reading", "Share them with colleagues", "Document them in medical records", "Print and file them"],
+        correctAnswer: "Document them in medical records"
+      }
+    ]
+  });
+  
+  // Form Creation Module
+  const formCreationModule = await storage.createEducationModule({
+    title: "Creating Custom Patient Forms",
+    description: "Learn how to create and manage custom patient intake forms to replace external Formsite forms.",
+    content: `
+# Creating Custom Patient Forms
+
+This module teaches you how to create and manage custom patient forms directly in the application, eliminating the need for external Formsite forms.
+
+## Benefits of Internal Forms
+
+- **Data Security**: All patient data stays within your secure system
+- **Seamless Integration**: Form responses automatically link to patient records
+- **Customization**: Create forms tailored to your specific practice needs
+- **Efficient Workflow**: No need to manage external accounts or switch between systems
+
+## Creating Your First Form
+
+1. Navigate to the Forms page
+2. Click "Create New Form"
+3. Add a descriptive name and category
+4. Build your form with various question types:
+   - Text fields
+   - Multiple choice questions
+   - Checkboxes
+   - Date fields
+   - Numeric fields
+
+## Best Practices
+
+- Keep forms concise and focused
+- Group related questions together
+- Use clear, specific language
+- Include instructions where needed
+- Test your forms before distributing
+
+## Form Distribution
+
+Forms can be sent to patients via:
+- Secure messaging
+- Email links
+- QR codes
+- During intake process
+
+## Reviewing Responses
+
+Form responses are automatically saved to the patient's record and can be reviewed in their profile.
+
+## Special Use Cases
+
+### STD Testing Forms
+
+Create comprehensive forms that collect relevant sexual health history while maintaining patient privacy and dignity.
+
+### Urgent Care Walk-ins
+
+Design forms that quickly capture essential information for urgent care scenarios, focusing on current symptoms, severity, and relevant medical history.
+    `,
+    moduleType: "tutorial",
+    durationMinutes: 25,
+    difficulty: "beginner",
+    prerequisites: [],
+    featuresUnlocked: ["form_creation"],
+    quizQuestions: [
+      {
+        question: "What is a benefit of using internal forms instead of external Formsite forms?",
+        options: [
+          "They cost less money", 
+          "They're automatically translated to multiple languages", 
+          "Form responses automatically link to patient records", 
+          "They work without internet connection"
+        ],
+        correctAnswer: "Form responses automatically link to patient records"
+      },
+      {
+        question: "Which of these is a best practice for form creation?",
+        options: [
+          "Make forms as long as possible", 
+          "Use technical medical terminology for precision", 
+          "Keep forms concise and focused", 
+          "Collect as much data as possible regardless of relevance"
+        ],
+        correctAnswer: "Keep forms concise and focused"
+      }
+    ]
+  });
+  
+  // Create some progress for the first user
+  await storage.createUserEducationProgress({
+    userId: 1,
+    moduleId: aiAssistantModule.id,
+    status: "completed",
+    completedAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // Completed 14 days ago
+    quizScore: 100
+  });
+  
+  await storage.createUserEducationProgress({
+    userId: 1,
+    moduleId: patientCommunicationModule.id,
+    status: "in_progress",
+    completedAt: null,
+    quizScore: null
+  });
+}
+
+async function createSampleFormTemplates() {
+  // STD Testing Form Template
+  await storage.createFormTemplate({
+    name: "STD Testing Intake Form",
+    description: "Comprehensive intake form for patients seeking STD testing",
+    category: "STD Testing",
+    userId: 1,
+    isPublic: true,
+    questions: [
+      {
+        id: crypto.randomUUID(),
+        type: "radio",
+        label: "Have you ever been tested for STDs before?",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "date",
+        label: "If yes, when was your last STD test?",
+        required: false
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "checkbox",
+        label: "Which tests are you interested in today? (Select all that apply)",
+        required: true,
+        options: [
+          { value: "hiv", label: "HIV" },
+          { value: "chlamydia", label: "Chlamydia" },
+          { value: "gonorrhea", label: "Gonorrhea" },
+          { value: "syphilis", label: "Syphilis" },
+          { value: "herpes", label: "Herpes" },
+          { value: "hpv", label: "HPV" },
+          { value: "hepatitis", label: "Hepatitis" },
+          { value: "trichomoniasis", label: "Trichomoniasis" },
+          { value: "other", label: "Other (please specify)" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "textarea",
+        label: "If you selected 'Other' above, please specify which tests you're interested in:",
+        required: false,
+        placeholder: "Enter other tests you'd like to have"
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "radio",
+        label: "Are you currently experiencing any symptoms?",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" },
+          { value: "unsure", label: "Unsure" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "textarea",
+        label: "If you're experiencing symptoms, please describe them:",
+        required: false,
+        placeholder: "Describe any symptoms you're experiencing"
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "radio",
+        label: "Have you had unprotected sexual contact since your last STD test or in the last 6 months?",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "number",
+        label: "How many sexual partners have you had in the last 6 months?",
+        required: true,
+        placeholder: "Enter a number"
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "checkbox",
+        label: "What types of sexual contact have you had in the past 6 months? (Select all that apply)",
+        required: true,
+        options: [
+          { value: "vaginal", label: "Vaginal" },
+          { value: "oral", label: "Oral" },
+          { value: "anal", label: "Anal" },
+          { value: "none", label: "None" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "radio",
+        label: "Have you ever been diagnosed with an STD in the past?",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "textarea",
+        label: "If yes, which STD(s) and when were you diagnosed?",
+        required: false,
+        placeholder: "Enter details of previous STD diagnoses"
+      }
+    ]
+  });
+  
+  // Urgent Care Intake Form Template
+  await storage.createFormTemplate({
+    name: "Urgent Care Walk-in Intake Form",
+    description: "Quick intake form for urgent care walk-in patients",
+    category: "Urgent Care",
+    userId: 1,
+    isPublic: true,
+    questions: [
+      {
+        id: crypto.randomUUID(),
+        type: "text",
+        label: "What is your main reason for visiting today?",
+        required: true,
+        placeholder: "Briefly describe your main complaint"
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "radio",
+        label: "How long have you been experiencing these symptoms?",
+        required: true,
+        options: [
+          { value: "less_than_24h", label: "Less than 24 hours" },
+          { value: "1_3_days", label: "1-3 days" },
+          { value: "4_7_days", label: "4-7 days" },
+          { value: "1_2_weeks", label: "1-2 weeks" },
+          { value: "more_than_2_weeks", label: "More than 2 weeks" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "radio",
+        label: "On a scale of 1-10, how would you rate your pain or discomfort?",
+        required: true,
+        options: [
+          { value: "1", label: "1 (Minimal)" },
+          { value: "2", label: "2" },
+          { value: "3", label: "3" },
+          { value: "4", label: "4" },
+          { value: "5", label: "5 (Moderate)" },
+          { value: "6", label: "6" },
+          { value: "7", label: "7" },
+          { value: "8", label: "8" },
+          { value: "9", label: "9" },
+          { value: "10", label: "10 (Severe)" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "checkbox",
+        label: "Are you experiencing any of the following symptoms? (Select all that apply)",
+        required: false,
+        options: [
+          { value: "fever", label: "Fever" },
+          { value: "chills", label: "Chills" },
+          { value: "headache", label: "Headache" },
+          { value: "nausea", label: "Nausea" },
+          { value: "vomiting", label: "Vomiting" },
+          { value: "diarrhea", label: "Diarrhea" },
+          { value: "cough", label: "Cough" },
+          { value: "shortness_of_breath", label: "Shortness of breath" },
+          { value: "chest_pain", label: "Chest pain" },
+          { value: "sore_throat", label: "Sore throat" },
+          { value: "rash", label: "Rash" },
+          { value: "dizziness", label: "Dizziness" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "radio",
+        label: "Have you tried any treatment or medication for your current condition?",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "textarea",
+        label: "If yes, what treatments or medications have you tried and were they effective?",
+        required: false,
+        placeholder: "Enter treatments or medications tried"
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "radio",
+        label: "Do you have any allergies to medications?",
+        required: true,
+        options: [
+          { value: "yes", label: "Yes" },
+          { value: "no", label: "No" }
+        ]
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "textarea",
+        label: "If yes, please list your medication allergies and reactions:",
+        required: false,
+        placeholder: "Enter medication allergies and reactions"
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "textarea",
+        label: "Are you currently taking any medications? If so, please list them:",
+        required: false,
+        placeholder: "Enter current medications"
+      },
+      {
+        id: crypto.randomUUID(),
+        type: "textarea",
+        label: "Is there anything else you'd like us to know about your condition?",
+        required: false,
+        placeholder: "Enter any additional information"
+      }
+    ]
+  });
 }
