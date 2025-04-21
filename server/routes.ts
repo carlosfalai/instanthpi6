@@ -17,6 +17,7 @@ import { router as aiRouter } from "./routes/ai";
 import { router as patientsRouter } from "./routes/patients";
 import { router as spruceRouter } from "./routes/spruce";
 import { router as educationRouter } from "./routes/education";
+import formsRouter from "./routes/forms";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -39,6 +40,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/patients", patientsRouter);
   app.use("/api/spruce", spruceRouter);
   app.use("/api/education", educationRouter);
+  app.use("/api/forms", formsRouter);
   
   // Error handling middleware for Zod validation errors
   const handleZodError = (error: unknown, res: Response) => {
