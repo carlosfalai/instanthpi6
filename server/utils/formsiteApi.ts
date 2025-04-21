@@ -1,20 +1,83 @@
 import axios from 'axios';
+import { db } from '../db';
+import { formsiteIntegrations } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
-// Initialize Formsite API client
-const formsiteClient = axios.create({
-  baseURL: 'https://fs3.formsite.com/api/v2',
-  headers: {
-    'Authorization': `Bearer ${process.env.FORMSITE_API_KEY}`,
-    'Content-Type': 'application/json'
+/**
+ * Create a Formsite API client for a specific user
+ * @param userId The ID of the user to create the client for
+ * @returns A configured axios client for the user's Formsite account
+ */
+export async function createFormsiteClient(userId: number) {
+  try {
+    // Get the user's Formsite integration settings
+    const [integration] = await db.select()
+      .from(formsiteIntegrations)
+      .where(eq(formsiteIntegrations.userId, userId));
+    
+    if (!integration) {
+      throw new Error('No Formsite integration found for this user');
+    }
+    
+    return axios.create({
+      baseURL: integration.apiBaseUrl,
+      headers: {
+        'Authorization': `Bearer ${integration.apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+  } catch (error) {
+    console.error('Error creating Formsite client:', error);
+    
+    // Fall back to the global configuration
+    return axios.create({
+      baseURL: 'https://fs3.formsite.com/api/v2',
+      headers: {
+        'Authorization': `Bearer ${process.env.FORMSITE_API_KEY}`,
+        'Content-Type': 'application/json'
+      }
+    });
   }
-});
+}
 
-// Define the form IDs for the two forms we're using
-// Based on the Formsite URLs provided
-const FORMS = {
-  URGENT_CARE: 'zUW21K/cetzidycge', // General consultation form
-  STD_CHECKUP: 'zUW21K/vybfr7pych'  // STD checkup form (ITSS)
-};
+/**
+ * Get the form IDs for a specific user
+ * @param userId The ID of the user to get form IDs for
+ * @returns An object with form IDs for different form types
+ */
+export async function getUserFormIds(userId: number) {
+  try {
+    // Get the user's Formsite integration settings
+    const [integration] = await db.select()
+      .from(formsiteIntegrations)
+      .where(eq(formsiteIntegrations.userId, userId));
+    
+    if (!integration) {
+      // Return default form IDs
+      return {
+        URGENT_CARE: 'zUW21K/cetzidycge', // Default general consultation form
+        STD_CHECKUP: 'zUW21K/vybfr7pych'  // Default STD checkup form (ITSS)
+      };
+    }
+    
+    // Parse the user's form configuration
+    const formConfig = integration.formsConfiguration as Record<string, any> || {};
+    
+    // Return the user's configured form IDs, or fall back to defaults
+    return {
+      URGENT_CARE: formConfig.urgent_care?.formId || 'zUW21K/cetzidycge',
+      STD_CHECKUP: formConfig.std_checkup?.formId || 'zUW21K/vybfr7pych',
+    };
+  } catch (error) {
+    console.error('Error getting user form IDs:', error);
+    
+    // Return default form IDs
+    return {
+      URGENT_CARE: 'zUW21K/cetzidycge', // Default general consultation form
+      STD_CHECKUP: 'zUW21K/vybfr7pych'  // Default STD checkup form (ITSS)
+    };
+  }
+}
 
 /**
  * Find a form submission by pseudonym

@@ -388,6 +388,33 @@ export const insertAiPromptSchema = createInsertSchema(aiPrompts).pick({
 export type AiPrompt = typeof aiPrompts.$inferSelect;
 export type InsertAiPrompt = z.infer<typeof insertAiPromptSchema>;
 
+// Formsite Integration model for doctor-specific configurations
+export const formsiteIntegrations = pgTable("formsite_integrations", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  apiKey: text("api_key").notNull(),
+  apiBaseUrl: text("api_base_url").notNull().default("https://fs3.formsite.com/api/v2"),
+  isVerified: boolean("is_verified").default(false),
+  lastVerified: timestamp("last_verified"),
+  formsConfiguration: jsonb("forms_configuration").default({}), // Stores form IDs and settings
+  lastSynced: timestamp("last_synced"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertFormsiteIntegrationSchema = createInsertSchema(formsiteIntegrations).pick({
+  userId: true,
+  apiKey: true,
+  apiBaseUrl: true,
+  isVerified: true,
+  lastVerified: true,
+  formsConfiguration: true,
+  lastSynced: true,
+});
+
+export type FormsiteIntegration = typeof formsiteIntegrations.$inferSelect;
+export type InsertFormsiteIntegration = z.infer<typeof insertFormsiteIntegrationSchema>;
+
 // Education Modules model for feature unlocking
 export const educationModules = pgTable("education_modules", {
   id: serial("id").primaryKey(),
