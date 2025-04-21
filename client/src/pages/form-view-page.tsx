@@ -100,8 +100,8 @@ export default function FormViewPage() {
     
     // Check if required questions are answered
     const unansweredRequired = formTemplate.questions
-      .filter(q => q.required)
-      .filter(q => !answers[q.id] || 
+      .filter((q: any) => q.required)
+      .filter((q: any) => !answers[q.id] || 
         (Array.isArray(answers[q.id]) && answers[q.id].length === 0) || 
         answers[q.id] === "");
     
@@ -183,7 +183,7 @@ export default function FormViewPage() {
                   <SelectValue placeholder="Select a patient" />
                 </SelectTrigger>
                 <SelectContent>
-                  {patients.map((patient) => (
+                  {patients.map((patient: any) => (
                     <SelectItem key={patient.id} value={patient.id.toString() || "0"}>
                       {patient.name}
                     </SelectItem>
@@ -195,7 +195,7 @@ export default function FormViewPage() {
             <Separator className="my-6" />
             
             <div className="space-y-8">
-              {formTemplate.questions.map((question) => (
+              {formTemplate.questions.map((question: any) => (
                 <div key={question.id} className="space-y-2">
                   <Label className="flex items-start">
                     <span>{question.label}</span>
@@ -232,7 +232,7 @@ export default function FormViewPage() {
                         <SelectValue placeholder="Select an option" />
                       </SelectTrigger>
                       <SelectContent>
-                        {question.options?.map((option, optionIndex) => (
+                        {question.options?.map((option: any, optionIndex: number) => (
                           <SelectItem key={option.value || optionIndex} value={option.value || `option_${optionIndex + 1}`}>
                             {option.label}
                           </SelectItem>
@@ -247,7 +247,7 @@ export default function FormViewPage() {
                       onValueChange={(value) => handleInputChange(question.id, value)}
                       className="space-y-2"
                     >
-                      {question.options?.map((option, optionIndex) => (
+                      {question.options?.map((option: any, optionIndex: number) => (
                         <div key={option.value || optionIndex} className="flex items-center space-x-2">
                           <RadioGroupItem 
                             id={`${question.id}-${option.value || optionIndex}`} 
@@ -261,7 +261,7 @@ export default function FormViewPage() {
                   
                   {question.type === "checkbox" && (
                     <div className="space-y-2">
-                      {question.options?.map((option, optionIndex) => {
+                      {question.options?.map((option: any, optionIndex: number) => {
                         const selectedValues = answers[question.id] || [];
                         const value = option.value || `option_${optionIndex + 1}`;
                         return (
