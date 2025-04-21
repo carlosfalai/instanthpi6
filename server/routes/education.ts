@@ -1,14 +1,19 @@
 import { Router } from "express";
 import { storage } from "../storage";
+import { DbEducationStorage } from "../db";
 import { z } from "zod";
 import { insertEducationModuleSchema, insertUserEducationProgressSchema } from "@shared/schema";
+
+// Initialize database storage for education modules
+const dbEducationStorage = new DbEducationStorage();
 
 export const router = Router();
 
 // Get all education modules
 router.get("/modules", async (req, res) => {
   try {
-    const modules = await storage.getAllEducationModules();
+    // Use the database adapter instead of memory storage
+    const modules = await dbEducationStorage.getAllEducationModules();
     res.json(modules);
   } catch (error) {
     console.error("Error fetching education modules:", error);
@@ -24,7 +29,7 @@ router.get("/modules/:id", async (req, res) => {
       return res.status(400).json({ error: "Invalid module ID" });
     }
 
-    const module = await storage.getEducationModule(moduleId);
+    const module = await dbEducationStorage.getEducationModule(moduleId);
     if (!module) {
       return res.status(404).json({ error: "Module not found" });
     }
@@ -104,7 +109,7 @@ router.get("/progress", async (req, res) => {
     // For now we'll use the first user (doctor) as our default user
     // In a real app, this would come from authentication
     const userId = 1; // Doctor user ID
-    const progress = await storage.getUserEducationProgress(userId);
+    const progress = await dbEducationStorage.getUserEducationProgress(userId);
     res.json(progress);
   } catch (error) {
     console.error("Error fetching progress:", error);
@@ -129,14 +134,14 @@ router.post("/progress", async (req, res) => {
     const { moduleId, status, quizScore, notes } = schema.parse(req.body);
     
     // Check if progress already exists
-    const existingProgress = await storage.getModuleProgress(userId, moduleId);
+    const existingProgress = await dbEducationStorage.getModuleProgress(userId, moduleId);
     
     if (existingProgress) {
       // Update existing progress
       const now = new Date();
       const completedAt = status === "completed" ? now : null;
       
-      const updatedProgress = await storage.updateUserEducationProgress(existingProgress.id, {
+      const updatedProgress = await dbEducationStorage.updateUserEducationProgress(existingProgress.id, {
         status,
         completedAt,
         quizScore,
@@ -149,7 +154,7 @@ router.post("/progress", async (req, res) => {
       const now = new Date();
       const completedAt = status === "completed" ? now : null;
       
-      const newProgress = await storage.createUserEducationProgress({
+      const newProgress = await dbEducationStorage.createUserEducationProgress({
         userId,
         moduleId,
         status,
@@ -175,7 +180,7 @@ router.get("/unlocked-features", async (req, res) => {
     // For now we'll use the first user (doctor) as our default user
     // In a real app, this would come from authentication
     const userId = 1; // Doctor user ID
-    const unlockedFeatures = await storage.getUserUnlockedFeatures(userId);
+    const unlockedFeatures = await dbEducationStorage.getUserUnlockedFeatures(userId);
     res.json(unlockedFeatures);
   } catch (error) {
     console.error("Error fetching unlocked features:", error);

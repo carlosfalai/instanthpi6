@@ -61,10 +61,13 @@ export class DbEducationStorage {
 
   async getModuleProgress(userId: number, moduleId: number): Promise<UserEducationProgress | undefined> {
     try {
-      const progress = await db.select().from(schema.userEducationProgress)
-        .where(eq(schema.userEducationProgress.userId, userId))
-        .where(eq(schema.userEducationProgress.moduleId, moduleId));
-      return progress.length > 0 ? progress[0] : undefined;
+      const progress = await db.select()
+        .from(schema.userEducationProgress)
+        .where(
+          eq(schema.userEducationProgress.userId, userId)
+        );
+      
+      return progress.find(p => p.moduleId === moduleId);
     } catch (error) {
       console.error(`Error fetching module progress for user ${userId}, module ${moduleId}:`, error);
       return undefined;
@@ -106,31 +109,40 @@ export class DbEducationStorage {
   async getUserUnlockedFeatures(userId: number): Promise<string[]> {
     try {
       // Get completed progress items for this user
-      const completedProgress = await db.select().from(schema.userEducationProgress)
-        .where(eq(schema.userEducationProgress.userId, userId))
-        .where(eq(schema.userEducationProgress.status, "completed"));
+      const completedProgress = await db.select()
+        .from(schema.userEducationProgress)
+        .where(
+          eq(schema.userEducationProgress.userId, userId)
+        );
+      
+      // Filter by completed status
+      const completed = completedProgress.filter((progress: any) => progress.status === "completed");
       
       // Get the module IDs
-      const completedModuleIds = completedProgress.map(progress => progress.moduleId);
+      const completedModuleIds = completed.map((progress: any) => progress.moduleId);
       
       if (completedModuleIds.length === 0) {
         return [];
       }
       
       // Fetch the modules that the user has completed
-      const modules = await db.select().from(schema.educationModules)
-        .where(schema.educationModules.id.in(completedModuleIds));
+      const allModules = await db.select().from(schema.educationModules);
+      const completedModules = allModules.filter(module => 
+        completedModuleIds.includes(module.id)
+      );
       
       // Extract all features unlocked by these modules
       let unlockedFeatures: string[] = [];
-      modules.forEach(module => {
+      completedModules.forEach(module => {
         if (module.featuresUnlocked) {
           unlockedFeatures = unlockedFeatures.concat(module.featuresUnlocked);
         }
       });
       
-      // Return unique features
-      return [...new Set(unlockedFeatures)];
+      // Return unique features by removing duplicates
+      const uniqueFeatures = [...new Set<string>(unlockedFeatures)];
+      
+      return uniqueFeatures;
     } catch (error) {
       console.error(`Error getting unlocked features for user ${userId}:`, error);
       return [];
