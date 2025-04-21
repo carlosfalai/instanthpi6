@@ -56,15 +56,6 @@ export default function NavigationBar() {
   // Fetch notification counts
   const { data: notificationCounts = {} } = useQuery<Record<string, number>>({
     queryKey: ['/api/notifications/counts'],
-    // If the endpoint doesn't exist yet, we'll use placeholders for now
-    placeholderData: {
-      documents: 3,
-      messages: 5,
-      chronicConditions: 2,
-      medicationRefills: 0,
-      urgentCare: 1,
-      forms: 2
-    },
     refetchInterval: 30000, // Refresh every 30 seconds
   });
   

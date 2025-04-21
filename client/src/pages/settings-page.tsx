@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import NavigationBar from '@/components/navigation/NavigationBar';
+import NavigationSettings from '@/components/settings/NavigationSettings';
 import { Loader2, Plus, Save, Trash2, Heart, PillIcon, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
