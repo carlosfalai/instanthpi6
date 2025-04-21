@@ -178,7 +178,7 @@ export default function FormViewPage() {
               </SelectTrigger>
               <SelectContent>
                 {patients.map((patient) => (
-                  <SelectItem key={patient.id} value={patient.id.toString()}>
+                  <SelectItem key={patient.id} value={patient.id.toString() || "0"}>
                     {patient.name}
                   </SelectItem>
                 ))}
@@ -226,8 +226,8 @@ export default function FormViewPage() {
                       <SelectValue placeholder="Select an option" />
                     </SelectTrigger>
                     <SelectContent>
-                      {question.options?.map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
+                      {question.options?.map((option, optionIndex) => (
+                        <SelectItem key={option.value || optionIndex} value={option.value || `option_${optionIndex + 1}`}>
                           {option.label}
                         </SelectItem>
                       ))}
@@ -241,10 +241,13 @@ export default function FormViewPage() {
                     onValueChange={(value) => handleInputChange(question.id, value)}
                     className="space-y-2"
                   >
-                    {question.options?.map((option) => (
-                      <div key={option.value} className="flex items-center space-x-2">
-                        <RadioGroupItem id={`${question.id}-${option.value}`} value={option.value} />
-                        <Label htmlFor={`${question.id}-${option.value}`}>{option.label}</Label>
+                    {question.options?.map((option, optionIndex) => (
+                      <div key={option.value || optionIndex} className="flex items-center space-x-2">
+                        <RadioGroupItem 
+                          id={`${question.id}-${option.value || optionIndex}`} 
+                          value={option.value || `option_${optionIndex + 1}`} 
+                        />
+                        <Label htmlFor={`${question.id}-${option.value || optionIndex}`}>{option.label}</Label>
                       </div>
                     ))}
                   </RadioGroup>
@@ -252,25 +255,26 @@ export default function FormViewPage() {
                 
                 {question.type === "checkbox" && (
                   <div className="space-y-2">
-                    {question.options?.map((option) => {
+                    {question.options?.map((option, optionIndex) => {
                       const selectedValues = answers[question.id] || [];
+                      const value = option.value || `option_${optionIndex + 1}`;
                       return (
-                        <div key={option.value} className="flex items-center space-x-2">
+                        <div key={value} className="flex items-center space-x-2">
                           <Checkbox
-                            id={`${question.id}-${option.value}`}
-                            checked={selectedValues.includes(option.value)}
+                            id={`${question.id}-${value}`}
+                            checked={selectedValues.includes(value)}
                             onCheckedChange={(checked) => {
                               const values = [...(answers[question.id] || [])];
                               if (checked) {
-                                values.push(option.value);
+                                values.push(value);
                               } else {
-                                const index = values.indexOf(option.value);
+                                const index = values.indexOf(value);
                                 if (index !== -1) values.splice(index, 1);
                               }
                               handleInputChange(question.id, values);
                             }}
                           />
-                          <Label htmlFor={`${question.id}-${option.value}`}>{option.label}</Label>
+                          <Label htmlFor={`${question.id}-${value}`}>{option.label}</Label>
                         </div>
                       );
                     })}

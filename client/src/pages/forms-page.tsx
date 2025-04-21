@@ -134,7 +134,7 @@ const FormBuilder = () => {
   const { data: formTemplates = [], isLoading: isLoadingTemplates } = useQuery({
     queryKey: ["/api/forms/templates", selectedCategory],
     queryFn: async () => {
-      const url = selectedCategory 
+      const url = selectedCategory && selectedCategory !== "all"
         ? `/api/forms/templates?category=${encodeURIComponent(selectedCategory)}`
         : "/api/forms/templates";
       const res = await fetch(url);
@@ -333,7 +333,7 @@ const FormBuilder = () => {
                   <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Categories</SelectItem>
+                  <SelectItem value="all">All Categories</SelectItem>
                   {formCategories.map((category) => (
                     <SelectItem key={category} value={category}>{category}</SelectItem>
                   ))}
