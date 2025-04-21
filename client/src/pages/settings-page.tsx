@@ -37,7 +37,11 @@ export default function SettingsPage() {
   });
   
   // Default navigation preferences if user not loaded yet
-  const navPreferences = currentUser?.navPreferences || {
+  const navPreferences = currentUser?.navPreferences as {
+    showChronicConditions: boolean;
+    showMedicationRefills: boolean;
+    showUrgentCare: boolean;
+  } || {
     showChronicConditions: true,
     showMedicationRefills: true,
     showUrgentCare: true

@@ -84,6 +84,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // User preferences route
+  // Get current user route
+  app.get("/api/user", async (req, res) => {
+    try {
+      // For now, we'll hardcode user ID 1 since we don't have proper authentication yet
+      const userId = 1;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Don't return the password
+      const { password, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+  
+  // Update user preferences route
   app.patch("/api/user/preferences", async (req, res) => {
     try {
       // For now, we'll hardcode user ID 1 since we don't have proper authentication yet

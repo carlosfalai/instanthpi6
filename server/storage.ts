@@ -224,7 +224,12 @@ export class MemStorage implements IStorage {
       id, 
       role: insertUser.role || "doctor", 
       avatarUrl: insertUser.avatarUrl || null,
-      createdAt: new Date() 
+      createdAt: new Date(),
+      navPreferences: insertUser.navPreferences || {
+        showChronicConditions: true,
+        showMedicationRefills: true,
+        showUrgentCare: true
+      }
     };
     this.users.set(id, user);
     return user;
@@ -232,6 +237,17 @@ export class MemStorage implements IStorage {
   
   async getAllUsers(): Promise<User[]> {
     return Array.from(this.users.values());
+  }
+  
+  async updateUser(id: number, userUpdate: Partial<InsertUser>): Promise<User> {
+    const existingUser = this.users.get(id);
+    if (!existingUser) {
+      throw new Error(`User with ID ${id} not found`);
+    }
+    
+    const updatedUser = { ...existingUser, ...userUpdate };
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
   
   // Patient operations

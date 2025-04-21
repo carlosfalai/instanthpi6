@@ -48,17 +48,28 @@ router.get('/search-patients', async (req, res) => {
     
     try {
       // Search patients in Spruce API directly
+      // Spruce API doesn't have a search endpoint, so we need to get all patients and filter
       const response = await axios.create({
         baseURL: 'https://api.sprucehealth.com/v1',
         headers: {
           'Authorization': `Bearer ${process.env.SPRUCE_API_KEY}`,
           'Content-Type': 'application/json'
         }
-      }).get('/patients/search', {
-        params: { query }
+      }).get('/patients');
+      
+      // Filter patients based on query
+      const allPatients = response.data.patients || [];
+      const searchTerm = query.toLowerCase();
+      const filteredPatients = allPatients.filter((patient: SprucePatient) => {
+        return (
+          (patient.name && patient.name.toLowerCase().includes(searchTerm)) ||
+          (patient.email && patient.email.toLowerCase().includes(searchTerm)) ||
+          (patient.phone && patient.phone.includes(searchTerm))
+        );
       });
       
-      const sprucePatients = response.data.patients || [];
+      // Use the filtered patients
+      const sprucePatients = filteredPatients || [];
       
       // Convert Spruce patients to our format
       const mappedPatients = sprucePatients.map((sprucePatient: SprucePatient) => ({
