@@ -10,8 +10,11 @@ export async function seedDatabase() {
   const users = await storage.getAllUsers();
   const forceReseed = process.env.SEED_DB === 'force';
   
+  // Always create or update the scheduler module
+  await createSchedulerModule();
+  
   if (users.length > 0 && !forceReseed) {
-    console.log("Database already has users, skipping seed");
+    console.log("Database already has users, skipping further seeding");
     return;
   }
   
@@ -180,6 +183,41 @@ async function createPendingItems(patientId: number) {
     priority: "low",
     category: "appointment"
   });
+}
+
+async function createSchedulerModule() {
+  console.log("Creating/updating Scheduler module");
+  
+  // Check if the module already exists
+  const existingModules = await storage.getAllEducationModules();
+  const existingSchedulerModule = existingModules.find(m => m.title === schedulerModuleMetadata.title);
+  
+  if (existingSchedulerModule) {
+    console.log("Scheduler module already exists, updating...");
+    await storage.updateEducationModule(existingSchedulerModule.id, {
+      description: schedulerModuleMetadata.description,
+      content: schedulerEducationContent,
+      featuresUnlocked: schedulerModuleMetadata.featuresUnlocked,
+      prerequisiteModules: schedulerModuleMetadata.prerequisiteModules,
+      order: schedulerModuleMetadata.order,
+      estimatedMinutes: schedulerModuleMetadata.estimatedMinutes
+    });
+    return;
+  }
+  
+  // Create new module
+  await storage.createEducationModule({
+    title: schedulerModuleMetadata.title,
+    description: schedulerModuleMetadata.description,
+    type: "article", // Convert from string to literal type
+    content: schedulerEducationContent,
+    featuresUnlocked: schedulerModuleMetadata.featuresUnlocked,
+    prerequisiteModules: schedulerModuleMetadata.prerequisiteModules,
+    order: schedulerModuleMetadata.order,
+    estimatedMinutes: schedulerModuleMetadata.estimatedMinutes
+  });
+  
+  console.log("Scheduler module created successfully");
 }
 
 async function createPreventativeCare(patientId: number) {
@@ -649,6 +687,18 @@ This represents the future of medical practice where technology handles the admi
     prerequisiteModules: [7],
     order: 8,
     estimatedMinutes: 15
+  });
+  
+  // Scheduler AI Module
+  const schedulerModule = await storage.createEducationModule({
+    title: schedulerModuleMetadata.title,
+    description: schedulerModuleMetadata.description,
+    type: schedulerModuleMetadata.type,
+    content: schedulerEducationContent,
+    featuresUnlocked: schedulerModuleMetadata.featuresUnlocked,
+    prerequisiteModules: schedulerModuleMetadata.prerequisiteModules,
+    order: schedulerModuleMetadata.order,
+    estimatedMinutes: schedulerModuleMetadata.estimatedMinutes
   });
   
   // Create some progress for the first user

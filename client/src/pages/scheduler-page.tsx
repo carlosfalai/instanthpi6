@@ -182,6 +182,216 @@ function SchedulerSettings() {
   );
 }
 
+// AI Recommendations Component
+interface SchedulerRecommendation {
+  id: string;
+  patientId: number;
+  patientName: string;
+  type: 'vaccination' | 'screening' | 'followup' | 'other';
+  title: string;
+  description: string;
+  messageTemplate: string;
+  dueDate: string;
+  priority: 'low' | 'medium' | 'high';
+  status: 'pending' | 'dismissed' | 'scheduled';
+}
+
+function SchedulerRecommendations() {
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<string>("pending");
+  
+  // Fetch recommendations
+  const { data: recommendations = [], isLoading } = useQuery<SchedulerRecommendation[]>({
+    queryKey: ['/api/scheduler/recommendations'],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/scheduler/recommendations');
+        if (!response.ok) throw new Error('Failed to load recommendations');
+        return response.json();
+      } catch (error) {
+        console.error("Error fetching recommendations:", error);
+        return [];
+      }
+    }
+  });
+
+  // Action mutations
+  const scheduleRecommendationMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/scheduler/recommendations/${id}/schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!response.ok) throw new Error('Failed to schedule recommendation');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/scheduler/recommendations'] });
+      toast({
+        title: "Recommendation scheduled",
+        description: "The recommendation has been scheduled successfully."
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Scheduling failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+
+  const dismissRecommendationMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await fetch(`/api/scheduler/recommendations/${id}/dismiss`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      
+      if (!response.ok) throw new Error('Failed to dismiss recommendation');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/scheduler/recommendations'] });
+      toast({
+        title: "Recommendation dismissed",
+        description: "The recommendation has been dismissed."
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Dismissal failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Handle schedule
+  const handleSchedule = (id: string) => {
+    scheduleRecommendationMutation.mutate(id);
+  };
+
+  // Handle dismiss
+  const handleDismiss = (id: string) => {
+    dismissRecommendationMutation.mutate(id);
+  };
+  
+  // Filter recommendations by status
+  const filteredRecommendations = recommendations.filter(rec => {
+    if (activeTab === 'pending') return rec.status === 'pending';
+    if (activeTab === 'scheduled') return rec.status === 'scheduled';
+    if (activeTab === 'dismissed') return rec.status === 'dismissed';
+    return true;
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col space-y-1">
+        <h2 className="text-2xl font-bold">AI Recommendations</h2>
+        <p className="text-muted-foreground">
+          Suggested preventative care and follow-ups for your patients
+        </p>
+      </div>
+
+      <Tabs defaultValue="pending" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid grid-cols-3 w-full max-w-md">
+          <TabsTrigger value="pending">
+            Pending
+            {recommendations.filter(r => r.status === 'pending').length > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {recommendations.filter(r => r.status === 'pending').length}
+              </Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+          <TabsTrigger value="dismissed">Dismissed</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value={activeTab} className="mt-6">
+          <div className="grid gap-4">
+            {filteredRecommendations.length > 0 ? (
+              filteredRecommendations.map((rec) => (
+                <Card key={rec.id} className={rec.priority === 'high' ? 'border-red-400' : ''}>
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-start gap-2">
+                        {activeTab === 'pending' && (
+                          <Checkbox 
+                            id={`schedule-${rec.id}`}
+                            className="mt-1"
+                            onCheckedChange={() => handleSchedule(rec.id)}
+                          />
+                        )}
+                        <div>
+                          <CardTitle className="text-lg">
+                            {rec.title}
+                            {rec.priority === 'high' && (
+                              <Badge variant="destructive" className="ml-2">High Priority</Badge>
+                            )}
+                          </CardTitle>
+                          <CardDescription>Patient: {rec.patientName}</CardDescription>
+                        </div>
+                      </div>
+                      {activeTab === 'pending' && (
+                        <Button variant="ghost" size="sm" onClick={() => handleDismiss(rec.id)}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <p className="text-sm">{rec.description}</p>
+                      
+                      <div className="flex items-center text-sm text-muted-foreground">
+                        <Calendar className="h-4 w-4 mr-2" />
+                        Due: {new Date(rec.dueDate).toLocaleDateString()}
+                      </div>
+                      
+                      <div className="border rounded-md p-3 bg-muted/50">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm font-medium">Suggested Message Template</span>
+                        </div>
+                        <p className="text-sm italic">"{rec.messageTemplate}"</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                  {activeTab === 'pending' && (
+                    <CardFooter>
+                      <Button size="sm" className="mr-2" onClick={() => handleSchedule(rec.id)}>
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        Schedule
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleDismiss(rec.id)}>
+                        Dismiss
+                      </Button>
+                    </CardFooter>
+                  )}
+                </Card>
+              ))
+            ) : (
+              <div className="text-center py-10">
+                <p className="text-muted-foreground">No {activeTab} recommendations</p>
+              </div>
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
 // Upcoming Scheduled Events Component
 function UpcomingScheduledEvents() {
   const { data: events = [], isLoading } = useQuery({
@@ -260,9 +470,13 @@ export default function SchedulerPage() {
           AI Scheduler
         </h1>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          <SchedulerSettings />
-          <UpcomingScheduledEvents />
+        <div className="space-y-10">
+          <SchedulerRecommendations />
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <SchedulerSettings />
+            <UpcomingScheduledEvents />
+          </div>
         </div>
       </div>
     </BaseLayout>
