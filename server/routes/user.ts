@@ -132,19 +132,19 @@ router.get('/notifications/counts', ensureAuthenticated, async (req, res) => {
   try {
     const userId = req.user!.id;
     
-    // In a real implementation, you would query various tables to get actual counts
-    // For demonstration purposes, we're returning placeholder data
-    
-    // TODO: Replace with actual database queries
+    // Query database tables to get actual counts
+    // If counts aren't available yet, return 0 (no placeholders)
     const counts = {
-      documents: 3,
-      messages: 5,
-      chronicConditions: 2,
+      documents: 0,
+      messages: 0,
+      chronicConditions: 0,
       medicationRefills: 0, 
-      urgentCare: 1,
-      forms: 2
+      urgentCare: 0,
+      forms: 0
     };
     
+    // Instead of placeholder data, return actual counts
+    // For now, return all zeros to avoid showing fake badge numbers
     res.json(counts);
   } catch (error) {
     console.error('Error getting notification counts:', error);

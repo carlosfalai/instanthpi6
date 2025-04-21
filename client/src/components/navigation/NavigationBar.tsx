@@ -75,12 +75,12 @@ export default function NavigationBar() {
   const defaultNavItems: NavItem[] = [
     { id: 'home', path: '/', icon: <Home className="h-5 w-5" />, label: 'Home', visible: true, order: 1, row: 'primary' },
     { id: 'patients', path: '/patients', icon: <Users className="h-5 w-5" />, label: 'Patients', visible: true, order: 2, row: 'primary' },
-    { id: 'documents', path: '/documents', icon: <FileText className="h-5 w-5" />, label: 'Documents', visible: true, order: 3, row: 'primary', notificationCount: notificationCounts.documents },
-    { id: 'messages', path: '/messages', icon: <MessageSquare className="h-5 w-5" />, label: 'Messages', visible: true, order: 4, row: 'primary', notificationCount: notificationCounts.messages },
-    { id: 'forms', path: '/forms', icon: <ClipboardList className="h-5 w-5" />, label: 'Forms', visible: true, order: 1, row: 'secondary', notificationCount: notificationCounts.forms },
-    { id: 'chronicConditions', path: '/chronic-conditions', icon: <Heart className="h-5 w-5" />, label: 'Chronic Conditions', visible: navPreferences.showChronicConditions, order: 2, row: 'secondary', notificationCount: notificationCounts.chronicConditions },
-    { id: 'medicationRefills', path: '/medication-refills', icon: <PillIcon className="h-5 w-5" />, label: 'Medication Refills', visible: navPreferences.showMedicationRefills, order: 3, row: 'secondary', notificationCount: notificationCounts.medicationRefills },
-    { id: 'urgentCare', path: '/urgent-care', icon: <AlertCircle className="h-5 w-5" />, label: 'Urgent Care', visible: navPreferences.showUrgentCare, order: 4, row: 'secondary', notificationCount: notificationCounts.urgentCare },
+    { id: 'documents', path: '/documents', icon: <FileText className="h-5 w-5" />, label: 'Documents', visible: true, order: 3, row: 'primary' },
+    { id: 'messages', path: '/messages', icon: <MessageSquare className="h-5 w-5" />, label: 'Messages', visible: true, order: 4, row: 'primary' },
+    { id: 'forms', path: '/forms', icon: <ClipboardList className="h-5 w-5" />, label: 'Forms', visible: true, order: 1, row: 'secondary' },
+    { id: 'chronicConditions', path: '/chronic-conditions', icon: <Heart className="h-5 w-5" />, label: 'Chronic Conditions', visible: navPreferences.showChronicConditions, order: 2, row: 'secondary' },
+    { id: 'medicationRefills', path: '/medication-refills', icon: <PillIcon className="h-5 w-5" />, label: 'Medication Refills', visible: navPreferences.showMedicationRefills, order: 3, row: 'secondary' },
+    { id: 'urgentCare', path: '/urgent-care', icon: <AlertCircle className="h-5 w-5" />, label: 'Urgent Care', visible: navPreferences.showUrgentCare, order: 4, row: 'secondary' },
     { id: 'education', path: '/education', icon: <GraduationCap className="h-5 w-5" />, label: 'Education', visible: true, order: 5, row: 'secondary' },
     { id: 'settings', path: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Settings', visible: true, order: 6, row: 'secondary' },
   ];
