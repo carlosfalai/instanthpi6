@@ -435,3 +435,53 @@ export const insertUserEducationProgressSchema = createInsertSchema(userEducatio
 
 export type UserEducationProgress = typeof userEducationProgress.$inferSelect;
 export type InsertUserEducationProgress = z.infer<typeof insertUserEducationProgressSchema>;
+
+// Form templates
+export const formTemplates = pgTable("form_templates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  userId: integer("user_id").references(() => users.id),
+  isPublic: boolean("is_public").default(false).notNull(),
+  category: text("category").notNull(),
+  questions: jsonb("questions").notNull()
+});
+
+export const insertFormTemplateSchema = createInsertSchema(formTemplates).pick({
+  name: true,
+  description: true,
+  userId: true,
+  isPublic: true,
+  category: true,
+  questions: true
+});
+
+export type FormTemplate = typeof formTemplates.$inferSelect;
+export type InsertFormTemplate = z.infer<typeof insertFormTemplateSchema>;
+
+// Form responses
+export const formResponses = pgTable("form_responses", {
+  id: serial("id").primaryKey(),
+  formTemplateId: integer("form_template_id").references(() => formTemplates.id).notNull(),
+  patientId: integer("patient_id").references(() => patients.id).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  completedAt: timestamp("completed_at"),
+  answers: jsonb("answers").notNull(),
+  status: text("status").default("in_progress").notNull(), // in_progress, completed
+  notes: text("notes")
+});
+
+export const insertFormResponseSchema = createInsertSchema(formResponses).pick({
+  formTemplateId: true,
+  patientId: true,
+  completedAt: true,
+  answers: true,
+  status: true,
+  notes: true
+});
+
+export type FormResponse = typeof formResponses.$inferSelect;
+export type InsertFormResponse = z.infer<typeof insertFormResponseSchema>;

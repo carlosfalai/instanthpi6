@@ -8,7 +8,9 @@ import {
   preventativeCare, type PreventativeCare, type InsertPreventativeCare,
   aiPrompts, type AiPrompt, type InsertAiPrompt,
   educationModules, type EducationModule, type InsertEducationModule,
-  userEducationProgress, type UserEducationProgress, type InsertUserEducationProgress
+  userEducationProgress, type UserEducationProgress, type InsertUserEducationProgress,
+  formTemplates, type FormTemplate, type InsertFormTemplate,
+  formResponses, type FormResponse, type InsertFormResponse
 } from "@shared/schema";
 
 export interface IStorage {
@@ -77,6 +79,22 @@ export interface IStorage {
   createUserEducationProgress(progress: InsertUserEducationProgress): Promise<UserEducationProgress>;
   updateUserEducationProgress(id: number, progress: Partial<InsertUserEducationProgress>): Promise<UserEducationProgress | undefined>;
   getUserUnlockedFeatures(userId: number): Promise<string[]>;
+  
+  // Form Template operations
+  getAllFormTemplates(): Promise<FormTemplate[]>;
+  getFormTemplatesByCategory(category: string): Promise<FormTemplate[]>;
+  getFormTemplate(id: number): Promise<FormTemplate | undefined>;
+  createFormTemplate(template: InsertFormTemplate): Promise<FormTemplate>;
+  updateFormTemplate(id: number, template: Partial<InsertFormTemplate>): Promise<FormTemplate | undefined>;
+  deleteFormTemplate(id: number): Promise<boolean>;
+  
+  // Form Response operations
+  getFormResponsesByPatientId(patientId: number): Promise<FormResponse[]>;
+  getFormResponsesByTemplateId(templateId: number): Promise<FormResponse[]>;
+  getFormResponse(id: number): Promise<FormResponse | undefined>;
+  createFormResponse(response: InsertFormResponse): Promise<FormResponse>;
+  updateFormResponse(id: number, response: Partial<InsertFormResponse>): Promise<FormResponse | undefined>;
+  deleteFormResponse(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -90,6 +108,8 @@ export class MemStorage implements IStorage {
   private aiPrompts: Map<number, AiPrompt>;
   private educationModules: Map<number, EducationModule>;
   private userEducationProgress: Map<number, UserEducationProgress>;
+  private formTemplates: Map<number, FormTemplate>;
+  private formResponses: Map<number, FormResponse>;
   
   private userId: number;
   private patientId: number;
@@ -99,6 +119,8 @@ export class MemStorage implements IStorage {
   private promptId: number;
   private moduleId: number;
   private progressId: number;
+  private formTemplateId: number;
+  private formResponseId: number;
 
   constructor() {
     this.users = new Map();
@@ -111,6 +133,8 @@ export class MemStorage implements IStorage {
     this.aiPrompts = new Map();
     this.educationModules = new Map();
     this.userEducationProgress = new Map();
+    this.formTemplates = new Map();
+    this.formResponses = new Map();
     
     this.userId = 1;
     this.patientId = 1;
@@ -120,6 +144,8 @@ export class MemStorage implements IStorage {
     this.promptId = 1;
     this.moduleId = 1;
     this.progressId = 1;
+    this.formTemplateId = 1;
+    this.formResponseId = 1;
     
     // Add a default user for testing
     this.createUser({
