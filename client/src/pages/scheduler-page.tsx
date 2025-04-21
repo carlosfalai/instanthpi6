@@ -17,6 +17,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Calendar,
   CheckCircle,
@@ -24,7 +26,10 @@ import {
   FileText,
   Users,
   AlertCircle,
-  Plus
+  Plus,
+  X,
+  MessageSquare,
+  Stethoscope
 } from "lucide-react";
 import { queryClient } from "@/lib/queryClient";
 

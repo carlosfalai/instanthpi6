@@ -1,5 +1,6 @@
 import { storage } from "./storage";
 import crypto from "crypto";
+import { schedulerEducationContent, schedulerModuleMetadata } from "./modules/scheduler-education";
 
 /**
  * Seeds the database with initial data for testing
