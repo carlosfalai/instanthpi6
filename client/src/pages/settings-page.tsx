@@ -312,69 +312,7 @@ export default function SettingsPage() {
             </TabsContent>
             
             <TabsContent value="navigation">
-              <Card className="bg-[#1e1e1e] border-gray-800">
-                <CardHeader>
-                  <CardTitle>Navigation Menu Preferences</CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Customize which items appear in your navigation menu
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between py-3 border-b border-gray-800">
-                      <div className="flex items-center space-x-3">
-                        <Heart className="h-5 w-5 text-red-500" />
-                        <div>
-                          <h3 className="font-medium">Chronic Conditions</h3>
-                          <p className="text-sm text-gray-400">Manage patient chronic conditions and ongoing care</p>
-                        </div>
-                      </div>
-                      <Switch
-                        id="show-chronic-conditions"
-                        checked={navPreferences.showChronicConditions}
-                        onCheckedChange={(checked) => handleNavToggleChange('showChronicConditions', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between py-3 border-b border-gray-800">
-                      <div className="flex items-center space-x-3">
-                        <PillIcon className="h-5 w-5 text-blue-500" />
-                        <div>
-                          <h3 className="font-medium">Medication Refills</h3>
-                          <p className="text-sm text-gray-400">Handle medication refill requests from patients</p>
-                        </div>
-                      </div>
-                      <Switch
-                        id="show-medication-refills"
-                        checked={navPreferences.showMedicationRefills}
-                        onCheckedChange={(checked) => handleNavToggleChange('showMedicationRefills', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between py-3 border-b border-gray-800">
-                      <div className="flex items-center space-x-3">
-                        <AlertCircle className="h-5 w-5 text-yellow-500" />
-                        <div>
-                          <h3 className="font-medium">Urgent Care</h3>
-                          <p className="text-sm text-gray-400">Manage urgent care requests and walk-ins</p>
-                        </div>
-                      </div>
-                      <Switch
-                        id="show-urgent-care"
-                        checked={navPreferences.showUrgentCare}
-                        onCheckedChange={(checked) => handleNavToggleChange('showUrgentCare', checked)}
-                      />
-                    </div>
-                    
-                    <div className="pt-4">
-                      <p className="text-sm text-gray-400">
-                        Changes to navigation preferences will take effect immediately. Items that are turned off will not
-                        appear in your navigation menu, but their functionality will still be available if accessed directly.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <NavigationSettings currentUser={currentUser} />
             </TabsContent>
             
             <TabsContent value="add">
