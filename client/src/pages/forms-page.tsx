@@ -28,11 +28,13 @@ import { Badge } from "@/components/ui/badge";
 // Question types that can be added to a form
 type QuestionType = "text" | "textarea" | "select" | "radio" | "checkbox" | "date" | "number";
 
+// Option structure for select, radio, checkbox questions
 interface Option {
   value: string;
   label: string;
 }
 
+// Question structure
 interface Question {
   id: string;
   type: QuestionType;
@@ -43,6 +45,7 @@ interface Question {
   options?: Option[];
 }
 
+// Form template structure
 interface FormTemplate {
   id: number;
   name: string;
@@ -55,107 +58,54 @@ interface FormTemplate {
   updatedAt: string;
 }
 
-const defaultQuestions: Record<QuestionType, Omit<Question, "id">> = {
-  text: {
-    type: "text",
-    label: "Short Answer",
-    required: false,
-    placeholder: "Enter your answer",
-  },
-  textarea: {
-    type: "textarea",
-    label: "Long Answer",
-    required: false,
-    placeholder: "Enter your detailed answer",
-  },
-  select: {
-    type: "select",
-    label: "Dropdown Selection",
-    required: false,
-    options: [
-      { value: "option1", label: "Option 1" },
-      { value: "option2", label: "Option 2" },
-    ],
-  },
-  radio: {
-    type: "radio",
-    label: "Single Choice",
-    required: false,
-    options: [
-      { value: "option1", label: "Option 1" },
-      { value: "option2", label: "Option 2" },
-    ],
-  },
-  checkbox: {
-    type: "checkbox",
-    label: "Multiple Choice",
-    required: false,
-    options: [
-      { value: "option1", label: "Option 1" },
-      { value: "option2", label: "Option 2" },
-    ],
-  },
-  date: {
-    type: "date",
-    label: "Date",
-    required: false,
-  },
-  number: {
-    type: "number",
-    label: "Number",
-    required: false,
-    placeholder: "Enter a number",
-  },
-};
-
-// Main form categories
-const formCategories = [
-  "General Medical",
-  "STD Testing",
-  "Urgent Care",
-  "Follow-up",
-  "Wellness Visit",
-  "Mental Health",
-  "Other"
-];
-
-const FormBuilder = () => {
+function FormBuilder() {
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("template-list");
-  const [editingTemplate, setEditingTemplate] = useState<FormTemplate | null>(null);
   const [formName, setFormName] = useState("");
   const [formDescription, setFormDescription] = useState("");
-  const [formCategory, setFormCategory] = useState(formCategories[0]);
-  const [isPublic, setIsPublic] = useState(true);
+  const [formCategory, setFormCategory] = useState("General");
+  const [isPublic, setIsPublic] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [editingTemplate, setEditingTemplate] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   
-  const { toast } = useToast();
-
+  // Predefined form categories
+  const formCategories = [
+    "General",
+    "Medical History",
+    "Screening",
+    "Intake",
+    "Assessment",
+    "Follow-up",
+    "Consent",
+    "Vaccination"
+  ];
+  
   // Fetch form templates
   const { data: formTemplates = [], isLoading: isLoadingTemplates } = useQuery({
     queryKey: ["/api/forms/templates", selectedCategory],
     queryFn: async () => {
-      const url = selectedCategory && selectedCategory !== "all"
-        ? `/api/forms/templates?category=${encodeURIComponent(selectedCategory)}`
+      const url = selectedCategory && selectedCategory !== "all" 
+        ? `/api/forms/templates?category=${selectedCategory}`
         : "/api/forms/templates";
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch templates");
       return res.json();
-    }
+    },
   });
-
+  
   // Create form template mutation
   const createTemplateMutation = useMutation({
-    mutationFn: async (newTemplate: Omit<FormTemplate, "id" | "createdAt" | "updatedAt">) => {
-      const res = await apiRequest("POST", "/api/forms/templates", newTemplate);
+    mutationFn: async (data: any) => {
+      const res = await apiRequest("POST", "/api/forms/templates", data);
       return await res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/forms/templates"] });
       toast({
         title: "Success",
         description: "Form template created successfully",
       });
+      queryClient.invalidateQueries({ queryKey: ["/api/forms/templates"] });
       resetFormState();
       setActiveTab("template-list");
     },
@@ -167,20 +117,19 @@ const FormBuilder = () => {
       });
     },
   });
-
+  
   // Update form template mutation
   const updateTemplateMutation = useMutation({
-    mutationFn: async (template: Partial<FormTemplate> & { id: number }) => {
-      const { id, ...updateData } = template;
-      const res = await apiRequest("PUT", `/api/forms/templates/${id}`, updateData);
+    mutationFn: async ({ id, data }: { id: number; data: any }) => {
+      const res = await apiRequest("PATCH", `/api/forms/templates/${id}`, data);
       return await res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/forms/templates"] });
       toast({
         title: "Success",
         description: "Form template updated successfully",
       });
+      queryClient.invalidateQueries({ queryKey: ["/api/forms/templates"] });
       resetFormState();
       setActiveTab("template-list");
     },
@@ -192,19 +141,18 @@ const FormBuilder = () => {
       });
     },
   });
-
+  
   // Delete form template mutation
   const deleteTemplateMutation = useMutation({
     mutationFn: async (id: number) => {
       await apiRequest("DELETE", `/api/forms/templates/${id}`);
-      return id;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/forms/templates"] });
       toast({
         title: "Success",
         description: "Form template deleted successfully",
       });
+      queryClient.invalidateQueries({ queryKey: ["/api/forms/templates"] });
     },
     onError: (error: Error) => {
       toast({
@@ -214,74 +162,84 @@ const FormBuilder = () => {
       });
     },
   });
-
+  
   // Reset form state
   const resetFormState = () => {
     setFormName("");
     setFormDescription("");
-    setFormCategory(formCategories[0]);
-    setIsPublic(true);
+    setFormCategory("General");
+    setIsPublic(false);
     setQuestions([]);
     setEditingTemplate(null);
   };
-
-  // Add a new question to the form
+  
+  // Add a question to the form
   const addQuestion = (type: QuestionType) => {
     const newQuestion: Question = {
-      ...defaultQuestions[type],
-      id: crypto.randomUUID(),
+      id: `question_${Date.now()}`,
+      type,
+      label: `New ${type} question`,
+      required: false,
     };
+    
+    if (type === "select" || type === "radio" || type === "checkbox") {
+      newQuestion.options = [
+        { value: "option1", label: "Option 1" },
+        { value: "option2", label: "Option 2" },
+      ];
+    }
+    
     setQuestions([...questions, newQuestion]);
   };
-
-  // Remove a question from the form
-  const removeQuestion = (id: string) => {
-    setQuestions(questions.filter((q) => q.id !== id));
-  };
-
-  // Update a question
+  
+  // Update a question's properties
   const updateQuestion = (id: string, updates: Partial<Question>) => {
     setQuestions(
       questions.map((q) => (q.id === id ? { ...q, ...updates } : q))
     );
   };
-
-  // Move question up in the list
+  
+  // Remove a question
+  const removeQuestion = (id: string) => {
+    setQuestions(questions.filter((q) => q.id !== id));
+  };
+  
+  // Move question up in the order
   const moveQuestionUp = (index: number) => {
     if (index === 0) return;
     const newQuestions = [...questions];
     [newQuestions[index], newQuestions[index - 1]] = [newQuestions[index - 1], newQuestions[index]];
     setQuestions(newQuestions);
   };
-
-  // Move question down in the list
+  
+  // Move question down in the order
   const moveQuestionDown = (index: number) => {
     if (index === questions.length - 1) return;
     const newQuestions = [...questions];
     [newQuestions[index], newQuestions[index + 1]] = [newQuestions[index + 1], newQuestions[index]];
     setQuestions(newQuestions);
   };
-
+  
   // Handle form submission
   const handleSubmit = () => {
-    if (!formName.trim()) {
+    if (!formName) {
       toast({
-        title: "Validation Error",
+        title: "Error",
         description: "Form name is required",
         variant: "destructive",
       });
       return;
     }
-
+    
     if (questions.length === 0) {
       toast({
-        title: "Validation Error",
-        description: "Form must have at least one question",
+        title: "Error",
+        description: "Add at least one question to the form",
         variant: "destructive",
       });
       return;
     }
-
+    
     const templateData = {
       name: formName,
       description: formDescription,
@@ -289,24 +247,24 @@ const FormBuilder = () => {
       isPublic,
       questions,
     };
-
+    
     if (editingTemplate) {
       updateTemplateMutation.mutate({
-        id: editingTemplate.id,
-        ...templateData,
+        id: editingTemplate,
+        data: templateData,
       });
     } else {
-      createTemplateMutation.mutate(templateData as any);
+      createTemplateMutation.mutate(templateData);
     }
   };
-
-  // Handle editing a template
+  
+  // Edit an existing template
   const handleEditTemplate = (template: FormTemplate) => {
-    setEditingTemplate(template);
     setFormName(template.name);
     setFormDescription(template.description);
     setFormCategory(template.category);
     setIsPublic(template.isPublic);
+    setEditingTemplate(template.id);
     setQuestions(template.questions);
     setActiveTab("create-template");
   };
@@ -568,24 +526,25 @@ const FormBuilder = () => {
                                   <Input
                                     value={option.label}
                                     onChange={(e) => {
-                                      const options = [...(question.options || [])];
-                                      options[optionIndex] = {
-                                        ...options[optionIndex],
+                                      const newOptions = [...(question.options || [])];
+                                      newOptions[optionIndex] = {
+                                        ...newOptions[optionIndex],
                                         label: e.target.value,
                                       };
-                                      updateQuestion(question.id, { options });
+                                      updateQuestion(question.id, { options: newOptions });
                                     }}
                                     className="flex-1"
+                                    placeholder="Option label"
                                   />
                                   <Button
-                                    type="button"
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => {
-                                      const options = [...(question.options || [])];
-                                      options.splice(optionIndex, 1);
-                                      updateQuestion(question.id, { options });
+                                      const newOptions = [...(question.options || [])];
+                                      newOptions.splice(optionIndex, 1);
+                                      updateQuestion(question.id, { options: newOptions });
                                     }}
+                                    className="text-red-500 hover:text-red-700"
                                   >
                                     <X className="h-4 w-4" />
                                   </Button>
@@ -603,35 +562,37 @@ const FormBuilder = () => {
                               updateQuestion(question.id, { required: checked })
                             }
                           />
-                          <Label htmlFor={`required-${question.id}`}>Required question</Label>
+                          <Label htmlFor={`required-${question.id}`}>Required</Label>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="bg-gray-50 p-4 rounded-lg">
                     <div className="text-sm font-medium mb-2 w-full">Add a question:</div>
-                    <Button variant="outline" onClick={() => addQuestion("text")}>
-                      <Plus className="h-4 w-4 mr-1" /> Text
-                    </Button>
-                    <Button variant="outline" onClick={() => addQuestion("textarea")}>
-                      <Plus className="h-4 w-4 mr-1" /> Long Text
-                    </Button>
-                    <Button variant="outline" onClick={() => addQuestion("select")}>
-                      <Plus className="h-4 w-4 mr-1" /> Dropdown
-                    </Button>
-                    <Button variant="outline" onClick={() => addQuestion("radio")}>
-                      <Plus className="h-4 w-4 mr-1" /> Single Choice
-                    </Button>
-                    <Button variant="outline" onClick={() => addQuestion("checkbox")}>
-                      <Plus className="h-4 w-4 mr-1" /> Multiple Choice
-                    </Button>
-                    <Button variant="outline" onClick={() => addQuestion("date")}>
-                      <Plus className="h-4 w-4 mr-1" /> Date
-                    </Button>
-                    <Button variant="outline" onClick={() => addQuestion("number")}>
-                      <Plus className="h-4 w-4 mr-1" /> Number
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" onClick={() => addQuestion("text")}>
+                        <Plus className="h-3 w-3 mr-1" /> Text
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => addQuestion("textarea")}>
+                        <Plus className="h-3 w-3 mr-1" /> Text Area
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => addQuestion("select")}>
+                        <Plus className="h-3 w-3 mr-1" /> Dropdown
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => addQuestion("radio")}>
+                        <Plus className="h-3 w-3 mr-1" /> Radio
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => addQuestion("checkbox")}>
+                        <Plus className="h-3 w-3 mr-1" /> Checkbox
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => addQuestion("date")}>
+                        <Plus className="h-3 w-3 mr-1" /> Date
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => addQuestion("number")}>
+                        <Plus className="h-3 w-3 mr-1" /> Number
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
