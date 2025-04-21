@@ -8,7 +8,8 @@ import {
   Settings, 
   MessageSquare,
   User,
-  GraduationCap
+  GraduationCap,
+  ClipboardList
 } from 'lucide-react';
 
 export default function NavigationBar() {
@@ -20,6 +21,7 @@ export default function NavigationBar() {
     { path: '/documents', icon: <FileText className="h-5 w-5" />, label: 'Documents' },
     { path: '/appointments', icon: <Calendar className="h-5 w-5" />, label: 'Appointments' },
     { path: '/messages', icon: <MessageSquare className="h-5 w-5" />, label: 'Messages' },
+    { path: '/forms', icon: <ClipboardList className="h-5 w-5" />, label: 'Forms' },
     { path: '/education', icon: <GraduationCap className="h-5 w-5" />, label: 'Education' },
     { path: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Settings' },
   ];

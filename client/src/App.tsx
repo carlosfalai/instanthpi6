@@ -8,6 +8,9 @@ import ThreePanelLayout from '@/components/dashboard/ThreePanelLayout';
 import PatientsPage from '@/pages/patients-page';
 import DocumentsPage from '@/pages/documents-page';
 import EducationPage from '@/pages/education-page';
+import FormsPage from '@/pages/forms-page';
+import FormBuilderPage from '@/pages/form-builder-page';
+import FormViewPage from '@/pages/form-view-page';
 
 function Router() {
   return (
@@ -16,6 +19,10 @@ function Router() {
       <Route path="/patients" component={PatientsPage} />
       <Route path="/documents" component={DocumentsPage} />
       <Route path="/education" component={EducationPage} />
+      <Route path="/forms" component={FormsPage} />
+      <Route path="/forms/new" component={FormBuilderPage} />
+      <Route path="/forms/edit/:id" component={FormBuilderPage} />
+      <Route path="/forms/:id" component={FormViewPage} />
       <Route component={NotFound} />
     </Switch>
   );
