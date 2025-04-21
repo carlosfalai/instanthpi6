@@ -7,8 +7,17 @@ import crypto from "crypto";
 export async function seedDatabase() {
   // Check if we already have users
   const users = await storage.getAllUsers();
-  if (users.length > 0) {
+  const forceReseed = process.env.SEED_DB === 'force';
+  
+  if (users.length > 0 && !forceReseed) {
     console.log("Database already has users, skipping seed");
+    return;
+  }
+  
+  if (forceReseed) {
+    console.log("Force reseeding the database with education modules");
+    // Only create/update education modules
+    await createEducationModules();
     return;
   }
 
@@ -91,56 +100,49 @@ async function createMessagesForPatient(patientId: number) {
     patientId,
     senderId: 1, // Doctor
     content: "Hello Jessica, how are you feeling today? I noticed it's been a few weeks since your last check-up.",
-    isFromPatient: false,
-    timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 days ago
+    isFromPatient: false
   });
   
   await storage.createMessage({
     patientId,
     senderId: patientId,
     content: "Hi Dr. Johnson, I've been doing better. The medication you prescribed has helped with my symptoms, but I still have some questions about side effects.",
-    isFromPatient: true,
-    timestamp: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000) // 6 days ago
+    isFromPatient: true
   });
   
   await storage.createMessage({
     patientId,
     senderId: 1, // Doctor
     content: "I'm glad to hear the medication is helping. What kind of side effects are you experiencing?",
-    isFromPatient: false,
-    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // 5 days ago
+    isFromPatient: false
   });
   
   await storage.createMessage({
     patientId,
     senderId: patientId,
     content: "I've been feeling a bit dizzy in the mornings, and sometimes I have a slight headache that lasts for a few hours.",
-    isFromPatient: true,
-    timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000) // 4 days ago
+    isFromPatient: true
   });
   
   await storage.createMessage({
     patientId,
     senderId: 1, // Doctor
     content: "Those can be common side effects. Try taking the medication with food in the morning, and ensure you're staying hydrated. Let's monitor these symptoms for another week. If they persist or worsen, we might need to adjust your dosage or try a different medication.",
-    isFromPatient: false,
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
+    isFromPatient: false
   });
   
   await storage.createMessage({
     patientId,
     senderId: patientId,
     content: "Thank you, I'll try that. Should I schedule another appointment soon?",
-    isFromPatient: true,
-    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
+    isFromPatient: true
   });
   
   await storage.createMessage({
     patientId,
     senderId: 1, // Doctor
     content: "Let's schedule a follow-up in two weeks. In the meantime, please keep track of any side effects in a diary - noting when they occur and their severity. This will help us determine if we need to make any adjustments to your treatment plan.",
-    isFromPatient: false,
-    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+    isFromPatient: false
   });
 }
 
@@ -219,6 +221,7 @@ async function createEducationModules() {
   const aiAssistantModule = await storage.createEducationModule({
     title: "Using AI Assistants",
     description: "Learn how to effectively use AI assistants to improve patient care and streamline documentation.",
+    type: "article",
     content: `
 # Using AI Assistants in Clinical Practice
 
@@ -251,29 +254,17 @@ When a patient conversation occurs, the AI can help generate:
 
 AI assistants are powerful tools that can save you time and improve care, but they require human oversight and clinical judgment.
     `,
-    moduleType: "tutorial",
-    durationMinutes: 15,
-    difficulty: "beginner",
-    prerequisites: [],
-    featuresUnlocked: ["ai_documentation"],
-    quizQuestions: [
-      {
-        question: "What should you always do before approving AI-generated content?",
-        options: ["Delete it", "Review it", "Share it with patients", "Ignore it"],
-        correctAnswer: "Review it"
-      },
-      {
-        question: "Which of the following can AI help generate?",
-        options: ["Medical licenses", "HPI summaries", "Billing codes", "Scheduling"],
-        correctAnswer: "HPI summaries"
-      }
-    ]
+    featuresUnlocked: ["AI Documentation"],
+    prerequisiteModules: null,
+    order: 1,
+    estimatedMinutes: 15
   });
   
   // Patient Communication Module
   const patientCommunicationModule = await storage.createEducationModule({
     title: "Effective Patient Communication",
     description: "Learn techniques for clear and empathetic communication with patients through digital channels.",
+    type: "article",
     content: `
 # Effective Digital Patient Communication
 
@@ -302,29 +293,17 @@ While templates can improve efficiency, always personalize your communication to
 
 Ensure all digital communications are properly documented in the patient's medical record.
     `,
-    moduleType: "tutorial",
-    durationMinutes: 20,
-    difficulty: "intermediate",
-    prerequisites: [],
-    featuresUnlocked: ["patient_messaging"],
-    quizQuestions: [
-      {
-        question: "What type of language should be used when communicating with patients?",
-        options: ["Technical medical jargon", "Clear, jargon-free language", "Formal academic writing", "Brief abbreviations"],
-        correctAnswer: "Clear, jargon-free language"
-      },
-      {
-        question: "What should you do with digital communications with patients?",
-        options: ["Delete them after reading", "Share them with colleagues", "Document them in medical records", "Print and file them"],
-        correctAnswer: "Document them in medical records"
-      }
-    ]
+    featuresUnlocked: ["Patient Messaging"],
+    prerequisiteModules: [1],
+    order: 2,
+    estimatedMinutes: 20
   });
   
   // Form Creation Module
   const formCreationModule = await storage.createEducationModule({
     title: "Creating Custom Patient Forms",
     description: "Learn how to create and manage custom patient intake forms to replace external Formsite forms.",
+    type: "article",
     content: `
 # Creating Custom Patient Forms
 
@@ -379,33 +358,296 @@ Create comprehensive forms that collect relevant sexual health history while mai
 
 Design forms that quickly capture essential information for urgent care scenarios, focusing on current symptoms, severity, and relevant medical history.
     `,
-    moduleType: "tutorial",
-    durationMinutes: 25,
-    difficulty: "beginner",
-    prerequisites: [],
-    featuresUnlocked: ["form_creation"],
-    quizQuestions: [
-      {
-        question: "What is a benefit of using internal forms instead of external Formsite forms?",
-        options: [
-          "They cost less money", 
-          "They're automatically translated to multiple languages", 
-          "Form responses automatically link to patient records", 
-          "They work without internet connection"
-        ],
-        correctAnswer: "Form responses automatically link to patient records"
-      },
-      {
-        question: "Which of these is a best practice for form creation?",
-        options: [
-          "Make forms as long as possible", 
-          "Use technical medical terminology for precision", 
-          "Keep forms concise and focused", 
-          "Collect as much data as possible regardless of relevance"
-        ],
-        correctAnswer: "Keep forms concise and focused"
-      }
-    ]
+    featuresUnlocked: ["Form Creation"],
+    prerequisiteModules: [1],
+    order: 3,
+    estimatedMinutes: 25
+  });
+  
+  // Medical Practice Automation Module - Tier 0
+  const automationTier0 = await storage.createEducationModule({
+    title: "Medical Practice Automation: Tier 0",
+    description: "Understanding the baseline (no automation) in medical practices",
+    type: "article",
+    content: `
+# Medical Practice Automation: Tier 0
+
+## Understanding Non-Automated Medical Practices
+
+Tier 0 represents the most basic level of medical practice with virtually no automation. This tier is characterized by fully manual, paper-based processes that create significant inefficiencies in a medical practice.
+
+## Key Characteristics of Tier 0 Practices
+
+### Paper-Based Patient Information
+- Patients fill out paper forms by hand when visiting a clinic
+- No digital capture of patient information
+- Forms must be manually scanned and entered into patient files
+- Patient files are built and maintained manually
+
+### Manual Documentation
+- Physicians write notes by hand
+- Prescriptions are written manually
+- Lab requests are completed by hand
+- Work notes, insurance paperwork, and other documentation are all handwritten
+
+### Administrative Burden
+- High dependency on secretarial staff
+- Labor-intensive filing and retrieval of documents
+- Inefficient information retrieval when needed
+
+### Prescription Process
+- Medication refill requests arrive via physical fax
+- Physicians must manually write dosages and renewal information
+- Forms must be physically signed
+- Staff must fax completed forms to pharmacies
+- High potential for errors and miscommunication
+
+## Impact on Physician Workflow
+
+As the complexity and volume of cases increase, the burden on the physician grows exponentially. This leads to:
+
+- Reduced time spent with patients
+- Increased administrative workload
+- Higher potential for errors
+- Lower overall efficiency
+- Physician burnout from administrative tasks
+
+In the following modules, we'll explore how automation can gradually transform these inefficient processes and significantly improve medical practice workflow.
+    `,
+    featuresUnlocked: ["Basic Automation Concepts"],
+    prerequisiteModules: null,
+    order: 4,
+    estimatedMinutes: 15
+  });
+  
+  // Medical Practice Automation Module - Tier 1
+  const automationTier1 = await storage.createEducationModule({
+    title: "Medical Practice Automation: Tier 1",
+    description: "Beginning automation with templated documentation and forms",
+    type: "article",
+    content: `
+# Medical Practice Automation: Tier 1
+
+## Initial Steps Toward Automation
+
+Tier 1 represents the first step toward automating a medical practice. While still partially paper-based, this tier introduces basic templating tools and early digital solutions to improve efficiency.
+
+## Key Characteristics of Tier 1 Practices
+
+### Using Stamps and Templates
+- TRODAT stamps to create pre-formatted notes on paper
+- Signature stamps that include physician name, license number, and date
+- Pre-made prescription stamps for commonly prescribed medications
+- Standardized form templates that can be quickly filled in
+
+### Early Digital EMR Use
+- Basic use of Electronic Medical Records (EMR) systems
+- Creating and saving exam templates in the EMR
+- Setting up lab work templates for common conditions
+- Templates for work notes and standard forms
+
+### Simple Automation Tools
+- Saved text snippets in EMR for common diagnoses
+- Pre-configured order sets for common conditions
+- Basic digital prescription templates
+- Standardized documentation formats
+
+## Benefits of Tier 1 Automation
+
+While still labor-intensive compared to more advanced automation, Tier 1 provides:
+- Reduced time writing the same information repeatedly
+- More consistent documentation
+- Fewer errors in prescriptions
+- Slightly reduced administrative burden
+
+## Real-World Example
+
+A physician treating patients in an urgent care setting might have TRODAT stamps for common prescriptions like Z-packs and Ventolin. This saves time when seeing multiple patients per hour who need similar prescriptions. The physician only needs to add the patient name, allowing more time for patient care rather than writing the same prescription details repeatedly.
+
+Tier 1 automation represents the simplest form of practice optimization but still requires significant manual effort. The next tiers will introduce more substantial digital automation to further improve workflow efficiency.
+    `,
+    featuresUnlocked: ["Template Creation"],
+    prerequisiteModules: [4],
+    order: 5,
+    estimatedMinutes: 15
+  });
+  
+  // Medical Practice Automation Module - Tier 2
+  const automationTier2 = await storage.createEducationModule({
+    title: "Medical Practice Automation: Tier 2",
+    description: "Integrated digital systems and advanced templates",
+    type: "article",
+    content: `
+# Medical Practice Automation: Tier 2
+
+## Digital Workflow Integration
+
+Tier 2 automation represents a significant step forward, with comprehensive digital systems handling most documentation and clinical workflows. At this tier, practices have fully embraced electronic records and digital communication tools.
+
+## Key Characteristics of Tier 2 Practices
+
+### Comprehensive EMR Usage
+- Full electronic medical record implementation
+- Digital documentation for all patient encounters
+- Electronic prescription management
+- Digital lab ordering and results review
+
+### Advanced Templates
+- Extensive template libraries for different visit types
+- Customized documentation templates by specialty
+- Decision support templates
+- Automated coding suggestions
+
+### Digital Communication
+- Secure messaging with patients
+- Electronic referrals to specialists
+- Digital transmission of prescriptions to pharmacies
+- Online appointment scheduling
+
+### Workflow Automation
+- Automated patient reminders
+- Digital check-in processes
+- Electronic forms completed by patients
+- Basic task routing for staff
+
+## Benefits of Tier 2 Automation
+
+- Significant reduction in paper usage
+- Improved documentation consistency
+- Better coordination between care team members
+- Reduced transcription and documentation time
+- Enhanced prescription safety
+
+## Limitations
+
+While Tier 2 represents a major improvement over Tiers 0 and 1, it still has limitations:
+- Systems often operate in silos
+- Templates may be rigid and time-consuming to customize
+- Manual data entry is still required in many cases
+- Limited intelligence in processing information
+
+In the next module, we'll explore how Tier 3 automation introduces advanced integration and early AI capabilities to further enhance practice efficiency.
+    `,
+    featuresUnlocked: ["Digital Workflow Management"],
+    prerequisiteModules: [5],
+    order: 6,
+    estimatedMinutes: 15
+  });
+  
+  // Medical Practice Automation Module - Tier 3
+  const automationTier3 = await storage.createEducationModule({
+    title: "Medical Practice Automation: Tier 3",
+    description: "Advanced integration with early AI implementation",
+    type: "article",
+    content: `
+# Medical Practice Automation: Tier 3
+
+## Intelligent Systems and Integration
+
+Tier 3 represents a highly advanced level of medical practice automation, characterized by intelligent systems, seamless integration between platforms, and early AI implementation to enhance clinical decision-making and documentation.
+
+## Key Characteristics of Tier 3 Practices
+
+### Intelligent Documentation
+- Voice recognition and dictation with automatic formatting
+- Natural language processing to extract key clinical data
+- Automated coding and billing suggestions
+- Smart templates that adapt based on patient history
+
+### System Integration
+- Health information exchange with other healthcare providers
+- Integration with pharmacy systems
+- Connected lab and diagnostic imaging platforms
+- Patient portal integration with practice management
+
+### Early AI Implementation
+- Clinical decision support with evidence-based recommendations
+- Predictive analytics for population health management
+- Automated triage of patient messages
+- Pattern recognition for early disease detection
+
+### Workflow Intelligence
+- Smart scheduling based on visit complexity
+- Automated care gap identification
+- Intelligent task routing and prioritization
+- Proactive medication management
+
+## Benefits of Tier 3 Automation
+
+- Dramatic reduction in administrative time
+- Enhanced clinical decision quality
+- Improved preventive care delivery
+- Better population health management
+- Reduced physician documentation burden
+
+## Real-World Applications
+
+In a Tier 3 practice, a physician might dictate notes during a patient visit while an AI assistant captures, organizes, and formats the information into a structured clinical note. The system would automatically suggest relevant codes, identify care gaps, and generate appropriate follow-up tasks without manual input.
+
+Tier 3 represents a transformative level of automation that significantly reduces physician administrative burden while enhancing clinical care quality.
+    `,
+    featuresUnlocked: ["AI Assistant Features"],
+    prerequisiteModules: [6],
+    order: 7,
+    estimatedMinutes: 15
+  });
+  
+  // Medical Practice Automation Module - Tier 4
+  const automationTier4 = await storage.createEducationModule({
+    title: "Medical Practice Automation: Tier 4",
+    description: "Full AI integration and autonomous systems",
+    type: "article",
+    content: `
+# Medical Practice Automation: Tier 4
+
+## Autonomous Healthcare Systems
+
+Tier 4 represents the pinnacle of medical practice automation, featuring fully autonomous AI systems that work alongside physicians as true clinical partners. This tier includes advanced predictive capabilities, autonomous documentation, and intelligent patient interaction systems.
+
+## Key Characteristics of Tier 4 Practices
+
+### Autonomous Documentation
+- Ambient clinical intelligence that listens and documents entire patient encounters
+- AI systems that autonomously generate complete clinical notes
+- Intelligent summarization of patient information from multiple sources
+- Automated narrative creation with clinical reasoning
+
+### Advanced AI Clinical Partnership
+- Real-time clinical decision support with personalized recommendations
+- Predictive analytics for individual patient outcomes
+- Autonomous monitoring of patient data with alert generation
+- AI-driven differential diagnosis suggestions
+
+### Intelligent Patient Interaction
+- Autonomous pre-visit data collection and analysis
+- Smart triage systems that adapt to patient needs
+- AI-powered patient education customized to individual circumstances
+- Continuous remote monitoring with intelligent intervention recommendations
+
+### System Autonomy
+- Self-learning systems that improve with experience
+- Autonomous care coordination across the healthcare ecosystem
+- Intelligent resource allocation and scheduling
+- Predictive staffing and resource management
+
+## Benefits of Tier 4 Automation
+
+- Physicians focus almost exclusively on patient care
+- Documentation becomes a byproduct of patient encounters
+- Significantly enhanced clinical decision quality
+- Improved patient outcomes through predictive intervention
+- Optimized practice resources and efficiency
+
+## The Future of Medical Practice
+
+In a Tier 4 practice, InstantHPI serves as an autonomous clinical partner that handles the majority of administrative tasks. The physician focuses primarily on patient relationships, complex decision-making, and care delivery, while AI systems manage documentation, routine clinical decisions, and practice operations.
+
+This represents the future of medical practice where technology handles the administrative burden, allowing physicians to practice at the top of their license and focus on the human aspects of healthcare delivery.
+    `,
+    featuresUnlocked: ["Advanced AI Features", "InstantHPI Full System Access"],
+    prerequisiteModules: [7],
+    order: 8,
+    estimatedMinutes: 15
   });
   
   // Create some progress for the first user
