@@ -82,6 +82,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
       handleZodError(error, res);
     }
   });
+  
+  // User preferences route
+  app.patch("/api/user/preferences", async (req, res) => {
+    try {
+      // For now, we'll hardcode user ID 1 since we don't have proper authentication yet
+      const userId = 1;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Update navigation preferences
+      if (req.body.navPreferences) {
+        const updatedUser = await storage.updateUser(userId, {
+          navPreferences: req.body.navPreferences
+        });
+        
+        // Don't return the password
+        const { password, ...userWithoutPassword } = updatedUser;
+        return res.json(userWithoutPassword);
+      }
+      
+      res.status(400).json({ message: "No preferences specified to update" });
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      res.status(500).json({ message: "Failed to update user preferences" });
+    }
+  });
 
   // Patient routes
   app.get("/api/patients", async (req, res) => {

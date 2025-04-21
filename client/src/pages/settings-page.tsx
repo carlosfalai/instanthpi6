@@ -31,6 +31,18 @@ export default function SettingsPage() {
   const [newPromptCategory, setNewPromptCategory] = useState('documentation');
   const [newPromptText, setNewPromptText] = useState('');
   
+  // Query user data for navigation preferences
+  const { data: currentUser } = useQuery<User>({
+    queryKey: ['/api/user'],
+  });
+  
+  // Default navigation preferences if user not loaded yet
+  const navPreferences = currentUser?.navPreferences || {
+    showChronicConditions: true,
+    showMedicationRefills: true,
+    showUrgentCare: true
+  };
+  
   // Query AI settings
   const { 
     data: aiSettings = [], 
@@ -135,6 +147,51 @@ export default function SettingsPage() {
       });
     },
   });
+  
+  // Update user navigation preferences mutation
+  const updateNavPreferencesMutation = useMutation({
+    mutationFn: async (preferences: typeof navPreferences) => {
+      const response = await fetch('/api/user/preferences', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ navPreferences: preferences }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update navigation preferences');
+      }
+      
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+      toast({
+        title: 'Navigation updated',
+        description: 'Your navigation preferences have been saved successfully.',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: `Failed to update navigation preferences: ${error.message}`,
+        variant: 'destructive',
+      });
+    },
+  });
+  
+  // Handle navigation preference toggle
+  const handleNavToggleChange = (key: string, enabled: boolean) => {
+    if (!currentUser) return;
+    
+    const updatedPreferences = {
+      ...navPreferences,
+      [key]: enabled
+    };
+    
+    updateNavPreferencesMutation.mutate(updatedPreferences);
+  };
   
   // Handle toggle change
   const handleToggleChange = (setting: AiSetting, enabled: boolean) => {
@@ -248,6 +305,72 @@ export default function SettingsPage() {
                   />
                 ))}
               </div>
+            </TabsContent>
+            
+            <TabsContent value="navigation">
+              <Card className="bg-[#1e1e1e] border-gray-800">
+                <CardHeader>
+                  <CardTitle>Navigation Menu Preferences</CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Customize which items appear in your navigation menu
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between py-3 border-b border-gray-800">
+                      <div className="flex items-center space-x-3">
+                        <Heart className="h-5 w-5 text-red-500" />
+                        <div>
+                          <h3 className="font-medium">Chronic Conditions</h3>
+                          <p className="text-sm text-gray-400">Manage patient chronic conditions and ongoing care</p>
+                        </div>
+                      </div>
+                      <Switch
+                        id="show-chronic-conditions"
+                        checked={navPreferences.showChronicConditions}
+                        onCheckedChange={(checked) => handleNavToggleChange('showChronicConditions', checked)}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-3 border-b border-gray-800">
+                      <div className="flex items-center space-x-3">
+                        <PillIcon className="h-5 w-5 text-blue-500" />
+                        <div>
+                          <h3 className="font-medium">Medication Refills</h3>
+                          <p className="text-sm text-gray-400">Handle medication refill requests from patients</p>
+                        </div>
+                      </div>
+                      <Switch
+                        id="show-medication-refills"
+                        checked={navPreferences.showMedicationRefills}
+                        onCheckedChange={(checked) => handleNavToggleChange('showMedicationRefills', checked)}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between py-3 border-b border-gray-800">
+                      <div className="flex items-center space-x-3">
+                        <AlertCircle className="h-5 w-5 text-yellow-500" />
+                        <div>
+                          <h3 className="font-medium">Urgent Care</h3>
+                          <p className="text-sm text-gray-400">Manage urgent care requests and walk-ins</p>
+                        </div>
+                      </div>
+                      <Switch
+                        id="show-urgent-care"
+                        checked={navPreferences.showUrgentCare}
+                        onCheckedChange={(checked) => handleNavToggleChange('showUrgentCare', checked)}
+                      />
+                    </div>
+                    
+                    <div className="pt-4">
+                      <p className="text-sm text-gray-400">
+                        Changes to navigation preferences will take effect immediately. Items that are turned off will not
+                        appear in your navigation menu, but their functionality will still be available if accessed directly.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
             
             <TabsContent value="add">
