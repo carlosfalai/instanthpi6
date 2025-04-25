@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
@@ -616,10 +616,310 @@ function FormBuilder() {
   );
 }
 
+// FormAccessibility component to manage form accessibility and display URLs
+function FormAccessibility() {
+  const { toast } = useToast();
+  const [selectedForms, setSelectedForms] = useState<Record<number, boolean>>({});
+  
+  // Fetch all form templates
+  const { data: formTemplates = [], isLoading } = useQuery({
+    queryKey: ["/api/forms/templates/all"],
+    queryFn: async () => {
+      const res = await fetch("/api/forms/templates");
+      if (!res.ok) throw new Error("Failed to fetch templates");
+      return res.json();
+    },
+  });
+  
+  // Initialize selected forms when data is loaded
+  useEffect(() => {
+    const initialSelectedForms: Record<number, boolean> = {};
+    formTemplates.forEach((template: FormTemplate) => {
+      initialSelectedForms[template.id] = template.isPublic;
+    });
+    setSelectedForms(initialSelectedForms);
+  }, [formTemplates]);
+  
+  // Update form accessibility mutation
+  const updateFormAccessibilityMutation = useMutation({
+    mutationFn: async ({ id, isPublic }: { id: number; isPublic: boolean }) => {
+      const res = await apiRequest("PATCH", `/api/forms/templates/${id}`, { isPublic });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/forms/templates/all"] });
+      toast({
+        title: "Success",
+        description: "Form accessibility updated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: `Failed to update form accessibility: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Handle form toggle
+  const handleFormToggle = (id: number, isPublic: boolean) => {
+    setSelectedForms(prev => ({ ...prev, [id]: isPublic }));
+    updateFormAccessibilityMutation.mutate({ id, isPublic });
+  };
+  
+  // Generate sharable URL for a form
+  const getFormUrl = (formId: number) => {
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/form/${formId}`;
+  };
+  
+  // State for the currently viewed form
+  const [viewingForm, setViewingForm] = useState<FormTemplate | null>(null);
+  
+  return (
+    <div className="container mx-auto py-6">
+      <h1 className="text-3xl font-bold mb-6">Form Accessibility</h1>
+      <p className="text-gray-500 mb-6">
+        Manage which forms are accessible to patients and view their URLs. Toggle forms on to make them available to patients.
+      </p>
+      
+      {isLoading ? (
+        <div className="text-center py-8">Loading forms...</div>
+      ) : formTemplates.length === 0 ? (
+        <div className="text-center py-8 border rounded-lg bg-gray-50">
+          <p className="text-gray-500 mb-4">No form templates found</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Available Forms</CardTitle>
+              <CardDescription>
+                Toggle forms on/off to control patient access. Click on a form to view its details.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {formTemplates.map((template: FormTemplate) => (
+                  <div key={template.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <h3 className="font-medium cursor-pointer hover:text-blue-600" onClick={() => setViewingForm(template)}>
+                            {template.name}
+                          </h3>
+                          <Badge variant="outline">{template.category}</Badge>
+                        </div>
+                        <p className="text-sm text-gray-500">{template.description}</p>
+                        <div className="text-xs text-gray-400">
+                          {template.questions.length} question{template.questions.length !== 1 ? "s" : ""}
+                        </div>
+                        <div className="pt-2">
+                          <div className="flex items-center space-x-2">
+                            <Label htmlFor={`url-${template.id}`} className="text-sm font-medium">
+                              Form URL:
+                            </Label>
+                            <div className="relative flex-1">
+                              <Input
+                                id={`url-${template.id}`}
+                                value={getFormUrl(template.id)}
+                                readOnly
+                                className="pr-16 text-xs"
+                              />
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="absolute right-0 top-0 h-full px-3"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(getFormUrl(template.id));
+                                  toast({
+                                    title: "URL Copied",
+                                    description: "Form URL copied to clipboard",
+                                  });
+                                }}
+                              >
+                                Copy
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 ml-4">
+                        <div className="flex flex-col items-center gap-1">
+                          <Switch
+                            id={`form-${template.id}`}
+                            checked={selectedForms[template.id] || false}
+                            onCheckedChange={(checked) => handleFormToggle(template.id, checked)}
+                          />
+                          <Label htmlFor={`form-${template.id}`} className="text-xs">
+                            {selectedForms[template.id] ? "Accessible" : "Hidden"}
+                          </Label>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+          
+          {/* Form viewer dialog */}
+          {viewingForm && (
+            <Dialog open={!!viewingForm} onOpenChange={(open) => !open && setViewingForm(null)}>
+              <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>{viewingForm.name}</DialogTitle>
+                  <DialogDescription>
+                    {viewingForm.description}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6 py-4">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline">{viewingForm.category}</Badge>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">Accessibility:</span>
+                      <Switch
+                        id={`dialog-form-${viewingForm.id}`}
+                        checked={selectedForms[viewingForm.id] || false}
+                        onCheckedChange={(checked) => handleFormToggle(viewingForm.id, checked)}
+                      />
+                      <Label htmlFor={`dialog-form-${viewingForm.id}`} className="text-sm">
+                        {selectedForms[viewingForm.id] ? "Accessible" : "Hidden"}
+                      </Label>
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Form URL</h3>
+                    <div className="flex items-center space-x-2">
+                      <Input
+                        value={getFormUrl(viewingForm.id)}
+                        readOnly
+                        className="flex-1"
+                      />
+                      <Button
+                        onClick={() => {
+                          navigator.clipboard.writeText(getFormUrl(viewingForm.id));
+                          toast({
+                            title: "URL Copied",
+                            description: "Form URL copied to clipboard",
+                          });
+                        }}
+                      >
+                        Copy URL
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div>
+                    <h3 className="text-lg font-medium mb-4">Questions Preview</h3>
+                    <div className="space-y-4">
+                      {viewingForm.questions.map((question, index) => (
+                        <Card key={question.id}>
+                          <CardHeader className="pb-2">
+                            <div className="flex justify-between">
+                              <CardTitle className="text-base">
+                                {index + 1}. {question.label} {question.required && <span className="text-red-500">*</span>}
+                              </CardTitle>
+                              <Badge>{question.type}</Badge>
+                            </div>
+                          </CardHeader>
+                          <CardContent>
+                            {/* Preview of question content based on type */}
+                            {(question.type === 'text' || question.type === 'textarea') && (
+                              <Input disabled placeholder={question.placeholder || `Enter ${question.type === 'text' ? 'text' : 'long text'} here...`} />
+                            )}
+                            
+                            {question.type === 'select' && question.options && (
+                              <Select disabled>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select an option" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {question.options.map(option => (
+                                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                            
+                            {question.type === 'radio' && question.options && (
+                              <div className="space-y-2">
+                                {question.options.map(option => (
+                                  <div key={option.value} className="flex items-center space-x-2">
+                                    <input type="radio" id={`${question.id}-${option.value}`} name={question.id} disabled />
+                                    <Label htmlFor={`${question.id}-${option.value}`}>{option.label}</Label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {question.type === 'checkbox' && question.options && (
+                              <div className="space-y-2">
+                                {question.options.map(option => (
+                                  <div key={option.value} className="flex items-center space-x-2">
+                                    <input type="checkbox" id={`${question.id}-${option.value}`} disabled />
+                                    <Label htmlFor={`${question.id}-${option.value}`}>{option.label}</Label>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
+                            {question.type === 'date' && (
+                              <Input type="date" disabled />
+                            )}
+                            
+                            {question.type === 'number' && (
+                              <Input type="number" disabled placeholder="Enter a number..." />
+                            )}
+                            
+                            {question.description && (
+                              <p className="text-xs text-gray-500 mt-2">{question.description}</p>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button onClick={() => setViewingForm(null)}>Close</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function FormsPage() {
+  const [activeTab, setActiveTab] = useState("builder");
+  
   return (
     <BaseLayout>
-      <FormBuilder />
+      <div className="container mx-auto py-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="builder">Form Builder</TabsTrigger>
+            <TabsTrigger value="accessibility">Form Accessibility</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="builder">
+            <FormBuilder />
+          </TabsContent>
+          
+          <TabsContent value="accessibility">
+            <FormAccessibility />
+          </TabsContent>
+        </Tabs>
+      </div>
     </BaseLayout>
   );
 }
