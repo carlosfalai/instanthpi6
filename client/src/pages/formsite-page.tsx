@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import BaseLayout from '@/components/layout/BaseLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Search, FileText, RefreshCw, Zap, FormInput } from 'lucide-react';
 import { format } from 'date-fns';
 import formsiteService, { FormSiteSubmission } from '@/services/formsite';
+import { getFieldLabel, formatFieldValue } from '@/services/formsiteFieldMapping';
 
 const FormsitePage: React.FC = () => {
   const { toast } = useToast();
@@ -89,8 +89,16 @@ const FormsitePage: React.FC = () => {
 
     try {
       const results = await formsiteService.searchFormSubmissions(searchQuery);
+      
+      // Ensure results is an array before updating the state
+      const formattedResults = Array.isArray(results) 
+        ? results 
+        : 'results' in results && Array.isArray(results.results)
+          ? results.results
+          : [];
+      
       // Temporarily update the submissions data with search results
-      queryClient.setQueryData(['/api/formsite/submissions'], results);
+      queryClient.setQueryData(['/api/formsite/submissions'], formattedResults);
     } catch (error) {
       console.error('Error searching submissions:', error);
       toast({
@@ -127,22 +135,95 @@ const FormsitePage: React.FC = () => {
 
     // Get the first few form fields for preview
     const preview = entries.slice(0, 3).map(([key, value]) => {
-      // Try to extract the question if it's in a complex format
-      let question = key;
-      if (typeof key === 'string' && key.includes(':')) {
-        question = key.split(':')[1];
+      // Extract the field ID
+      let fieldId = key;
+      if (typeof key === 'string') {
+        // Handle keys in various formats like "items[0][id]:2" or just "2"
+        fieldId = key.includes('[id]') 
+          ? key.split('[id]')[1].replace(/[^\d]/g, '') 
+          : key.includes(':')
+            ? key.split(':')[0]
+            : key;
       }
+      
+      // Get the field label
+      const fieldLabel = getFieldLabel(fieldId);
       
       // Format the value for display
       let displayValue = value;
       if (typeof value === 'object') {
-        displayValue = JSON.stringify(value).substring(0, 20) + '...';
+        if (value.value !== undefined) {
+          displayValue = value.value;
+        } else {
+          displayValue = JSON.stringify(value).substring(0, 20) + '...';
+        }
       }
       
-      return `${question}: ${displayValue}`;
+      return `${fieldLabel}: ${displayValue}`;
     }).join(', ');
 
     return entries.length > 3 ? `${preview}...` : preview;
+  };
+
+  // Render the submissions list (with error handling for non-array data)
+  const renderSubmissionsList = () => {
+    // Make sure submissions is an array before mapping
+    if (!Array.isArray(submissions)) {
+      return (
+        <div className="py-10 text-center">
+          <p className="text-gray-400">Invalid data format received</p>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => refetchSubmissions()}
+            className="mt-2"
+          >
+            Refresh Data
+          </Button>
+        </div>
+      );
+    }
+
+    if (submissions.length === 0) {
+      return (
+        <div className="py-10 text-center">
+          <p className="text-gray-400">No form submissions found</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-3">
+        {submissions.map((submission) => (
+          <div
+            key={submission.id}
+            onClick={() => handleSelectSubmission(submission)}
+            className={`p-3 rounded-md cursor-pointer transition-colors ${
+              selectedSubmission?.id === submission.id 
+                ? 'bg-blue-900/30 border border-blue-700' 
+                : 'bg-[#252525] border border-[#333] hover:border-[#444]'
+            }`}
+          >
+            <div className="flex justify-between items-start mb-1">
+              <h3 className="font-medium">
+                Submission #{submission.reference || submission.id}
+              </h3>
+              {submission.processed && (
+                <div className="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-xs font-medium">
+                  Processed
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 mb-1.5">
+              {formatDate(submission.date_submitted)}
+            </p>
+            <p className="text-sm text-gray-300 truncate">
+              {getFormPreview(submission.results)}
+            </p>
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -211,42 +292,7 @@ const FormsitePage: React.FC = () => {
                   Try Again
                 </Button>
               </div>
-            ) : submissions.length === 0 ? (
-              <div className="py-10 text-center">
-                <p className="text-gray-400">No form submissions found</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {submissions.map((submission) => (
-                  <div
-                    key={submission.id}
-                    onClick={() => handleSelectSubmission(submission)}
-                    className={`p-3 rounded-md cursor-pointer transition-colors ${
-                      selectedSubmission?.id === submission.id 
-                        ? 'bg-blue-900/30 border border-blue-700' 
-                        : 'bg-[#252525] border border-[#333] hover:border-[#444]'
-                    }`}
-                  >
-                    <div className="flex justify-between items-start mb-1">
-                      <h3 className="font-medium">
-                        Submission #{submission.reference || submission.id}
-                      </h3>
-                      {submission.processed && (
-                        <div className="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-xs font-medium">
-                          Processed
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-xs text-gray-400 mb-1.5">
-                      {formatDate(submission.date_submitted)}
-                    </p>
-                    <p className="text-sm text-gray-300 truncate">
-                      {getFormPreview(submission.results)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
+            ) : renderSubmissionsList()}
           </ScrollArea>
         </div>
 
@@ -306,27 +352,24 @@ const FormsitePage: React.FC = () => {
                       <div className="py-10 text-center">
                         <p className="text-gray-400">Failed to load submission details</p>
                       </div>
-                    ) : Object.keys(selectedSubmission.results).length === 0 ? (
+                    ) : !selectedSubmission.results || Object.keys(selectedSubmission.results).length === 0 ? (
                       <div className="py-10 text-center">
                         <p className="text-gray-400">No form data available</p>
                       </div>
                     ) : (
                       <div className="space-y-4">
                         {Object.entries(selectedSubmission.results).map(([key, value]) => {
-                          // Try to extract the question if it's in a complex format
-                          let question = key;
-                          if (typeof key === 'string' && key.includes(':')) {
-                            question = key.split(':')[1];
-                          }
+                          // Extract the field ID
+                          const fieldId = key.includes(':') ? key.split(':')[0] : key;
+                          // Get human-readable label for the field
+                          const fieldLabel = getFieldLabel(fieldId);
                           
                           return (
                             <div key={key} className="border-b border-[#333] pb-3 last:border-b-0">
-                              <h4 className="font-medium text-gray-300">{question}</h4>
-                              <p className="mt-1 text-gray-200">
-                                {typeof value === 'object' 
-                                  ? JSON.stringify(value, null, 2) 
-                                  : value || 'No response'}
-                              </p>
+                              <h4 className="font-medium text-gray-300">{fieldLabel}</h4>
+                              <div className="mt-1 text-gray-200 whitespace-pre-wrap font-mono text-sm bg-[#252525] rounded p-2">
+                                {formatFieldValue(value)}
+                              </div>
                             </div>
                           );
                         })}

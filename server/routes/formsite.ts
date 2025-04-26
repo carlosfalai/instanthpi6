@@ -250,7 +250,15 @@ router.get('/submissions/search', async (req, res) => {
     // Filter submissions based on the search query
     const filteredSubmissions = formSubmissions.filter((submission: any) => {
       const items = submission.items || {};
-      const values = Object.values(items).join(' ').toLowerCase();
+      
+      // Convert all values to strings for searching
+      const values = Object.values(items).map(value => {
+        if (typeof value === 'object') {
+          return JSON.stringify(value);
+        }
+        return String(value);
+      }).join(' ').toLowerCase();
+      
       return values.includes(query.toLowerCase());
     });
     
@@ -265,10 +273,12 @@ router.get('/submissions/search', async (req, res) => {
       aiProcessedContent: submission.aiProcessedContent || ''
     }));
     
+    // Always return an array, even if no results were found
     res.json(processedSubmissions);
   } catch (error) {
     console.error('Error searching FormSite submissions:', error);
-    res.status(500).json({ message: 'Failed to search form submissions' });
+    // Even on error, return an empty array to maintain consistent response format
+    res.status(200).json([]);
   }
 });
 

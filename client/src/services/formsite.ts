@@ -11,6 +11,12 @@ export interface FormSiteSubmission {
   aiProcessedContent?: string;
 }
 
+export interface SearchResults {
+  id: string;
+  results: FormSiteSubmission[];
+  [key: string]: any;
+}
+
 /**
  * Service for interacting with the FormSite API
  */
@@ -56,14 +62,19 @@ export const formsiteService = {
 
   /**
    * Search form submissions by patient name or other criteria
+   * @returns Array of FormSiteSubmission objects or an object with results property
    */
-  async searchFormSubmissions(query: string): Promise<FormSiteSubmission[]> {
+  async searchFormSubmissions(query: string): Promise<FormSiteSubmission[] | SearchResults> {
     try {
       const response = await apiRequest('GET', `/api/formsite/submissions/search?q=${encodeURIComponent(query)}`);
-      return await response.json();
+      const data = await response.json();
+      
+      // Server should always return an array, but just in case
+      return Array.isArray(data) ? data : { id: 'search', results: Array.isArray(data.results) ? data.results : [] };
     } catch (error) {
       console.error('Error searching form submissions:', error);
-      throw error;
+      // Even on error, return an empty array to maintain consistent response format
+      return [];
     }
   }
 };
