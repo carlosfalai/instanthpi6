@@ -168,8 +168,8 @@ export default function AiAssistantPanel({
           </TabsList>
         </div>
         
-        <TabsContent value="suggestions" className="flex-1 flex flex-col p-0 m-0">
-          <ScrollArea className="flex-1 p-4">
+        <TabsContent value="suggestions" className="flex-1 flex flex-col p-0 m-0 overflow-hidden">
+          <ScrollArea className="flex-1 p-4 overflow-auto">
             {suggestionsLoading ? (
               <div className="flex justify-center items-center h-32">
                 <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
@@ -278,8 +278,8 @@ export default function AiAssistantPanel({
           )}
         </TabsContent>
         
-        <TabsContent value="plan" className="flex-1 flex flex-col p-0 m-0">
-          <ScrollArea className="flex-1 p-4">
+        <TabsContent value="plan" className="flex-1 flex flex-col p-0 m-0 overflow-hidden">
+          <ScrollArea className="flex-1 p-4 overflow-auto">
             {/* Current Complaint Box */}
             <div className="mb-4">
               <Card className="bg-[#1e1e1e] border-gray-800">
