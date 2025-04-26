@@ -127,13 +127,14 @@ export default function NavigationBar() {
       key={item.id} 
       href={item.path}
       className={`
-        relative flex items-center p-2 px-4 text-sm rounded-md hover:bg-[#2a2a2a] transition-colors
-        ${location === item.path ? 'bg-[#2a2a2a] text-blue-400' : 'text-gray-300'}
-        min-w-fit whitespace-nowrap mx-2 my-1 border border-transparent
-        ${location === item.path ? 'border-gray-700' : 'hover:border-gray-800'}
+        relative flex items-center p-2 px-3 text-sm rounded-md transition-colors
+        ${location === item.path 
+          ? 'bg-blue-600 text-white font-medium' 
+          : 'text-gray-200 bg-[#2a2a2a] hover:bg-[#333333]'}
+        min-w-fit whitespace-nowrap mr-2 my-1 shadow-sm
       `}
     >
-      <div className="relative mr-3">
+      <div className="relative mr-2">
         {item.icon}
         {item.notificationCount && item.notificationCount > 0 && (
           <NotificationBadge count={item.notificationCount} />
@@ -144,10 +145,10 @@ export default function NavigationBar() {
   );
   
   return (
-    <div className="flex flex-col w-full bg-[#121212] border-b border-gray-800 py-2 sticky top-0 z-50">
+    <nav className="w-full bg-[#1a1a1a] border-b border-gray-800 py-1 sticky top-14 z-40">
       {/* Primary Nav Row - Must be visible */}
-      <div className="flex items-center px-3 mb-2 overflow-x-auto hide-scrollbar py-2">
-        <div className="inline-flex items-center gap-4">
+      <div className="flex items-center px-4 mb-1 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2">
+        <div className="flex items-center space-x-2">
           {primaryNavItems.map((item) => (
             <div key={item.id} className="flex-shrink-0">
               {renderNavItem(item)}
@@ -163,8 +164,8 @@ export default function NavigationBar() {
       </div>
       
       {/* Secondary Nav Row */}
-      <div className="flex items-center px-3 overflow-x-auto hide-scrollbar py-2 border-t border-gray-800">
-        <div className="inline-flex items-center gap-4 w-full">
+      <div className="flex items-center px-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2 border-t border-gray-800">
+        <div className="flex items-center space-x-2">
           {secondaryNavItems.map((item) => (
             <div key={item.id} className="flex-shrink-0">
               {renderNavItem(item)}
@@ -172,6 +173,6 @@ export default function NavigationBar() {
           ))}
         </div>
       </div>
-    </div>
+    </nav>
   );
 }
