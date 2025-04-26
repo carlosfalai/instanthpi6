@@ -178,7 +178,7 @@ router.post('/sync-patients', async (req, res) => {
               name: sprucePatient.name,
               gender: sprucePatient.gender || 'unknown',
               dateOfBirth: sprucePatient.date_of_birth || '1970-01-01',
-              email: sprucePatient.email || `patient-${sprucePatient.id}@example.com`,
+              email: sprucePatient.email || '',
               phone: sprucePatient.phone || '',
               spruceId: sprucePatient.id,
               language: sprucePatient.language || null
