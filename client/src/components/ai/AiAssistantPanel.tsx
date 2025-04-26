@@ -280,12 +280,13 @@ export default function AiAssistantPanel({
         
         <TabsContent value="plan" className="flex-1 flex flex-col p-0 m-0">
           <ScrollArea className="flex-1 p-4">
+            {/* Current Complaint Box */}
             <div className="mb-4">
               <Card className="bg-[#1e1e1e] border-gray-800">
                 <CardHeader className="pb-2 border-b border-gray-800">
                   <CardTitle className="text-md font-medium text-blue-400 flex items-center">
                     <Clipboard className="h-4 w-4 mr-2" />
-                    HPI Confirmation Summary
+                    Current Complaint
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="pt-3">
@@ -294,7 +295,13 @@ export default function AiAssistantPanel({
                     <Button 
                       variant="ghost" 
                       className="text-xs text-blue-400 p-1 h-auto mt-2"
-                      onClick={() => onSendMessage("Here's a summary of what we discussed for confirmation: [HPI Confirmation]")}
+                      onClick={() => {
+                        const confirmationText = "Here's a summary of what we discussed for confirmation: [HPI Confirmation]";
+                        onSendMessage(confirmationText);
+                        setPreviewContent(prevContent => prevContent + 
+                          (prevContent ? '\n\n' : '') + 
+                          '📋 HPI Confirmation Added');
+                      }}
                     >
                       <Clipboard className="h-3 w-3 mr-1" />
                       Use template
@@ -304,6 +311,283 @@ export default function AiAssistantPanel({
               </Card>
             </div>
 
+            {/* Treatment Plan with Checkboxes */}
+            <div className="mb-4">
+              <Card className="bg-[#1e1e1e] border-gray-800">
+                <CardHeader className="pb-2 border-b border-gray-800">
+                  <CardTitle className="text-md font-medium text-purple-400 flex items-center">
+                    <ClipboardList className="h-4 w-4 mr-2" />
+                    Treatment Plan
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-3">
+                  <div className="text-sm text-white">
+                    <div className="mb-3">
+                      <h4 className="font-medium text-gray-400 mb-1">Medications</h4>
+                      <div className="space-y-1.5">
+                        {treatmentItems
+                          .filter(item => item.category === 'medication')
+                          .map((item) => (
+                            <div key={item.id} className="flex items-center">
+                              <Checkbox 
+                                id={item.id}
+                                checked={item.isSelected}
+                                onCheckedChange={(checked) => {
+                                  setTreatmentItems(prev => 
+                                    prev.map(i => i.id === item.id ? {...i, isSelected: !!checked} : i)
+                                  );
+                                }}
+                                className="mr-2"
+                              />
+                              <Label htmlFor={item.id} className="text-sm font-normal cursor-pointer">
+                                {item.text}
+                              </Label>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <h4 className="font-medium text-gray-400 mb-1">Imaging</h4>
+                      <div className="space-y-1.5">
+                        {treatmentItems
+                          .filter(item => item.category === 'imaging')
+                          .map((item) => (
+                            <div key={item.id} className="flex items-center">
+                              <Checkbox 
+                                id={item.id}
+                                checked={item.isSelected}
+                                onCheckedChange={(checked) => {
+                                  setTreatmentItems(prev => 
+                                    prev.map(i => i.id === item.id ? {...i, isSelected: !!checked} : i)
+                                  );
+                                }}
+                                className="mr-2"
+                              />
+                              <Label htmlFor={item.id} className="text-sm font-normal cursor-pointer">
+                                {item.text}
+                              </Label>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <h4 className="font-medium text-gray-400 mb-1">Labs</h4>
+                      <div className="space-y-1.5">
+                        {treatmentItems
+                          .filter(item => item.category === 'labs')
+                          .map((item) => (
+                            <div key={item.id} className="flex items-center">
+                              <Checkbox 
+                                id={item.id}
+                                checked={item.isSelected}
+                                onCheckedChange={(checked) => {
+                                  setTreatmentItems(prev => 
+                                    prev.map(i => i.id === item.id ? {...i, isSelected: !!checked} : i)
+                                  );
+                                }}
+                                className="mr-2"
+                              />
+                              <Label htmlFor={item.id} className="text-sm font-normal cursor-pointer">
+                                {item.text}
+                              </Label>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </div>
+                    
+                    <div className="mb-3">
+                      <h4 className="font-medium text-gray-400 mb-1">Referrals & Follow-up</h4>
+                      <div className="space-y-1.5">
+                        {treatmentItems
+                          .filter(item => item.category === 'referral' || item.category === 'followup')
+                          .map((item) => (
+                            <div key={item.id} className="flex items-center">
+                              <Checkbox 
+                                id={item.id}
+                                checked={item.isSelected}
+                                onCheckedChange={(checked) => {
+                                  setTreatmentItems(prev => 
+                                    prev.map(i => i.id === item.id ? {...i, isSelected: !!checked} : i)
+                                  );
+                                }}
+                                className="mr-2"
+                              />
+                              <Label htmlFor={item.id} className="text-sm font-normal cursor-pointer">
+                                {item.text}
+                              </Label>
+                            </div>
+                          ))
+                        }
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 pt-3 border-t border-gray-800">
+                      <h4 className="font-medium text-gray-400 mb-2">Actions</h4>
+                      <div className="space-y-2">
+                        {actionItems.map((item) => (
+                          <div key={item.id} className="flex items-center">
+                            <Checkbox 
+                              id={item.id}
+                              checked={item.isSelected}
+                              onCheckedChange={(checked) => {
+                                setActionItems(prev => 
+                                  prev.map(i => i.id === item.id ? {...i, isSelected: !!checked} : i)
+                                );
+                              }}
+                              className="mr-2"
+                            />
+                            <Label htmlFor={item.id} className="text-sm font-normal cursor-pointer flex items-center">
+                              {item.type === 'message_patient' && <Mail className="h-3.5 w-3.5 mr-1.5 text-blue-400" />}
+                              {item.type === 'soap_note' && <FileText className="h-3.5 w-3.5 mr-1.5 text-green-400" />}
+                              {item.type === 'french_note' && <Languages className="h-3.5 w-3.5 mr-1.5 text-purple-400" />}
+                              {item.text}
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+                <CardFooter className="flex justify-between bg-[#181818] border-t border-gray-800 pt-3 pb-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setTreatmentItems(prev => prev.map(item => ({...item, isSelected: false})));
+                      setActionItems(prev => prev.map(item => ({...item, isSelected: false})));
+                      setPreviewContent('');
+                    }}
+                    className="text-xs"
+                  >
+                    <X className="h-3.5 w-3.5 mr-1.5" /> Reset
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="text-xs"
+                    onClick={() => {
+                      // Create treatment plan from selected items
+                      const selectedTreatments = treatmentItems.filter(item => item.isSelected);
+                      
+                      if (selectedTreatments.length === 0) {
+                        toast({
+                          title: "No treatments selected",
+                          description: "Please select at least one treatment item",
+                          variant: "destructive"
+                        });
+                        return;
+                      }
+                      
+                      // Categorize selected treatments
+                      const medItems = selectedTreatments.filter(item => item.category === 'medication');
+                      const imgItems = selectedTreatments.filter(item => item.category === 'imaging');
+                      const labItems = selectedTreatments.filter(item => item.category === 'labs');
+                      const refItems = selectedTreatments.filter(item => item.category === 'referral');
+                      const fupItems = selectedTreatments.filter(item => item.category === 'followup');
+                      
+                      // Generate preview content
+                      let preview = "🩺 Treatment Plan:\n";
+                      
+                      if (medItems.length > 0) {
+                        preview += "\nMedications:\n";
+                        medItems.forEach(item => preview += `- ${item.text}\n`);
+                      }
+                      
+                      if (imgItems.length > 0) {
+                        preview += "\nImaging:\n";
+                        imgItems.forEach(item => preview += `- ${item.text}\n`);
+                      }
+                      
+                      if (labItems.length > 0) {
+                        preview += "\nLabs:\n";
+                        labItems.forEach(item => preview += `- ${item.text}\n`);
+                      }
+                      
+                      if (refItems.length > 0) {
+                        preview += "\nReferrals:\n";
+                        refItems.forEach(item => preview += `- ${item.text}\n`);
+                      }
+                      
+                      if (fupItems.length > 0) {
+                        preview += "\nFollow-up:\n";
+                        fupItems.forEach(item => preview += `- ${item.text}\n`);
+                      }
+                      
+                      // Add action items
+                      const selectedActions = actionItems.filter(item => item.isSelected);
+                      if (selectedActions.length > 0) {
+                        preview += "\n📋 Selected Actions:\n";
+                        selectedActions.forEach(item => preview += `- ${item.text}\n`);
+                      }
+                      
+                      setPreviewContent(preview);
+                    }}
+                  >
+                    <ClipboardList className="h-3.5 w-3.5 mr-1.5" /> Generate Plan
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+
+            {/* Preview Area */}
+            {previewContent && (
+              <div className="mb-4">
+                <Card className="bg-[#1e1e1e] border-gray-800">
+                  <CardHeader className="pb-2 border-b border-gray-800">
+                    <CardTitle className="text-md font-medium text-green-400 flex items-center">
+                      <FileText className="h-4 w-4 mr-2" />
+                      Generated Content Preview
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-3">
+                    <div className="text-sm text-white whitespace-pre-wrap">
+                      {previewContent}
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between bg-[#181818] border-t border-gray-800 pt-3 pb-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        // Copy to clipboard
+                        navigator.clipboard.writeText(previewContent);
+                        toast({
+                          title: "Copied to clipboard",
+                          description: "Content has been copied to your clipboard",
+                        });
+                      }}
+                      className="text-xs"
+                    >
+                      <Copy className="h-3.5 w-3.5 mr-1.5" /> Copy
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="text-xs"
+                      onClick={() => {
+                        // Send to patient
+                        const messageText = actionItems.find(item => item.type === 'message_patient' && item.isSelected)
+                          ? previewContent
+                          : "Treatment plan: " + previewContent;
+                        
+                        onSendMessage(messageText);
+                        toast({
+                          title: "Message sent",
+                          description: "Your message has been sent to the patient",
+                        });
+                      }}
+                    >
+                      <SendHorizontal className="h-3.5 w-3.5 mr-1.5" /> Send to Patient
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </div>
+            )}
+
+            {/* SOAP Note */}
             <div className="mb-4">
               <Card className="bg-[#1e1e1e] border-gray-800">
                 <CardHeader className="pb-2 border-b border-gray-800">
@@ -317,47 +601,47 @@ export default function AiAssistantPanel({
                     <p><strong>S:</strong> {'[Age] [Gender] with [Description] at [Location] since [Symptom] [Onset]; [Severity] [0-10]/10'}</p>
                     <p><strong>A:</strong> {'Suspect [Chief] [Complaint]; ddx includes musculoskeletal cause...'}</p>
                     <p><strong>P:</strong> {'In-person eval, imaging if needed, NSAIDs if tolerated...'}</p>
-                    <Button 
-                      variant="ghost" 
-                      className="text-xs text-blue-400 p-1 h-auto mt-2"
-                      onClick={() => onSendMessage("Here's my SOAP note assessment: [SOAP Note]")}
-                    >
-                      <Clipboard className="h-3 w-3 mr-1" />
-                      Use template
-                    </Button>
+                    <div className="flex justify-between mt-2">
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                        onClick={() => {
+                          const soapContent = "S: [Age] [Gender] with [Description] at [Location] since [Symptom] [Onset]; [Severity] [0-10]/10\n" +
+                            "A: Suspect [Chief] [Complaint]; ddx includes musculoskeletal cause...\n" +
+                            "P: In-person eval, imaging if needed, NSAIDs if tolerated...";
+                          
+                          navigator.clipboard.writeText(soapContent);
+                          toast({
+                            title: "SOAP note copied",
+                            description: "Content has been copied to your clipboard",
+                          });
+                        }}
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Copy
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        className="text-xs text-blue-400"
+                        onClick={() => {
+                          const noteText = "Here's my SOAP note assessment: [SOAP Note]";
+                          onSendMessage(noteText);
+                          setPreviewContent(prevContent => prevContent + 
+                            (prevContent ? '\n\n' : '') + 
+                            '📋 SOAP Note Added');
+                        }}
+                      >
+                        <Clipboard className="h-3 w-3 mr-1" />
+                        Use template
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="mb-4">
-              <Card className="bg-[#1e1e1e] border-gray-800">
-                <CardHeader className="pb-2 border-b border-gray-800">
-                  <CardTitle className="text-md font-medium text-purple-400 flex items-center">
-                    <ClipboardList className="h-4 w-4 mr-2" />
-                    Plan – Bullet Points
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="pt-3">
-                  <div className="text-sm text-white">
-                    <ul className="list-disc pl-5 space-y-2">
-                      <li><strong>Medications:</strong> Trial NSAID (e.g., ibuprofen) ± acetaminophen; consider muscle relaxant if spasms</li>
-                      <li><strong>Imaging:</strong> Lumbar MRI with and without IV contrast if red flags or persistent severe pain</li>
-                      <li><strong>Labs:</strong> CBC, ESR, CRP to evaluate for infection/inflammation given fever or systemic concern</li>
-                    </ul>
-                    <Button 
-                      variant="ghost" 
-                      className="text-xs text-purple-400 p-1 h-auto mt-2"
-                      onClick={() => onSendMessage("Here's my treatment plan recommendation: [Treatment Plan]")}
-                    >
-                      <Clipboard className="h-3 w-3 mr-1" />
-                      Use template
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
+            {/* Follow-Up Questions */}
             <div className="mb-4">
               <Card className="bg-[#1e1e1e] border-gray-800">
                 <CardHeader className="pb-2 border-b border-gray-800">
@@ -376,7 +660,13 @@ export default function AiAssistantPanel({
                     <Button 
                       variant="ghost" 
                       className="text-xs text-blue-400 p-1 h-auto mt-2"
-                      onClick={() => onSendMessage("Some important follow-up questions: [Follow-up Questions]")}
+                      onClick={() => {
+                        const followUpText = "Some important follow-up questions: [Follow-up Questions]";
+                        onSendMessage(followUpText);
+                        setPreviewContent(prevContent => prevContent + 
+                          (prevContent ? '\n\n' : '') + 
+                          '📋 Follow-up Questions Added');
+                      }}
                     >
                       <Clipboard className="h-3 w-3 mr-1" />
                       Use template

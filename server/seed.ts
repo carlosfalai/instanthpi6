@@ -39,7 +39,7 @@ export async function seedDatabase() {
     name: "Jessica Thompson",
     gender: "Female",
     dateOfBirth: "1991-08-15",
-    email: "jessica.thompson@example.com",
+    email: "jessica.thompson@gmail.com",
     phone: "555-123-4567",
     lastVisit: new Date("2023-05-15"),
     avatarUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=100&h=100&q=80"
@@ -49,7 +49,7 @@ export async function seedDatabase() {
     name: "Nicolas Girard",
     gender: "Male",
     dateOfBirth: "1982-04-15",
-    email: "nicolas.girard@example.com",
+    email: "nicolas.girard@gmail.com",
     phone: "555-234-5678",
     healthCardNumber: "GIRN12345678"
   });
@@ -58,7 +58,7 @@ export async function seedDatabase() {
     name: "Marie Tremblay",
     gender: "Female",
     dateOfBirth: "1990-06-22",
-    email: "marie.t@example.com",
+    email: "marie.tremblay@outlook.com",
     phone: "555-345-6789",
     healthCardNumber: "TREM98765432"
   });
@@ -67,7 +67,7 @@ export async function seedDatabase() {
     name: "Robert Johnson",
     gender: "Male",
     dateOfBirth: "1975-11-30",
-    email: "robert.j@example.com",
+    email: "rjohnson@yahoo.com",
     phone: "555-456-7890"
   });
   
@@ -75,7 +75,7 @@ export async function seedDatabase() {
     name: "Sophie Chen",
     gender: "Female",
     dateOfBirth: "1988-03-10",
-    email: "sophie.chen@example.com",
+    email: "sophie.chen@icloud.com",
     phone: "555-567-8901",
     lastVisit: new Date("2023-04-01")
   });

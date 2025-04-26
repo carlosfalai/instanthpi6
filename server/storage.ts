@@ -173,7 +173,7 @@ export class MemStorage implements IStorage {
       name: "Nicolas Girard",
       gender: "Male",
       dateOfBirth: "1982-04-15",
-      email: "nicolas.girard@example.com",
+      email: "nicolas.girard@gmail.com",
       phone: "555-234-5678",
       healthCardNumber: "GIRN12345678"
     });
@@ -182,7 +182,7 @@ export class MemStorage implements IStorage {
       name: "Marie Tremblay",
       gender: "Female",
       dateOfBirth: "1990-06-22",
-      email: "marie.t@example.com",
+      email: "marie.tremblay@outlook.com",
       phone: "555-345-6789",
       healthCardNumber: "TREM98765432"
     });
@@ -191,7 +191,7 @@ export class MemStorage implements IStorage {
       name: "Robert Johnson",
       gender: "Male",
       dateOfBirth: "1975-11-30",
-      email: "robert.j@example.com",
+      email: "rjohnson@yahoo.com",
       phone: "555-456-7890"
     });
     
@@ -199,7 +199,7 @@ export class MemStorage implements IStorage {
       name: "Sophie Chen",
       gender: "Female",
       dateOfBirth: "1988-03-10",
-      email: "sophie.chen@example.com",
+      email: "sophie.chen@icloud.com",
       phone: "555-567-8901",
       lastVisit: new Date("2023-04-01")
     });
