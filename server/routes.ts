@@ -2,12 +2,16 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ZodError } from "zod";
+import { v4 as uuidv4 } from 'uuid';
+import { db } from './db';
 import {
   insertUserSchema,
   insertPatientSchema,
   insertMessageSchema,
   insertAiDocumentationSchema,
-  insertFormSubmissionSchema
+  insertFormSubmissionSchema,
+  insertPendingItemSchema,
+  medicationRefills
 } from "@shared/schema";
 import OpenAI from "openai";
 import axios from "axios";
@@ -200,6 +204,84 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const messageData = insertMessageSchema.parse(req.body);
       const message = await storage.createMessage(messageData);
+      
+      // Process the message to detect medication refill requests
+      if (message.content && (
+        message.content.toLowerCase().includes('refill') || 
+        message.content.toLowerCase().includes('prescription') ||
+        message.content.toLowerCase().includes('medication')
+      )) {
+        // Process with AI to determine if it's a refill request
+        try {
+          // We already have openai client initialized at the top level
+          // Use the existing OpenAI instance
+          
+          const aiResponse = await openai.chat.completions.create({
+            model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+            messages: [
+              {
+                role: "system",
+                content: "You are a medical assistant AI that analyzes patient messages to identify medication refill requests. Extract key information and return it in JSON format."
+              },
+              {
+                role: "user",
+                content: `Analyze this patient message and determine if it's a medication refill request. If it is, extract the patient name, medication name if mentioned. Return JSON with the following format:
+                {
+                  "isRefill": boolean,
+                  "patientName": string or null,
+                  "medicationName": string or null,
+                  "confidence": number between 0-1
+                }
+                
+                Patient message:
+                ${message.content}`
+              }
+            ],
+            response_format: { type: "json_object" }
+          });
+          
+          const result = JSON.parse(aiResponse.choices[0].message.content || "{}");
+          
+          // If this is a refill request, create a medication refill entry
+          if (result.isRefill) {
+            console.log("Detected medication refill request in patient message");
+            
+            // Get patient details
+            const patient = await storage.getPatient(message.patientId);
+            
+            // Create a medication refill entry
+            await db.insert(medicationRefills).values({
+              id: uuidv4(),
+              patientName: patient ? patient.name : (result.patientName || "Unknown Patient"),
+              dateReceived: new Date(),
+              status: "pending",
+              medicationName: result.medicationName || "Medication in message",
+              pdfUrl: "",  // No PDF for message-based requests
+              emailSource: "Patient message",
+              aiProcessed: true,
+              aiConfidence: result.confidence.toString(),
+              processingNotes: `Detected in patient message: "${message.content}"`,
+            });
+            
+            // Create a pending item for the refill
+            if (patient) {
+              await storage.createPendingItem({
+                patientId: patient.id,
+                type: "refill",
+                title: "Medication Refill Request",
+                description: `Refill request for ${result.medicationName || "medication"}`,
+                status: "pending",
+                dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // due in 1 day
+                priority: "medium"
+              });
+            }
+          }
+        } catch (aiError) {
+          console.error("Error detecting medication refill in message:", aiError);
+          // Continue processing even if AI analysis fails
+        }
+      }
+      
       res.status(201).json(message);
     } catch (error) {
       handleZodError(error, res);
