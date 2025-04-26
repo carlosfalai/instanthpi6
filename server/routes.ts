@@ -21,6 +21,7 @@ import { router as userRouter } from "./routes/user";
 import formsRouter from "./routes/forms";
 import { schedulerRouter } from "./routes/scheduler";
 import { messagingRouter } from "./routes/messaging";
+import formsiteRouter from "./routes/formsite";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -46,6 +47,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/forms", formsRouter);
   app.use("/api/scheduler", schedulerRouter);
   app.use("/api/messaging", messagingRouter);
+  app.use("/api/formsite", formsiteRouter);
   app.use("/api", userRouter);
   
   // Error handling middleware for Zod validation errors
