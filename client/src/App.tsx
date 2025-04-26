@@ -12,6 +12,7 @@ import FormsPage from '@/pages/forms-page';
 import FormBuilderPage from '@/pages/form-builder-page';
 import FormViewPage from '@/pages/form-view-page';
 import SchedulerPage from '@/pages/scheduler-page';
+import FormsitePage from '@/pages/formsite-page';
 
 function Router() {
   return (
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/forms/edit/:id" component={FormBuilderPage} />
       <Route path="/forms/:id" component={FormViewPage} />
       <Route path="/scheduler" component={SchedulerPage} />
+      <Route path="/formsite" component={FormsitePage} />
       <Route component={NotFound} />
     </Switch>
   );
