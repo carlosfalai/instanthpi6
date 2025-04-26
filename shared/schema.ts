@@ -217,6 +217,7 @@ export const aiSettings = pgTable("ai_settings", {
   medicalNotesDraftEnabled: boolean("medical_notes_draft_enabled").default(true),
   pendingItemsTrackingEnabled: boolean("pending_items_tracking_enabled").default(true),
   billingOptimizationEnabled: boolean("billing_optimization_enabled").default(true),
+  functionalMedicineEnabled: boolean("functional_medicine_enabled").default(false), // New field for functional medicine
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
@@ -232,6 +233,7 @@ export const insertAiSettingsSchema = createInsertSchema(aiSettings).pick({
   medicalNotesDraftEnabled: true,
   pendingItemsTrackingEnabled: true,
   billingOptimizationEnabled: true,
+  functionalMedicineEnabled: true,
 });
 
 export type AiSettings = typeof aiSettings.$inferSelect;

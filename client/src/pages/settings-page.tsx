@@ -31,6 +31,7 @@ export default function SettingsPage() {
   const [newPromptName, setNewPromptName] = useState('');
   const [newPromptCategory, setNewPromptCategory] = useState('documentation');
   const [newPromptText, setNewPromptText] = useState('');
+  const [functionalMedicineEnabled, setFunctionalMedicineEnabled] = useState(false);
   
   // Query user data for navigation preferences
   const { data: currentUser } = useQuery<User>({
@@ -55,6 +56,32 @@ export default function SettingsPage() {
   } = useQuery<AiSetting[]>({
     queryKey: ['/api/ai/settings'],
   });
+  
+  // Check if we have the functional medicine setting
+  useEffect(() => {
+    const functionalMedicineSetting = aiSettings.find(s => s.name === "functionalMedicine");
+    
+    // If the setting doesn't exist in the list, add it
+    if (!functionalMedicineSetting && !isLoading && aiSettings.length > 0) {
+      // Calculate the next order value for application category
+      const maxOrder = aiSettings.reduce(
+        (max, setting) => (setting.category === 'application' && setting.order > max ? setting.order : max),
+        0
+      );
+      
+      // Add the functional medicine setting
+      addPromptMutation.mutate({
+        name: "functionalMedicine",
+        category: "application",
+        enabled: false,
+        promptText: "When enabled, include functional medicine laboratory tests and root-cause analysis in patient evaluations.",
+        order: maxOrder + 1,
+      });
+    } else if (functionalMedicineSetting) {
+      // Update our local state with the current value
+      setFunctionalMedicineEnabled(functionalMedicineSetting.enabled);
+    }
+  }, [aiSettings, isLoading, addPromptMutation, setFunctionalMedicineEnabled]);
   
   // Update settings mutation
   const updateSettingMutation = useMutation({
@@ -266,6 +293,7 @@ export default function SettingsPage() {
               <TabsTrigger value="documentation">Documentation</TabsTrigger>
               <TabsTrigger value="response">Patient Responses</TabsTrigger>
               <TabsTrigger value="analysis">Analysis</TabsTrigger>
+              <TabsTrigger value="application">Application</TabsTrigger>
               <TabsTrigger value="navigation">Navigation</TabsTrigger>
               <TabsTrigger value="add">Add New Prompt</TabsTrigger>
             </TabsList>
@@ -310,6 +338,57 @@ export default function SettingsPage() {
                   />
                 ))}
               </div>
+            </TabsContent>
+            
+            <TabsContent value="application">
+              <Card className="bg-[#1e1e1e] border-gray-800">
+                <CardHeader>
+                  <CardTitle>Application Settings</CardTitle>
+                  <CardDescription className="text-gray-400">
+                    Configure general application behavior and features
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="border-b border-gray-800 pb-6">
+                      <h3 className="text-lg font-medium mb-4">Specialized Medicine Options</h3>
+                      
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <h4 className="font-medium text-base">Functional Medicine Mode</h4>
+                          <p className="text-sm text-gray-400">
+                            When enabled, AI recommendations will include functional medicine labs and explanations
+                          </p>
+                        </div>
+                        <Switch
+                          id="toggle-functional-medicine"
+                          checked={functionalMedicineEnabled}
+                          onCheckedChange={(checked) => {
+                            setFunctionalMedicineEnabled(checked);
+                            const setting = aiSettings.find(s => s.name === "functionalMedicine");
+                            if (setting) {
+                              handleToggleChange(setting, checked);
+                              toast({
+                                title: checked ? 'Functional Medicine Enabled' : 'Functional Medicine Disabled',
+                                description: checked 
+                                  ? 'AI will now include specialized functional medicine recommendations'
+                                  : 'AI will no longer include functional medicine recommendations',
+                              });
+                            }
+                          }}
+                        />
+                      </div>
+                      
+                      <div className="mt-2 p-3 bg-[#262626] rounded-md">
+                        <p className="text-sm text-gray-300">
+                          Enabling functional medicine mode will expand AI analysis to include specialized laboratory tests, 
+                          nutritional assessments, and root-cause analysis explanations in the middle column.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
             
             <TabsContent value="navigation">
