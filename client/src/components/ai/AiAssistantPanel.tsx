@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { SendHorizontal, Loader2, Sparkles, X, MessageSquare } from 'lucide-react';
+import { SendHorizontal, Loader2, Sparkles, X, MessageSquare, FileText, Clipboard, ClipboardList } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 
 interface AiAssistantPanelProps {
@@ -28,6 +29,7 @@ export default function AiAssistantPanel({
 }: AiAssistantPanelProps) {
   const [customPrompt, setCustomPrompt] = useState('');
   const [selectedSuggestions, setSelectedSuggestions] = useState<Record<string, boolean>>({});
+  const [activeTab, setActiveTab] = useState<'suggestions' | 'plan' | 'custom'>('suggestions');
   
   // Query for AI suggestions
   const { 
@@ -107,13 +109,17 @@ export default function AiAssistantPanel({
   
   return (
     <div className="flex flex-col h-full bg-[#121212] text-white">
-      <Tabs defaultValue="suggestions" className="h-full flex flex-col">
+      <Tabs defaultValue="suggestions" className="h-full flex flex-col" onValueChange={(value) => setActiveTab(value as any)}>
         <div className="p-3 bg-[#1e1e1e] border-b border-gray-800">
           <h2 className="font-semibold mb-3">AI Assistant</h2>
           <TabsList className="w-full bg-[#262626]">
             <TabsTrigger value="suggestions" className="flex-1 data-[state=active]:bg-blue-600">
               <Sparkles className="h-4 w-4 mr-2" />
               Suggestions
+            </TabsTrigger>
+            <TabsTrigger value="plan" className="flex-1 data-[state=active]:bg-blue-600">
+              <ClipboardList className="h-4 w-4 mr-2" />
+              Plan
             </TabsTrigger>
             <TabsTrigger value="custom" className="flex-1 data-[state=active]:bg-blue-600">
               <MessageSquare className="h-4 w-4 mr-2" />
@@ -230,6 +236,116 @@ export default function AiAssistantPanel({
               </Button>
             </div>
           )}
+        </TabsContent>
+        
+        <TabsContent value="plan" className="flex-1 flex flex-col p-0 m-0">
+          <ScrollArea className="flex-1 p-4">
+            <div className="mb-4">
+              <Card className="bg-[#1e1e1e] border-gray-800">
+                <CardHeader className="pb-2 border-b border-gray-800">
+                  <CardTitle className="text-md font-medium text-blue-400 flex items-center">
+                    <Clipboard className="h-4 w-4 mr-2" />
+                    HPI Confirmation Summary
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-3">
+                  <div className="text-sm text-white">
+                    <p>Just to verify this with you beforehand, you are a [Age]-year-old [Gender] experiencing [Description] located in the [Location] that began on [Symptom][Onset].</p>
+                    <Button 
+                      variant="ghost" 
+                      className="text-xs text-blue-400 p-1 h-auto mt-2"
+                      onClick={() => onSendMessage("Here's a summary of what we discussed for confirmation: [HPI Confirmation]")}
+                    >
+                      <Clipboard className="h-3 w-3 mr-1" />
+                      Use template
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="mb-4">
+              <Card className="bg-[#1e1e1e] border-gray-800">
+                <CardHeader className="pb-2 border-b border-gray-800">
+                  <CardTitle className="text-md font-medium text-blue-400 flex items-center">
+                    <Clipboard className="h-4 w-4 mr-2" />
+                    Super Spartan SOAP Note
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-3">
+                  <div className="text-sm text-white">
+                    <p><strong>S:</strong> [Age][Gender] with [Description] at [Location] since [Symptom][Onset]; [Severity][0-10]/10</p>
+                    <p><strong>A:</strong> Suspect [Chief][Complaint]; ddx includes musculoskeletal cause...</p>
+                    <p><strong>P:</strong> In-person eval, imaging if needed, NSAIDs if tolerated...</p>
+                    <Button 
+                      variant="ghost" 
+                      className="text-xs text-blue-400 p-1 h-auto mt-2"
+                      onClick={() => onSendMessage("Here's my SOAP note assessment: [SOAP Note]")}
+                    >
+                      <Clipboard className="h-3 w-3 mr-1" />
+                      Use template
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="mb-4">
+              <Card className="bg-[#1e1e1e] border-gray-800">
+                <CardHeader className="pb-2 border-b border-gray-800">
+                  <CardTitle className="text-md font-medium text-purple-400 flex items-center">
+                    <ClipboardList className="h-4 w-4 mr-2" />
+                    Plan – Bullet Points
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-3">
+                  <div className="text-sm text-white">
+                    <ul className="list-disc pl-5 space-y-2">
+                      <li><strong>Medications:</strong> Trial NSAID (e.g., ibuprofen) ± acetaminophen; consider muscle relaxant if spasms</li>
+                      <li><strong>Imaging:</strong> Lumbar MRI with and without IV contrast if red flags or persistent severe pain</li>
+                      <li><strong>Labs:</strong> CBC, ESR, CRP to evaluate for infection/inflammation given fever or systemic concern</li>
+                    </ul>
+                    <Button 
+                      variant="ghost" 
+                      className="text-xs text-purple-400 p-1 h-auto mt-2"
+                      onClick={() => onSendMessage("Here's my treatment plan recommendation: [Treatment Plan]")}
+                    >
+                      <Clipboard className="h-3 w-3 mr-1" />
+                      Use template
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="mb-4">
+              <Card className="bg-[#1e1e1e] border-gray-800">
+                <CardHeader className="pb-2 border-b border-gray-800">
+                  <CardTitle className="text-md font-medium text-blue-400 flex items-center">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Follow-Up Questions
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-3">
+                  <div className="text-sm text-white">
+                    <ul className="list-disc pl-5 space-y-1">
+                      <li>Does the pain radiate into your legs, groin, or buttocks?</li>
+                      <li>Have you noticed numbness, tingling, or weakness in either leg?</li>
+                      <li>Do coughing, sneezing, or straining worsen the pain?</li>
+                    </ul>
+                    <Button 
+                      variant="ghost" 
+                      className="text-xs text-blue-400 p-1 h-auto mt-2"
+                      onClick={() => onSendMessage("Some important follow-up questions: [Follow-up Questions]")}
+                    >
+                      <Clipboard className="h-3 w-3 mr-1" />
+                      Use template
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </ScrollArea>
         </TabsContent>
         
         <TabsContent value="custom" className="flex-1 flex flex-col p-0 m-0">

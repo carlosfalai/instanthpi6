@@ -1,0 +1,50 @@
+<!-- Medical Transcription Output Template in HTML -->
+<h3>HPI Confirmation Summary</h3>
+<p>Just to verify this with you beforehand, you are a {{Age}}-year-old {{Gender}} experiencing {{Description}} located in the {{Location}} that began on {{Symptom}}{{Onset}}. The symptom is rated {{Severity}}{{(0 - 10)}} out of 10, worsens with {{Aggravating}}{{Factors}}, and is relieved by {{Relieving}}{{Factors}}. You also report {{Associated}}{{Symptoms}}. No treatments have been tried yet. You have the following chronic conditions: {{Chronic}}{{Conditions}}. No medication allergies reported. Is this correct?</p>
+
+<h3>Super Spartan SOAP Note</h3>
+<p><strong>S:</strong> {{Age}}{{Gender}} with {{Description}} at {{Location}} since {{Symptom}}{{Onset}}; {{Severity}}{{(0 - 10)}}/10; ↑ {{Aggravating}}{{Factors}}, ↓ {{Relieving}}{{Factors}}; reports {{Associated}}{{Symptoms}}; no prior tx; hx of {{Chronic}}{{Conditions}}; no drug allergies.</p>
+<p><strong>A:</strong> Suspect {{Chief}}{{Complaint}}; ddx includes musculoskeletal cause, infection, or systemic pathology based on associated symptoms.</p>
+<p><strong>P:</strong> In-person eval, imaging if needed, NSAIDs if tolerated, labs if fever or red flags present, monitor and reassess.</p>
+
+<h3>Plan – Bullet Points</h3>
+<ul>
+  <li><strong>Medications:</strong> Trial NSAID (e.g., ibuprofen) ± acetaminophen; consider muscle relaxant if spasms</li>
+  <li><strong>Imaging:</strong> Lumbar MRI with and without IV contrast if red flags or persistent severe pain</li>
+  <li><strong>Labs:</strong> CBC, ESR, CRP to evaluate for infection/inflammation given fever or systemic concern</li>
+  <li><strong>Referrals:</strong> Physio for core/postural support; ortho/neurosurg if imaging abnormal</li>
+  <li><strong>Other:</strong> Patient education: avoid exacerbating activities, re-eval in 7 days or sooner if worsening</li>
+</ul>
+
+<h3 style="color: purple;">In case this is a telemedicine consultation</h3>
+<p>I understand the pain is severe and accompanied by fever or chills, which may signal a more serious issue such as spinal infection, epidural abscess, or inflammatory discitis. Telemedicine cannot provide hands-on evaluation, neurological exam, reflex testing, or vital sign measurement. These are necessary to rule out emergent causes. An in-person clinician would conduct a physical exam, order urgent imaging (e.g., lumbar MRI with/without contrast), and run labs to check for systemic inflammation or infection. Please go to urgent care or the ER if this worsens before your appointment.</p>
+
+<h3>Follow-Up Questions</h3>
+<p><strong>{{Chief}}{{Complaint}}</strong></p>
+<ul>
+  <li>Does the pain radiate into your legs, groin, or buttocks?</li>
+  <li>Have you noticed numbness, tingling, or weakness in either leg?</li>
+  <li>Do coughing, sneezing, or straining worsen the pain?</li>
+  <li>Have you experienced any loss of bowel or bladder control?</li>
+  <li>What positions or activities (e.g., sitting, bending) most affect the pain?</li>
+  <li>Have you had prior episodes of similar {{Chief}}{{Complaint}}?</li>
+  <li>Have you taken your temperature to confirm a fever? If so, what was it?</li>
+  <!-- Required standard follow-up questions -->
+  <li>Have you seen a doctor for this before?</li>
+  <li>Have you been treated for this before?</li>
+  <li>What diagnosis were you given?</li>
+</ul>
+
+<h3>Diagnostic Strategy & Reasoning</h3>
+<p>Based on your current symptoms, the leading differentials include: 1) mechanical low-back strain or sprain, 2) lumbar disc herniation with possible nerve impingement, and 3) spinal infection such as osteomyelitis or epidural abscess. The strategy for diagnosis involves:</p>
+<ul>
+  <li><strong>Initial Exam:</strong> In-person neuro exam to assess strength, reflexes, and sensation</li>
+  <li><strong>Labs:</strong> CBC, ESR, CRP to evaluate systemic inflammation</li>
+  <li><strong>Imaging Requisition Text:</strong> 
+    <em>
+      "Lumbar MRI with and without IV contrast requested for rule out osteomyelitis, epidural abscess, or discitis. Patient has severe lower back pain, 8/10 intensity, associated with fever and no prior treatment. Red-flag symptoms under investigation."
+    </em>
+  </li>
+  <li><strong>Treatment Plan:</strong> Once urgent pathology excluded, initiate conservative care with medication, posture rehab, and monitoring</li>
+</ul>
+<p>This structured process ensures the clinician can confirm or exclude urgent causes early, while creating a roadmap for long-term resolution and recovery.</p>
