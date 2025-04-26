@@ -13,6 +13,7 @@ import FormBuilderPage from '@/pages/form-builder-page';
 import FormViewPage from '@/pages/form-view-page';
 import SchedulerPage from '@/pages/scheduler-page';
 import FormsitePage from '@/pages/formsite-page';
+import PseudonymPage from '@/pages/pseudonym-page';
 
 function Router() {
   return (
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/forms/:id" component={FormViewPage} />
       <Route path="/scheduler" component={SchedulerPage} />
       <Route path="/formsite" component={FormsitePage} />
+      <Route path="/pseudonym" component={PseudonymPage} />
       <Route component={NotFound} />
     </Switch>
   );
