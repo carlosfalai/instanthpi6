@@ -79,9 +79,9 @@ export default function PendingItemsPanel({ patientId }: PendingItemsPanelProps)
     <div className="flex flex-col h-full bg-[#121212] text-white">
       {/* Header */}
       <div className="p-4 bg-[#1e1e1e] border-b border-gray-800">
-        <h2 className="font-semibold mb-4">Pending Items</h2>
+        <h2 className="font-semibold mb-4 pl-2">Pending Items</h2>
         
-        <div className="flex space-x-2">
+        <div className="flex space-x-2 pl-2">
           <Button
             variant={filter === 'all' ? 'default' : 'outline'}
             size="sm"

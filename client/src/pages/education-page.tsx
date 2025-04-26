@@ -179,7 +179,7 @@ export default function EducationPage() {
 
   return (
     <BaseLayout>
-      <div className="container max-w-6xl py-8">
+      <div className="container mx-auto max-w-6xl px-6 py-8">
         <div className="flex flex-col space-y-8">
           {/* Header and Progress Overview */}
           <div className="flex flex-col space-y-2">

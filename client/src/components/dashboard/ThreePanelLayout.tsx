@@ -77,18 +77,18 @@ export default function ThreePanelLayout() {
   return (
     <div className="h-screen flex flex-col bg-[#121212] text-white">
       {/* Header */}
-      <header className="h-14 flex items-center px-4 bg-[#1e1e1e] border-b border-gray-800">
+      <header className="h-14 flex items-center px-6 bg-[#1e1e1e] border-b border-gray-800">
         <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">InstantHPI</h1>
-        <div className="ml-6 flex-1">
-          <NavigationBar />
-        </div>
       </header>
+      
+      {/* Navigation Bar */}
+      <NavigationBar />
       
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup direction="horizontal">
           {/* Left Panel - Pending Items */}
-          <ResizablePanel defaultSize={20} minSize={15}>
+          <ResizablePanel defaultSize={20} minSize={15} className="px-1">
             <PendingItemsPanel patientId={selectedPatientId || 0} />
           </ResizablePanel>
           
