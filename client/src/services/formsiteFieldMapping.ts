@@ -2,26 +2,26 @@
  * Mapping of FormSite field IDs to human-readable labels
  */
 export const FORMSITE_FIELD_LABELS: Record<string, string> = {
-  '2': 'Email',
-  '5': 'Patient ID',
+  '2': 'Email: (Note: In the actual patient-facing version, email is not requested)',
+  '5': 'Generated Patient ID',
   '6': 'Gender',
   '7': 'Age',
-  '8': 'Chief Complaint',
-  '9': 'Symptom Onset',
-  '10': 'Trigger',
-  '11': 'Symptom Location',
-  '12': 'Symptom Description',
-  '13': 'Aggravating Factors',
-  '14': 'Relieving Factors',
-  '15': 'Symptom Severity (0-10)',
-  '16': 'Symptom Evolution',
-  '17': 'Associated Symptoms',
-  '18': 'Previous Treatments',
-  '19': 'Treatment Effectiveness',
-  '20': 'Chronic Conditions',
-  '21': 'Medication Allergies',
-  '23': 'Pregnancy/Breastfeeding Status',
-  '25': 'Additional Information'
+  '8': 'What brings you to the clinic today?',
+  '9': 'When did this problem start?',
+  '10': 'Was there a specific trigger?',
+  '11': 'Where is the symptom located?',
+  '12': 'How would you describe your symptom?',
+  '13': 'What makes the symptom worse?',
+  '14': 'What relieves the symptom?',
+  '15': 'On a scale of 0 to 10, how severe is your symptom?',
+  '16': 'How has the symptom evolved over time?',
+  '17': 'Are you experiencing any of the following symptoms?',
+  '18': 'Have you tried any treatments or remedies for this problem?',
+  '19': 'Were the treatments effective?',
+  '20': 'Do you have any chronic conditions?',
+  '21': 'Do you have any known medication allergies?',
+  '23': 'Are you pregnant or breastfeeding?',
+  '25': 'Is there anything else we should know about your current condition?'
 };
 
 /**

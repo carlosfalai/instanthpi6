@@ -67,7 +67,7 @@ export function mapFormDataToTemplateVariables(formData: Record<string, any>): R
   // Initialize the variables with default values
   const variables: Record<string, string> = {
     'Age': extractFieldValue(formData, '7') || 'N/A',
-    'Gender': extractFieldValue(formData, '6') || 'N/A',
+    'Gender': getGenderText(formData) || 'N/A',
     'Chief Complaint': extractFieldValue(formData, '8') || 'N/A',
     'Symptom Onset': extractFieldValue(formData, '9') || 'N/A',
     'Trigger': extractFieldValue(formData, '10') || 'N/A',
@@ -80,9 +80,52 @@ export function mapFormDataToTemplateVariables(formData: Record<string, any>): R
     'Treatments Tried': getTreatmentsTriedText(formData),
     'Chronic Conditions': extractFieldValue(formData, '20') || 'none',
     'Medication Allergies': getMedicationAllergiesText(formData),
+    'Pregnancy': getPregnancyText(formData),
+    'Additional Info': extractFieldValue(formData, '25') || 'None provided',
   };
   
+  // Log the extracted variables for debugging
+  console.log('Extracted variables from form data:', variables);
+  
   return variables;
+}
+
+/**
+ * Get formatted text for gender
+ * @param formData The form data object
+ * @returns Formatted text about gender
+ */
+function getGenderText(formData: Record<string, any>): string {
+  const gender = extractFieldValue(formData, '6');
+  
+  if (!gender) return 'not specified';
+  
+  if (gender.toLowerCase().includes('fem') || gender.toLowerCase() === 'f') {
+    return 'female';
+  } else if (gender.toLowerCase().includes('male') || gender.toLowerCase() === 'm') {
+    return 'male';
+  } else {
+    return gender;
+  }
+}
+
+/**
+ * Get formatted text about pregnancy
+ * @param formData The form data object
+ * @returns Formatted text about pregnancy status
+ */
+function getPregnancyText(formData: Record<string, any>): string {
+  const pregnancy = extractFieldValue(formData, '23');
+  
+  if (!pregnancy) return 'Pregnancy status not provided';
+  
+  if (pregnancy.toLowerCase().includes('yes')) {
+    return 'Patient is pregnant or breastfeeding';
+  } else if (pregnancy.toLowerCase().includes('no')) {
+    return 'Patient is not pregnant or breastfeeding';
+  } else {
+    return `Pregnancy status: ${pregnancy}`;
+  }
 }
 
 /**

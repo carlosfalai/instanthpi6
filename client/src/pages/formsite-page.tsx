@@ -128,13 +128,13 @@ const FormsitePage: React.FC = () => {
     }
   };
 
-  // Get a preview of form content
+  // Get a preview of form content - only show the Patient ID (field 5)
   const getFormPreview = (results: Record<string, any>) => {
     const entries = Object.entries(results);
-    if (entries.length === 0) return 'No form data';
+    if (entries.length === 0) return 'No patient ID available';
 
-    // Get the first few form fields for preview
-    const preview = entries.slice(0, 3).map(([key, value]) => {
+    // Find the patient ID field (field 5)
+    for (const [key, value] of entries) {
       // Extract the field ID
       let fieldId = key;
       if (typeof key === 'string') {
@@ -146,23 +146,23 @@ const FormsitePage: React.FC = () => {
             : key;
       }
       
-      // Get the field label
-      const fieldLabel = getFieldLabel(fieldId);
-      
-      // Format the value for display
-      let displayValue = value;
-      if (typeof value === 'object') {
-        if (value.value !== undefined) {
-          displayValue = value.value;
-        } else {
-          displayValue = JSON.stringify(value).substring(0, 20) + '...';
+      // If this is field 5 (Patient ID), return just its value
+      if (fieldId === '5') {
+        // Format the value for display
+        let displayValue = value;
+        if (typeof value === 'object') {
+          if (value.value !== undefined) {
+            displayValue = value.value;
+          } else {
+            displayValue = JSON.stringify(value);
+          }
         }
+        
+        return String(displayValue);
       }
-      
-      return `${fieldLabel}: ${displayValue}`;
-    }).join(', ');
+    }
 
-    return entries.length > 3 ? `${preview}...` : preview;
+    return 'Patient ID not found';
   };
 
   // Render the submissions list (with error handling for non-array data)
@@ -265,15 +265,15 @@ const FormsitePage: React.FC = () => {
         {/* Left Column - Submissions List */}
         <div className="bg-[#1A1A1A] rounded-lg p-4 border border-[#333] h-[calc(100vh-180px)] flex flex-col">
           <div className="mb-4">
-            <h2 className="text-lg font-semibold mb-1">Form Submissions</h2>
+            <h2 className="text-lg font-semibold mb-1">Generated Patient IDs</h2>
             <p className="text-sm text-gray-400 mb-3">
-              View and process patient form submissions from FormSite
+              View and process patient information by their generated ID
             </p>
             
             {/* Search Input */}
             <div className="relative">
               <Input
-                placeholder="Search submissions..."
+                placeholder="Search patient IDs..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pr-10 bg-[#252525] border-[#444]"
