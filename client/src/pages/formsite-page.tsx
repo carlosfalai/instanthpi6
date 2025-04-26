@@ -234,15 +234,30 @@ const FormsitePage: React.FC = () => {
           <FormInput className="h-6 w-6 mr-2 text-blue-500" />
           <h1 className="text-2xl font-bold">FormSite Submissions</h1>
         </div>
-        <Button 
-          onClick={() => refetchSubmissions()}
-          disabled={isLoadingSubmissions}
-          variant="outline"
-          size="sm"
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingSubmissions ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex space-x-2">
+          {/* Pseudonym Lookup Button */}
+          <Button 
+            onClick={() => window.location.href = "/pseudonym"}
+            variant="default"
+            size="sm"
+            className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 border-0 shadow-md hover:shadow-lg transition-all duration-200"
+          >
+            <Search className="h-4 w-4 mr-2" />
+            Pseudonym Lookup
+          </Button>
+          
+          {/* Refresh Button */}
+          <Button 
+            onClick={() => refetchSubmissions()}
+            disabled={isLoadingSubmissions}
+            variant="outline"
+            size="sm"
+            className="border border-gray-700 hover:bg-gray-800 transition-all duration-200"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingSubmissions ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Main Content */}

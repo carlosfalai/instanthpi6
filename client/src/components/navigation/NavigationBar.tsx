@@ -80,6 +80,7 @@ export default function NavigationBar() {
     { id: 'messages', path: '/messages', icon: <MessageSquare className="h-5 w-5" />, label: 'Messages', visible: true, order: 4, row: 'primary' },
     { id: 'scheduler', path: '/scheduler', icon: <Calendar className="h-5 w-5" />, label: 'Scheduler', visible: true, order: 5, row: 'primary' },
     { id: 'formsite', path: '/formsite', icon: <FormInput className="h-5 w-5" />, label: 'FormSite', visible: true, order: 6, row: 'primary' },
+    { id: 'pseudonym', path: '/pseudonym', icon: <User className="h-5 w-5" />, label: 'Pseudonym Lookup', visible: true, order: 7, row: 'primary' },
     { id: 'forms', path: '/forms', icon: <ClipboardList className="h-5 w-5" />, label: 'Forms', visible: true, order: 1, row: 'secondary' },
     { id: 'chronicConditions', path: '/chronic-conditions', icon: <Heart className="h-5 w-5" />, label: 'Chronic Conditions', visible: navPreferences.showChronicConditions, order: 2, row: 'secondary' },
     { id: 'medicationRefills', path: '/medication-refills', icon: <PillIcon className="h-5 w-5" />, label: 'Medication Refills', visible: navPreferences.showMedicationRefills, order: 3, row: 'secondary' },
