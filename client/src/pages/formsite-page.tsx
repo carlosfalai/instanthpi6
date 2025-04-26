@@ -132,7 +132,14 @@ const FormsitePage: React.FC = () => {
       if (typeof key === 'string' && key.includes(':')) {
         question = key.split(':')[1];
       }
-      return `${question}: ${value}`;
+      
+      // Format the value for display
+      let displayValue = value;
+      if (typeof value === 'object') {
+        displayValue = JSON.stringify(value).substring(0, 20) + '...';
+      }
+      
+      return `${question}: ${displayValue}`;
     }).join(', ');
 
     return entries.length > 3 ? `${preview}...` : preview;
@@ -315,7 +322,11 @@ const FormsitePage: React.FC = () => {
                           return (
                             <div key={key} className="border-b border-[#333] pb-3 last:border-b-0">
                               <h4 className="font-medium text-gray-300">{question}</h4>
-                              <p className="mt-1 text-gray-200">{value || 'No response'}</p>
+                              <p className="mt-1 text-gray-200">
+                                {typeof value === 'object' 
+                                  ? JSON.stringify(value, null, 2) 
+                                  : value || 'No response'}
+                              </p>
                             </div>
                           );
                         })}
