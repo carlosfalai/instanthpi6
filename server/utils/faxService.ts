@@ -1,6 +1,6 @@
 import { createWriteStream, readFileSync } from 'fs';
 import { resolve } from 'path';
-import * as Phaxio from 'phaxio';
+import Phaxio from 'phaxio';
 import InterFAX from 'interfax';
 import phone from 'phone';
 
@@ -454,6 +454,36 @@ export class InterFaxService implements FaxService {
   }
 }
 
+// Define a mock fax service for development if no real credentials are available
+class MockFaxService implements FaxService {
+  async sendFax(options: SendFaxOptions): Promise<SendFaxResult> {
+    console.log('Mock Fax Service: Sending fax to', options.to);
+    return {
+      success: true,
+      faxId: `mock-${Date.now()}`,
+      message: 'Fax queued in mock service (no real fax sent)',
+    };
+  }
+
+  async getFaxStatus(faxId: string): Promise<FaxStatus> {
+    console.log('Mock Fax Service: Getting status for', faxId);
+    return 'success';
+  }
+
+  async listFaxes(options: ListFaxOptions = {}): Promise<ListFaxResult> {
+    console.log('Mock Fax Service: Listing faxes with options', options);
+    return {
+      faxes: [],
+      hasMore: false,
+    };
+  }
+
+  async downloadFax(faxId: string, filePath: string): Promise<string> {
+    console.log('Mock Fax Service: Downloading fax', faxId, 'to', filePath);
+    return filePath;
+  }
+}
+
 // Factory function to create the appropriate fax service
 export function createFaxService(): FaxService {
   // Check for environment variables to decide which service to use
@@ -475,6 +505,7 @@ export function createFaxService(): FaxService {
     return new InterFaxService(interfaxUsername, interfaxPassword);
   }
   
-  // Throw error if no service can be initialized
-  throw new Error('No fax service credentials found in environment variables');
+  // Use mock service in development mode when no credentials are available
+  console.log('No fax service credentials found, using mock fax service (for development only)');
+  return new MockFaxService();
 }

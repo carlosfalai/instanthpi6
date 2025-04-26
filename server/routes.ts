@@ -270,8 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
               await storage.createPendingItem({
                 patientId: patient.id,
                 type: "refill",
-                title: "Medication Refill Request",
-                description: `Refill request for ${result.medicationName || "medication"}`,
+                description: `Medication Refill Request: ${result.medicationName || "medication"}`,
                 status: "pending",
                 dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // due in 1 day
                 priority: "medium"
@@ -478,7 +477,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ],
         });
         
-        return res.json({ text: response.choices[0].message.content.trim() });
+        return res.json({ text: response.choices[0].message.content?.trim() || "No response generated" });
       }
       
       // No API keys available, return error

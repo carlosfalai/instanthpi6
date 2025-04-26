@@ -23,31 +23,53 @@ router.get('/search-patients', async (req, res) => {
     const { query } = req.query;
     
     if (!query || typeof query !== 'string') {
-      return res.status(400).json({ message: 'Search query is required' });
+      // If no query is provided, return all patients from local database
+      try {
+        const allPatients = await storage.getAllPatients();
+        return res.json({
+          patients: allPatients,
+          source: 'local'
+        });
+      } catch (dbError) {
+        console.error('Error fetching all patients:', dbError);
+        return res.status(500).json({ message: 'Failed to fetch patients' });
+      }
     }
+    
+    const searchTerm = query.toLowerCase();
+    console.log(`Searching for patients with term: "${searchTerm}"`);
     
     // Check if Spruce API key is available
     if (!process.env.SPRUCE_API_KEY) {
+      console.log('No Spruce API key available, using local search only');
       // If no API key, fall back to local search
-      const localPatients = await storage.getAllPatients();
-      const searchTerm = query.toLowerCase();
-      
-      const filteredPatients = localPatients.filter(patient => {
-        return (
-          patient.name.toLowerCase().includes(searchTerm) ||
-          patient.email.toLowerCase().includes(searchTerm) ||
-          patient.phone.includes(searchTerm)
-        );
-      });
-      
-      return res.json({
-        patients: filteredPatients,
-        source: 'local'
-      });
+      try {
+        const localPatients = await storage.getAllPatients();
+        
+        const filteredPatients = localPatients.filter(patient => {
+          return (
+            (patient.name && patient.name.toLowerCase().includes(searchTerm)) ||
+            (patient.email && patient.email.toLowerCase().includes(searchTerm)) ||
+            (patient.phone && patient.phone && patient.phone.includes(searchTerm))
+          );
+        });
+        
+        console.log(`Found ${filteredPatients.length} matching patients in local database`);
+        
+        return res.json({
+          patients: filteredPatients,
+          source: 'local'
+        });
+      } catch (dbError) {
+        console.error('Error searching local patients:', dbError);
+        return res.status(500).json({ message: 'Failed to search local patients' });
+      }
     }
     
+    // Try to search using Spruce API
     try {
-      // Search patients in Spruce API directly
+      console.log('Attempting to search patients via Spruce API');
+      
       // Spruce API doesn't have a search endpoint, so we need to get all patients and filter
       const response = await axios.create({
         baseURL: 'https://api.sprucehealth.com/v1',
@@ -59,7 +81,8 @@ router.get('/search-patients', async (req, res) => {
       
       // Filter patients based on query
       const allPatients = response.data.patients || [];
-      const searchTerm = query.toLowerCase();
+      console.log(`Received ${allPatients.length} patients from Spruce API`);
+      
       const filteredPatients = allPatients.filter((patient: SprucePatient) => {
         return (
           (patient.name && patient.name.toLowerCase().includes(searchTerm)) ||
@@ -68,13 +91,12 @@ router.get('/search-patients', async (req, res) => {
         );
       });
       
-      // Use the filtered patients
-      const sprucePatients = filteredPatients || [];
+      console.log(`Found ${filteredPatients.length} matching patients in Spruce API`);
       
       // Convert Spruce patients to our format
-      const mappedPatients = sprucePatients.map((sprucePatient: SprucePatient) => ({
-        id: sprucePatient.id,
-        name: sprucePatient.name,
+      const mappedPatients = filteredPatients.map((sprucePatient: SprucePatient) => ({
+        id: parseInt(sprucePatient.id) || Math.floor(Math.random() * 10000) + 1000, // Convert to number or generate random ID
+        name: sprucePatient.name || 'Unknown Name',
         email: sprucePatient.email || '',
         phone: sprucePatient.phone || '',
         dateOfBirth: sprucePatient.date_of_birth || '',
@@ -89,23 +111,31 @@ router.get('/search-patients', async (req, res) => {
       });
     } catch (spruceError) {
       console.error('Error searching patients in Spruce API:', spruceError);
+      console.log('Falling back to local search');
       
       // Fallback to local search if Spruce API fails
-      const localPatients = await storage.getAllPatients();
-      const searchTerm = query.toLowerCase();
-      
-      const filteredPatients = localPatients.filter(patient => {
-        return (
-          patient.name.toLowerCase().includes(searchTerm) ||
-          patient.email.toLowerCase().includes(searchTerm) ||
-          patient.phone.includes(searchTerm)
-        );
-      });
-      
-      return res.json({
-        patients: filteredPatients,
-        source: 'local'
-      });
+      try {
+        const localPatients = await storage.getAllPatients();
+        
+        const filteredPatients = localPatients.filter(patient => {
+          return (
+            (patient.name && patient.name.toLowerCase().includes(searchTerm)) ||
+            (patient.email && patient.email.toLowerCase().includes(searchTerm)) ||
+            (patient.phone && patient.phone && patient.phone.includes(searchTerm))
+          );
+        });
+        
+        console.log(`Found ${filteredPatients.length} matching patients in local database (fallback)`);
+        
+        return res.json({
+          patients: filteredPatients,
+          source: 'local',
+          message: 'Using local search due to Spruce API error'
+        });
+      } catch (dbError) {
+        console.error('Error in fallback local search:', dbError);
+        return res.status(500).json({ message: 'Failed to search patients in both Spruce and local database' });
+      }
     }
   } catch (error) {
     console.error('Error in patient search:', error);
