@@ -3,7 +3,7 @@ import { db } from '../db';
 import { eq } from 'drizzle-orm';
 import { medicationRefills } from '@shared/schema';
 import { v4 as uuidv4 } from 'uuid';
-import { processEmailAttachments } from '../utils/emailProcessor';
+import { processEmailAttachments } from '../utils/emailProcessor.js';
 import * as OpenAI from 'openai';
 
 const router = Router();
@@ -88,7 +88,7 @@ router.post('/check-email', async (req: Request, res: Response) => {
     
     // Process each attachment with AI to determine if it's a refill request
     const processedAttachments = await Promise.all(
-      newAttachments.map(async (attachment) => {
+      newAttachments.map(async (attachment: { url: string; content: string; emailSource: string }) => {
         try {
           // Use AI to analyze the PDF content
           const isRefillRequest = await analyzeAttachment(attachment.content);
@@ -108,7 +108,7 @@ router.post('/check-email', async (req: Request, res: Response) => {
                 pdfUrl: attachment.url,
                 emailSource: attachment.emailSource,
                 aiProcessed: true,
-                aiConfidence: isRefillRequest.confidence,
+                aiConfidence: isRefillRequest.confidence.toString(),
                 createdAt: new Date(),
                 updatedAt: new Date(),
               })
@@ -175,14 +175,14 @@ async function analyzeAttachment(content: string): Promise<{
       response_format: { type: "json_object" }
     });
     
-    const result = JSON.parse(response.choices[0].message.content);
+    const result = JSON.parse(response.choices[0].message.content || "{}");
     return {
-      isRefill: result.isRefill,
-      patientName: result.patientName,
-      medicationName: result.medicationName,
-      prescriptionNumber: result.prescriptionNumber,
-      pharmacy: result.pharmacy,
-      confidence: result.confidence
+      isRefill: result.isRefill || false,
+      patientName: result.patientName || null,
+      medicationName: result.medicationName || null,
+      prescriptionNumber: result.prescriptionNumber || null,
+      pharmacy: result.pharmacy || null,
+      confidence: result.confidence || 0
     };
   } catch (error) {
     console.error('Error analyzing attachment with AI:', error);
