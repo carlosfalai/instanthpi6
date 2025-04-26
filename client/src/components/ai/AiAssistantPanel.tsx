@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { SendHorizontal, Loader2, Sparkles, X, MessageSquare, FileText, Clipboard, ClipboardList } from 'lucide-react';
+import { SendHorizontal, Loader2, Sparkles, X, MessageSquare, FileText, Clipboard, ClipboardList, Mail, Languages, Copy } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { apiRequest, queryClient } from '@/lib/queryClient';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 
 interface AiAssistantPanelProps {
   patientId: number;
@@ -22,14 +25,51 @@ interface SuggestionItem {
   isSelected?: boolean;
 }
 
+interface TreatmentItem {
+  id: string;
+  text: string;
+  category: 'medication' | 'imaging' | 'labs' | 'referral' | 'followup';
+  isSelected: boolean;
+}
+
+interface ActionItem {
+  id: string;
+  text: string;
+  type: 'message_patient' | 'soap_note' | 'french_note';
+  isSelected: boolean;
+}
+
 export default function AiAssistantPanel({ 
   patientId, 
   language, 
   onSendMessage 
 }: AiAssistantPanelProps) {
+  const { toast } = useToast();
   const [customPrompt, setCustomPrompt] = useState('');
   const [selectedSuggestions, setSelectedSuggestions] = useState<Record<string, boolean>>({});
-  const [activeTab, setActiveTab] = useState<'suggestions' | 'plan' | 'custom'>('suggestions');
+  const [activeTab, setActiveTab] = useState<'suggestions' | 'plan' | 'custom'>('plan');
+  const [previewContent, setPreviewContent] = useState<string>('');
+  
+  // Treatment plan items with checkboxes
+  const [treatmentItems, setTreatmentItems] = useState<TreatmentItem[]>([
+    { id: 'med1', text: 'Trial NSAID (e.g., ibuprofen) ± acetaminophen', category: 'medication', isSelected: false },
+    { id: 'med2', text: 'Consider muscle relaxant if spasms present', category: 'medication', isSelected: false },
+    { id: 'med3', text: 'Topical analgesic cream/patch to affected area', category: 'medication', isSelected: false },
+    { id: 'img1', text: 'Lumbar MRI with and without IV contrast', category: 'imaging', isSelected: false },
+    { id: 'img2', text: 'X-ray of affected area to rule out structural issues', category: 'imaging', isSelected: false },
+    { id: 'lab1', text: 'CBC, ESR, CRP to evaluate for infection/inflammation', category: 'labs', isSelected: false },
+    { id: 'lab2', text: 'Basic metabolic panel', category: 'labs', isSelected: false },
+    { id: 'ref1', text: 'Physical therapy referral', category: 'referral', isSelected: false },
+    { id: 'ref2', text: 'Pain management specialist consultation', category: 'referral', isSelected: false },
+    { id: 'fup1', text: 'Follow up in 2 weeks to reassess symptoms', category: 'followup', isSelected: false },
+  ]);
+  
+  // Action items with checkboxes
+  const [actionItems, setActionItems] = useState<ActionItem[]>([
+    { id: 'action1', text: 'Prepare message for patient', type: 'message_patient', isSelected: false },
+    { id: 'action2', text: 'Prepare SOAP note', type: 'soap_note', isSelected: false },
+    { id: 'action3', text: 'Prepare super spartan note in French', type: 'french_note', isSelected: false },
+  ]);
   
   // Query for AI suggestions
   const { 
@@ -250,7 +290,7 @@ export default function AiAssistantPanel({
                 </CardHeader>
                 <CardContent className="pt-3">
                   <div className="text-sm text-white">
-                    <p>Just to verify this with you beforehand, you are a [Age]-year-old [Gender] experiencing [Description] located in the [Location] that began on [Symptom][Onset].</p>
+                    <p>{'Just to verify this with you beforehand, you are a [Age]-year-old [Gender] experiencing [Description] located in the [Location] that began on [Symptom] [Onset].'}</p>
                     <Button 
                       variant="ghost" 
                       className="text-xs text-blue-400 p-1 h-auto mt-2"
@@ -274,9 +314,9 @@ export default function AiAssistantPanel({
                 </CardHeader>
                 <CardContent className="pt-3">
                   <div className="text-sm text-white">
-                    <p><strong>S:</strong> [Age][Gender] with [Description] at [Location] since [Symptom][Onset]; [Severity][0-10]/10</p>
-                    <p><strong>A:</strong> Suspect [Chief][Complaint]; ddx includes musculoskeletal cause...</p>
-                    <p><strong>P:</strong> In-person eval, imaging if needed, NSAIDs if tolerated...</p>
+                    <p><strong>S:</strong> {'[Age] [Gender] with [Description] at [Location] since [Symptom] [Onset]; [Severity] [0-10]/10'}</p>
+                    <p><strong>A:</strong> {'Suspect [Chief] [Complaint]; ddx includes musculoskeletal cause...'}</p>
+                    <p><strong>P:</strong> {'In-person eval, imaging if needed, NSAIDs if tolerated...'}</p>
                     <Button 
                       variant="ghost" 
                       className="text-xs text-blue-400 p-1 h-auto mt-2"
