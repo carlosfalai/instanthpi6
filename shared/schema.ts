@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, uuid, real } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, uuid, real, numeric } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -520,3 +520,39 @@ export const insertFormResponseSchema = createInsertSchema(formResponses).pick({
 
 export type FormResponse = typeof formResponses.$inferSelect;
 export type InsertFormResponse = z.infer<typeof insertFormResponseSchema>;
+
+// Medication Refill Requests
+export const medicationRefills = pgTable("medication_refills", {
+  id: text("id").primaryKey(), // UUID
+  patientName: text("patient_name").notNull(),
+  dateReceived: timestamp("date_received").notNull(),
+  status: text("status", { enum: ["pending", "approved", "denied", "needs_info"] }).notNull().default("pending"),
+  medicationName: text("medication_name").notNull(),
+  prescriptionNumber: text("prescription_number"),
+  pharmacy: text("pharmacy"),
+  pdfUrl: text("pdf_url").notNull(),
+  emailSource: text("email_source").notNull(),
+  aiProcessed: boolean("ai_processed").default(false),
+  aiConfidence: numeric("ai_confidence").default("0"),
+  processingNotes: text("processing_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertMedicationRefillSchema = createInsertSchema(medicationRefills).pick({
+  id: true,
+  patientName: true,
+  dateReceived: true,
+  status: true,
+  medicationName: true,
+  prescriptionNumber: true,
+  pharmacy: true,
+  pdfUrl: true,
+  emailSource: true,
+  aiProcessed: true,
+  aiConfidence: true,
+  processingNotes: true,
+});
+
+export type MedicationRefill = typeof medicationRefills.$inferSelect;
+export type InsertMedicationRefill = z.infer<typeof insertMedicationRefillSchema>;

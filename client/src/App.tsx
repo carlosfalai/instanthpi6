@@ -14,6 +14,7 @@ import FormViewPage from '@/pages/form-view-page';
 import SchedulerPage from '@/pages/scheduler-page';
 import FormsitePage from '@/pages/formsite-page';
 import PseudonymPage from '@/pages/pseudonym-page';
+import MedicationRefillsPage from '@/pages/medication-refills-page';
 
 function Router() {
   return (
@@ -29,6 +30,7 @@ function Router() {
       <Route path="/scheduler" component={SchedulerPage} />
       <Route path="/formsite" component={FormsitePage} />
       <Route path="/pseudonym" component={PseudonymPage} />
+      <Route path="/medication-refills" component={MedicationRefillsPage} />
       <Route component={NotFound} />
     </Switch>
   );
