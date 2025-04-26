@@ -94,7 +94,7 @@ router.post('/check-email', async (req: Request, res: Response) => {
           const isRefillRequest = await analyzeAttachment(attachment.content);
           
           if (isRefillRequest.isRefill) {
-            // Insert into the database
+            // Insert into the database based on schema structure
             const [newRefill] = await db
               .insert(medicationRefills)
               .values({
@@ -103,14 +103,12 @@ router.post('/check-email', async (req: Request, res: Response) => {
                 dateReceived: new Date(),
                 status: 'pending',
                 medicationName: isRefillRequest.medicationName || 'Unknown Medication',
-                prescriptionNumber: isRefillRequest.prescriptionNumber,
-                pharmacy: isRefillRequest.pharmacy,
+                prescriptionNumber: isRefillRequest.prescriptionNumber || null,
+                pharmacy: isRefillRequest.pharmacy || null,
                 pdfUrl: attachment.url,
                 emailSource: attachment.emailSource,
                 aiProcessed: true,
                 aiConfidence: isRefillRequest.confidence.toString(),
-                createdAt: new Date(),
-                updatedAt: new Date(),
               })
               .returning();
             
