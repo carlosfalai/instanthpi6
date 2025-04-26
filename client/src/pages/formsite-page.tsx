@@ -209,21 +209,23 @@ const FormsitePage: React.FC = () => {
                   : 'bg-[#252525] border border-[#333] hover:border-[#444]'
               }`}
             >
-              <div className="flex justify-between items-center">
-                <h3 className="font-medium text-xl text-blue-400">
-                  {patientId}
-                </h3>
+              <div className="flex flex-col">
+                <div className="flex justify-between items-center">
+                  <h3 className="font-medium text-2xl text-blue-400">
+                    {patientId}
+                  </h3>
+                  
+                  {submission.processed && (
+                    <div className="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-xs font-medium">
+                      Processed
+                    </div>
+                  )}
+                </div>
                 
-                {submission.processed && (
-                  <div className="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-xs font-medium">
-                    Processed
-                  </div>
-                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  Submission ID: {submission.id}
+                </p>
               </div>
-              
-              <p className="text-xs text-gray-500 mt-2">
-                ID: {submission.id}
-              </p>
             </div>
           );
         })}
