@@ -7,10 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, FileText, RefreshCw, Zap, FormInput } from 'lucide-react';
+import { Loader2, Search, FileText, RefreshCw, Zap, FormInput, UserRound } from 'lucide-react';
 import { format } from 'date-fns';
 import formsiteService, { FormSiteSubmission } from '@/services/formsite';
 import { getFieldLabel, formatFieldValue } from '@/services/formsiteFieldMapping';
+import { PseudonymLookup } from '@/components/pseudonym-lookup';
 
 const FormsitePage: React.FC = () => {
   const { toast } = useToast();
@@ -194,34 +195,43 @@ const FormsitePage: React.FC = () => {
 
     return (
       <div className="space-y-3">
-        {submissions.map((submission) => (
-          <div
-            key={submission.id}
-            onClick={() => handleSelectSubmission(submission)}
-            className={`p-3 rounded-md cursor-pointer transition-colors ${
-              selectedSubmission?.id === submission.id 
-                ? 'bg-blue-900/30 border border-blue-700' 
-                : 'bg-[#252525] border border-[#333] hover:border-[#444]'
-            }`}
-          >
-            <div className="flex justify-between items-start mb-1">
-              <h3 className="font-medium">
-                Submission #{submission.reference || submission.id}
-              </h3>
-              {submission.processed && (
-                <div className="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-xs font-medium">
-                  Processed
-                </div>
-              )}
+        {submissions.map((submission) => {
+          // Get the patient ID
+          const patientId = getFormPreview(submission.results);
+          
+          return (
+            <div
+              key={submission.id}
+              onClick={() => handleSelectSubmission(submission)}
+              className={`p-3 rounded-md cursor-pointer transition-colors ${
+                selectedSubmission?.id === submission.id 
+                  ? 'bg-blue-900/30 border border-blue-700' 
+                  : 'bg-[#252525] border border-[#333] hover:border-[#444]'
+              }`}
+            >
+              <div className="flex justify-between items-start mb-1">
+                <p className="text-xs text-gray-400">
+                  {formatDate(submission.date_submitted)}
+                </p>
+                {submission.processed && (
+                  <div className="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-xs font-medium">
+                    Processed
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex items-center">
+                <h3 className="font-medium text-lg text-blue-400">
+                  {patientId}
+                </h3>
+              </div>
+              
+              <p className="text-xs text-gray-500 mt-1">
+                Submission ID: {submission.id}
+              </p>
             </div>
-            <p className="text-xs text-gray-400 mb-1.5">
-              {formatDate(submission.date_submitted)}
-            </p>
-            <p className="text-sm text-gray-300 truncate">
-              {getFormPreview(submission.results)}
-            </p>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
@@ -232,20 +242,9 @@ const FormsitePage: React.FC = () => {
       <div className="mb-6 flex justify-between items-center">
         <div className="flex items-center">
           <FormInput className="h-6 w-6 mr-2 text-blue-500" />
-          <h1 className="text-2xl font-bold">FormSite Submissions</h1>
+          <h1 className="text-2xl font-bold">formsite</h1>
         </div>
         <div className="flex space-x-2">
-          {/* Pseudonym Lookup Button */}
-          <Button 
-            onClick={() => window.location.href = "/pseudonym"}
-            variant="default"
-            size="sm"
-            className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 border-0 shadow-md hover:shadow-lg transition-all duration-200"
-          >
-            <Search className="h-4 w-4 mr-2" />
-            Pseudonym Lookup
-          </Button>
-          
           {/* Refresh Button */}
           <Button 
             onClick={() => refetchSubmissions()}
@@ -262,53 +261,73 @@ const FormsitePage: React.FC = () => {
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Column - Submissions List */}
+        {/* Left Column - Tabs for Submissions and Pseudonym Lookup */}
         <div className="bg-[#1A1A1A] rounded-lg p-4 border border-[#333] h-[calc(100vh-180px)] flex flex-col">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold mb-1">Generated Patient IDs</h2>
-            <p className="text-sm text-gray-400 mb-3">
-              View and process patient information by their generated ID
-            </p>
+          <Tabs defaultValue="submissions" className="flex-grow flex flex-col">
+            <TabsList className="w-full bg-[#252525] mb-4 grid grid-cols-2">
+              <TabsTrigger value="submissions" className="flex items-center gap-2">
+                <FormInput className="h-4 w-4" />
+                Generated Patient IDs
+              </TabsTrigger>
+              <TabsTrigger value="pseudonym" className="flex items-center gap-2">
+                <UserRound className="h-4 w-4" />
+                Pseudonym Lookup
+              </TabsTrigger>
+            </TabsList>
             
-            {/* Search Input */}
-            <div className="relative">
-              <Input
-                placeholder="Search patient IDs..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pr-10 bg-[#252525] border-[#444]"
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-              />
-              <Button 
-                variant="ghost" 
-                size="icon"
-                className="absolute right-0 top-0 h-full"
-                onClick={handleSearch}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          
-          {/* Submissions List */}
-          <ScrollArea className="flex-grow pr-2">
-            {isLoadingSubmissions ? (
-              <div className="flex justify-center items-center h-40">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+            {/* Submissions Tab */}
+            <TabsContent value="submissions" className="flex-grow data-[state=active]:flex flex-col mt-0">
+              <div className="mb-4">
+                <p className="text-sm text-gray-400 mb-3">
+                  View and process patient information by their generated ID
+                </p>
+                
+                {/* Search Input */}
+                <div className="relative">
+                  <Input
+                    placeholder="Search patient IDs..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pr-10 bg-[#252525] border-[#444]"
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  />
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="absolute right-0 top-0 h-full"
+                    onClick={handleSearch}
+                  >
+                    <Search className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
-            ) : submissionsError ? (
-              <div className="py-10 text-center">
-                <p className="text-gray-400 mb-2">Failed to load form submissions</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => refetchSubmissions()}
-                >
-                  Try Again
-                </Button>
-              </div>
-            ) : renderSubmissionsList()}
-          </ScrollArea>
+              
+              {/* Submissions List */}
+              <ScrollArea className="flex-grow pr-2">
+                {isLoadingSubmissions ? (
+                  <div className="flex justify-center items-center h-40">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                  </div>
+                ) : submissionsError ? (
+                  <div className="py-10 text-center">
+                    <p className="text-gray-400 mb-2">Failed to load form submissions</p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => refetchSubmissions()}
+                    >
+                      Try Again
+                    </Button>
+                  </div>
+                ) : renderSubmissionsList()}
+              </ScrollArea>
+            </TabsContent>
+            
+            {/* Pseudonym Lookup Tab */}
+            <TabsContent value="pseudonym" className="flex-grow data-[state=active]:flex flex-col mt-0">
+              <PseudonymLookup />
+            </TabsContent>
+          </Tabs>
         </div>
 
         {/* Right Column - Submission Details */}
