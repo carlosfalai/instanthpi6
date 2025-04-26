@@ -701,6 +701,100 @@ This represents the future of medical practice where technology handles the admi
     estimatedMinutes: schedulerModuleMetadata.estimatedMinutes
   });
   
+  // Gmail Filter Module
+  const gmailFilterModule = await storage.createEducationModule({
+    title: "Setting Up Gmail Filters for InstantHPI Notifications",
+    description: "Learn how to create Gmail filters to automatically organize InstantHPI emails",
+    type: "article",
+    content: `
+# Setting Up Gmail Filters for InstantHPI Notifications
+
+## Introduction
+
+As a physician using InstantHPI, you'll receive important notifications and patient information via email from our system. To stay organized and ensure you never miss critical information, setting up a dedicated filter in Gmail will automatically sort all InstantHPI communications into a dedicated folder.
+
+This guide will walk you through the process of creating a Gmail filter to instantly index and categorize all emails from noreply@instanthpi.ai into a dedicated InstantHPI folder.
+
+## Benefits of Creating a Gmail Filter
+
+- **Improved Organization**: Keep all InstantHPI notifications in one dedicated location
+- **Reduced Inbox Clutter**: Your primary inbox stays focused on other important communications
+- **Instant Access**: Quickly locate all patient-related notifications when needed
+- **Never Miss Important Updates**: All InstantHPI communications are properly categorized and preserved
+
+## Step-by-Step Filter Creation Process
+
+### Step 1: Access Gmail Filter Settings
+
+1. Log in to your Gmail account
+2. Click on the gear icon ⚙️ in the top-right corner of your Gmail interface
+3. Select "See all settings" from the dropdown menu
+4. Navigate to the "Filters and Blocked Addresses" tab
+5. Scroll down and click on "Create a new filter"
+
+### Step 2: Define Filter Criteria
+
+In the filter creation form:
+
+1. In the "From" field, enter: **noreply@instanthpi.ai**
+2. Alternatively, in the "Subject" field, enter: **InstantHPI note for**
+3. Click "Create filter" to proceed to the next step
+
+### Step 3: Specify Filter Actions
+
+After clicking "Create filter," you'll see options for what Gmail should do with matching emails:
+
+1. Check the box next to "Skip the Inbox (Archive it)"
+2. Check the box next to "Apply the label"
+3. Click "Choose label" or "New label" if you haven't created an InstantHPI label yet
+4. If creating a new label:
+   - Enter "InstantHPI" as the label name
+   - Click "Create"
+5. Check the box next to "Never send it to Spam"
+6. Optionally, check "Always mark it as important" if you want these messages to be highlighted
+7. Click "Create filter" to finalize
+
+### Step 4: Apply Filter to Existing Messages (Optional)
+
+If you've already received emails from InstantHPI and want to organize them:
+
+1. Before finalizing your filter in Step 3, check the box that says "Also apply filter to X matching conversations"
+2. This will categorize all existing InstantHPI emails according to your new filter rules
+
+## Accessing Your InstantHPI Messages
+
+After setting up the filter:
+
+1. All new messages from InstantHPI will automatically be labeled and organized
+2. To access them, click on the "InstantHPI" label in the left sidebar of Gmail
+3. You can also search for them using: label:InstantHPI in the Gmail search bar
+
+## Troubleshooting Common Issues
+
+**Issue**: Emails from InstantHPI still appearing in the main inbox
+- **Solution**: Verify that your filter includes both the sender address and subject line criteria
+- **Solution**: Make sure the "Skip the Inbox" option is selected in your filter actions
+
+**Issue**: Not seeing the InstantHPI label in the sidebar
+- **Solution**: Look under the "More" dropdown in your Gmail sidebar
+- **Solution**: You may need to hover over "Labels" in the sidebar and click "Manage labels" to ensure it's visible
+
+**Issue**: Filter not applying to new messages
+- **Solution**: Edit the filter and ensure all criteria are correct
+- **Solution**: Try creating a new filter if the existing one isn't working properly
+
+## Conclusion
+
+By setting up this simple Gmail filter, you'll ensure that all communications from InstantHPI are properly organized and easily accessible. This small investment in organization will save you time and help you stay on top of important patient information.
+
+Remember, all emails from InstantHPI with the subject line "InstantHPI note for" contain important patient information that requires your attention. With this filter in place, you'll have a dedicated location to review these notes efficiently.
+    `,
+    featuresUnlocked: ["Email Management"],
+    prerequisiteModules: null,
+    order: 9,
+    estimatedMinutes: 10
+  });
+  
   // Create some progress for the first user
   await storage.createUserEducationProgress({
     userId: 1,
