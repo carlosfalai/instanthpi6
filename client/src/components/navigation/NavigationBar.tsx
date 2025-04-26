@@ -93,8 +93,8 @@ export default function NavigationBar() {
   
   // Update navItems when user preferences change
   useEffect(() => {
-    if (currentUser?.navPreferences?.navItems) {
-      setNavItems(currentUser.navPreferences.navItems);
+    if (currentUser?.navPreferences && 'navItems' in currentUser.navPreferences && currentUser.navPreferences.navItems) {
+      setNavItems(currentUser.navPreferences.navItems as NavItem[]);
     }
   }, [currentUser]);
   
@@ -122,9 +122,10 @@ export default function NavigationBar() {
     <Link 
       key={item.id} 
       href={item.path}
-      className={`relative flex items-center p-2 px-3 text-sm rounded-md hover:bg-[#262626] transition-colors ${
-        location === item.path ? 'bg-[#262626] text-blue-400' : 'text-gray-300'
-      }`}
+      className={`relative flex items-center p-2 px-3 text-sm rounded-md hover:bg-[#262626] transition-colors
+        ${location === item.path ? 'bg-[#262626] text-blue-400' : 'text-gray-300'}
+        min-w-fit whitespace-nowrap mx-1
+      `}
     >
       <div className="relative mr-2">
         {item.icon}
@@ -132,17 +133,19 @@ export default function NavigationBar() {
           <NotificationBadge count={item.notificationCount} />
         )}
       </div>
-      {item.label}
+      <span className="truncate">{item.label}</span>
     </Link>
   );
   
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
       {/* Primary Nav Row */}
-      <div className="flex items-center space-x-1 px-1 mb-1">
-        {primaryNavItems.map(renderNavItem)}
+      <div className="flex items-center px-1 mb-2 overflow-x-auto hide-scrollbar py-2">
+        <div className="flex items-center space-x-2">
+          {primaryNavItems.map(renderNavItem)}
+        </div>
         
-        <div className="ml-auto flex items-center">
+        <div className="ml-auto flex items-center pl-4">
           <div className="w-8 h-8 rounded-full bg-[#262626] flex items-center justify-center">
             <User className="h-4 w-4 text-gray-300" />
           </div>
@@ -150,8 +153,10 @@ export default function NavigationBar() {
       </div>
       
       {/* Secondary Nav Row */}
-      <div className="flex items-center space-x-1 px-1">
-        {secondaryNavItems.map(renderNavItem)}
+      <div className="flex items-center px-1 overflow-x-auto hide-scrollbar py-2">
+        <div className="flex items-center space-x-2 w-full">
+          {secondaryNavItems.map(renderNavItem)}
+        </div>
       </div>
     </div>
   );
