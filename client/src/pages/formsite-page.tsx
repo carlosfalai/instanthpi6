@@ -223,7 +223,7 @@ const FormsitePage: React.FC = () => {
                 </div>
                 
                 <p className="text-xs text-gray-500 mt-1">
-                  Submission ID: {submission.id}
+                  {formatDate(submission.date_submitted)} • ID: {submission.id.substring(0, 6)}...
                 </p>
               </div>
             </div>

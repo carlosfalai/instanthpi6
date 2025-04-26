@@ -57,32 +57,6 @@ export default function SettingsPage() {
     queryKey: ['/api/ai/settings'],
   });
   
-  // Check if we have the functional medicine setting
-  useEffect(() => {
-    const functionalMedicineSetting = aiSettings.find(s => s.name === "functionalMedicine");
-    
-    // If the setting doesn't exist in the list, add it
-    if (!functionalMedicineSetting && !isLoading && aiSettings.length > 0) {
-      // Calculate the next order value for application category
-      const maxOrder = aiSettings.reduce(
-        (max, setting) => (setting.category === 'application' && setting.order > max ? setting.order : max),
-        0
-      );
-      
-      // Add the functional medicine setting
-      addPromptMutation.mutate({
-        name: "functionalMedicine",
-        category: "application",
-        enabled: false,
-        promptText: "When enabled, include functional medicine laboratory tests and root-cause analysis in patient evaluations.",
-        order: maxOrder + 1,
-      });
-    } else if (functionalMedicineSetting) {
-      // Update our local state with the current value
-      setFunctionalMedicineEnabled(functionalMedicineSetting.enabled);
-    }
-  }, [aiSettings, isLoading, addPromptMutation, setFunctionalMedicineEnabled]);
-  
   // Update settings mutation
   const updateSettingMutation = useMutation({
     mutationFn: async (setting: Partial<AiSetting>) => {
