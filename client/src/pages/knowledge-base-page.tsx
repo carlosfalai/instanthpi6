@@ -246,10 +246,113 @@ const diagnosisList: Diagnosis[] = [
       { id: '34-10', name: 'SOAP note preparation', category: 'examination', enabled: true },
     ]
   },
-  { id: '35', name: 'Skin Disorders (Eczema, Psoriasis)', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { 
+    id: '35', 
+    name: 'Eczema (Atopic Dermatitis)', 
+    category: 'chronic', 
+    standardProtocol: '• Identify and avoid triggers/allergens\n• Daily moisturizing with thick emollient cream (ceramide-containing preferred)\n• Topical corticosteroids for flares: moderate potency (triamcinolone 0.1%) for body, low potency (hydrocortisone 1-2.5%) for face/flexural areas\n• Topical calcineurin inhibitors (tacrolimus, pimecrolimus) for face, eyelids, skin folds\n• Antihistamines for pruritus: cetirizine 10mg daily or hydroxyzine 25mg at bedtime\n• Wet wrap therapy for severe flares\n• Consider bleach baths (1/2 cup regular bleach in full bathtub) twice weekly for recurrent infections\n• Referral to dermatology if poor response to treatment or severe disease\n\n• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you\n\nI will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks', 
+    standardProtocolEnabled: false, 
+    treatments: [
+      { id: '35-1', name: 'Trigger identification and avoidance', category: 'lifestyle', enabled: true },
+      { id: '35-2', name: 'Daily emollient moisturizers', category: 'lifestyle', enabled: true },
+      { id: '35-3', name: 'Topical corticosteroids', category: 'medication', enabled: true },
+      { id: '35-4', name: 'Topical calcineurin inhibitors', category: 'medication', enabled: false },
+      { id: '35-5', name: 'Oral antihistamines', category: 'medication', enabled: true },
+      { id: '35-6', name: 'Wet wrap therapy instructions', category: 'lifestyle', enabled: false },
+      { id: '35-7', name: 'Bleach baths for infection prevention', category: 'lifestyle', enabled: false },
+      { id: '35-8', name: 'Dermatology referral if severe', category: 'referral', enabled: false },
+    ]
+  },
+  { 
+    id: '43', 
+    name: 'Psoriasis', 
+    category: 'chronic', 
+    standardProtocol: '• Topical therapy: corticosteroids (clobetasol, betamethasone) and vitamin D analogs (calcipotriene)\n• For scalp involvement: medicated shampoos (tar, salicylic acid) and high-potency topical steroids in solution form\n• For limited plaque psoriasis: combination calcipotriene/betamethasone dipropionate ointment daily\n• Regular sun exposure or narrow-band UVB phototherapy consideration\n• Avoid known triggers: stress, skin injury, certain medications\n• Assessment for psoriatic arthritis symptoms\n• Screen for cardiovascular risk factors and metabolic syndrome\n• Dermatology referral for extensive disease or consideration of systemic therapy\n\n• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you\n\nI will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks', 
+    standardProtocolEnabled: false, 
+    treatments: [
+      { id: '43-1', name: 'Topical corticosteroids', category: 'medication', enabled: true },
+      { id: '43-2', name: 'Vitamin D analogs (calcipotriene)', category: 'medication', enabled: true },
+      { id: '43-3', name: 'Medicated shampoos for scalp involvement', category: 'medication', enabled: true },
+      { id: '43-4', name: 'Combination calcipotriene/betamethasone', category: 'medication', enabled: false },
+      { id: '43-5', name: 'Phototherapy consideration', category: 'lifestyle', enabled: false },
+      { id: '43-6', name: 'Trigger avoidance counseling', category: 'lifestyle', enabled: true },
+      { id: '43-7', name: 'Psoriatic arthritis screening', category: 'examination', enabled: true },
+      { id: '43-8', name: 'Cardiovascular risk assessment', category: 'examination', enabled: true },
+      { id: '43-9', name: 'Dermatology referral if needed', category: 'referral', enabled: false },
+    ]
+  },
   { id: '36', name: 'Suspected ADHD in Adults (Diagnostic Evaluation Phase)', category: 'mental', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '37', name: 'Upper Respiratory Infection (Cold, Sinusitis)', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '38', name: 'Urinary Tract Infection (UTI)', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { 
+    id: '39', 
+    name: 'Adjustment Disorder', 
+    category: 'mental', 
+    standardProtocol: '• PHQ-9 and GAD-7 screening tools to assess depression and anxiety symptoms\n• Psychotherapy referral (cognitive behavioral therapy preferred)\n• Consider short-term anxiolytic therapy if significant anxiety present\n• Provide psychoeducation about stress management techniques\n• Sleep hygiene counseling if sleep disturbances are present\n• Regular follow-up appointments to monitor symptom progression\n\n• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you\n\nI will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks', 
+    standardProtocolEnabled: false, 
+    treatments: [
+      { id: '39-1', name: 'Mental health assessment (PHQ-9, GAD-7)', category: 'examination', enabled: true },
+      { id: '39-2', name: 'Psychotherapy referral (CBT)', category: 'referral', enabled: true },
+      { id: '39-3', name: 'Short-term anxiolytic therapy', category: 'medication', enabled: false },
+      { id: '39-4', name: 'Stress management techniques', category: 'lifestyle', enabled: true },
+      { id: '39-5', name: 'Sleep hygiene counseling', category: 'lifestyle', enabled: true },
+      { id: '39-6', name: 'Regular follow-up assessment', category: 'followup', enabled: true },
+    ]
+  },
+  { 
+    id: '40', 
+    name: 'Panic Attacks/Panic Disorder', 
+    category: 'mental', 
+    standardProtocol: '• Rule out cardiac, pulmonary, thyroid, and other medical causes\n• EKG, basic metabolic panel, TSH/free T4 if first presentation\n• Start SSRI (e.g., sertraline 25mg daily for 1 week, then 50mg daily)\n• Consider benzodiazepines for acute symptoms (short term only)\n• Breathing exercises and relaxation techniques\n• Cognitive behavioral therapy referral\n• Regular follow-up to assess medication efficacy and side effects\n\n• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you\n\nI will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks', 
+    standardProtocolEnabled: false, 
+    treatments: [
+      { id: '40-1', name: 'Medical cause exclusion workup', category: 'examination', enabled: true },
+      { id: '40-2', name: 'EKG', category: 'testing', enabled: true },
+      { id: '40-3', name: 'Basic metabolic panel', category: 'testing', enabled: true },
+      { id: '40-4', name: 'Thyroid function tests', category: 'testing', enabled: true },
+      { id: '40-5', name: 'SSRI therapy (sertraline, escitalopram)', category: 'medication', enabled: true },
+      { id: '40-6', name: 'Short-term benzodiazepine therapy', category: 'medication', enabled: false },
+      { id: '40-7', name: 'Breathing/relaxation techniques', category: 'lifestyle', enabled: true },
+      { id: '40-8', name: 'CBT referral', category: 'referral', enabled: true },
+      { id: '40-9', name: 'Biweekly follow-up initially', category: 'followup', enabled: true },
+    ]
+  },
+  { 
+    id: '41', 
+    name: 'Bipolar Disorder', 
+    category: 'mental', 
+    standardProtocol: '• Comprehensive psychiatric evaluation\n• Mood stabilizer (lithium, valproate, or lamotrigine based on predominant symptoms)\n• Atypical antipsychotic if mania present\n• Regular monitoring of mood, sleep patterns, and medication adherence\n• Thyroid and kidney function monitoring if on lithium\n• Psychiatry referral for medication management\n• Psychotherapy referral (focused on illness management)\n• Sleep hygiene education\n• Regular blood work to monitor medication levels and side effects\n\n• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you\n\nI will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks', 
+    standardProtocolEnabled: false, 
+    treatments: [
+      { id: '41-1', name: 'Comprehensive psychiatric evaluation', category: 'examination', enabled: true },
+      { id: '41-2', name: 'Mood stabilizer therapy', category: 'medication', enabled: true },
+      { id: '41-3', name: 'Atypical antipsychotic if needed', category: 'medication', enabled: false },
+      { id: '41-4', name: 'Thyroid and kidney function monitoring', category: 'testing', enabled: true },
+      { id: '41-5', name: 'Psychiatry referral', category: 'referral', enabled: true },
+      { id: '41-6', name: 'Psychotherapy referral', category: 'referral', enabled: true },
+      { id: '41-7', name: 'Sleep hygiene education', category: 'lifestyle', enabled: true },
+      { id: '41-8', name: 'Regular blood work monitoring', category: 'testing', enabled: true },
+      { id: '41-9', name: 'Monthly follow-up initially', category: 'followup', enabled: true },
+    ]
+  },
+  { 
+    id: '42', 
+    name: 'Shift Work Sleep Disorder', 
+    category: 'mental', 
+    standardProtocol: '• Sleep diary for 2 weeks\n• Sleep hygiene counseling specific to shift workers\n• Melatonin 1-3mg 30 minutes before bedtime\n• Consider modafinil 200mg daily for excessive daytime sleepiness\n• Light therapy: bright light exposure during work hours, light avoidance before sleep\n• Blackout curtains and white noise machine recommendations\n• Regular sleep/wake schedule even on days off\n• Caffeine management: avoid 6 hours before planned sleep time\n\n• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you\n\nI will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks', 
+    standardProtocolEnabled: false, 
+    treatments: [
+      { id: '42-1', name: 'Sleep diary monitoring', category: 'examination', enabled: true },
+      { id: '42-2', name: 'Sleep hygiene counseling', category: 'lifestyle', enabled: true },
+      { id: '42-3', name: 'Melatonin supplement', category: 'medication', enabled: true },
+      { id: '42-4', name: 'Modafinil for excessive sleepiness', category: 'medication', enabled: false },
+      { id: '42-5', name: 'Light therapy recommendations', category: 'lifestyle', enabled: true },
+      { id: '42-6', name: 'Environmental sleep optimization', category: 'lifestyle', enabled: true },
+      { id: '42-7', name: 'Regular sleep schedule counseling', category: 'lifestyle', enabled: true },
+      { id: '42-8', name: 'Caffeine management', category: 'lifestyle', enabled: true },
+      { id: '42-9', name: 'Monthly follow-up', category: 'followup', enabled: true },
+    ]
+  },
 ];
 
 export default function KnowledgeBasePage() {
@@ -262,13 +365,16 @@ export default function KnowledgeBasePage() {
   const [tempProtocol, setTempProtocol] = useState('');
   
   // Get saved diagnoses from server or use local mock data
-  const { data: savedDiagnoses, isLoading } = useQuery<Diagnosis[]>({
+  const { data: savedDiagnoses, isLoading, isError } = useQuery<Diagnosis[]>({
     queryKey: ['/api/knowledge-base/diagnoses'],
-    // Falling back to local data if API fails or not implemented yet
-    onError: () => {
+  });
+  
+  // Log error if the API fails
+  useEffect(() => {
+    if (isError) {
       console.log('Using local diagnosis data');
     }
-  });
+  }, [isError]);
 
   // Mutation for saving diagnosis changes
   const saveDiagnosisMutation = useMutation({
@@ -299,7 +405,7 @@ export default function KnowledgeBasePage() {
 
   // Use server data if available, otherwise use local data
   useEffect(() => {
-    if (savedDiagnoses) {
+    if (savedDiagnoses && Array.isArray(savedDiagnoses)) {
       setEditedDiagnoses(savedDiagnoses);
     }
   }, [savedDiagnoses]);
