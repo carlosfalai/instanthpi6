@@ -21,12 +21,761 @@ import {
   ArrowRight, 
   FileText,
   Clipboard,
-  Building
+  Building,
+  Loader2
 } from "lucide-react";
 import BaseLayout from "@/components/layout/BaseLayout";
-import SignaturePad from "@/components/doctor/SignaturePad";
-import SignaturePinModal from "@/components/doctor/SignaturePinModal";
-import DocumentTemplateEditor, { DocumentTemplate } from "@/components/doctor/DocumentTemplateEditor";
+
+// Internal components to avoid import errors
+const SignaturePad = ({ onComplete }: { onComplete: (signatureDataUrl: string) => void }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [hasContent, setHasContent] = useState(false);
+  const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null);
+  const [lastX, setLastX] = useState(0);
+  const [lastY, setLastY] = useState(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Set canvas size to match container width with a fixed height
+    canvas.width = canvas.offsetWidth;
+    canvas.height = 200;
+
+    const context = canvas.getContext('2d');
+    if (context) {
+      // Set up the context
+      context.lineJoin = 'round';
+      context.lineCap = 'round';
+      context.lineWidth = 2.5;
+      context.strokeStyle = '#FFFFFF';
+      setCtx(context);
+    }
+
+    // Handle window resize
+    const handleResize = () => {
+      if (!canvas) return;
+      const prevImg = canvas.toDataURL();
+      canvas.width = canvas.offsetWidth;
+      
+      if (context) {
+        context.lineJoin = 'round';
+        context.lineCap = 'round';
+        context.lineWidth = 2.5;
+        context.strokeStyle = '#FFFFFF';
+        
+        // Redraw the previous content
+        if (hasContent) {
+          const img = new Image();
+          img.onload = () => {
+            context.drawImage(img, 0, 0, canvas.width, canvas.height);
+          };
+          img.src = prevImg;
+        }
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [hasContent]);
+
+  const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!ctx) return;
+    
+    setIsDrawing(true);
+    
+    // Get the position
+    let x, y;
+    if ('touches' in e) {
+      // Touch event
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      // Mouse event
+      x = e.nativeEvent.offsetX;
+      y = e.nativeEvent.offsetY;
+    }
+    
+    setLastX(x);
+    setLastY(y);
+  };
+
+  const draw = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!isDrawing || !ctx) return;
+    
+    // Get the position
+    let x, y;
+    if ('touches' in e) {
+      // Touch event
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      e.preventDefault(); // Prevent scrolling when drawing
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      // Mouse event
+      x = e.nativeEvent.offsetX;
+      y = e.nativeEvent.offsetY;
+    }
+    
+    // Drawing logic
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    
+    setLastX(x);
+    setLastY(y);
+    setHasContent(true);
+  };
+
+  const endDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearCanvas = () => {
+    if (!ctx || !canvasRef.current) return;
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    setHasContent(false);
+  };
+
+  const completeSignature = () => {
+    if (!canvasRef.current || !hasContent) return;
+    
+    // Get the signature as a data URL
+    const signatureDataUrl = canvasRef.current.toDataURL('image/png');
+    onComplete(signatureDataUrl);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div 
+        className="border-2 border-gray-700 rounded-md overflow-hidden bg-[#262626] touch-none"
+      >
+        <canvas
+          ref={canvasRef}
+          className="w-full cursor-crosshair"
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={endDrawing}
+          onMouseOut={endDrawing}
+          onTouchStart={startDrawing}
+          onTouchMove={draw}
+          onTouchEnd={endDrawing}
+        />
+      </div>
+      
+      <div className="flex justify-between">
+        <Button 
+          variant="outline" 
+          onClick={clearCanvas}
+          className="flex items-center"
+          type="button"
+        >
+          <ArrowRight className="mr-2 h-4 w-4" />
+          Clear
+        </Button>
+        
+        <div className="space-x-2">
+          <Button 
+            variant="outline" 
+            onClick={() => onComplete('')}
+            className="flex items-center"
+            type="button"
+          >
+            <AlertCircle className="mr-2 h-4 w-4" />
+            Cancel
+          </Button>
+          
+          <Button 
+            onClick={completeSignature}
+            disabled={!hasContent}
+            className="bg-blue-600 hover:bg-blue-700 flex items-center"
+            type="button"
+          >
+            <Check className="mr-2 h-4 w-4" />
+            Save
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const SignaturePinModal = ({ 
+  isOpen, 
+  isVerifying, 
+  onClose, 
+  onCreatePin, 
+  onVerifyPin, 
+  isProcessing 
+}: { 
+  isOpen: boolean;
+  isVerifying: boolean;
+  onClose: () => void;
+  onCreatePin: (pin: string) => void;
+  onVerifyPin: (pin: string) => void;
+  isProcessing: boolean;
+}) => {
+  const [pin, setPin] = useState<string>("");
+  const [confirmPin, setConfirmPin] = useState<string>("");
+  const [error, setError] = useState<string>("");
+
+  // Reset error on open
+  useEffect(() => {
+    if (isOpen) {
+      setError("");
+      setPin("");
+      setConfirmPin("");
+    }
+  }, [isOpen]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (isVerifying) {
+      // PIN verification mode
+      if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+        setError("PIN must be 4 digits");
+        return;
+      }
+      
+      onVerifyPin(pin);
+    } else {
+      // PIN creation mode
+      if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+        setError("PIN must be 4 digits");
+        return;
+      }
+      
+      if (pin !== confirmPin) {
+        setError("PINs do not match");
+        return;
+      }
+      
+      onCreatePin(pin);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
+      <div className="bg-[#1e1e1e] border border-gray-800 rounded-md w-full max-w-md p-6">
+        <h2 className="text-xl font-semibold mb-2">
+          {isVerifying ? "Verify Signature PIN" : "Create Signature PIN"}
+        </h2>
+        <p className="text-gray-400 mb-4">
+          {isVerifying
+            ? "Enter your 4-digit PIN to verify your signature"
+            : "Create a secure 4-digit PIN to protect your signature"}
+        </p>
+        
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="pin" className="text-sm font-medium text-gray-300">
+                {isVerifying ? "Your PIN" : "Create PIN"}
+              </Label>
+              <Input
+                id="pin"
+                type="password"
+                inputMode="numeric"
+                maxLength={4}
+                pattern="[0-9]*"
+                autoComplete="off"
+                value={pin}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (/^\d*$/.test(val) && val.length <= 4) {
+                    setPin(val);
+                    setError(""); 
+                  }
+                }}
+                className="bg-[#262626] border-gray-700"
+                placeholder="Enter 4-digit PIN"
+              />
+            </div>
+            
+            {!isVerifying && (
+              <div className="space-y-2">
+                <Label htmlFor="confirmPin" className="text-sm font-medium text-gray-300">
+                  Confirm PIN
+                </Label>
+                <Input
+                  id="confirmPin"
+                  type="password"
+                  inputMode="numeric"
+                  maxLength={4}
+                  pattern="[0-9]*"
+                  autoComplete="off"
+                  value={confirmPin}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (/^\d*$/.test(val) && val.length <= 4) {
+                      setConfirmPin(val);
+                      setError("");
+                    }
+                  }}
+                  className="bg-[#262626] border-gray-700"
+                  placeholder="Confirm 4-digit PIN"
+                />
+              </div>
+            )}
+            
+            {error && (
+              <div className="text-red-500 text-sm font-medium">{error}</div>
+            )}
+          </div>
+          
+          <div className="flex justify-end space-x-3 mt-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isProcessing}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700"
+              disabled={
+                isProcessing ||
+                pin.length !== 4 ||
+                (!isVerifying && confirmPin.length !== 4)
+              }
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : isVerifying ? (
+                "Verify PIN"
+              ) : (
+                "Create PIN"
+              )}
+            </Button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+interface DocumentTemplate {
+  id?: string;
+  name: string;
+  logoUrl?: string;
+  clinicName: string;
+  clinicAddress: string;
+  clinicPhone: string;
+  clinicFax: string;
+  clinicEmail: string;
+  footerText: string;
+  headerColor: string;
+  footerColor: string;
+}
+
+const DocumentTemplateEditor = ({ 
+  templateId, 
+  initialData, 
+  onSave 
+}: {
+  templateId?: string;
+  initialData?: DocumentTemplate;
+  onSave: (template: DocumentTemplate) => void;
+}) => {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewMode, setPreviewMode] = useState(false);
+  const [template, setTemplate] = useState<DocumentTemplate>(
+    initialData || {
+      name: "Default Template",
+      clinicName: "",
+      clinicAddress: "",
+      clinicPhone: "",
+      clinicFax: "",
+      clinicEmail: "",
+      footerText: "Confidential medical document. For patient use only.",
+      headerColor: "#0f766e", // Teal color
+      footerColor: "#0f766e", // Teal color
+    }
+  );
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | undefined>(
+    initialData?.logoUrl
+  );
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setTemplate({
+      ...template,
+      [name]: value,
+    });
+  };
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      
+      // Check file size (limit to 2MB)
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          variant: "destructive",
+          title: "File too large",
+          description: "Logo image must be less than 2MB",
+        });
+        return;
+      }
+      
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          variant: "destructive",
+          title: "Invalid file type",
+          description: "Please upload an image file",
+        });
+        return;
+      }
+      
+      setLogoFile(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          setLogoPreview(e.target.result as string);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(undefined);
+  };
+
+  const handleSaveTemplate = async () => {
+    try {
+      // In a real app, you would upload the logo file to a server
+      // and get back a URL to store in the template
+      const templateToSave: DocumentTemplate = {
+        ...template,
+        logoUrl: logoPreview,
+      };
+      
+      // Call the save function
+      onSave(templateToSave);
+      
+      toast({
+        title: "Template saved",
+        description: "Your document template has been saved successfully",
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error saving template",
+        description: "There was an error saving your template",
+      });
+    }
+  };
+
+  const renderPreview = () => {
+    return (
+      <div className="border border-gray-700 bg-white text-black rounded-md p-6 overflow-hidden">
+        {/* Header */}
+        <div
+          className="p-4 rounded-t-md flex items-center justify-between"
+          style={{ backgroundColor: template.headerColor }}
+        >
+          <div className="flex items-center">
+            {logoPreview && (
+              <img
+                src={logoPreview}
+                alt="Clinic Logo"
+                className="h-16 max-w-[200px] object-contain mr-4"
+              />
+            )}
+            <div className="text-white">
+              <h2 className="text-xl font-bold">{template.clinicName || "Clinic Name"}</h2>
+              <p className="text-sm">{template.clinicAddress || "Clinic Address"}</p>
+            </div>
+          </div>
+          <div className="text-white text-right text-sm">
+            <p>Phone: {template.clinicPhone || "Phone Number"}</p>
+            <p>Fax: {template.clinicFax || "Fax Number"}</p>
+            <p>{template.clinicEmail || "Email"}</p>
+          </div>
+        </div>
+        
+        {/* Content Area (Sample) */}
+        <div className="p-6 min-h-[300px] border-l border-r border-gray-300">
+          <div className="mb-6">
+            <div className="flex justify-between mb-4">
+              <div>
+                <h3 className="font-bold">Patient Information:</h3>
+                <p>Name: John Doe</p>
+                <p>DOB: 01/01/1980</p>
+                <p>Phone: (555) 123-4567</p>
+              </div>
+              <div className="text-right">
+                <h3 className="font-bold">Prescription:</h3>
+                <p>Date: 04/27/2025</p>
+                <p>Rx #: 12345678</p>
+              </div>
+            </div>
+            
+            <div className="border-t border-gray-300 pt-4 mt-4">
+              <h3 className="font-bold mb-2">Medication:</h3>
+              <p>Medication Name: <span className="font-semibold">Amoxicillin 500mg</span></p>
+              <p>Sig: 1 capsule by mouth three times daily for 10 days</p>
+              <p>Quantity: 30</p>
+              <p>Refills: 0</p>
+            </div>
+            
+            <div className="border-t border-gray-300 pt-4 mt-4">
+              <h3 className="font-bold mb-2">Prescriber:</h3>
+              <p>Dr. Jane Smith, MD</p>
+              <p>License #: ABC12345</p>
+              <div className="mt-3">
+                <p className="font-semibold mb-1">Signature:</p>
+                <div className="border border-gray-300 h-16 bg-gray-50 flex items-center justify-center text-gray-400 italic">
+                  [Digital Signature]
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Footer */}
+        <div
+          className="p-3 text-center text-white text-sm rounded-b-md"
+          style={{ backgroundColor: template.footerColor }}
+        >
+          {template.footerText || "Confidential medical document"}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex justify-between">
+        <Button
+          variant="outline"
+          className="flex items-center"
+          onClick={() => setPreviewMode(!previewMode)}
+        >
+          <Eye className="mr-2 h-4 w-4" />
+          {previewMode ? "Edit Template" : "Preview Template"}
+        </Button>
+        
+        <Button
+          className="bg-blue-600 hover:bg-blue-700 flex items-center"
+          onClick={handleSaveTemplate}
+        >
+          <Save className="mr-2 h-4 w-4" />
+          Save Template
+        </Button>
+      </div>
+      
+      {previewMode ? (
+        renderPreview()
+      ) : (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">Template Name</Label>
+              <Input
+                id="name"
+                name="name"
+                value={template.name}
+                onChange={handleInputChange}
+                className="bg-[#262626] border-gray-700"
+                placeholder="Template Name"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Clinic Logo</Label>
+              <div className="flex items-center space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex items-center"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload Logo
+                </Button>
+                {logoPreview && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleRemoveLogo}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="image/*"
+                  onChange={handleLogoChange}
+                />
+              </div>
+              {logoPreview && (
+                <div className="mt-2 border border-gray-700 p-2 rounded-md bg-[#262626]">
+                  <img
+                    src={logoPreview}
+                    alt="Logo Preview"
+                    className="h-20 max-w-full object-contain"
+                  />
+                </div>
+              )}
+              {!logoPreview && (
+                <div className="mt-2 border border-dashed border-gray-700 p-4 rounded-md bg-[#262626] flex flex-col items-center justify-center">
+                  <Image className="h-8 w-8 text-gray-500 mb-2" />
+                  <p className="text-gray-500 text-sm text-center">
+                    No logo uploaded
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="clinicName">Clinic Name</Label>
+            <Input
+              id="clinicName"
+              name="clinicName"
+              value={template.clinicName}
+              onChange={handleInputChange}
+              className="bg-[#262626] border-gray-700"
+              placeholder="Enter your clinic name"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="clinicAddress">Clinic Address</Label>
+            <Textarea
+              id="clinicAddress"
+              name="clinicAddress"
+              value={template.clinicAddress}
+              onChange={handleInputChange}
+              className="bg-[#262626] border-gray-700"
+              placeholder="Enter your clinic address"
+              rows={2}
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="clinicPhone">Phone Number</Label>
+              <Input
+                id="clinicPhone"
+                name="clinicPhone"
+                value={template.clinicPhone}
+                onChange={handleInputChange}
+                className="bg-[#262626] border-gray-700"
+                placeholder="Phone number"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="clinicFax">Fax Number</Label>
+              <Input
+                id="clinicFax"
+                name="clinicFax"
+                value={template.clinicFax}
+                onChange={handleInputChange}
+                className="bg-[#262626] border-gray-700"
+                placeholder="Fax number"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="clinicEmail">Email</Label>
+              <Input
+                id="clinicEmail"
+                name="clinicEmail"
+                value={template.clinicEmail}
+                onChange={handleInputChange}
+                className="bg-[#262626] border-gray-700"
+                placeholder="Email address"
+              />
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="footerText">Footer Text</Label>
+            <Input
+              id="footerText"
+              name="footerText"
+              value={template.footerText}
+              onChange={handleInputChange}
+              className="bg-[#262626] border-gray-700"
+              placeholder="Footer text"
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+              <Label htmlFor="headerColor">Header Color</Label>
+              <div className="flex">
+                <Input
+                  id="headerColor"
+                  name="headerColor"
+                  type="color"
+                  value={template.headerColor}
+                  onChange={handleInputChange}
+                  className="w-12 h-10 p-1 bg-[#262626] border-gray-700"
+                />
+                <Input
+                  value={template.headerColor}
+                  onChange={handleInputChange}
+                  name="headerColor"
+                  className="ml-2 bg-[#262626] border-gray-700"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="footerColor">Footer Color</Label>
+              <div className="flex">
+                <Input
+                  id="footerColor"
+                  name="footerColor"
+                  type="color"
+                  value={template.footerColor}
+                  onChange={handleInputChange}
+                  className="w-12 h-10 p-1 bg-[#262626] border-gray-700"
+                />
+                <Input
+                  value={template.footerColor}
+                  onChange={handleInputChange}
+                  name="footerColor"
+                  className="ml-2 bg-[#262626] border-gray-700"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface DoctorSettings {
   id: number;
@@ -39,6 +788,10 @@ interface DoctorSettings {
   hasSignature: boolean;
   documentTemplates?: DocumentTemplate[];
 }
+
+import { useRef } from "react";
+import { Upload, Trash2, Eye, Image, Check } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function DoctorSettingsPage() {
   const { toast } = useToast();
@@ -180,6 +933,19 @@ export default function DoctorSettingsPage() {
     }
     return doctorSettings.documentTemplates?.find(t => t.id === activeTemplate);
   };
+
+  if (loading) {
+    return (
+      <BaseLayout>
+        <div className="container mx-auto py-6 flex items-center justify-center min-h-[50vh]">
+          <div className="text-center">
+            <Loader2 className="h-10 w-10 animate-spin text-blue-500 mx-auto mb-4" />
+            <p className="text-gray-400">Loading doctor settings...</p>
+          </div>
+        </div>
+      </BaseLayout>
+    );
+  }
 
   return (
     <BaseLayout>
@@ -446,7 +1212,7 @@ export default function DoctorSettingsPage() {
                           key={template.id}
                           variant={activeTemplate === template.id ? "default" : "outline"}
                           className={`justify-start h-auto py-3 ${activeTemplate === template.id ? 'bg-blue-600 hover:bg-blue-700' : ''}`}
-                          onClick={() => setActiveTemplate(template.id)}
+                          onClick={() => setActiveTemplate(template.id || '')}
                         >
                           <Building className="mr-2 h-4 w-4" />
                           {template.name}
@@ -481,4 +1247,5 @@ export default function DoctorSettingsPage() {
       )}
     </BaseLayout>
   );
+}
 }
