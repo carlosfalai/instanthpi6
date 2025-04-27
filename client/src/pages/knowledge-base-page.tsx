@@ -696,324 +696,320 @@ export default function KnowledgeBasePage() {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-7">
-            <Card className="bg-[#1e1e1e] border-gray-800">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <BookOpen className="mr-2 h-5 w-5" />
-                  Medical Conditions
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Select a condition to customize treatment preferences and protocols
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-                  <TabsList className="bg-[#262626] mb-6">
-                    <TabsTrigger value="all">All</TabsTrigger>
-                    <TabsTrigger value="urgent">Urgent Care</TabsTrigger>
-                    <TabsTrigger value="msk">MSK</TabsTrigger>
-                    <TabsTrigger value="preventative">Preventative</TabsTrigger>
-                    <TabsTrigger value="mental">Mental Health</TabsTrigger>
-                    <TabsTrigger value="std">STD</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-                
-                <div className="space-y-6 max-h-[650px] overflow-y-auto pr-2">
-                  {/* Urgent Care Section */}
-                  <div className="space-y-3">
-                    <h3 className="text-md font-medium text-white">Urgent Care</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {filteredDiagnoses
-                        .filter(d => getMedicalGroup(d.category) === 'urgent' || (activeTab === 'all' && d.category === 'acute'))
-                        .map((diagnosis) => (
-                        <Button
-                          key={diagnosis.id}
-                          variant="outline"
-                          className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                          onClick={() => handleDiagnosisClick(diagnosis.id)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="text-sm font-medium">{diagnosis.name}</div>
-                            {diagnosis.standardProtocolEnabled && (
-                              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                            )}
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* MSK Section */}
-                  <div className="space-y-3">
-                    <h3 className="text-md font-medium text-white">MSK</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {filteredDiagnoses
-                        .filter(d => getMedicalGroup(d.category) === 'msk' || (activeTab === 'all' && d.category === 'common'))
-                        .map((diagnosis) => (
-                        <Button
-                          key={diagnosis.id}
-                          variant="outline"
-                          className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                          onClick={() => handleDiagnosisClick(diagnosis.id)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="text-sm font-medium">{diagnosis.name}</div>
-                            {diagnosis.standardProtocolEnabled && (
-                              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                            )}
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Preventative Section */}
-                  <div className="space-y-3">
-                    <h3 className="text-md font-medium text-white">Preventative</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {filteredDiagnoses
-                        .filter(d => getMedicalGroup(d.category) === 'preventative' || (activeTab === 'all' && d.category === 'chronic'))
-                        .map((diagnosis) => (
-                        <Button
-                          key={diagnosis.id}
-                          variant="outline"
-                          className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                          onClick={() => handleDiagnosisClick(diagnosis.id)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="text-sm font-medium">{diagnosis.name}</div>
-                            {diagnosis.standardProtocolEnabled && (
-                              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                            )}
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* Mental Health Section */}
-                  <div className="space-y-3">
-                    <h3 className="text-md font-medium text-white">Mental Health</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {filteredDiagnoses
-                        .filter(d => getMedicalGroup(d.category) === 'mental' || (activeTab === 'all' && d.category === 'mental'))
-                        .map((diagnosis) => (
-                        <Button
-                          key={diagnosis.id}
-                          variant="outline"
-                          className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                          onClick={() => handleDiagnosisClick(diagnosis.id)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="text-sm font-medium">{diagnosis.name}</div>
-                            {diagnosis.standardProtocolEnabled && (
-                              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                            )}
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  {/* STD Section */}
-                  <div className="space-y-3">
-                    <h3 className="text-md font-medium text-white">STD</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {filteredDiagnoses
-                        .filter(d => (getMedicalGroup(d.category) === 'other' && activeTab === 'std') || (activeTab === 'all' && d.category === 'other'))
-                        .map((diagnosis) => (
-                        <Button
-                          key={diagnosis.id}
-                          variant="outline"
-                          className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                          onClick={() => handleDiagnosisClick(diagnosis.id)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="text-sm font-medium">{diagnosis.name}</div>
-                            {diagnosis.standardProtocolEnabled && (
-                              <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                            )}
-                          </div>
-                        </Button>
-                      ))}
-                    </div>
+        <div className="space-y-6">
+          <Card className="bg-[#1e1e1e] border-gray-800">
+            <CardHeader>
+              <CardTitle className="flex items-center">
+                <BookOpen className="mr-2 h-5 w-5" />
+                Medical Conditions
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                Select a condition to customize treatment preferences and protocols
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+                <TabsList className="bg-[#262626] mb-6">
+                  <TabsTrigger value="all">All</TabsTrigger>
+                  <TabsTrigger value="urgent">Urgent Care</TabsTrigger>
+                  <TabsTrigger value="msk">MSK</TabsTrigger>
+                  <TabsTrigger value="preventative">Preventative</TabsTrigger>
+                  <TabsTrigger value="mental">Mental Health</TabsTrigger>
+                  <TabsTrigger value="std">STD</TabsTrigger>
+                </TabsList>
+              </Tabs>
+              
+              <div className="space-y-6 max-h-[350px] overflow-y-auto pr-2">
+                {/* Urgent Care Section */}
+                <div className="space-y-3">
+                  <h3 className="text-md font-medium text-white">Urgent Care</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {filteredDiagnoses
+                      .filter(d => getMedicalGroup(d.category) === 'urgent' || (activeTab === 'all' && d.category === 'acute'))
+                      .map((diagnosis) => (
+                      <Button
+                        key={diagnosis.id}
+                        variant="outline"
+                        className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
+                        onClick={() => handleDiagnosisClick(diagnosis.id)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm font-medium">{diagnosis.name}</div>
+                          {diagnosis.standardProtocolEnabled && (
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          )}
+                        </div>
+                      </Button>
+                    ))}
                   </div>
                 </div>
                 
-                {filteredDiagnoses.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <AlertCircle className="h-12 w-12 text-gray-400 mb-4" />
-                    <h3 className="text-xl font-medium mb-2">No results found</h3>
-                    <p className="text-gray-500 max-w-md">
-                      We couldn't find any medical conditions matching your search criteria. 
-                      Try adjusting your search or category filter.
-                    </p>
+                {/* MSK Section */}
+                <div className="space-y-3">
+                  <h3 className="text-md font-medium text-white">MSK</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {filteredDiagnoses
+                      .filter(d => getMedicalGroup(d.category) === 'msk' || (activeTab === 'all' && d.category === 'common'))
+                      .map((diagnosis) => (
+                      <Button
+                        key={diagnosis.id}
+                        variant="outline"
+                        className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
+                        onClick={() => handleDiagnosisClick(diagnosis.id)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm font-medium">{diagnosis.name}</div>
+                          {diagnosis.standardProtocolEnabled && (
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          )}
+                        </div>
+                      </Button>
+                    ))}
                   </div>
-                )}
+                </div>
+                
+                {/* Preventative Section */}
+                <div className="space-y-3">
+                  <h3 className="text-md font-medium text-white">Preventative</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {filteredDiagnoses
+                      .filter(d => getMedicalGroup(d.category) === 'preventative' || (activeTab === 'all' && d.category === 'chronic'))
+                      .map((diagnosis) => (
+                      <Button
+                        key={diagnosis.id}
+                        variant="outline"
+                        className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
+                        onClick={() => handleDiagnosisClick(diagnosis.id)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm font-medium">{diagnosis.name}</div>
+                          {diagnosis.standardProtocolEnabled && (
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          )}
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Mental Health Section */}
+                <div className="space-y-3">
+                  <h3 className="text-md font-medium text-white">Mental Health</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {filteredDiagnoses
+                      .filter(d => getMedicalGroup(d.category) === 'mental' || (activeTab === 'all' && d.category === 'mental'))
+                      .map((diagnosis) => (
+                      <Button
+                        key={diagnosis.id}
+                        variant="outline"
+                        className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
+                        onClick={() => handleDiagnosisClick(diagnosis.id)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm font-medium">{diagnosis.name}</div>
+                          {diagnosis.standardProtocolEnabled && (
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          )}
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* STD Section */}
+                <div className="space-y-3">
+                  <h3 className="text-md font-medium text-white">STD</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {filteredDiagnoses
+                      .filter(d => (getMedicalGroup(d.category) === 'other' && activeTab === 'std') || (activeTab === 'all' && d.category === 'other'))
+                      .map((diagnosis) => (
+                      <Button
+                        key={diagnosis.id}
+                        variant="outline"
+                        className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
+                        onClick={() => handleDiagnosisClick(diagnosis.id)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="text-sm font-medium">{diagnosis.name}</div>
+                          {diagnosis.standardProtocolEnabled && (
+                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                          )}
+                        </div>
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              {filteredDiagnoses.length === 0 && (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <AlertCircle className="h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-xl font-medium mb-2">No results found</h3>
+                  <p className="text-gray-500 max-w-md">
+                    We couldn't find any medical conditions matching your search criteria. 
+                    Try adjusting your search or category filter.
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+          {isLoading ? (
+            <Card className="bg-[#1e1e1e] border-gray-800">
+              <CardContent className="flex justify-center items-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
               </CardContent>
             </Card>
-          </div>
-          
-          <div className="lg:col-span-5">
-            {isLoading ? (
+          ) : selectedDiagnosisData ? (
+            <div className="space-y-6">
               <Card className="bg-[#1e1e1e] border-gray-800">
-                <CardContent className="flex justify-center items-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-                </CardContent>
-              </Card>
-            ) : selectedDiagnosisData ? (
-              <div className="space-y-6">
-                <Card className="bg-[#1e1e1e] border-gray-800">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle>{selectedDiagnosisData.name}</CardTitle>
-                        <CardDescription className="text-gray-400">
-                          Customize your preferred treatment approach
-                        </CardDescription>
-                      </div>
-                      <Button 
-                        onClick={handleSaveDiagnosis} 
-                        className="bg-blue-600 hover:bg-blue-700"
-                        disabled={saveDiagnosisMutation.isPending}
-                      >
-                        {saveDiagnosisMutation.isPending && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        <Save className="mr-2 h-4 w-4" />
-                        Save Preferences
-                      </Button>
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle>{selectedDiagnosisData.name}</CardTitle>
+                      <CardDescription className="text-gray-400">
+                        Customize your preferred treatment approach
+                      </CardDescription>
                     </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-6">
-                      <div className="border-b border-gray-800 pb-6">
-                        <div className="flex items-center justify-between mb-3">
-                          <h3 className="text-lg font-medium">Standard Protocol</h3>
-                          <div className="flex items-center space-x-2">
-                            <Label htmlFor="protocol-toggle" className="text-sm text-gray-400">
-                              Enable
-                            </Label>
-                            <Switch
-                              id="protocol-toggle"
-                              checked={selectedDiagnosisData.standardProtocolEnabled}
-                              onCheckedChange={(enabled) => handleProtocolToggle(selectedDiagnosisData.id, enabled)}
-                            />
-                          </div>
+                    <Button 
+                      onClick={handleSaveDiagnosis} 
+                      className="bg-blue-600 hover:bg-blue-700"
+                      disabled={saveDiagnosisMutation.isPending}
+                    >
+                      {saveDiagnosisMutation.isPending && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
+                      <Save className="mr-2 h-4 w-4" />
+                      Save Preferences
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div className="border-b border-gray-800 pb-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-lg font-medium">Standard Protocol</h3>
+                        <div className="flex items-center space-x-2">
+                          <Label htmlFor="protocol-toggle" className="text-sm text-gray-400">
+                            Enable
+                          </Label>
+                          <Switch
+                            id="protocol-toggle"
+                            checked={selectedDiagnosisData.standardProtocolEnabled}
+                            onCheckedChange={(enabled) => handleProtocolToggle(selectedDiagnosisData.id, enabled)}
+                          />
                         </div>
-                        
-                        <p className="text-sm text-gray-400 mb-3">
-                          This protocol will be offered as a single-click option when the AI detects this condition
-                        </p>
-                        
-                        {editingProtocol ? (
-                          <div className="space-y-4">
-                            <Textarea
-                              value={tempProtocol}
-                              onChange={(e) => setTempProtocol(e.target.value)}
-                              className="bg-[#262626] border-gray-700 text-white min-h-[120px]"
-                              placeholder="Enter your standard treatment protocol..."
-                            />
-                            <div className="flex justify-end space-x-2">
-                              <Button 
-                                variant="outline" 
-                                onClick={() => {
-                                  setTempProtocol(selectedDiagnosisData.standardProtocol);
-                                  setEditingProtocol(false);
-                                }}
-                              >
-                                Cancel
-                              </Button>
-                              <Button 
-                                onClick={handleSaveProtocol}
-                                className="bg-blue-600 hover:bg-blue-700"
-                              >
-                                <Save className="mr-2 h-4 w-4" />
-                                Save Protocol
-                              </Button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div>
-                            <div className="p-3 bg-[#262626] rounded-md mb-3">
-                              <p className="text-sm text-gray-300 whitespace-pre-wrap">
-                                {selectedDiagnosisData.standardProtocol || "No standard protocol defined yet."}
-                              </p>
-                            </div>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setEditingProtocol(true)}
-                              className="w-full"
-                            >
-                              Edit Protocol
-                            </Button>
-                          </div>
-                        )}
                       </div>
                       
-                      {/* Planning */}
-                      <div>
-                        <h3 className="text-lg font-medium mb-4">Planning</h3>
-                        <p className="text-sm text-gray-400 mb-6">
-                          Toggle each option to customize your preferred planning. The AI will reference 
-                          these settings when providing recommendations.
-                        </p>
-                        
-                        {selectedDiagnosisData.treatments.length === 0 ? (
-                          <div className="text-center p-4 bg-[#262626] rounded-md">
-                            <p className="text-gray-400">No planning options defined for this condition yet.</p>
+                      <p className="text-sm text-gray-400 mb-3">
+                        This protocol will be offered as a single-click option when the AI detects this condition
+                      </p>
+                      
+                      {editingProtocol ? (
+                        <div className="space-y-4">
+                          <Textarea
+                            value={tempProtocol}
+                            onChange={(e) => setTempProtocol(e.target.value)}
+                            className="bg-[#262626] border-gray-700 text-white min-h-[120px]"
+                            placeholder="Enter your standard treatment protocol..."
+                          />
+                          <div className="flex justify-end space-x-2">
+                            <Button 
+                              variant="outline" 
+                              onClick={() => {
+                                setTempProtocol(selectedDiagnosisData.standardProtocol);
+                                setEditingProtocol(false);
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                            <Button 
+                              onClick={handleSaveProtocol}
+                              className="bg-blue-600 hover:bg-blue-700"
+                            >
+                              <Save className="mr-2 h-4 w-4" />
+                              Save Protocol
+                            </Button>
                           </div>
-                        ) : (
-                          <div className="space-y-6">
-                            {Object.entries(groupedTreatments).map(([category, treatments]) => (
-                              <div key={category} className="space-y-2">
-                                <h4 className="text-sm font-medium text-gray-300 flex items-center">
-                                  {getTreatmentIcon(category)}
-                                  <span className="ml-2">{getTreatmentCategoryLabel(category)}</span>
-                                </h4>
-                                
-                                <div className="space-y-2">
-                                  {treatments.map(treatment => (
-                                    <div 
-                                      key={treatment.id} 
-                                      className="flex items-center justify-between p-3 bg-[#262626] rounded-md"
-                                    >
-                                      <span className="text-sm text-gray-300">{treatment.name}</span>
-                                      <Switch
-                                        checked={treatment.enabled}
-                                        onCheckedChange={(enabled) => 
-                                          handleTreatmentToggle(selectedDiagnosisData.id, treatment.id, enabled)
-                                        }
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            ))}
+                        </div>
+                      ) : (
+                        <div>
+                          <div className="p-3 bg-[#262626] rounded-md mb-3">
+                            <p className="text-sm text-gray-300 whitespace-pre-wrap">
+                              {selectedDiagnosisData.standardProtocol || "No standard protocol defined yet."}
+                            </p>
                           </div>
-                        )}
-                      </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingProtocol(true)}
+                            className="w-full"
+                          >
+                            Edit Protocol
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              </div>
-            ) : (
-              <Card className="bg-[#1e1e1e] border-gray-800">
-                <CardContent className="py-12">
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <BookOpen className="h-12 w-12 text-gray-400 mb-4" />
-                    <h3 className="text-lg font-medium mb-2">No condition selected</h3>
-                    <p className="text-gray-500 mb-4">
-                      Select a medical condition from the list to view and customize treatment protocols.
-                    </p>
+                    
+                    {/* Planning */}
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Planning</h3>
+                      <p className="text-sm text-gray-400 mb-6">
+                        Toggle each option to customize your preferred planning. The AI will reference 
+                        these settings when providing recommendations.
+                      </p>
+                      
+                      {selectedDiagnosisData.treatments.length === 0 ? (
+                        <div className="text-center p-4 bg-[#262626] rounded-md">
+                          <p className="text-gray-400">No planning options defined for this condition yet.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-6">
+                          {Object.entries(groupedTreatments).map(([category, treatments]) => (
+                            <div key={category} className="space-y-2">
+                              <h4 className="text-sm font-medium text-gray-300 flex items-center">
+                                {getTreatmentIcon(category)}
+                                <span className="ml-2">{getTreatmentCategoryLabel(category)}</span>
+                              </h4>
+                              
+                              <div className="space-y-2">
+                                {treatments.map(treatment => (
+                                  <div 
+                                    key={treatment.id} 
+                                    className="flex items-center justify-between p-3 bg-[#262626] rounded-md"
+                                  >
+                                    <span className="text-sm text-gray-300">{treatment.name}</span>
+                                    <Switch
+                                      checked={treatment.enabled}
+                                      onCheckedChange={(enabled) => 
+                                        handleTreatmentToggle(selectedDiagnosisData.id, treatment.id, enabled)
+                                      }
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            )}
-          </div>
+            </div>
+          ) : (
+            <Card className="bg-[#1e1e1e] border-gray-800">
+              <CardContent className="py-12">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <BookOpen className="h-12 w-12 text-gray-400 mb-4" />
+                  <h3 className="text-lg font-medium mb-2">No condition selected</h3>
+                  <p className="text-gray-500 mb-4">
+                    Select a medical condition from the list to view and customize treatment protocols.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </BaseLayout>
