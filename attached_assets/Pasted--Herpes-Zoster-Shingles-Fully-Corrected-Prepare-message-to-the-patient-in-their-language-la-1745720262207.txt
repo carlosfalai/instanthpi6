@@ -1,0 +1,64 @@
+🩺 Herpes Zoster (Shingles) (Fully Corrected)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating ‘Examen: Non réalisé’. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+
+☐ Prepare VZV PCR from lesion swab since diagnosis is uncertain
+
+Antiviral therapy (initiate within 72 hours of rash onset):
+  ☐ Valacyclovir 1000 mg PO TID x 7 days
+  ☐ Famciclovir 500 mg PO TID x 7 days
+  ☐ Acyclovir 800 mg PO 5 times daily x 7 days
+
+Pain control options (prescriptions for 14 days):
+  ☐ Acetaminophen 500–1000 mg PO QID PRN x 14 days
+  ☐ Ibuprofen 400 mg PO QID PRN x 14 days
+
+☐ Shingrix® vaccine prescription — 2-dose series, first dose now, second dose to be administered between 2 to 6 months after the first dose
+
+☐ Counseling and hydration: Recommend shingles vaccination (Shingrix®) for patients ≥50 years old or immunocompromised ≥18 years old, maintain contact precautions by keeping rash covered until all lesions are crusted over, avoid contact with pregnant women, newborns, and immunocompromised persons, practice strict hand hygiene after touching lesions, if pain or discomfort persists after rash resolution patient should reach back to the clinic, maintain hydration by drinking approximately 2–3 liters of water daily adjusted to thirst and body size.
+
+• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+☐ I will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks
+
+Corrected.
+Ready for the next task.
+
+
+
+
+
+
+
+You said:
+So this is perfect. What you have done for shingles now should be applied to all future cases and previous ones. So let's proceed with the next problem. Shoulder pain followed by wrist pain followed by paronychia.
+
+
+ChatGPT said:
+🩺 Shoulder Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating ‘Examen: Non réalisé’. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+
+Investigations and initial evaluation:
+☐ Shoulder X-ray AP, lateral, axillary views
+☐ MRI of shoulder without contrast if persistent pain, suspicion of rotator cuff tear, labral tear, or instability
+
+Pain management (prescriptions for 14 days):
+  ☐ Acetaminophen 500–1000 mg PO QID PRN x 14 days
+  ☐ Ibuprofen 400 mg PO QID PRN x 14 days
+
+Treatment options:
+  ☐ Physical therapy referral for rotator cuff strengthening and shoulder stabilization
+  ☐ Subacromial corticosteroid injection if persistent bursitis
+  ☐ Short-term sling use if acute trauma (limit immobilization)
+
+☐ Referral to orthopedics if rotator cuff tear, labral injury, or refractory symptoms
+
+☐ Counseling and hydration: Counsel on gentle mobilization of shoulder to avoid adhesive capsulitis, avoid heavy lifting until reassessment, maintain hydration by drinking approximately 2–3 liters of water daily adjusted to thirst and body size.
+
+• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+☐ I will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks
+

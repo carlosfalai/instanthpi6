@@ -205,6 +205,24 @@ const diagnosisList: Diagnosis[] = [
   },
   { id: '11', name: 'Chronic Fatigue', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { 
+    id: '11-hz', 
+    name: 'Herpes Zoster (Shingles)', 
+    category: 'acute', 
+    standardProtocol: '🩺 Herpes Zoster (Shingles)\n\n☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)\n☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating \'Examen: Non réalisé\'. Keep the plan to only essential interventions, ideally in one line.)\n☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.\n\n☐ Prepare VZV PCR from lesion swab since diagnosis is uncertain\n\nAntiviral therapy (initiate within 72 hours of rash onset):\n  ☐ Valacyclovir 1000 mg PO TID x 7 days\n  ☐ Famciclovir 500 mg PO TID x 7 days\n  ☐ Acyclovir 800 mg PO 5 times daily x 7 days\n\nPain control options (prescriptions for 14 days):\n  ☐ Acetaminophen 500–1000 mg PO QID PRN x 14 days\n  ☐ Ibuprofen 400 mg PO QID PRN x 14 days\n\n☐ Shingrix® vaccine prescription — 2-dose series, first dose now, second dose to be administered between 2 to 6 months after the first dose\n\n☐ Counseling and hydration: Recommend shingles vaccination (Shingrix®) for patients ≥50 years old or immunocompromised ≥18 years old, maintain contact precautions by keeping rash covered until all lesions are crusted over, avoid contact with pregnant women, newborns, and immunocompromised persons, practice strict hand hygiene after touching lesions, if pain or discomfort persists after rash resolution patient should reach back to the clinic, maintain hydration by drinking approximately 2–3 liters of water daily adjusted to thirst and body size.\n\n• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you', 
+    standardProtocolEnabled: false, 
+    treatments: [
+      { id: 'hz-1', name: 'VZV PCR from lesion swab', category: 'testing', enabled: true },
+      { id: 'hz-2', name: 'Valacyclovir 1000 mg PO TID x 7 days', category: 'medication', enabled: true },
+      { id: 'hz-3', name: 'Famciclovir 500 mg PO TID x 7 days', category: 'medication', enabled: false },
+      { id: 'hz-4', name: 'Acyclovir 800 mg PO 5 times daily x 7 days', category: 'medication', enabled: false },
+      { id: 'hz-5', name: 'Acetaminophen 500-1000 mg PO QID PRN x 14 days', category: 'medication', enabled: true },
+      { id: 'hz-6', name: 'Ibuprofen 400 mg PO QID PRN x 14 days', category: 'medication', enabled: false },
+      { id: 'hz-7', name: 'Shingrix® vaccine prescription', category: 'medication', enabled: true },
+      { id: 'hz-8', name: 'Patient education on infection control', category: 'lifestyle', enabled: true },
+      { id: 'hz-9', name: 'Follow-up in 1-2 weeks', category: 'followup', enabled: true }
+    ]
+  },
+  { 
     id: '12', 
     name: 'Chronic Low Back Pain', 
     category: 'chronic', 
@@ -279,6 +297,24 @@ const diagnosisList: Diagnosis[] = [
   { id: '21', name: 'Hyperlipidemia', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '23', name: 'Hypothyroidism', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '24', name: 'Insomnia', category: 'common', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  {
+    id: '24-sp',
+    name: 'Shoulder Pain',
+    category: 'acute',
+    standardProtocol: '🩺 Shoulder Pain\n☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)\n☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating \'Examen: Non réalisé\'. Keep the plan to only essential interventions, ideally in one line.)\n☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.\n\nInvestigations and initial evaluation:\n☐ Shoulder X-ray AP, lateral, axillary views\n☐ MRI of shoulder without contrast if persistent pain, suspicion of rotator cuff tear, labral tear, or instability\n\nPain management (prescriptions for 14 days):\n  ☐ Acetaminophen 500–1000 mg PO QID PRN x 14 days\n  ☐ Ibuprofen 400 mg PO QID PRN x 14 days\n\nTreatment options:\n  ☐ Physical therapy referral for rotator cuff strengthening and shoulder stabilization\n  ☐ Subacromial corticosteroid injection if persistent bursitis\n  ☐ Short-term sling use if acute trauma (limit immobilization)\n\n☐ Referral to orthopedics if rotator cuff tear, labral injury, or refractory symptoms\n\n☐ Counseling and hydration: Counsel on gentle mobilization of shoulder to avoid adhesive capsulitis, avoid heavy lifting until reassessment, maintain hydration by drinking approximately 2–3 liters of water daily adjusted to thirst and body size.\n\n• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you',
+    standardProtocolEnabled: false,
+    treatments: [
+      { id: 'sp-1', name: 'Shoulder X-ray (AP, lateral, axillary views)', category: 'testing', enabled: true },
+      { id: 'sp-2', name: 'MRI of shoulder without contrast', category: 'testing', enabled: false },
+      { id: 'sp-3', name: 'Acetaminophen 500-1000 mg PO QID PRN x 14 days', category: 'medication', enabled: true },
+      { id: 'sp-4', name: 'Ibuprofen 400 mg PO QID PRN x 14 days', category: 'medication', enabled: false },
+      { id: 'sp-5', name: 'Physical therapy referral', category: 'referral', enabled: true },
+      { id: 'sp-6', name: 'Subacromial corticosteroid injection', category: 'medication', enabled: false },
+      { id: 'sp-7', name: 'Short-term sling use if acute trauma', category: 'lifestyle', enabled: false },
+      { id: 'sp-8', name: 'Orthopedics referral if severe', category: 'referral', enabled: false },
+      { id: 'sp-9', name: 'Patient education on shoulder care', category: 'lifestyle', enabled: true }
+    ]
+  },
   { id: '25', name: 'Irregular Periods/Amenorrhea', category: 'common', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '26', name: 'Knee Pain', category: 'common', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '27', name: 'Laryngitis', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },

@@ -159,7 +159,7 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
       }
       
       // Set any additional notes
-      const notesMatch = aiGeneratedInstructions.match(/Notes:(.+?)(?:\n\n|$)/s);
+      const notesMatch = aiGeneratedInstructions.match(/Notes:([\s\S]+?)(?:\n\n|$)/);
       if (notesMatch) {
         setNotes(notesMatch[1].trim());
       }
@@ -534,8 +534,8 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
               onClick={() => handleSign("pharmacy")}
               disabled={!hasPharmacy}
             >
-              <Fax className="mr-2 h-4 w-4" />
-              Fax to Pharmacy
+              <Phone className="mr-2 h-4 w-4" />
+              Send to Pharmacy
             </Button>
           </div>
         </CardFooter>
