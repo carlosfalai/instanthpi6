@@ -349,7 +349,23 @@ const diagnosisList: Diagnosis[] = [
     ]
   },
   { id: '36', name: 'Suspected ADHD in Adults (Diagnostic Evaluation Phase)', category: 'mental', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
-  { id: '37', name: 'Upper Respiratory Infection (Cold, Sinusitis)', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  {
+    id: '37', 
+    name: 'Upper Respiratory Infection (Cold, Sinusitis)', 
+    category: 'acute', 
+    standardProtocol: '🩺 Upper Respiratory Infection (Cold, Sinusitis)\n\n☐ Prepare message to patient in their language (language considered the one used in the SMS-based secure messaging system)\n☐ Prepare Spartan SOAP note (essential interventions, one line, no fluff, no unnecessary details)\n☐ This is a complex case: put all details in subjective\n\nTreatment options:\n ☐ Gelomyrtol 300 mg PO QID PRN x 10 days, #40, REN: Ø\n ☐ Dymista nasal spray, 1–2 sprays per nostril BID PRN, #1 bottle, REN: Ø\n ☐ Mometasone nasal spray, 2 sprays per nostril daily PRN, #1 bottle, REN: Ø\n ☐ Fluticasone nasal spray, 2 sprays per nostril daily PRN, #1 bottle, REN: Ø\n\nAntibiotic therapy (if bacterial sinusitis suspected):\n ☐ Amoxicillin 500 mg PO TID x 5 days, #15, REN: Ø\n ☐ Azithromycin 500 mg PO daily x 3 days, #3, REN: Ø\n\n☐ Counseling and hydration: Explain to the patient that approximately 98–99% of cases are viral; hydrate adequately (≥2 liters water/day), and symptoms typically resolve without antibiotics.\n\n• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you\n\n☐ I will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks', 
+    standardProtocolEnabled: false, 
+    treatments: [
+      { id: '37-1', name: 'Gelomyrtol 300mg PO QID PRN', category: 'medication', enabled: true },
+      { id: '37-2', name: 'Dymista nasal spray', category: 'medication', enabled: false },
+      { id: '37-3', name: 'Mometasone nasal spray', category: 'medication', enabled: true },
+      { id: '37-4', name: 'Fluticasone nasal spray', category: 'medication', enabled: false },
+      { id: '37-5', name: 'Amoxicillin 500mg PO TID (if bacterial)', category: 'medication', enabled: false },
+      { id: '37-6', name: 'Azithromycin 500mg PO daily (if bacterial)', category: 'medication', enabled: false },
+      { id: '37-7', name: 'Patient education on viral causes', category: 'lifestyle', enabled: true },
+      { id: '37-8', name: 'Hydration counseling', category: 'lifestyle', enabled: true },
+    ]
+  },
   { id: '38', name: 'Urinary Tract Infection (UTI)', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { 
     id: '39', 
