@@ -268,7 +268,6 @@ export default function SettingsPage() {
               <TabsTrigger value="documentation">Documentation</TabsTrigger>
               <TabsTrigger value="response">Patient Responses</TabsTrigger>
               <TabsTrigger value="analysis">Analysis</TabsTrigger>
-              <TabsTrigger value="diagnoses">Diagnoses</TabsTrigger>
               <TabsTrigger value="application">Application</TabsTrigger>
               <TabsTrigger value="navigation">Navigation</TabsTrigger>
               <TabsTrigger value="add">Add New Prompt</TabsTrigger>
@@ -316,9 +315,7 @@ export default function SettingsPage() {
               </div>
             </TabsContent>
 
-            <TabsContent value="diagnoses">
-              <DiagnosisSettings />
-            </TabsContent>
+
             
             <TabsContent value="application">
               <Card className="bg-[#1e1e1e] border-gray-800">
