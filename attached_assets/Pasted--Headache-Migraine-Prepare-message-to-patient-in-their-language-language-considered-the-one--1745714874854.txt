@@ -1,0 +1,54 @@
+🩺 Headache – Migraine
+
+☐ Prepare message to patient in their language (language considered the one used in the SMS-based secure messaging system)
+☐ Prepare Spartan SOAP note (essential interventions, one line, no fluff, no unnecessary details)
+☐ This is a complex case: put all details in subjective
+
+Investigations:
+ ☐ CT scan head without contrast
+ ☐ MRI brain without contrast
+
+Abortive therapy:
+ ☐ Sumatriptan 50 mg PO, repeat once in 2 hours PRN, max 200 mg/day, #9, REN: Ø
+ ☐ Sumatriptan 100 mg PO, repeat once in 2 hours PRN, max 200 mg/day, #9, REN: Ø
+ ☐ Rizatriptan 10 mg PO, repeat once in 2 hours PRN, max 30 mg/day, #9, REN: Ø
+ ☐ Zolmitriptan 2.5 mg PO, repeat once in 2 hours PRN, max 10 mg/day, #9, REN: Ø
+ ☐ Zolmitriptan 5 mg PO, repeat once in 2 hours PRN, max 10 mg/day, #9, REN: Ø
+ ☐ Acetaminophen 1000 mg PO QID PRN x 14 days, #56, REN: Ø
+
+Preventive therapy:
+ ☐ Magnesium citrate 400 mg PO daily, #30, REN: Ø
+ ☐ Riboflavin (Vitamin B2) 400 mg PO daily, #30, REN: Ø
+ ☐ Propranolol 40 mg PO BID daily, #60, REN: Ø
+
+☐ Referral to Neurology for management
+
+☐ Counseling and hydration: Discuss avoidance of known migraine triggers (stress, caffeine, foods), regular sleep pattern, stress management, hydration ≥2 liters/day
+
+• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+☐ I will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks
+
+⸻
+
+🩺 Headache – Tension Type
+
+☐ Prepare message to patient in their language (language considered the one used in the SMS-based secure messaging system)
+☐ Prepare Spartan SOAP note (essential interventions, one line, no fluff, no unnecessary details)
+☐ This is a complex case: put all details in subjective
+
+Pain management (14 days):
+ ☐ Acetaminophen 500 mg PO QID PRN x 14 days, #56, REN: Ø
+ ☐ Acetaminophen 1000 mg PO QID PRN x 14 days, #56, REN: Ø
+ ☐ Ibuprofen 400 mg PO QID PRN x 14 days, #56, REN: Ø
+ ☐ Naproxen 500 mg PO BID PRN x 14 days, #28, REN: Ø
+
+Treatment options:
+ ☐ Physiotherapy referral for relaxation and postural techniques
+ ☐ Massage therapy
+
+☐ Counseling and hydration: Stress management techniques, posture improvement, regular sleep schedule, adequate hydration (≥2 liters/day)
+
+• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+☐ I will prepare a work leave for you for: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 4 days ☐ 5 days ☐ 1 week ☐ 2 weeks ☐ 3 weeks
