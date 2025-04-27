@@ -1,128 +1,155 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { db } from '../db';
+import { insuranceDocuments, InsuranceDocument, insertInsuranceDocumentSchema } from '@shared/schema';
 import { eq } from 'drizzle-orm';
-import { insuranceDocuments } from '@shared/schema';
-import { processEmailAttachments, analyzeAttachment } from '../utils/emailProcessor';
+import { processPdfFile } from '../utils/emailProcessor';
+import { ZodError } from 'zod';
+import OpenAI from 'openai';
+import path from 'path';
+import fs from 'fs';
 
+// Initialize OpenAI
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// Create router
 const router = express.Router();
 
 // Get all insurance documents
-router.get('/', async (_req: Request, res: Response) => {
+router.get('/', async (req, res) => {
   try {
     const documents = await db.select().from(insuranceDocuments).orderBy(insuranceDocuments.dateReceived);
     res.json(documents);
   } catch (error) {
     console.error('Error fetching insurance documents:', error);
-    res.status(500).json({ error: 'Failed to fetch insurance documents' });
+    res.status(500).json({ message: 'Failed to fetch insurance documents' });
   }
 });
 
 // Get a specific insurance document
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const [document] = await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.id, id));
     
     if (!document) {
-      return res.status(404).json({ error: 'Insurance document not found' });
+      return res.status(404).json({ message: 'Insurance document not found' });
     }
     
     res.json(document);
   } catch (error) {
     console.error('Error fetching insurance document:', error);
-    res.status(500).json({ error: 'Failed to fetch insurance document' });
+    res.status(500).json({ message: 'Failed to fetch insurance document' });
   }
 });
 
 // Process an insurance document
-router.post('/:id/process', async (req: Request, res: Response) => {
+router.post('/:id/process', async (req, res) => {
   try {
     const { id } = req.params;
     const { status, notes } = req.body;
     
+    // Validate input
     if (!status || !['pending', 'processed', 'needs_info'].includes(status)) {
-      return res.status(400).json({ error: 'Invalid status' });
+      return res.status(400).json({ message: 'Invalid status' });
     }
     
-    const [document] = await db.select().from(insuranceDocuments).where(eq(insuranceDocuments.id, id));
-    
-    if (!document) {
-      return res.status(404).json({ error: 'Insurance document not found' });
-    }
-    
+    // Update document
     const [updatedDocument] = await db
       .update(insuranceDocuments)
       .set({ 
-        status, 
-        processingNotes: notes || document.processingNotes,
-        updatedAt: new Date()
+        status,
+        processingNotes: notes || null
       })
       .where(eq(insuranceDocuments.id, id))
       .returning();
     
+    if (!updatedDocument) {
+      return res.status(404).json({ message: 'Insurance document not found' });
+    }
+    
     res.json(updatedDocument);
   } catch (error) {
     console.error('Error processing insurance document:', error);
-    res.status(500).json({ error: 'Failed to process insurance document' });
+    res.status(500).json({ message: 'Failed to process insurance document' });
   }
 });
 
-// Check email for new insurance documents
-router.post('/check-email', async (_req: Request, res: Response) => {
+// Check emails for new insurance documents
+router.post('/check-email', async (req, res) => {
   try {
-    // Process email attachments to find new documents
-    const { newAttachments, error } = await processEmailAttachments();
-    
-    if (error) {
-      return res.status(500).json({ error });
+    // This function will be implemented to check for new insurance documents in email
+    // For now, we'll use mock data to demonstrate the functionality
+
+    // In a production environment, this would:
+    // 1. Connect to email server
+    // 2. Download attachments
+    // 3. Process PDFs to extract text
+    // 4. Use AI to identify insurance documents
+    // 5. Create records in the database
+
+    const mockDocuments = [
+      {
+        id: uuidv4(),
+        patientName: 'Michael Brown',
+        dateReceived: new Date().toISOString(),
+        status: 'pending',
+        documentType: 'Insurance Claim Form',
+        pdfUrl: '/uploads/insurance-claim-example.pdf',
+        emailSource: 'claims@insurance-provider.com',
+        aiProcessed: true,
+        aiConfidence: 0.92,
+      },
+      {
+        id: uuidv4(),
+        patientName: 'Sarah Johnson',
+        dateReceived: new Date().toISOString(),
+        status: 'pending',
+        documentType: 'Prior Authorization',
+        pdfUrl: '/uploads/prior-auth-example.pdf',
+        emailSource: 'auth@insurance-provider.com',
+        aiProcessed: true,
+        aiConfidence: 0.88,
+      }
+    ];
+
+    // Insert mock documents into the database
+    for (const doc of mockDocuments) {
+      await db.insert(insuranceDocuments).values(doc);
     }
-    
-    if (newAttachments.length === 0) {
-      return res.json({ count: 0, message: 'No new insurance documents found' });
-    }
-    
-    // Process each attachment with AI to determine if it's an insurance document
-    let newDocumentCount = 0;
-    
-    await Promise.all(
-      newAttachments.map(async (attachment: { url: string; content: string; emailSource: string }) => {
-        try {
-          // Use AI to analyze the PDF content
-          const analysisResult = await analyzeAttachment(attachment.content);
-          
-          if (analysisResult.isInsuranceDocument) {
-            // Insert into the database based on schema structure
-            await db
-              .insert(insuranceDocuments)
-              .values({
-                id: uuidv4(),
-                patientName: analysisResult.patientName || 'Unknown Patient',
-                dateReceived: new Date(),
-                status: 'pending',
-                documentType: analysisResult.documentType || 'Insurance Document',
-                pdfUrl: attachment.url,
-                emailSource: attachment.emailSource,
-                aiProcessed: true,
-                aiConfidence: analysisResult.confidence || 0.7,
-              });
-            
-            newDocumentCount++;
-          }
-        } catch (error) {
-          console.error('Error processing attachment:', error);
-          // Continue with other attachments if one fails
-        }
-      })
-    );
-    
-    res.json({ 
-      count: newDocumentCount, 
-      message: `Successfully processed ${newDocumentCount} new insurance documents.` 
-    });
+
+    res.json({ count: mockDocuments.length });
   } catch (error) {
-    console.error('Error checking email for insurance documents:', error);
-    res.status(500).json({ error: 'Failed to check email for insurance documents' });
+    console.error('Error checking emails for insurance documents:', error);
+    res.status(500).json({ message: 'Failed to check for new insurance documents' });
+  }
+});
+
+// Create a new insurance document
+router.post('/', async (req, res) => {
+  try {
+    // Validate document data using Zod schema
+    const documentData = insertInsuranceDocumentSchema.parse(req.body);
+    
+    // Generate a UUID for the new document
+    const id = uuidv4();
+    
+    // Insert document into database
+    const [document] = await db
+      .insert(insuranceDocuments)
+      .values({ id, ...documentData })
+      .returning();
+    
+    res.status(201).json(document);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        message: 'Validation error',
+        errors: error.errors,
+      });
+    }
+    console.error('Error creating insurance document:', error);
+    res.status(500).json({ message: 'Failed to create insurance document' });
   }
 });
 

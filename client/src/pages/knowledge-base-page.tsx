@@ -90,9 +90,6 @@ const diagnosisList: Diagnosis[] = [
     standardProtocol: 'Rest for 48 hours, then gentle movement. Acetaminophen or NSAIDs for pain. Apply heat/ice 20 minutes at a time. If no improvement in 1 week or worsening symptoms, in-person evaluation.',
     standardProtocolEnabled: false,
     treatments: [
-      { id: '3-1', name: 'Physical examination of lumbar spine', category: 'examination', enabled: true },
-      { id: '3-2', name: 'Assessment for red flags requiring urgent imaging', category: 'examination', enabled: true },
-      { id: '3-3', name: 'X-ray if indicated by red flags', category: 'testing', enabled: false },
       { id: '3-4', name: 'NSAIDs for pain (Ibuprofen/Naproxen)', category: 'medication', enabled: true },
       { id: '3-5', name: 'Muscle relaxant (Cyclobenzaprine)', category: 'medication', enabled: true },
       { id: '3-6', name: 'Physical therapy referral', category: 'referral', enabled: true },
