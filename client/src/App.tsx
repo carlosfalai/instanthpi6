@@ -15,6 +15,7 @@ import SchedulerPage from '@/pages/scheduler-page';
 import FormsitePage from '@/pages/formsite-page';
 import PseudonymPage from '@/pages/pseudonym-page';
 import MedicationRefillsPage from '@/pages/medication-refills-page';
+import ChronicConditionsPage from '@/pages/chronic-conditions-page';
 
 function Router() {
   return (
@@ -31,6 +32,7 @@ function Router() {
       <Route path="/formsite" component={FormsitePage} />
       <Route path="/pseudonym" component={PseudonymPage} />
       <Route path="/medication-refills" component={MedicationRefillsPage} />
+      <Route path="/chronic-conditions" component={ChronicConditionsPage} />
       <Route component={NotFound} />
     </Switch>
   );
