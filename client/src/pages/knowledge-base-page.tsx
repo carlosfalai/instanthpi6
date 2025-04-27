@@ -493,7 +493,14 @@ export default function KnowledgeBasePage() {
   // Filter diagnoses based on search and active tab
   const filteredDiagnoses = editedDiagnoses.filter(diagnosis => {
     const matchesSearch = diagnosis.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = activeTab === 'all' || diagnosis.category === activeTab;
+    let matchesCategory = activeTab === 'all';
+    
+    if (activeTab === 'urgent') matchesCategory = diagnosis.category === 'acute';
+    else if (activeTab === 'preventative') matchesCategory = diagnosis.category === 'chronic';
+    else if (activeTab === 'msk') matchesCategory = diagnosis.category === 'common';
+    else if (activeTab === 'mental') matchesCategory = diagnosis.category === 'mental';
+    else if (activeTab === 'std') matchesCategory = diagnosis.category === 'other';
+    
     return matchesSearch && matchesCategory;
   });
 
@@ -815,7 +822,7 @@ export default function KnowledgeBasePage() {
                     <h3 className="text-md font-medium text-white">STD</h3>
                     <div className="flex flex-wrap gap-2">
                       {filteredDiagnoses
-                        .filter(d => activeTab === 'all' || activeTab === 'std')
+                        .filter(d => (getMedicalGroup(d.category) === 'other' && activeTab === 'std') || (activeTab === 'all' && d.category === 'other'))
                         .map((diagnosis) => (
                         <Button
                           key={diagnosis.id}
