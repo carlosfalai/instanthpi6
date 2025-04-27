@@ -133,14 +133,14 @@ export default function PatientTreatmentPage() {
         {
           title: "Follow-up options",
           options: [
-            "1 week",
-            "2 weeks",
-            "3 weeks",
-            "1 month",
-            "2 months",
-            "3 months",
-            "6 months",
-            "after results arrive at clinic, we will reach out to you"
+            "• Follow-up options: 1 week",
+            "• Follow-up options: 2 weeks",
+            "• Follow-up options: 3 weeks",
+            "• Follow-up options: 1 month",
+            "• Follow-up options: 2 months",
+            "• Follow-up options: 3 months",
+            "• Follow-up options: 6 months",
+            "• Follow-up options: after results arrive at clinic, we will reach out to you"
           ]
         },
         {
@@ -209,14 +209,14 @@ export default function PatientTreatmentPage() {
         {
           title: "Follow-up options",
           options: [
-            "1 week",
-            "2 weeks",
-            "3 weeks",
-            "1 month",
-            "2 months",
-            "3 months",
-            "6 months",
-            "after results arrive at clinic, we will reach out to you"
+            "• Follow-up options: 1 week",
+            "• Follow-up options: 2 weeks",
+            "• Follow-up options: 3 weeks",
+            "• Follow-up options: 1 month",
+            "• Follow-up options: 2 months",
+            "• Follow-up options: 3 months",
+            "• Follow-up options: 6 months",
+            "• Follow-up options: after results arrive at clinic, we will reach out to you"
           ]
         },
         {
@@ -285,14 +285,14 @@ export default function PatientTreatmentPage() {
         {
           title: "Follow-up options",
           options: [
-            "1 week",
-            "2 weeks",
-            "3 weeks",
-            "1 month",
-            "2 months",
-            "3 months",
-            "6 months",
-            "after results arrive at clinic, we will reach out to you"
+            "• Follow-up options: 1 week",
+            "• Follow-up options: 2 weeks",
+            "• Follow-up options: 3 weeks",
+            "• Follow-up options: 1 month",
+            "• Follow-up options: 2 months",
+            "• Follow-up options: 3 months",
+            "• Follow-up options: 6 months",
+            "• Follow-up options: after results arrive at clinic, we will reach out to you"
           ]
         },
         {
