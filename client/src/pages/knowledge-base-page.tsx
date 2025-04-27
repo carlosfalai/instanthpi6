@@ -954,17 +954,17 @@ export default function KnowledgeBasePage() {
                         )}
                       </div>
                       
-                      {/* Treatment Options */}
+                      {/* Planning */}
                       <div>
-                        <h3 className="text-lg font-medium mb-4">Treatment Options</h3>
+                        <h3 className="text-lg font-medium mb-4">Planning</h3>
                         <p className="text-sm text-gray-400 mb-6">
-                          Toggle each option to customize your preferred treatments. The AI will reference 
+                          Toggle each option to customize your preferred planning. The AI will reference 
                           these settings when providing recommendations.
                         </p>
                         
                         {selectedDiagnosisData.treatments.length === 0 ? (
                           <div className="text-center p-4 bg-[#262626] rounded-md">
-                            <p className="text-gray-400">No treatment options defined for this condition yet.</p>
+                            <p className="text-gray-400">No planning options defined for this condition yet.</p>
                           </div>
                         ) : (
                           <div className="space-y-6">
