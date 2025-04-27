@@ -11,7 +11,8 @@ import {
   insertAiDocumentationSchema,
   insertFormSubmissionSchema,
   insertPendingItemSchema,
-  medicationRefills
+  medicationRefills,
+  insuranceDocuments
 } from "@shared/schema";
 import OpenAI from "openai";
 import axios from "axios";
@@ -28,6 +29,7 @@ import { messagingRouter } from "./routes/messaging";
 import formsiteRouter from "./routes/formsite";
 import formsitePseudonymRoutes from "./routes/formsite-pseudonym";
 import medicationRefillsRouter from "./routes/medication-refills";
+import insuranceDocumentsRouter from "./routes/insurance-documents";
 import faxRouter from "./routes/fax";
 
 // Initialize OpenAI API
@@ -57,6 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/formsite", formsiteRouter);
   app.use("/api/formsite-pseudonym", formsitePseudonymRoutes);
   app.use("/api/medication-refills", medicationRefillsRouter);
+  app.use("/api/insurance-documents", insuranceDocumentsRouter);
   app.use("/api/fax", faxRouter);
   app.use("/api", userRouter);
   
