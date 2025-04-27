@@ -556,3 +556,33 @@ export const insertMedicationRefillSchema = createInsertSchema(medicationRefills
 
 export type MedicationRefill = typeof medicationRefills.$inferSelect;
 export type InsertMedicationRefill = z.infer<typeof insertMedicationRefillSchema>;
+
+// Insurance Documents model for patient insurance paperwork
+export const insuranceDocuments = pgTable("insurance_documents", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  patientName: text("patient_name").notNull(),
+  dateReceived: timestamp("date_received").defaultNow(),
+  status: text("status", { enum: ["pending", "processed", "needs_info"] }).notNull().default("pending"),
+  documentType: text("document_type").notNull(), // e.g., 'claim', 'prior_authorization', 'coverage', etc.
+  pdfUrl: text("pdf_url").notNull(),
+  emailSource: text("email_source"),
+  aiProcessed: boolean("ai_processed").default(false),
+  aiConfidence: real("ai_confidence"),
+  processingNotes: text("processing_notes"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertInsuranceDocumentSchema = createInsertSchema(insuranceDocuments).pick({
+  patientName: true,
+  dateReceived: true,
+  status: true,
+  documentType: true,
+  pdfUrl: true,
+  emailSource: true,
+  aiProcessed: true,
+  aiConfidence: true,
+  processingNotes: true,
+});
+
+export type InsuranceDocument = typeof insuranceDocuments.$inferSelect;
+export type InsertInsuranceDocument = z.infer<typeof insertInsuranceDocumentSchema>;
