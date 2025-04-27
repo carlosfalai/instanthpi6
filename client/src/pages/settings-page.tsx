@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import NavigationBar from '@/components/navigation/NavigationBar';
 import NavigationSettings from '@/components/settings/NavigationSettings';
-import { Loader2, Plus, Save, Trash2, Heart, PillIcon, AlertCircle } from 'lucide-react';
+import DiagnosisSettings from '@/components/settings/DiagnosisSettings';
+import { Loader2, Plus, Save, Trash2, Heart, PillIcon, AlertCircle, Stethoscope } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
@@ -267,6 +268,7 @@ export default function SettingsPage() {
               <TabsTrigger value="documentation">Documentation</TabsTrigger>
               <TabsTrigger value="response">Patient Responses</TabsTrigger>
               <TabsTrigger value="analysis">Analysis</TabsTrigger>
+              <TabsTrigger value="diagnoses">Diagnoses</TabsTrigger>
               <TabsTrigger value="application">Application</TabsTrigger>
               <TabsTrigger value="navigation">Navigation</TabsTrigger>
               <TabsTrigger value="add">Add New Prompt</TabsTrigger>
@@ -312,6 +314,10 @@ export default function SettingsPage() {
                   />
                 ))}
               </div>
+            </TabsContent>
+
+            <TabsContent value="diagnoses">
+              <DiagnosisSettings />
             </TabsContent>
             
             <TabsContent value="application">
