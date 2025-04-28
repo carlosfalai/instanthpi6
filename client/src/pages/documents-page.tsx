@@ -1,8 +1,9 @@
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, FileText, Search } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { FileText, Search } from 'lucide-react';
 import NavigationBar from '@/components/navigation/NavigationBar';
 import { Input } from '@/components/ui/input';
+import { Link } from 'wouter';
 
 export default function DocumentsPage() {
   return (
@@ -32,24 +33,90 @@ export default function DocumentsPage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Sample documents - these would be fetched from API in a real implementation */}
-          {["Patient Records", "SOAP Notes", "HPI Summaries", "Prescription History", "Lab Results", "Imaging Reports"].map((docType, index) => (
-            <Card key={index} className="bg-[#1e1e1e] border-gray-800 hover:border-gray-700 transition-colors cursor-pointer">
-              <CardHeader className="pb-2">
-                <CardTitle className="flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-[#2a2a2a] flex items-center justify-center mr-3">
-                    <FileText className="h-5 w-5 text-gray-400" />
-                  </div>
-                  {docType}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-400">
-                  Access and manage all {docType.toLowerCase()}
+          {/* Document Types */}
+          <Link to="/documents/patient-records" className="block">
+            <Card className="bg-[#1e1e1e] border-[#333] hover:border-gray-700 transition-colors cursor-pointer h-full">
+              <CardContent className="p-6 flex flex-col items-start">
+                <div className="flex items-center w-full">
+                  <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                  <h3 className="text-xl font-semibold">Patient Records</h3>
+                </div>
+                <p className="text-sm text-gray-400 mt-2">
+                  Access and manage all patient records
                 </p>
               </CardContent>
             </Card>
-          ))}
+          </Link>
+          
+          <Link to="/documents/soap-notes" className="block">
+            <Card className="bg-[#1e1e1e] border-[#333] hover:border-gray-700 transition-colors cursor-pointer h-full">
+              <CardContent className="p-6 flex flex-col items-start">
+                <div className="flex items-center w-full">
+                  <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                  <h3 className="text-xl font-semibold">SOAP Notes</h3>
+                </div>
+                <p className="text-sm text-gray-400 mt-2">
+                  Access and manage all soap notes
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          
+          <Link to="/documents/hpi-summaries" className="block">
+            <Card className="bg-[#1e1e1e] border-[#333] hover:border-gray-700 transition-colors cursor-pointer h-full">
+              <CardContent className="p-6 flex flex-col items-start">
+                <div className="flex items-center w-full">
+                  <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                  <h3 className="text-xl font-semibold">HPI Summaries</h3>
+                </div>
+                <p className="text-sm text-gray-400 mt-2">
+                  Access and manage all hpi summaries
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          
+          <Link to="/documents/prescription-history" className="block">
+            <Card className="bg-[#1e1e1e] border-[#333] hover:border-gray-700 transition-colors cursor-pointer h-full">
+              <CardContent className="p-6 flex flex-col items-start">
+                <div className="flex items-center w-full">
+                  <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                  <h3 className="text-xl font-semibold">Prescription History</h3>
+                </div>
+                <p className="text-sm text-gray-400 mt-2">
+                  Access and manage all prescription history
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          
+          <Link to="/documents/lab-results" className="block">
+            <Card className="bg-[#1e1e1e] border-[#333] hover:border-gray-700 transition-colors cursor-pointer h-full">
+              <CardContent className="p-6 flex flex-col items-start">
+                <div className="flex items-center w-full">
+                  <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                  <h3 className="text-xl font-semibold">Lab Results</h3>
+                </div>
+                <p className="text-sm text-gray-400 mt-2">
+                  Access and manage all lab results
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+          
+          <Link to="/documents/imaging-reports" className="block">
+            <Card className="bg-[#1e1e1e] border-[#333] hover:border-gray-700 transition-colors cursor-pointer h-full">
+              <CardContent className="p-6 flex flex-col items-start">
+                <div className="flex items-center w-full">
+                  <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                  <h3 className="text-xl font-semibold">Imaging Reports</h3>
+                </div>
+                <p className="text-sm text-gray-400 mt-2">
+                  Access and manage all imaging reports
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
     </div>

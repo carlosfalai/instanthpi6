@@ -299,27 +299,41 @@ const FormsitePage: React.FC = () => {
             {/* Submissions Tab */}
             <TabsContent value="submissions" className="flex-grow data-[state=active]:flex flex-col mt-0">
               <div className="mb-4">
-                <p className="text-sm text-gray-400 mb-3">
-                  View and process patient information by their generated ID
-                </p>
+                <div className="flex justify-between items-center mb-3">
+                  <p className="text-sm text-gray-400">
+                    View and process patient information by their generated ID
+                  </p>
+                  <Button 
+                    onClick={() => refetchSubmissions()}
+                    disabled={isLoadingSubmissions}
+                    variant="outline"
+                    size="sm"
+                    className="border border-gray-700 hover:bg-gray-800 transition-all duration-200 ml-2"
+                  >
+                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingSubmissions ? 'animate-spin' : ''}`} />
+                    Refresh
+                  </Button>
+                </div>
                 
                 {/* Search Input */}
-                <div className="relative">
-                  <Input
-                    placeholder="Search patient IDs..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pr-10 bg-[#252525] border-[#444]"
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                  />
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="absolute right-0 top-0 h-full"
-                    onClick={handleSearch}
-                  >
-                    <Search className="h-4 w-4" />
-                  </Button>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      placeholder="Search patient IDs..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pr-10 bg-[#252525] border-[#444] w-full"
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                    />
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      className="absolute right-0 top-0 h-full"
+                      onClick={handleSearch}
+                    >
+                      <Search className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
               
