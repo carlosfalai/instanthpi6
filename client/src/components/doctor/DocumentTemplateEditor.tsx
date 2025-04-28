@@ -1,16 +1,16 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Upload, Save, Eye, Trash2, Image } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-
-interface DocumentTemplateEditorProps {
-  templateId?: string;
-  initialData?: DocumentTemplate;
-  onSave: (template: DocumentTemplate) => void;
-}
+import { 
+  Eye, 
+  Save, 
+  Upload, 
+  Trash2, 
+  Image
+} from "lucide-react";
 
 export interface DocumentTemplate {
   id?: string;
@@ -26,10 +26,16 @@ export interface DocumentTemplate {
   footerColor: string;
 }
 
-const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
-  templateId,
-  initialData,
-  onSave,
+interface DocumentTemplateEditorProps {
+  templateId?: string;
+  initialData?: DocumentTemplate;
+  onSave: (template: DocumentTemplate) => void;
+}
+
+const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ 
+  templateId, 
+  initialData, 
+  onSave 
 }) => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -89,7 +95,9 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
       setLogoFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
-        setLogoPreview(e.target?.result as string);
+        if (e.target?.result) {
+          setLogoPreview(e.target.result as string);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -104,16 +112,9 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
     try {
       // In a real app, you would upload the logo file to a server
       // and get back a URL to store in the template
-      let logoUrl = template.logoUrl;
-      
-      if (logoFile) {
-        // Simulating logo upload - in a real app, this would be an API call
-        logoUrl = logoPreview;
-      }
-      
       const templateToSave: DocumentTemplate = {
         ...template,
-        logoUrl,
+        logoUrl: logoPreview,
       };
       
       // Call the save function

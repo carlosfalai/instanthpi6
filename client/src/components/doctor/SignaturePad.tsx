@@ -1,6 +1,6 @@
-import { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Check, X } from "lucide-react";
+import { AlertCircle, ArrowRight, Check } from "lucide-react";
 
 interface SignaturePadProps {
   onComplete: (signatureDataUrl: string) => void;
@@ -157,7 +157,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onComplete }) => {
           className="flex items-center"
           type="button"
         >
-          <RefreshCw className="mr-2 h-4 w-4" />
+          <ArrowRight className="mr-2 h-4 w-4" />
           Clear
         </Button>
         
@@ -168,7 +168,7 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onComplete }) => {
             className="flex items-center"
             type="button"
           >
-            <X className="mr-2 h-4 w-4" />
+            <AlertCircle className="mr-2 h-4 w-4" />
             Cancel
           </Button>
           

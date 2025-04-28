@@ -361,7 +361,7 @@ const FormsitePage: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <Zap className="h-4 w-4 mr-2" /> Process with AI
+                      <Zap className="h-4 w-4 mr-2" /> Process with your AI assistant
                     </>
                   )}
                 </Button>
@@ -435,7 +435,7 @@ const FormsitePage: React.FC = () => {
                             </>
                           ) : (
                             <>
-                              <Zap className="h-4 w-4 mr-2" /> Process Now
+                              <Zap className="h-4 w-4 mr-2" /> Process with your AI assistant
                             </>
                           )}
                         </Button>

@@ -1,14 +1,7 @@
-import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 
 interface SignaturePinModalProps {
@@ -20,13 +13,13 @@ interface SignaturePinModalProps {
   isProcessing: boolean;
 }
 
-const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
-  isOpen,
-  isVerifying,
-  onClose,
-  onCreatePin,
-  onVerifyPin,
-  isProcessing,
+const SignaturePinModal: React.FC<SignaturePinModalProps> = ({ 
+  isOpen, 
+  isVerifying, 
+  onClose, 
+  onCreatePin, 
+  onVerifyPin, 
+  isProcessing 
 }) => {
   const [pin, setPin] = useState<string>("");
   const [confirmPin, setConfirmPin] = useState<string>("");
@@ -68,26 +61,26 @@ const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px] bg-[#1e1e1e] border-gray-800">
-        <DialogHeader>
-          <DialogTitle>
-            {isVerifying ? "Verify Signature PIN" : "Create Signature PIN"}
-          </DialogTitle>
-          <DialogDescription>
-            {isVerifying
-              ? "Enter your 4-digit PIN to verify your signature"
-              : "Create a secure 4-digit PIN to protect your signature"}
-          </DialogDescription>
-        </DialogHeader>
+    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center">
+      <div className="bg-[#1e1e1e] border border-gray-800 rounded-md w-full max-w-md p-6">
+        <h2 className="text-xl font-semibold mb-2">
+          {isVerifying ? "Verify Signature PIN" : "Create Signature PIN"}
+        </h2>
+        <p className="text-gray-400 mb-4">
+          {isVerifying
+            ? "Enter your 4-digit PIN to verify your signature"
+            : "Create a secure 4-digit PIN to protect your signature"}
+        </p>
         
         <form onSubmit={handleSubmit}>
-          <div className="grid gap-4 py-4">
+          <div className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="pin" className="text-sm font-medium text-gray-300">
+              <Label htmlFor="pin" className="text-sm font-medium text-gray-300">
                 {isVerifying ? "Your PIN" : "Create PIN"}
-              </label>
+              </Label>
               <Input
                 id="pin"
                 type="password"
@@ -110,9 +103,9 @@ const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
             
             {!isVerifying && (
               <div className="space-y-2">
-                <label htmlFor="confirmPin" className="text-sm font-medium text-gray-300">
+                <Label htmlFor="confirmPin" className="text-sm font-medium text-gray-300">
                   Confirm PIN
-                </label>
+                </Label>
                 <Input
                   id="confirmPin"
                   type="password"
@@ -139,7 +132,7 @@ const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
             )}
           </div>
           
-          <DialogFooter>
+          <div className="flex justify-end space-x-3 mt-6">
             <Button
               type="button"
               variant="outline"
@@ -168,10 +161,10 @@ const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
                 "Create PIN"
               )}
             </Button>
-          </DialogFooter>
+          </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
 
