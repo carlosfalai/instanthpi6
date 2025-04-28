@@ -14,7 +14,9 @@ import {
   PillIcon,
   AlertCircle,
   FormInput,
-  BookOpen
+  BookOpen,
+  Receipt,
+  DollarSign
 } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { User as UserType } from '@shared/schema';
