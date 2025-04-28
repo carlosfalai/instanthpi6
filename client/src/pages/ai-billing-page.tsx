@@ -294,6 +294,30 @@ export default function AiBillingPage() {
             
             <div className="flex flex-wrap gap-2">
               <Button
+                variant="default"
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={() => {
+                  // Sample entry for testing - in real app, this would open a form
+                  const newEntry = {
+                    patientId: 1,
+                    patientName: "Jessica Thompson",
+                    date: new Date().toISOString(),
+                    encounterType: "message",
+                    duration: 15,
+                    description: "Video consultation for headache",
+                    suggestedCodes: ["15773#tt", "8129"],
+                    status: "pending"
+                  };
+                  
+                  createBillingEntry.mutate(newEntry);
+                }}
+              >
+                <PlusCircle className="mr-1 h-4 w-4" />
+                New Entry
+              </Button>
+              
+              <Button
                 variant="outline"
                 size="sm"
                 className="bg-[#1e1e1e] border-gray-700 text-white"
@@ -389,7 +413,7 @@ export default function AiBillingPage() {
                         <TableCell>{entry.description}</TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
-                            {entry.suggestedCodes.map((code) => (
+                            {(entry.suggestedCodes || []).map((code) => (
                               <span key={code} className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">{code}</span>
                             ))}
                           </div>
@@ -424,6 +448,18 @@ export default function AiBillingPage() {
                 size="sm"
                 className="bg-blue-600 hover:bg-blue-700"
                 disabled={selectedEntries.length === 0}
+                onClick={() => {
+                  // Update each selected entry to "processed"
+                  selectedEntries.forEach(id => {
+                    updateBillingEntry.mutate({ 
+                      id, 
+                      entry: { status: 'processed' } 
+                    });
+                  });
+                  
+                  // Clear selection after processing
+                  setSelectedEntries([]);
+                }}
               >
                 Process Selected
               </Button>
