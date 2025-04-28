@@ -174,7 +174,13 @@ export default function AiBillingPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">42</div>
+                <div className="text-2xl font-bold">
+                  {isLoading ? (
+                    <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
+                  ) : (
+                    billingEntries.filter(e => e.status === 'pending').length || 0
+                  )}
+                </div>
                 <p className="text-sm text-gray-400">Entries awaiting processing</p>
               </CardContent>
             </Card>
@@ -187,7 +193,17 @@ export default function AiBillingPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">8</div>
+                <div className="text-2xl font-bold">
+                  {isLoading ? (
+                    <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
+                  ) : (
+                    // Count today's entries
+                    billingEntries.filter(e => {
+                      const today = new Date().toISOString().split('T')[0];
+                      return e.date.includes(today);
+                    }).length || 0
+                  )}
+                </div>
                 <p className="text-sm text-gray-400">New patient encounters today</p>
               </CardContent>
             </Card>
@@ -200,7 +216,13 @@ export default function AiBillingPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">127</div>
+                <div className="text-2xl font-bold">
+                  {isLoading ? (
+                    <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
+                  ) : (
+                    billingEntries.filter(e => e.status === 'processed').length || 0
+                  )}
+                </div>
                 <p className="text-sm text-gray-400">Billing entries processed</p>
               </CardContent>
             </Card>
@@ -338,69 +360,38 @@ export default function AiBillingPage() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {/* Example rows - in production these would come from the API */}
-                    <TableRow className="border-gray-800">
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedEntries.includes(1)}
-                          onCheckedChange={() => toggleEntrySelection(1)}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">Jessica Thompson</TableCell>
-                      <TableCell>April 28, 2025</TableCell>
-                      <TableCell>Video</TableCell>
-                      <TableCell>Annual physical examination</TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          <span className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">99214</span>
-                          <span className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">G0402</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="px-1.5 py-0.5 text-xs rounded bg-yellow-900/30 text-yellow-300">Pending</span>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow className="border-gray-800">
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedEntries.includes(2)}
-                          onCheckedChange={() => toggleEntrySelection(2)}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">Robert Johnson</TableCell>
-                      <TableCell>April 27, 2025</TableCell>
-                      <TableCell>Message</TableCell>
-                      <TableCell>Follow-up on shoulder pain</TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          <span className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">99421</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="px-1.5 py-0.5 text-xs rounded bg-green-900/30 text-green-300">Processed</span>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow className="border-gray-800">
-                      <TableCell>
-                        <Checkbox
-                          checked={selectedEntries.includes(3)}
-                          onCheckedChange={() => toggleEntrySelection(3)}
-                        />
-                      </TableCell>
-                      <TableCell className="font-medium">Sophie Chen</TableCell>
-                      <TableCell>April 26, 2025</TableCell>
-                      <TableCell>Phone</TableCell>
-                      <TableCell>Prescription renewal discussion</TableCell>
-                      <TableCell>
-                        <div className="flex flex-wrap gap-1">
-                          <span className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">99441</span>
-                          <span className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">G2012</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <span className="px-1.5 py-0.5 text-xs rounded bg-red-900/30 text-red-300">Rejected</span>
-                      </TableCell>
-                    </TableRow>
+                    {filteredEntries.map((entry) => (
+                      <TableRow key={entry.id} className="border-gray-800">
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedEntries.includes(entry.id)}
+                            onCheckedChange={() => toggleEntrySelection(entry.id)}
+                          />
+                        </TableCell>
+                        <TableCell className="font-medium">{entry.patientName}</TableCell>
+                        <TableCell>{entry.date}</TableCell>
+                        <TableCell>{entry.encounterType}</TableCell>
+                        <TableCell>{entry.description}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {entry.suggestedCodes.map((code) => (
+                              <span key={code} className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">{code}</span>
+                            ))}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <span className={`px-1.5 py-0.5 text-xs rounded ${
+                            entry.status === 'pending' 
+                              ? 'bg-yellow-900/30 text-yellow-300' 
+                              : entry.status === 'processed' 
+                                ? 'bg-green-900/30 text-green-300' 
+                                : 'bg-red-900/30 text-red-300'
+                          }`}>
+                            {entry.status.charAt(0).toUpperCase() + entry.status.slice(1)}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               ) : (
