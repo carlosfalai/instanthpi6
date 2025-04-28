@@ -5,12 +5,24 @@ import { Button } from '@/components/ui/button';
 import { Stethoscope, ChevronRight, UserRound, Calendar } from 'lucide-react';
 import PatientSearchPanel from '@/components/patients/PatientSearchPanel';
 
+// Import the Patient interface
+interface Patient {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  dateOfBirth: string;
+  gender: string;
+  language: 'english' | 'french' | null;
+  spruceId: string | null;
+}
+
 export default function PatientDashboardPage() {
   const [, setLocation] = useLocation();
   
   // Handle patient selection
-  const handlePatientSelect = (patientId: number) => {
-    setLocation(`/patients/${patientId}`);
+  const handlePatientSelect = (patient: any) => {
+    setLocation(`/patients/${patient.id}`);
   };
   
   return (
@@ -23,7 +35,7 @@ export default function PatientDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Patient Search Panel */}
         <div className="md:col-span-2 bg-[#1e1e1e] rounded-lg overflow-hidden border border-gray-800 shadow-lg h-[600px]">
-          <PatientSearchPanel onPatientSelect={handlePatientSelect} />
+          <PatientSearchPanel onSelectPatient={handlePatientSelect} selectedPatientId={null} />
         </div>
         
         {/* Quick Actions */}
