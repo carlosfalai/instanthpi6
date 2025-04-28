@@ -1,45 +1,9 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { FileText, Search } from 'lucide-react';
 import NavigationBar from '@/components/navigation/NavigationBar';
 import { Input } from '@/components/ui/input';
-import { Link } from 'wouter';
 
 export default function DocumentsPage() {
-  // Document categories
-  const documentTypes = [
-    {
-      id: 'patient-records',
-      title: 'Patient Records',
-      description: 'Access and manage all patient records'
-    },
-    {
-      id: 'soap-notes',
-      title: 'SOAP Notes',
-      description: 'Access and manage all soap notes'
-    },
-    {
-      id: 'hpi-summaries',
-      title: 'HPI Summaries',
-      description: 'Access and manage all hpi summaries'
-    },
-    {
-      id: 'prescription-history',
-      title: 'Prescription History',
-      description: 'Access and manage all prescription history'
-    },
-    {
-      id: 'lab-results',
-      title: 'Lab Results',
-      description: 'Access and manage all lab results'
-    },
-    {
-      id: 'imaging-reports',
-      title: 'Imaging Reports',
-      description: 'Access and manage all imaging reports'
-    }
-  ];
-
   return (
     <div className="min-h-screen flex flex-col bg-[#121212] text-white">
       {/* Header */}
@@ -67,22 +31,83 @@ export default function DocumentsPage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {documentTypes.map((docType) => (
-            <Card 
-              key={docType.id} 
-              className="bg-[#1e1e1e] border border-[#333] hover:border-gray-700 transition-colors cursor-pointer"
-            >
-              <CardContent className="p-6">
-                <div className="flex items-center mb-2">
-                  <FileText className="h-5 w-5 text-blue-400 mr-3" />
-                  <h3 className="text-lg font-semibold">{docType.title}</h3>
-                </div>
-                <p className="text-sm text-gray-400">
-                  {docType.description}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
+          {/* Document Type 1 */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="p-6">
+              <div className="flex items-center mb-2">
+                <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                <h3 className="text-lg font-semibold">Patient Records</h3>
+              </div>
+              <p className="text-sm text-gray-400">
+                Access and manage all patient records
+              </p>
+            </div>
+          </div>
+          
+          {/* Document Type 2 */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="p-6">
+              <div className="flex items-center mb-2">
+                <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                <h3 className="text-lg font-semibold">SOAP Notes</h3>
+              </div>
+              <p className="text-sm text-gray-400">
+                Access and manage all soap notes
+              </p>
+            </div>
+          </div>
+          
+          {/* Document Type 3 */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="p-6">
+              <div className="flex items-center mb-2">
+                <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                <h3 className="text-lg font-semibold">HPI Summaries</h3>
+              </div>
+              <p className="text-sm text-gray-400">
+                Access and manage all hpi summaries
+              </p>
+            </div>
+          </div>
+          
+          {/* Document Type 4 */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="p-6">
+              <div className="flex items-center mb-2">
+                <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                <h3 className="text-lg font-semibold">Prescription History</h3>
+              </div>
+              <p className="text-sm text-gray-400">
+                Access and manage all prescription history
+              </p>
+            </div>
+          </div>
+          
+          {/* Document Type 5 */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="p-6">
+              <div className="flex items-center mb-2">
+                <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                <h3 className="text-lg font-semibold">Lab Results</h3>
+              </div>
+              <p className="text-sm text-gray-400">
+                Access and manage all lab results
+              </p>
+            </div>
+          </div>
+          
+          {/* Document Type 6 */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="p-6">
+              <div className="flex items-center mb-2">
+                <FileText className="h-5 w-5 text-blue-400 mr-3" />
+                <h3 className="text-lg font-semibold">Imaging Reports</h3>
+              </div>
+              <p className="text-sm text-gray-400">
+                Access and manage all imaging reports
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
