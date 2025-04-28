@@ -21,7 +21,7 @@ export default function PatientDashboardPage() {
   const [, setLocation] = useLocation();
   
   // Handle patient selection
-  const handlePatientSelect = (patient: any) => {
+  const handlePatientSelect = (patient: Patient) => {
     setLocation(`/patients/${patient.id}`);
   };
   

@@ -84,6 +84,7 @@ export default function NavigationBar() {
     { id: 'scheduler', path: '/scheduler', icon: <Calendar className="h-5 w-5" />, label: 'Scheduler', visible: true, order: 5, row: 'primary' },
     { id: 'formsite', path: '/formsite', icon: <FormInput className="h-5 w-5" />, label: 'formsite', visible: true, order: 6, row: 'primary' },
     { id: 'knowledgeBase', path: '/knowledge-base', icon: <BookOpen className="h-5 w-5" />, label: 'Knowledge Base', visible: true, order: 7, row: 'primary' },
+    { id: 'aiBilling', path: '/ai-billing', icon: <Receipt className="h-5 w-5" />, label: 'AI Billing', visible: true, order: 8, row: 'primary' },
     { id: 'forms', path: '/forms', icon: <ClipboardList className="h-5 w-5" />, label: 'Forms', visible: true, order: 1, row: 'secondary' },
     { id: 'chronicConditions', path: '/chronic-conditions', icon: <Heart className="h-5 w-5" />, label: 'Chronic Conditions', visible: navPreferences.showChronicConditions, order: 2, row: 'secondary' },
     { id: 'medicationRefills', path: '/medication-refills', icon: <PillIcon className="h-5 w-5" />, label: 'Medication Refills', visible: navPreferences.showMedicationRefills, order: 3, row: 'secondary' },

@@ -124,6 +124,27 @@ async function createMessagesForPatient(patientId: number) {
   await storage.createMessage({
     patientId,
     senderId: patientId,
+    content: "I've been feeling a bit dizzy in the mornings, and sometimes I have a dry mouth. I'm also wondering if I should continue taking it with meals or if I can take it on an empty stomach?",
+    isFromPatient: true
+  });
+  
+  await storage.createMessage({
+    patientId,
+    senderId: 1, // Doctor
+    content: "Treatment Plan:\n\n1. Continue with current medication but take it with food to minimize dizziness\n2. Decrease dosage from 20mg to 15mg daily\n3. Increase water intake to address dry mouth\n4. Monitor for 7 days and report any changes\n\nFollow up in 2 weeks if symptoms persist.",
+    isFromPatient: false
+  });
+  
+  await storage.createMessage({
+    patientId,
+    senderId: patientId,
+    content: "Thank you doctor, I understand the plan. I'll take it with food and reduce the dosage as suggested. I'll drink more water too and let you know how it goes after a week.",
+    isFromPatient: true
+  });
+  
+  await storage.createMessage({
+    patientId,
+    senderId: patientId,
     content: "I've been feeling a bit dizzy in the mornings, and sometimes I have a slight headache that lasts for a few hours.",
     isFromPatient: true
   });

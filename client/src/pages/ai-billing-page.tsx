@@ -1,0 +1,483 @@
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import {
+  Calendar,
+  CalendarIcon,
+  Download,
+  FileText,
+  Loader2,
+  Mail,
+  Printer,
+  RefreshCw,
+  Search,
+  Settings,
+  Wallet,
+} from 'lucide-react';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarComponent } from '@/components/ui/calendar';
+
+interface BillingEntry {
+  id: number;
+  patientName: string;
+  patientId: number;
+  date: string;
+  encounterType: 'message' | 'video' | 'form' | 'phone';
+  duration: number;
+  description: string;
+  suggestedCodes: string[];
+  status: 'pending' | 'processed' | 'rejected';
+  providerNote?: string;
+}
+
+export default function AiBillingPage() {
+  const { toast } = useToast();
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [aiEnabled, setAiEnabled] = useState(true);
+  const [selectedEntries, setSelectedEntries] = useState<number[]>([]);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Query to fetch billing entries
+  const {
+    data: billingEntries = [],
+    isLoading,
+    refetch,
+  } = useQuery<BillingEntry[]>({
+    queryKey: ['/api/billing/entries'],
+    enabled: true,
+  });
+
+  // Filter entries based on search and filters
+  const filteredEntries = billingEntries.filter(entry => {
+    const matchesSearch = entry.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        entry.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = filterStatus === 'all' || entry.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
+
+  // Toggle entry selection
+  const toggleEntrySelection = (id: number) => {
+    if (selectedEntries.includes(id)) {
+      setSelectedEntries(selectedEntries.filter(entryId => entryId !== id));
+    } else {
+      setSelectedEntries([...selectedEntries, id]);
+    }
+  };
+
+  // Handle regenerating AI suggestions
+  const handleRegenerateAI = async () => {
+    if (selectedEntries.length === 0) {
+      toast({
+        title: "No entries selected",
+        description: "Please select at least one billing entry to regenerate AI suggestions.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Mock API call - you would replace this with actual API call
+    toast({
+      title: "Generating billing codes",
+      description: `Analyzing ${selectedEntries.length} entries with AI...`,
+    });
+
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    toast({
+      title: "AI analysis complete",
+      description: "Billing codes have been updated with AI suggestions.",
+    });
+  };
+
+  // Handle exporting selected entries
+  const handleExport = (format: 'pdf' | 'csv' | 'email') => {
+    if (selectedEntries.length === 0) {
+      toast({
+        title: "No entries selected",
+        description: "Please select at least one billing entry to export.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    switch (format) {
+      case 'pdf':
+        toast({
+          title: "PDF Export Started",
+          description: `Exporting ${selectedEntries.length} entries as PDF...`,
+        });
+        break;
+      case 'csv':
+        toast({
+          title: "CSV Export Started",
+          description: `Exporting ${selectedEntries.length} entries as CSV...`,
+        });
+        break;
+      case 'email':
+        toast({
+          title: "Email Initiated",
+          description: `Preparing to email ${selectedEntries.length} entries to billing department...`,
+        });
+        break;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#121212] text-white p-4">
+      <div className="max-w-7xl mx-auto">
+        <header className="mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-2xl font-bold mb-1">AI Billing Assistant</h1>
+              <p className="text-gray-400">Organize and process billing information with AI assistance</p>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="ai-toggle" className="text-sm font-medium">
+                AI Suggestions
+              </Label>
+              <Switch
+                id="ai-toggle"
+                checked={aiEnabled}
+                onCheckedChange={setAiEnabled}
+              />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <Card className="bg-[#1e1e1e] border-gray-800">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-md flex items-center">
+                  <Wallet className="mr-2 h-4 w-4 text-blue-400" />
+                  <span>Pending Entries</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">42</div>
+                <p className="text-sm text-gray-400">Entries awaiting processing</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-[#1e1e1e] border-gray-800">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-md flex items-center">
+                  <Calendar className="mr-2 h-4 w-4 text-green-400" />
+                  <span>Today's Encounters</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">8</div>
+                <p className="text-sm text-gray-400">New patient encounters today</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-[#1e1e1e] border-gray-800">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-md flex items-center">
+                  <FileText className="mr-2 h-4 w-4 text-purple-400" />
+                  <span>Processed This Month</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">127</div>
+                <p className="text-sm text-gray-400">Billing entries processed</p>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+            <div className="flex items-center flex-wrap gap-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                <Input
+                  type="text"
+                  placeholder="Search patients or descriptions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-8 bg-[#1e1e1e] border-gray-700 text-white w-full md:w-64"
+                />
+              </div>
+              
+              <Select
+                value={filterStatus}
+                onValueChange={setFilterStatus}
+              >
+                <SelectTrigger className="w-full md:w-40 bg-[#1e1e1e] border-gray-700 text-white">
+                  <SelectValue placeholder="Filter by status" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#1e1e1e] border-gray-700 text-white">
+                  <SelectItem value="all">All Status</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="processed">Processed</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="bg-[#1e1e1e] border-gray-700 text-white"
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0 bg-[#1e1e1e] border-gray-700">
+                  <CalendarComponent
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-[#1e1e1e] border-gray-700 text-white"
+                onClick={() => handleRegenerateAI()}
+                disabled={!aiEnabled}
+              >
+                <RefreshCw className="mr-1 h-4 w-4" />
+                Regenerate AI
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-[#1e1e1e] border-gray-700 text-white"
+                onClick={() => handleExport('pdf')}
+              >
+                <Download className="mr-1 h-4 w-4" />
+                Export PDF
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-[#1e1e1e] border-gray-700 text-white"
+                onClick={() => handleExport('email')}
+              >
+                <Mail className="mr-1 h-4 w-4" />
+                Email Report
+              </Button>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                className="bg-[#1e1e1e] border-gray-700 text-white"
+                onClick={() => handleExport('csv')}
+              >
+                <Printer className="mr-1 h-4 w-4" />
+                Print
+              </Button>
+            </div>
+          </div>
+        </header>
+        
+        <main>
+          <Card className="bg-[#1e1e1e] border-gray-800">
+            <CardHeader className="pb-0">
+              <CardTitle>Billing Entries</CardTitle>
+              <CardDescription className="text-gray-400">
+                {aiEnabled ? 'AI-assisted billing code suggestions enabled' : 'AI suggestions disabled'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <div className="flex justify-center items-center py-10">
+                  <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                </div>
+              ) : filteredEntries.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-gray-800">
+                      <TableHead className="w-12">
+                        <Checkbox
+                          checked={selectedEntries.length > 0 && selectedEntries.length === filteredEntries.length}
+                          onCheckedChange={(checked) => {
+                            if (checked) {
+                              setSelectedEntries(filteredEntries.map(entry => entry.id));
+                            } else {
+                              setSelectedEntries([]);
+                            }
+                          }}
+                        />
+                      </TableHead>
+                      <TableHead>Patient</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Suggested Codes</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {/* Example rows - in production these would come from the API */}
+                    <TableRow className="border-gray-800">
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedEntries.includes(1)}
+                          onCheckedChange={() => toggleEntrySelection(1)}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium">Jessica Thompson</TableCell>
+                      <TableCell>April 28, 2025</TableCell>
+                      <TableCell>Video</TableCell>
+                      <TableCell>Annual physical examination</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          <span className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">99214</span>
+                          <span className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">G0402</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="px-1.5 py-0.5 text-xs rounded bg-yellow-900/30 text-yellow-300">Pending</span>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow className="border-gray-800">
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedEntries.includes(2)}
+                          onCheckedChange={() => toggleEntrySelection(2)}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium">Robert Johnson</TableCell>
+                      <TableCell>April 27, 2025</TableCell>
+                      <TableCell>Message</TableCell>
+                      <TableCell>Follow-up on shoulder pain</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          <span className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">99421</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="px-1.5 py-0.5 text-xs rounded bg-green-900/30 text-green-300">Processed</span>
+                      </TableCell>
+                    </TableRow>
+                    <TableRow className="border-gray-800">
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedEntries.includes(3)}
+                          onCheckedChange={() => toggleEntrySelection(3)}
+                        />
+                      </TableCell>
+                      <TableCell className="font-medium">Sophie Chen</TableCell>
+                      <TableCell>April 26, 2025</TableCell>
+                      <TableCell>Phone</TableCell>
+                      <TableCell>Prescription renewal discussion</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          <span className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">99441</span>
+                          <span className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300">G2012</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <span className="px-1.5 py-0.5 text-xs rounded bg-red-900/30 text-red-300">Rejected</span>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center py-10 text-gray-500">
+                  No billing entries match your search criteria
+                </div>
+              )}
+            </CardContent>
+            <CardFooter className="flex justify-between border-t border-gray-800 pt-4">
+              <div className="text-sm text-gray-400">
+                {selectedEntries.length > 0 ? `${selectedEntries.length} entries selected` : 'No entries selected'}
+              </div>
+              <Button
+                variant="default"
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700"
+                disabled={selectedEntries.length === 0}
+              >
+                Process Selected
+              </Button>
+            </CardFooter>
+          </Card>
+          
+          <div className="mt-6">
+            <h2 className="text-lg font-medium mb-3">Educational Resources</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <Card className="bg-[#1e1e1e] border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-md">Medical Billing Basics</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-400">
+                    Learn the fundamentals of medical billing, including code selection, documentation requirements, and common pitfalls to avoid.
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="outline" className="w-full bg-[#262626] hover:bg-[#333] border-gray-700">
+                    View Guide
+                  </Button>
+                </CardFooter>
+              </Card>
+              
+              <Card className="bg-[#1e1e1e] border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-md">Telemedicine Billing Codes</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-400">
+                    Comprehensive guide to billing codes specific to telemedicine services, including virtual visits and remote monitoring.
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="outline" className="w-full bg-[#262626] hover:bg-[#333] border-gray-700">
+                    View Guide
+                  </Button>
+                </CardFooter>
+              </Card>
+              
+              <Card className="bg-[#1e1e1e] border-gray-800">
+                <CardHeader>
+                  <CardTitle className="text-md">2025 Coding Updates</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-400">
+                    Stay current with the latest changes to medical billing codes, reimbursement policies, and documentation requirements.
+                  </p>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="outline" className="w-full bg-[#262626] hover:bg-[#333] border-gray-700">
+                    View Guide
+                  </Button>
+                </CardFooter>
+              </Card>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
