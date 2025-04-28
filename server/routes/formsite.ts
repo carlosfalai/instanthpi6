@@ -202,21 +202,9 @@ router.post('/submissions/:id/process', async (req, res) => {
     } catch (apiError: any) {
       // If FormSite API returns a 404 for this submission
       if (apiError.response && apiError.response.status === 404) {
-        // Generate a sample HPI confirmation with a note about the missing data
-        const sampleHpiConfirmation = `
-        <h3>HPI Confirmation Summary</h3>
-        <p>This is a sample confirmation for demonstration purposes.</p>
-        <ul>
-          <li>Submission ID: ${submissionId}</li>
-          <li>Form contains sample data as the original submission was not found</li>
-          <li>Generated on: ${new Date().toLocaleString()}</li>
-        </ul>
-        <p>Is this correct? [Yes] [No, there are corrections needed]</p>
-        `;
-        
-        return res.json({
-          processed: true,
-          aiContent: sampleHpiConfirmation
+        return res.status(404).json({ 
+          message: 'Form submission not found',
+          processed: false
         });
       }
       

@@ -247,9 +247,7 @@ const FormsitePage: React.FC = () => {
                   )}
                 </div>
                 
-                <p className="text-xs text-gray-500 mt-1">
-                  ID: {submission.id}
-                </p>
+
               </div>
             </div>
           );
