@@ -31,82 +31,70 @@ export default function DocumentsPage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Document Type 1 */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="p-6">
-              <div className="flex items-center mb-2">
-                <FileText className="h-5 w-5 text-blue-400 mr-3" />
-                <h3 className="text-lg font-semibold">Patient Records</h3>
-              </div>
-              <p className="text-sm text-gray-400">
-                Access and manage all patient records
-              </p>
+          {/* Patient Records */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="flex items-center mb-2">
+              <FileText className="h-5 w-5 text-blue-400 mr-3" />
+              <h3 className="text-xl font-semibold">Patient Records</h3>
             </div>
+            <p className="text-sm text-gray-400">
+              Access and manage all patient records
+            </p>
           </div>
           
-          {/* Document Type 2 */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="p-6">
-              <div className="flex items-center mb-2">
-                <FileText className="h-5 w-5 text-blue-400 mr-3" />
-                <h3 className="text-lg font-semibold">SOAP Notes</h3>
-              </div>
-              <p className="text-sm text-gray-400">
-                Access and manage all soap notes
-              </p>
+          {/* SOAP Notes */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="flex items-center mb-2">
+              <FileText className="h-5 w-5 text-blue-400 mr-3" />
+              <h3 className="text-xl font-semibold">SOAP Notes</h3>
             </div>
+            <p className="text-sm text-gray-400">
+              Access and manage all soap notes
+            </p>
           </div>
           
-          {/* Document Type 3 */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="p-6">
-              <div className="flex items-center mb-2">
-                <FileText className="h-5 w-5 text-blue-400 mr-3" />
-                <h3 className="text-lg font-semibold">HPI Summaries</h3>
-              </div>
-              <p className="text-sm text-gray-400">
-                Access and manage all hpi summaries
-              </p>
+          {/* HPI Summaries */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="flex items-center mb-2">
+              <FileText className="h-5 w-5 text-blue-400 mr-3" />
+              <h3 className="text-xl font-semibold">HPI Summaries</h3>
             </div>
+            <p className="text-sm text-gray-400">
+              Access and manage all hpi summaries
+            </p>
           </div>
           
-          {/* Document Type 4 */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="p-6">
-              <div className="flex items-center mb-2">
-                <FileText className="h-5 w-5 text-blue-400 mr-3" />
-                <h3 className="text-lg font-semibold">Prescription History</h3>
-              </div>
-              <p className="text-sm text-gray-400">
-                Access and manage all prescription history
-              </p>
+          {/* Prescription History */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="flex items-center mb-2">
+              <FileText className="h-5 w-5 text-blue-400 mr-3" />
+              <h3 className="text-xl font-semibold">Prescription History</h3>
             </div>
+            <p className="text-sm text-gray-400">
+              Access and manage all prescription history
+            </p>
           </div>
           
-          {/* Document Type 5 */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="p-6">
-              <div className="flex items-center mb-2">
-                <FileText className="h-5 w-5 text-blue-400 mr-3" />
-                <h3 className="text-lg font-semibold">Lab Results</h3>
-              </div>
-              <p className="text-sm text-gray-400">
-                Access and manage all lab results
-              </p>
+          {/* Lab Results */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="flex items-center mb-2">
+              <FileText className="h-5 w-5 text-blue-400 mr-3" />
+              <h3 className="text-xl font-semibold">Lab Results</h3>
             </div>
+            <p className="text-sm text-gray-400">
+              Access and manage all lab results
+            </p>
           </div>
           
-          {/* Document Type 6 */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="p-6">
-              <div className="flex items-center mb-2">
-                <FileText className="h-5 w-5 text-blue-400 mr-3" />
-                <h3 className="text-lg font-semibold">Imaging Reports</h3>
-              </div>
-              <p className="text-sm text-gray-400">
-                Access and manage all imaging reports
-              </p>
+          {/* Imaging Reports */}
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
+            <div className="flex items-center mb-2">
+              <FileText className="h-5 w-5 text-blue-400 mr-3" />
+              <h3 className="text-xl font-semibold">Imaging Reports</h3>
             </div>
+            <p className="text-sm text-gray-400">
+              Access and manage all imaging reports
+            </p>
           </div>
         </div>
       </div>
