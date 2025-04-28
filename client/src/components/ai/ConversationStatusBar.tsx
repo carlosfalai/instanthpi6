@@ -18,9 +18,9 @@ interface ConversationStatusBarProps {
 }
 
 export default function ConversationStatusBar({ 
-  status, 
-  statusDetail, 
-  patientName 
+  status = 'unknown', 
+  statusDetail = '', 
+  patientName = 'Patient'
 }: ConversationStatusBarProps) {
   
   // Status configuration: icon, color, label
@@ -69,7 +69,7 @@ export default function ConversationStatusBar({
     }
   };
 
-  const config = statusConfig[status];
+  const config = statusConfig[status] || statusConfig.unknown;
 
   return (
     <div className="w-full sticky top-0 z-10 bg-[#121212] border-b border-gray-800 px-3 py-2.5">

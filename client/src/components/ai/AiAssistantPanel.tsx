@@ -170,14 +170,12 @@ export default function AiAssistantPanel({
   
   return (
     <div className="flex flex-col h-full bg-[#121212] text-white">
-      {/* Conversation Status Bar - Fixed at the top */}
-      {patient && (
-        <ConversationStatusBar 
-          status={status} 
-          statusDetail={statusDetail} 
-          patientName={patient?.name || 'Patient'}
-        />
-      )}
+      {/* Conversation Status Bar - Fixed at the top, always visible */}
+      <ConversationStatusBar 
+        status={status} 
+        statusDetail={statusDetail} 
+        patientName={patient?.name || 'Patient'}
+      />
       
       <Tabs defaultValue="suggestions" className="h-full flex flex-col" onValueChange={(value) => setActiveTab(value as any)}>
         <div className="p-3 bg-[#1e1e1e] border-b border-gray-800">
