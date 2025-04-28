@@ -1,11 +1,12 @@
 import React, { useState, useRef } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { SendHorizontal, Loader2, Sparkles, X, MessageSquare, FileText, Clipboard, ClipboardList, Mail, Languages, Copy } from 'lucide-react';
+import { SendHorizontal, Loader2, Sparkles, X, MessageSquare, FileText, Clipboard, ClipboardList, Mail, Languages, Copy, Wallet } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { Badge } from '@/components/ui/badge';
@@ -51,7 +52,11 @@ export default function AiAssistantPanel({
   const [selectedSuggestions, setSelectedSuggestions] = useState<Record<string, boolean>>({});
   const [activeTab, setActiveTab] = useState<'suggestions' | 'plan' | 'custom'>('plan');
   const [previewContent, setPreviewContent] = useState<string>('');
-  const [selectedBillingCode, setSelectedBillingCode] = useState<boolean>(false);
+  const [selectedBillingCodes, setSelectedBillingCodes] = useState<Record<string, boolean>>({
+    telemed: false,
+    translation: false
+  });
+  const [customBillingCode, setCustomBillingCode] = useState<string>('');
   
   // Query for patient data
   const { 
@@ -387,11 +392,46 @@ export default function AiAssistantPanel({
                         <div className="flex items-center">
                           <Checkbox 
                             id="billing-telemed"
+                            checked={selectedBillingCodes.telemed}
+                            onCheckedChange={(checked) => setSelectedBillingCodes(prev => ({
+                              ...prev,
+                              telemed: !!checked
+                            }))}
                             className="mr-2"
                           />
                           <Label htmlFor="billing-telemed" className="text-sm font-normal cursor-pointer flex-1">
                             Telemedicine consultation (15773#tt)
                           </Label>
+                        </div>
+                        
+                        <div className="flex items-center">
+                          <Checkbox 
+                            id="billing-translation"
+                            checked={selectedBillingCodes.translation}
+                            onCheckedChange={(checked) => setSelectedBillingCodes(prev => ({
+                              ...prev,
+                              translation: !!checked
+                            }))}
+                            className="mr-2"
+                          />
+                          <Label htmlFor="billing-translation" className="text-sm font-normal cursor-pointer flex-1">
+                            Translation service for non-French/English speaking patient
+                          </Label>
+                        </div>
+                        
+                        <div className="mt-2">
+                          <Label htmlFor="custom-billing-code" className="text-xs text-gray-400 mb-1 block">
+                            Add custom billing code:
+                          </Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="custom-billing-code"
+                              value={customBillingCode}
+                              onChange={(e) => setCustomBillingCode(e.target.value)}
+                              placeholder="e.g. 8472#hc"
+                              className="h-8 text-sm bg-[#262626] border-gray-700"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -563,6 +603,12 @@ export default function AiAssistantPanel({
                       if (fupItems.length > 0) {
                         preview += "\nFollow-up:\n";
                         fupItems.forEach(item => preview += `- ${item.text}\n`);
+                      }
+                      
+                      // Add billing code if selected
+                      if (selectedBillingCode) {
+                        preview += "\n💼 Billing:\n";
+                        preview += "- Telemedicine consultation (15773#tt)\n";
                       }
                       
                       // Add action items
