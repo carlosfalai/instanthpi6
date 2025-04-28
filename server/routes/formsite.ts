@@ -90,19 +90,7 @@ router.get('/submissions/:id', async (req, res) => {
     } catch (apiError: any) {
       // Check if this is a 404 error from the FormSite API
       if (apiError.response && apiError.response.status === 404) {
-        // Return a mock submission object with placeholder data if the actual submission doesn't exist
-        // This is useful for development and testing
-        const mockSubmission = {
-          id: submissionId,
-          reference: submissionId,
-          status: 'submitted',
-          date_submitted: new Date().toISOString(),
-          results: {},
-          processed: false,
-          aiProcessedContent: ''
-        };
-        
-        return res.json(mockSubmission);
+        return res.status(404).json({ message: 'Form submission not found' });
       }
       
       // For other API errors, return an appropriate error response

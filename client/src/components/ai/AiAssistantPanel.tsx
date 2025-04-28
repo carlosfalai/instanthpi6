@@ -51,6 +51,7 @@ export default function AiAssistantPanel({
   const [selectedSuggestions, setSelectedSuggestions] = useState<Record<string, boolean>>({});
   const [activeTab, setActiveTab] = useState<'suggestions' | 'plan' | 'custom'>('plan');
   const [previewContent, setPreviewContent] = useState<string>('');
+  const [selectedBillingCode, setSelectedBillingCode] = useState<boolean>(false);
   
   // Query for patient data
   const { 
@@ -373,6 +374,25 @@ export default function AiAssistantPanel({
                             </div>
                           ))
                         }
+                      </div>
+                    </div>
+                    
+                    {/* Billing Section */}
+                    <div className="mb-3 p-2 border border-blue-800/50 rounded-md bg-blue-900/20">
+                      <h4 className="font-medium text-blue-400 mb-1 flex items-center">
+                        <Wallet className="h-4 w-4 mr-1" />
+                        Billing
+                      </h4>
+                      <div className="space-y-1.5">
+                        <div className="flex items-center">
+                          <Checkbox 
+                            id="billing-telemed"
+                            className="mr-2"
+                          />
+                          <Label htmlFor="billing-telemed" className="text-sm font-normal cursor-pointer flex-1">
+                            Telemedicine consultation (15773#tt)
+                          </Label>
+                        </div>
                       </div>
                     </div>
                     
