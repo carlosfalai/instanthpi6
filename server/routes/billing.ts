@@ -6,15 +6,14 @@ import {
   insertBillingEntrySchema, 
   billingEntries 
 } from "@shared/schema";
+import { eq } from "drizzle-orm";
 
 const router = Router();
 
 // Get all billing entries
 router.get('/entries', async (req, res) => {
   try {
-    const entries = await db.query.billingEntries.findMany({
-      orderBy: (billingEntries, { desc }) => [desc(billingEntries.date)]
-    });
+    const entries = await db.select().from(billingEntries).orderBy(billingEntries.date);
     res.json(entries);
   } catch (error) {
     console.error('Error fetching billing entries:', error);
@@ -30,7 +29,6 @@ router.post('/entries', async (req, res) => {
     const [newEntry] = await db.insert(billingEntries)
       .values({
         ...billingEntry,
-        id: billingEntry.id || Math.floor(Math.random() * 10000), // Temp ID generation
         date: billingEntry.date || new Date().toISOString(),
         status: billingEntry.status || 'pending'
       })
@@ -57,7 +55,7 @@ router.patch('/entries/:id', async (req, res) => {
     
     const [updatedEntry] = await db.update(billingEntries)
       .set(req.body)
-      .where(billingEntries.id.equals(id))
+      .where(eq(billingEntries.id, id))
       .returning();
       
     if (!updatedEntry) {
@@ -80,7 +78,7 @@ router.delete('/entries/:id', async (req, res) => {
     }
     
     await db.delete(billingEntries)
-      .where(billingEntries.id.equals(id));
+      .where(eq(billingEntries.id, id));
       
     res.status(204).send();
   } catch (error) {

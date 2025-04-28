@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useBillingEntries, useBillingMutations } from '@/hooks/use-billing';
 import {
   Card,
   CardContent,
@@ -62,15 +63,19 @@ export default function AiBillingPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Query to fetch billing entries
+  // Use our custom hook to fetch billing entries
   const {
     data: billingEntries = [],
     isLoading,
     refetch,
-  } = useQuery<BillingEntry[]>({
-    queryKey: ['/api/billing/entries'],
-    enabled: true,
-  });
+  } = useBillingEntries();
+  
+  // Get mutations for billing entries
+  const { 
+    createBillingEntry, 
+    updateBillingEntry, 
+    deleteBillingEntry 
+  } = useBillingMutations();
 
   // Filter entries based on search and filters
   const filteredEntries = billingEntries.filter(entry => {

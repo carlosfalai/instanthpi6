@@ -586,3 +586,37 @@ export const insertInsuranceDocumentSchema = createInsertSchema(insuranceDocumen
 
 export type InsuranceDocument = typeof insuranceDocuments.$inferSelect;
 export type InsertInsuranceDocument = z.infer<typeof insertInsuranceDocumentSchema>;
+
+// Billing entries model
+export const billingEntries = pgTable("billing_entries", {
+  id: serial("id").primaryKey(),
+  patientId: integer("patient_id").notNull(),
+  patientName: text("patient_name").notNull(),
+  patientDOB: text("patient_dob"),
+  date: text("date").notNull(),
+  encounterType: text("encounter_type").notNull(), // 'message', 'video', 'form', 'phone'
+  duration: integer("duration").default(0), // Duration in minutes
+  description: text("description").notNull(),
+  suggestedCodes: text("suggested_codes").array(),
+  status: text("status").notNull().default("pending"), // 'pending', 'processed', 'rejected'
+  providerNote: text("provider_note"),
+  serviceTime: text("service_time"), // Timestamp when service ended
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertBillingEntrySchema = createInsertSchema(billingEntries).pick({
+  patientId: true,
+  patientName: true,
+  patientDOB: true,
+  date: true,
+  encounterType: true,
+  duration: true,
+  description: true,
+  suggestedCodes: true,
+  status: true,
+  providerNote: true,
+  serviceTime: true,
+});
+
+export type BillingEntry = typeof billingEntries.$inferSelect;
+export type InsertBillingEntry = z.infer<typeof insertBillingEntrySchema>;
