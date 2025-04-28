@@ -4,6 +4,7 @@ import { apiRequest } from '@/lib/queryClient';
  * Service for managing mappings between patient pseudonyms and their chat conversations
  */
 export interface PseudonymLink {
+  id: number;
   pseudonym: string;
   patientId: number;
   patientName: string;
@@ -54,7 +55,7 @@ export const pseudonymMappingService = {
   /**
    * Creates a new pseudonym-patient link
    */
-  async createPseudonymLink(link: Omit<PseudonymLink, 'timestamp'>): Promise<PseudonymLink> {
+  async createPseudonymLink(link: Omit<PseudonymLink, 'timestamp' | 'id'> & { id?: number }): Promise<PseudonymLink> {
     try {
       const response = await apiRequest('POST', '/api/pseudonym-links', link);
       return await response.json();

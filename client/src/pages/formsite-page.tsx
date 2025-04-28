@@ -11,7 +11,8 @@ import { Loader2, Search, FileText, RefreshCw, Zap, FormInput, UserRound } from 
 import { format } from 'date-fns';
 import formsiteService, { FormSiteSubmission } from '@/services/formsite';
 import { getFieldLabel, formatFieldValue } from '@/services/formsiteFieldMapping';
-import { PseudonymLookup } from '@/components/pseudonym-lookup';
+import CreatePseudonymLink from '@/components/pseudonym/CreatePseudonymLink';
+import PseudonymLinks from '@/components/pseudonym/PseudonymLinks';
 
 const FormsitePage: React.FC = () => {
   const { toast } = useToast();
@@ -345,7 +346,19 @@ const FormsitePage: React.FC = () => {
             
             {/* Pseudonym Lookup Tab */}
             <TabsContent value="pseudonym" className="flex-grow data-[state=active]:flex flex-col mt-0">
-              <PseudonymLookup />
+              <div className="flex flex-col gap-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-lg font-medium">Pseudonym Management</h2>
+                  <CreatePseudonymLink 
+                    pseudonym={selectedSubmission?.results?.['1'] || ''}
+                  />
+                </div>
+                <div className="mt-2">
+                  <PseudonymLinks 
+                    pseudonym={selectedSubmission?.results?.['1'] || ''}
+                  />
+                </div>
+              </div>
             </TabsContent>
           </Tabs>
         </div>
