@@ -52,6 +52,25 @@ export default function AiAssistantPanel({
   const [activeTab, setActiveTab] = useState<'suggestions' | 'plan' | 'custom'>('plan');
   const [previewContent, setPreviewContent] = useState<string>('');
   
+  // Query for patient data
+  const { 
+    data: patient
+  } = useQuery<any>({
+    queryKey: [`/api/patients/${patientId}`],
+    enabled: !!patientId,
+  });
+  
+  // Query for patient messages
+  const {
+    data: messages = [],
+  } = useQuery<any[]>({
+    queryKey: [`/api/patients/${patientId}/messages`],
+    enabled: !!patientId,
+  });
+  
+  // Analyze conversation status
+  const { status, statusDetail } = useConversationStatus(messages, patient);
+  
   // Treatment plan items with checkboxes
   const [treatmentItems, setTreatmentItems] = useState<TreatmentItem[]>([
     { id: 'med1', text: 'Trial NSAID (e.g., ibuprofen) ± acetaminophen', category: 'medication', isSelected: false },
@@ -151,6 +170,15 @@ export default function AiAssistantPanel({
   
   return (
     <div className="flex flex-col h-full bg-[#121212] text-white">
+      {/* Conversation Status Bar - Fixed at the top */}
+      {patient && (
+        <ConversationStatusBar 
+          status={status} 
+          statusDetail={statusDetail} 
+          patientName={patient?.name || 'Patient'}
+        />
+      )}
+      
       <Tabs defaultValue="suggestions" className="h-full flex flex-col" onValueChange={(value) => setActiveTab(value as any)}>
         <div className="p-3 bg-[#1e1e1e] border-b border-gray-800">
           <h2 className="font-semibold mb-3">AI Assistant</h2>
