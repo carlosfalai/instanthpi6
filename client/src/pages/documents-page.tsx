@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Search } from 'lucide-react';
+import { FileText, Search, Cat } from 'lucide-react';
 import NavigationBar from '@/components/navigation/NavigationBar';
 import { Input } from '@/components/ui/input';
 
@@ -30,71 +30,26 @@ export default function DocumentsPage() {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Patient Records */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="flex items-center mb-2">
-              <FileText className="h-5 w-5 text-blue-400 mr-3" />
-              <h3 className="text-xl font-semibold">Patient Records</h3>
+        <div className="flex flex-col items-center justify-center p-10">
+          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-8 hover:border-gray-700 transition-colors cursor-pointer max-w-2xl w-full">
+            <div className="flex items-center mb-4 justify-center">
+              <Cat className="h-10 w-10 text-purple-400 mr-4" />
+              <h2 className="text-3xl font-bold">Catty</h2>
             </div>
-            <p className="text-sm text-gray-400">
-              Access and manage all patient records
-            </p>
-          </div>
-          
-          {/* SOAP Notes */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="flex items-center mb-2">
-              <FileText className="h-5 w-5 text-blue-400 mr-3" />
-              <h3 className="text-xl font-semibold">SOAP Notes</h3>
+            <div className="bg-[#272727] p-6 rounded-md mt-4">
+              <h3 className="text-xl font-semibold mb-2 text-blue-400">Definition:</h3>
+              <p className="text-lg text-gray-200 leading-relaxed">
+                "Catty" is a term used to describe slyly malicious or spiteful behavior, particularly in verbal interactions. 
+                It often refers to subtle, passive-aggressive comments or actions that appear innocuous on the surface but are actually intended to hurt, 
+                criticize, or undermine someone. The term derives from stereotypical cat-like behaviors such as being calculating, 
+                stealthy, or having hidden intentions.
+              </p>
+              <p className="text-lg text-gray-200 mt-4 leading-relaxed">
+                In social contexts, someone described as "catty" might engage in gossip, backhanded compliments, or making 
+                seemingly innocent remarks with underlying negative intentions. The behavior is characterized by its indirect nature - 
+                avoiding direct confrontation while still attempting to cause emotional harm or establish social dominance.
+              </p>
             </div>
-            <p className="text-sm text-gray-400">
-              Access and manage all soap notes
-            </p>
-          </div>
-          
-          {/* HPI Summaries */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="flex items-center mb-2">
-              <FileText className="h-5 w-5 text-blue-400 mr-3" />
-              <h3 className="text-xl font-semibold">HPI Summaries</h3>
-            </div>
-            <p className="text-sm text-gray-400">
-              Access and manage all hpi summaries
-            </p>
-          </div>
-          
-          {/* Prescription History */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="flex items-center mb-2">
-              <FileText className="h-5 w-5 text-blue-400 mr-3" />
-              <h3 className="text-xl font-semibold">Prescription History</h3>
-            </div>
-            <p className="text-sm text-gray-400">
-              Access and manage all prescription history
-            </p>
-          </div>
-          
-          {/* Lab Results */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="flex items-center mb-2">
-              <FileText className="h-5 w-5 text-blue-400 mr-3" />
-              <h3 className="text-xl font-semibold">Lab Results</h3>
-            </div>
-            <p className="text-sm text-gray-400">
-              Access and manage all lab results
-            </p>
-          </div>
-          
-          {/* Imaging Reports */}
-          <div className="bg-[#1e1e1e] border border-gray-800 rounded-md p-6 hover:border-gray-700 transition-colors cursor-pointer">
-            <div className="flex items-center mb-2">
-              <FileText className="h-5 w-5 text-blue-400 mr-3" />
-              <h3 className="text-xl font-semibold">Imaging Reports</h3>
-            </div>
-            <p className="text-sm text-gray-400">
-              Access and manage all imaging reports
-            </p>
           </div>
         </div>
       </div>
