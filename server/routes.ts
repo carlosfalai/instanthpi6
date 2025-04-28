@@ -111,7 +111,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Patient routes
   app.get("/api/patients", async (req, res) => {
     try {
+      const { search } = req.query;
       const patients = await storage.getAllPatients();
+      
+      if (search && typeof search === 'string' && search.trim() !== '') {
+        const searchTerm = search.toLowerCase().trim();
+        const filteredPatients = patients.filter(patient => {
+          return (
+            (patient.name?.toLowerCase() || '').includes(searchTerm) ||
+            (patient.email?.toLowerCase() || '').includes(searchTerm) ||
+            (patient.phone?.toLowerCase() || '').includes(searchTerm)
+          );
+        });
+        return res.json(filteredPatients);
+      }
+      
       res.json(patients);
     } catch (error) {
       console.error("Error fetching patients:", error);

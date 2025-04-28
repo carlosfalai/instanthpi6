@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { Search, Loader2, RefreshCw, Check } from 'lucide-react';
+import { Search, Loader2, Check } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
+import { useToast } from '@/hooks/use-toast';
 
 interface Patient {
   id: number;
@@ -17,11 +17,6 @@ interface Patient {
   spruceId: string | null;
 }
 
-interface PatientData {
-  patients: Patient[];
-  source: 'spruce' | 'local';
-}
-
 interface PatientSearchPanelProps {
   onSelectPatient: (patient: Patient) => void;
   selectedPatientId: number | null;
@@ -32,84 +27,70 @@ export default function PatientSearchPanel({
   selectedPatientId
 }: PatientSearchPanelProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
-  const [syncingPatients, setSyncingPatients] = useState(false);
-  
-  // Query patients with real-time search from Spruce API
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Simplified direct query to our own database (no Spruce sync attempts)
   const { 
-    data: patientData = { patients: [], source: 'local' }, 
+    data: patients = [], 
     isLoading,
-    refetch
-  } = useQuery<{ patients: Patient[], source: 'spruce' | 'local' }>({
-    queryKey: ['/api/spruce/search-patients', debouncedSearchTerm],
+    error
+  } = useQuery<Patient[]>({
+    queryKey: ['/api/patients', debouncedSearchTerm],
     queryFn: async () => {
-      // If no search term, get all patients from the local database
-      if (!debouncedSearchTerm) {
-        const res = await fetch('/api/patients');
-        
-        if (!res.ok) {
-          throw new Error('Failed to fetch patients');
-        }
-        
-        const patients = await res.json();
-        return { patients, source: 'local' };
+      let url = '/api/patients';
+      
+      // Add search parameter if available
+      if (debouncedSearchTerm) {
+        url += `?search=${encodeURIComponent(debouncedSearchTerm)}`;
       }
       
-      // If there's a search term, use the real-time Spruce API search
-      const url = `/api/spruce/search-patients?query=${encodeURIComponent(debouncedSearchTerm)}`;
       const res = await fetch(url);
       
       if (!res.ok) {
-        throw new Error('Failed to search patients');
+        throw new Error('Failed to fetch patients');
       }
       
       return res.json();
     }
   });
   
-  // Sync patients with Spruce API (or fallback to fetching local patients when API is unavailable)
-  const handleSyncPatients = async () => {
-    setSyncingPatients(true);
-    
-    try {
-      const res = await fetch('/api/spruce/sync-patients', {
-        method: 'POST',
+  // Show error toast if patient fetching fails
+  useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error loading patients",
+        description: "Please try again later",
+        variant: "destructive"
       });
-      
-      if (!res.ok) {
-        console.log('Spruce API sync failed, using local patients instead');
-      }
-      
-      // Refetch the patients list
-      await refetch();
-    } catch (error) {
-      console.error('Error syncing patients:', error);
-      // Still refetch to ensure we have the local patients
-      await refetch();
-    } finally {
-      setSyncingPatients(false);
     }
-  };
+  }, [error, toast]);
+
+  // Refresh data every 30 seconds to ensure it's current
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ['/api/patients'] });
+    }, 30000);
+
+    return () => clearInterval(intervalId);
+  }, [queryClient]);
+  
+  const filteredPatients = patients.filter(patient => {
+    if (!debouncedSearchTerm) return true;
+    
+    const searchLower = debouncedSearchTerm.toLowerCase();
+    return (
+      patient.name?.toLowerCase().includes(searchLower) ||
+      patient.email?.toLowerCase().includes(searchLower) ||
+      patient.phone?.toLowerCase().includes(searchLower)
+    );
+  });
   
   return (
     <div className="flex flex-col h-full bg-[#121212] text-white">
-      <div className="p-4 bg-[#1e1e1e] border-b border-gray-800 flex justify-between items-center">
+      <div className="p-4 bg-[#1e1e1e] border-b border-gray-800">
         <h2 className="font-semibold">Patients</h2>
-        
-        <Button 
-          size="sm" 
-          variant="outline" 
-          onClick={handleSyncPatients}
-          disabled={syncingPatients}
-          className="text-xs bg-[#262626] hover:bg-gray-700"
-        >
-          {syncingPatients ? (
-            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
-          ) : (
-            <RefreshCw className="h-3 w-3 mr-1" />
-          )}
-          Sync
-        </Button>
       </div>
       
       <div className="p-3">
@@ -130,9 +111,9 @@ export default function PatientSearchPanel({
           <div className="flex justify-center items-center h-32">
             <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
           </div>
-        ) : patientData.patients.length > 0 ? (
+        ) : filteredPatients.length > 0 ? (
           <div className="divide-y divide-gray-800">
-            {patientData.patients.map((patient) => (
+            {filteredPatients.map((patient) => (
               <div 
                 key={patient.id}
                 className={`p-3 cursor-pointer hover:bg-[#1e1e1e] ${selectedPatientId === patient.id ? 'bg-[#1e1e1e]' : ''}`}
@@ -142,7 +123,7 @@ export default function PatientSearchPanel({
                   <div>
                     <div className="font-medium">{patient.name}</div>
                     <div className="text-sm text-gray-400">
-                      {patient.email || patient.phone}
+                      {patient.email || patient.phone || ''}
                     </div>
                   </div>
                   
@@ -169,7 +150,7 @@ export default function PatientSearchPanel({
           </div>
         ) : (
           <div className="text-gray-500 text-center p-4">
-            {debouncedSearchTerm ? 'No patients found' : 'No patients available'}
+            {debouncedSearchTerm ? 'No patients matching your search' : 'No patients available'}
           </div>
         )}
       </ScrollArea>
