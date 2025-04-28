@@ -605,10 +605,48 @@ export default function AiAssistantPanel({
                         fupItems.forEach(item => preview += `- ${item.text}\n`);
                       }
                       
-                      // Add billing code if selected
-                      if (selectedBillingCode) {
+                      // Add billing codes if selected
+                      const hasBillingCodes = selectedBillingCodes.telemed || 
+                                            selectedBillingCodes.translation || 
+                                            customBillingCode.trim().length > 0;
+                      
+                      if (hasBillingCodes) {
                         preview += "\n💼 Billing:\n";
-                        preview += "- Telemedicine consultation (15773#tt)\n";
+                        if (selectedBillingCodes.telemed) {
+                          preview += "- Telemedicine consultation (15773#tt)\n";
+                        }
+                        if (selectedBillingCodes.translation) {
+                          preview += "- Translation services for non-French/English speaking patient\n";
+                        }
+                        if (customBillingCode.trim().length > 0) {
+                          preview += `- ${customBillingCode.trim()}\n`;
+                        }
+                        
+                        // Record the timestamp for billing purposes
+                        const timestamp = new Date().toLocaleTimeString();
+                        preview += `- Service time: ${timestamp}\n`;
+                        
+                        // Send billing information to billing system
+                        if (patient) {
+                          try {
+                            const billingCodes = [];
+                            if (selectedBillingCodes.telemed) billingCodes.push("15773#tt");
+                            if (selectedBillingCodes.translation) billingCodes.push("translation");
+                            if (customBillingCode.trim()) billingCodes.push(customBillingCode.trim());
+                            
+                            // This would be an actual API call in production
+                            console.log("Creating billing entry:", {
+                              patientId: patient.id,
+                              patientName: patient.name,
+                              patientDOB: patient.dob,
+                              encounterType: 'message',
+                              codes: billingCodes,
+                              timestamp: new Date().toISOString()
+                            });
+                          } catch (error) {
+                            console.error("Failed to create billing entry:", error);
+                          }
+                        }
                       }
                       
                       // Add action items

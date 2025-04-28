@@ -31,6 +31,8 @@ import {
   Search,
   Settings,
   Wallet,
+  ClipboardList,
+  CheckCircle,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -41,6 +43,7 @@ interface BillingEntry {
   id: number;
   patientName: string;
   patientId: number;
+  patientDOB?: string; // Date of birth for patient
   date: string;
   encounterType: 'message' | 'video' | 'form' | 'phone';
   duration: number;
@@ -48,6 +51,7 @@ interface BillingEntry {
   suggestedCodes: string[];
   status: 'pending' | 'processed' | 'rejected';
   providerNote?: string;
+  serviceTime?: string; // Timestamp when service ended
 }
 
 export default function AiBillingPage() {
