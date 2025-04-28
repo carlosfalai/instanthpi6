@@ -129,12 +129,12 @@ const FormsitePage: React.FC = () => {
     }
   };
 
-  // Get a preview of form content - only show the Patient ID (field 5)
-  const getFormPreview = (results: Record<string, any>) => {
+  // Get an address preview from form content (Field 1)
+  const getAddressPreview = (results: Record<string, any>) => {
     const entries = Object.entries(results);
-    if (entries.length === 0) return 'No patient ID available';
+    if (entries.length === 0) return 'No address available';
 
-    // Find the patient ID field (field 5)
+    // Find the address field (field 1)
     for (const [key, value] of entries) {
       // Extract the field ID
       let fieldId = key;
@@ -143,12 +143,12 @@ const FormsitePage: React.FC = () => {
         fieldId = key.includes('[id]') 
           ? key.split('[id]')[1].replace(/[^\d]/g, '') 
           : key.includes(':')
-            ? key.split(':')[0]
+            ? key.split(':')[1]
             : key;
       }
       
-      // If this is field 5 (Patient ID), return just its value
-      if (fieldId === '5') {
+      // If this is field 1 (Address), return its value
+      if (fieldId === '1') {
         // Format the value for display
         let displayValue = value;
         if (typeof value === 'object') {
@@ -163,7 +163,32 @@ const FormsitePage: React.FC = () => {
       }
     }
 
-    return 'Patient ID not found';
+    // As a backup, try to find field 0 which might contain the email address
+    for (const [key, value] of entries) {
+      let fieldId = key;
+      if (typeof key === 'string') {
+        fieldId = key.includes('[id]') 
+          ? key.split('[id]')[1].replace(/[^\d]/g, '') 
+          : key.includes(':')
+            ? key.split(':')[1]
+            : key;
+      }
+      
+      if (fieldId === '0') {
+        let displayValue = value;
+        if (typeof value === 'object') {
+          if (value.value !== undefined) {
+            displayValue = value.value;
+          } else {
+            displayValue = JSON.stringify(value);
+          }
+        }
+        
+        return String(displayValue);
+      }
+    }
+
+    return 'Address not found';
   };
 
   // Render the submissions list (with error handling for non-array data)
@@ -196,8 +221,8 @@ const FormsitePage: React.FC = () => {
     return (
       <div className="space-y-3">
         {submissions.map((submission) => {
-          // Get the patient ID
-          const patientId = getFormPreview(submission.results);
+          // Get the address (Field 1) instead of showing dates
+          const address = getAddressPreview(submission.results);
           
           return (
             <div
@@ -211,8 +236,8 @@ const FormsitePage: React.FC = () => {
             >
               <div className="flex flex-col">
                 <div className="flex justify-between items-center">
-                  <h3 className="font-medium text-2xl text-blue-400">
-                    {patientId}
+                  <h3 className="font-medium text-xl text-blue-400">
+                    {address}
                   </h3>
                   
                   {submission.processed && (
@@ -223,7 +248,7 @@ const FormsitePage: React.FC = () => {
                 </div>
                 
                 <p className="text-xs text-gray-500 mt-1">
-                  {formatDate(submission.date_submitted)} • ID: {submission.id.substring(0, 6)}...
+                  ID: {submission.id}
                 </p>
               </div>
             </div>
