@@ -63,6 +63,18 @@ export const pseudonymMappingService = {
       throw error;
     }
   },
+  
+  /**
+   * Deletes a pseudonym-patient link
+   */
+  async deletePseudonymLink(id: number): Promise<void> {
+    try {
+      await apiRequest('DELETE', `/api/pseudonym-links/${id}`);
+    } catch (error) {
+      console.error(`Error deleting pseudonym link with ID ${id}:`, error);
+      throw error;
+    }
+  },
 
   /**
    * Scans message content for potential pseudonym mentions
