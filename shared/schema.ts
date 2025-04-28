@@ -620,3 +620,23 @@ export const insertBillingEntrySchema = createInsertSchema(billingEntries).pick(
 
 export type BillingEntry = typeof billingEntries.$inferSelect;
 export type InsertBillingEntry = z.infer<typeof insertBillingEntrySchema>;
+
+// Pseudonym Links model for mapping FormSite pseudonyms to patient conversations
+export const pseudonymLinks = pgTable("pseudonym_links", {
+  id: serial("id").primaryKey(),
+  pseudonym: text("pseudonym").notNull(),
+  patientId: integer("patient_id").notNull(),
+  patientName: text("patient_name").notNull(),
+  messageId: integer("message_id"),
+  timestamp: timestamp("timestamp").defaultNow(),
+});
+
+export const insertPseudonymLinkSchema = createInsertSchema(pseudonymLinks).pick({
+  pseudonym: true,
+  patientId: true,
+  patientName: true,
+  messageId: true,
+});
+
+export type PseudonymLink = typeof pseudonymLinks.$inferSelect;
+export type InsertPseudonymLink = z.infer<typeof insertPseudonymLinkSchema>;
