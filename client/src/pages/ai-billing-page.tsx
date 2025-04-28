@@ -171,63 +171,69 @@ export default function AiBillingPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <Card className="bg-[#1e1e1e] border-gray-800">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-md flex items-center">
-                  <Wallet className="mr-2 h-4 w-4 text-blue-400" />
-                  <span>Pending Entries</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {isLoading ? (
-                    <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
-                  ) : (
-                    billingEntries.filter(e => e.status === 'pending').length || 0
-                  )}
+              <CardContent className="flex items-start p-4">
+                <div className="mr-3 mt-1">
+                  <div className="p-2 bg-blue-900/20 border border-blue-800/30 rounded-md">
+                    <ClipboardList className="h-5 w-5 text-blue-400" />
+                  </div>
                 </div>
-                <p className="text-sm text-gray-400">Entries awaiting processing</p>
+                <div>
+                  <h3 className="text-md font-semibold mb-1">Pending Entries</h3>
+                  <div className="text-2xl font-bold">
+                    {isLoading ? (
+                      <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
+                    ) : (
+                      billingEntries.filter(e => e.status === 'pending').length || 0
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-400">Entries awaiting processing</p>
+                </div>
               </CardContent>
             </Card>
             
             <Card className="bg-[#1e1e1e] border-gray-800">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-md flex items-center">
-                  <Calendar className="mr-2 h-4 w-4 text-green-400" />
-                  <span>Today's Encounters</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {isLoading ? (
-                    <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
-                  ) : (
-                    // Count today's entries
-                    billingEntries.filter(e => {
-                      const today = new Date().toISOString().split('T')[0];
-                      return e.date.includes(today);
-                    }).length || 0
-                  )}
+              <CardContent className="flex items-start p-4">
+                <div className="mr-3 mt-1">
+                  <div className="p-2 bg-green-900/20 border border-green-800/30 rounded-md">
+                    <Calendar className="h-5 w-5 text-green-400" />
+                  </div>
                 </div>
-                <p className="text-sm text-gray-400">New patient encounters today</p>
+                <div>
+                  <h3 className="text-md font-semibold mb-1">Today's Encounters</h3>
+                  <div className="text-2xl font-bold">
+                    {isLoading ? (
+                      <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
+                    ) : (
+                      // Count today's entries
+                      billingEntries.filter(e => {
+                        const today = new Date().toISOString().split('T')[0];
+                        return e.date.includes(today);
+                      }).length || 0
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-400">New patient encounters today</p>
+                </div>
               </CardContent>
             </Card>
             
             <Card className="bg-[#1e1e1e] border-gray-800">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-md flex items-center">
-                  <FileText className="mr-2 h-4 w-4 text-purple-400" />
-                  <span>Processed This Month</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {isLoading ? (
-                    <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
-                  ) : (
-                    billingEntries.filter(e => e.status === 'processed').length || 0
-                  )}
+              <CardContent className="flex items-start p-4">
+                <div className="mr-3 mt-1">
+                  <div className="p-2 bg-purple-900/20 border border-purple-800/30 rounded-md">
+                    <CheckCircle className="h-5 w-5 text-purple-400" />
+                  </div>
                 </div>
-                <p className="text-sm text-gray-400">Billing entries processed</p>
+                <div>
+                  <h3 className="text-md font-semibold mb-1">Processed This Month</h3>
+                  <div className="text-2xl font-bold">
+                    {isLoading ? (
+                      <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
+                    ) : (
+                      billingEntries.filter(e => e.status === 'processed').length || 0
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-400">Billing entries processed</p>
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -399,8 +405,8 @@ export default function AiBillingPage() {
                   </TableBody>
                 </Table>
               ) : (
-                <div className="text-center py-10 text-gray-500">
-                  No billing entries match your search criteria
+                <div className="text-center py-16">
+                  <p className="text-gray-500 mb-2">No billing entries match your search criteria</p>
                 </div>
               )}
             </CardContent>

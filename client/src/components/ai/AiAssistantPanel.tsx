@@ -634,14 +634,26 @@ export default function AiAssistantPanel({
                             if (selectedBillingCodes.translation) billingCodes.push("translation");
                             if (customBillingCode.trim()) billingCodes.push(customBillingCode.trim());
                             
-                            // This would be an actual API call in production
-                            console.log("Creating billing entry:", {
+                            // Make API call to create billing entry
+                            apiRequest('POST', '/api/billing/entries', {
                               patientId: patient.id,
                               patientName: patient.name,
                               patientDOB: patient.dob,
                               encounterType: 'message',
-                              codes: billingCodes,
-                              timestamp: new Date().toISOString()
+                              description: 'Telemedicine consultation',
+                              suggestedCodes: billingCodes,
+                              serviceTime: timestamp,
+                              date: new Date().toISOString(),
+                              status: 'pending'
+                            }).then(() => {
+                              toast({
+                                title: "Billing entry created",
+                                description: "A new billing entry has been added to the AI Billing Assistant"
+                              });
+                              // Invalidate the billing entries query
+                              queryClient.invalidateQueries({ queryKey: ['/api/billing/entries'] });
+                            }).catch(error => {
+                              console.error("Failed to create billing entry:", error);
                             });
                           } catch (error) {
                             console.error("Failed to create billing entry:", error);
