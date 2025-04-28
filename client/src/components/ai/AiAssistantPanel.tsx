@@ -11,6 +11,8 @@ import { apiRequest, queryClient } from '@/lib/queryClient';
 import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import ConversationStatusBar from './ConversationStatusBar';
+import { useConversationStatus } from '@/hooks/use-conversation-status';
 
 interface AiAssistantPanelProps {
   patientId: number;
