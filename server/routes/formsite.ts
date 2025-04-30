@@ -56,53 +56,52 @@ router.get('/submissions', async (req, res) => {
   }
 });
 
-// Fetch a single form submission by ID
-router.get('/submissions/:id', async (req, res) => {
+// Search form submissions - IMPORTANT: This must be placed BEFORE the :id route
+router.get('/submissions/search', async (req, res) => {
   try {
-    const submissionId = req.params.id;
+    const query = req.query.q as string || '';
     
     // Check if FormSite API key is available
     if (!FORMSITE_API_KEY) {
       return res.status(401).json({ message: 'FormSite API key not configured' });
     }
     
-    try {
-      // Get submission from FormSite API
-      const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results/${submissionId}`);
-      const submission = response.data;
+    // Get all submissions from FormSite API
+    const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results`);
+    const formSubmissions = response.data.results || [];
+    
+    // Filter submissions based on the search query
+    const filteredSubmissions = formSubmissions.filter((submission: any) => {
+      const items = submission.items || {};
       
-      if (!submission) {
-        return res.status(404).json({ message: 'Form submission not found' });
-      }
+      // Convert all values to strings for searching
+      const values = Object.values(items).map(value => {
+        if (typeof value === 'object') {
+          return JSON.stringify(value);
+        }
+        return String(value);
+      }).join(' ').toLowerCase();
       
-      // Process and return the submission
-      const processedSubmission = {
-        id: submission.id,
-        reference: submission.reference || '',
-        status: submission.status || 'submitted',
-        date_submitted: submission.date_created || new Date().toISOString(),
-        results: submission.items || {},
-        processed: Boolean(submission.processed),
-        aiProcessedContent: submission.aiProcessedContent || ''
-      };
-      
-      res.json(processedSubmission);
-    } catch (apiError: any) {
-      // Check if this is a 404 error from the FormSite API
-      if (apiError.response && apiError.response.status === 404) {
-        return res.status(404).json({ message: 'Form submission not found' });
-      }
-      
-      // For other API errors, return an appropriate error response
-      console.error('FormSite API error:', apiError.message);
-      return res.status(500).json({ 
-        message: 'Error connecting to FormSite API', 
-        error: apiError.message 
-      });
-    }
+      return values.includes(query.toLowerCase());
+    });
+    
+    // Process and return the filtered submissions
+    const processedSubmissions = filteredSubmissions.map((submission: any) => ({
+      id: submission.id,
+      reference: submission.reference || '',
+      status: submission.status || 'submitted',
+      date_submitted: submission.date_created || new Date().toISOString(),
+      results: submission.items || {},
+      processed: Boolean(submission.processed),
+      aiProcessedContent: submission.aiProcessedContent || ''
+    }));
+    
+    // Always return an array, even if no results were found
+    res.json(processedSubmissions);
   } catch (error) {
-    console.error('Error fetching FormSite submission:', error);
-    res.status(500).json({ message: 'Failed to fetch form submission' });
+    console.error('Error searching FormSite submissions:', error);
+    // Even on error, return an empty array to maintain consistent response format
+    res.status(200).json([]);
   }
 });
 
@@ -209,52 +208,53 @@ router.post('/submissions/:id/process', async (req, res) => {
   }
 });
 
-// Search form submissions
-router.get('/submissions/search', async (req, res) => {
+// Fetch a single form submission by ID - This must be AFTER more specific routes
+router.get('/submissions/:id', async (req, res) => {
   try {
-    const query = req.query.q as string || '';
+    const submissionId = req.params.id;
     
     // Check if FormSite API key is available
     if (!FORMSITE_API_KEY) {
       return res.status(401).json({ message: 'FormSite API key not configured' });
     }
     
-    // Get all submissions from FormSite API
-    const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results`);
-    const formSubmissions = response.data.results || [];
-    
-    // Filter submissions based on the search query
-    const filteredSubmissions = formSubmissions.filter((submission: any) => {
-      const items = submission.items || {};
+    try {
+      // Get submission from FormSite API
+      const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results/${submissionId}`);
+      const submission = response.data;
       
-      // Convert all values to strings for searching
-      const values = Object.values(items).map(value => {
-        if (typeof value === 'object') {
-          return JSON.stringify(value);
-        }
-        return String(value);
-      }).join(' ').toLowerCase();
+      if (!submission) {
+        return res.status(404).json({ message: 'Form submission not found' });
+      }
       
-      return values.includes(query.toLowerCase());
-    });
-    
-    // Process and return the filtered submissions
-    const processedSubmissions = filteredSubmissions.map((submission: any) => ({
-      id: submission.id,
-      reference: submission.reference || '',
-      status: submission.status || 'submitted',
-      date_submitted: submission.date_created || new Date().toISOString(),
-      results: submission.items || {},
-      processed: Boolean(submission.processed),
-      aiProcessedContent: submission.aiProcessedContent || ''
-    }));
-    
-    // Always return an array, even if no results were found
-    res.json(processedSubmissions);
+      // Process and return the submission
+      const processedSubmission = {
+        id: submission.id,
+        reference: submission.reference || '',
+        status: submission.status || 'submitted',
+        date_submitted: submission.date_created || new Date().toISOString(),
+        results: submission.items || {},
+        processed: Boolean(submission.processed),
+        aiProcessedContent: submission.aiProcessedContent || ''
+      };
+      
+      res.json(processedSubmission);
+    } catch (apiError: any) {
+      // Check if this is a 404 error from the FormSite API
+      if (apiError.response && apiError.response.status === 404) {
+        return res.status(404).json({ message: 'Form submission not found' });
+      }
+      
+      // For other API errors, return an appropriate error response
+      console.error('FormSite API error:', apiError.message);
+      return res.status(500).json({ 
+        message: 'Error connecting to FormSite API', 
+        error: apiError.message 
+      });
+    }
   } catch (error) {
-    console.error('Error searching FormSite submissions:', error);
-    // Even on error, return an empty array to maintain consistent response format
-    res.status(200).json([]);
+    console.error('Error fetching FormSite submission:', error);
+    res.status(500).json({ message: 'Failed to fetch form submission' });
   }
 });
 
