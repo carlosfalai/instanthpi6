@@ -109,16 +109,21 @@ router.get('/submissions/search', async (req, res) => {
 router.post('/submissions/:id/process', async (req, res) => {
   try {
     const submissionId = req.params.id;
+    console.log(`[DEBUG] Processing submission with ID: ${submissionId}`);
     
     // Check if FormSite API key is available
     if (!FORMSITE_API_KEY) {
+      console.log('[DEBUG] FormSite API key not configured');
       return res.status(401).json({ message: 'FormSite API key not configured' });
     }
+    console.log('[DEBUG] FormSite API key is present');
     
     // Check if OpenAI API key is available
     if (!process.env.OPENAI_API_KEY) {
+      console.log('[DEBUG] OpenAI API key not configured');
       return res.status(401).json({ message: 'OpenAI API key not configured' });
     }
+    console.log('[DEBUG] OpenAI API key is present');
     
     try {
       // Get submission from FormSite API
