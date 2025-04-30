@@ -37,8 +37,13 @@ router.get('/submissions', async (req, res) => {
     console.log(`[DEBUG FORMSITE] Using API key: ${FORMSITE_API_KEY.substring(0, 5)}...`);
     
     // Get submissions from FormSite API
+    console.log(`[DEBUG LIST] Making API call to list submissions`);
     const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results`);
+    console.log(`[DEBUG LIST] Response status: ${response.status}`);
+    console.log(`[DEBUG LIST] Response data keys:`, Object.keys(response.data));
+    
     const formSubmissions = response.data.results || [];
+    console.log(`[DEBUG LIST] Found ${formSubmissions.length} submissions`);
     
     // Process and return the submissions
     const processedSubmissions = formSubmissions.map((submission: any) => ({
@@ -127,19 +132,22 @@ router.post('/submissions/:id/process', async (req, res) => {
     }
     console.log('[DEBUG] OpenAI API key is present');
     
-    // Get submission from FormSite API
-    console.log(`[DEBUG PROCESS] Attempting to fetch submission ${submissionId} for processing`);
-    console.log(`[DEBUG PROCESS] API URL path: /forms/${FORMSITE_FORM_ID}/results/${submissionId}`);
+    // Get submission from FormSite API (using list and filter approach)
+    console.log(`[DEBUG PROCESS] Attempting to fetch submission ${submissionId} for processing via list`);
     
     try {
-      const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results/${submissionId}`);
-      console.log(`[DEBUG PROCESS] Response status: ${response.status}`);
-      console.log(`[DEBUG PROCESS] Response data available: ${!!response.data}`);
+      // Get all submissions and find the one with matching ID
+      const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results`);
+      console.log(`[DEBUG PROCESS] Got list response with status: ${response.status}`);
       
-      const submission = response.data;
+      const allSubmissions = response.data.results || [];
+      console.log(`[DEBUG PROCESS] Found ${allSubmissions.length} total submissions`);
+      
+      // Find the specific submission by ID
+      const submission = allSubmissions.find((sub: any) => sub.id === submissionId);
       
       if (!submission) {
-        console.log(`[DEBUG PROCESS] Submission data is null or undefined`);
+        console.log(`[DEBUG PROCESS] Submission with ID ${submissionId} not found in results`);
         return res.status(404).json({ message: 'Form submission not found', processed: false });
       }
       
@@ -235,21 +243,26 @@ router.get('/submissions/:id', async (req, res) => {
       return res.status(401).json({ message: 'FormSite API key not configured' });
     }
     
-    // Get submission from FormSite API
-    console.log(`[DEBUG GET] Attempting to fetch submission ${submissionId}`);
-    console.log(`[DEBUG GET] API URL path: /forms/${FORMSITE_FORM_ID}/results/${submissionId}`);
+    // Instead of direct API call by ID, which isn't working, get all submissions and find by ID
+    console.log(`[DEBUG GET] Attempting to fetch submission ${submissionId} via list and filter`);
     
     try {
-      const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results/${submissionId}`);
-      console.log(`[DEBUG GET] Response status: ${response.status}`);
-      console.log(`[DEBUG GET] Response data available: ${!!response.data}`);
+      // Get all submissions and find the one with matching ID
+      const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results`);
+      console.log(`[DEBUG GET] Got all submissions response with status: ${response.status}`);
       
-      const submission = response.data;
+      const allSubmissions = response.data.results || [];
+      console.log(`[DEBUG GET] Found ${allSubmissions.length} total submissions`);
+      
+      // Find the specific submission by ID
+      const submission = allSubmissions.find((sub: any) => sub.id === submissionId);
       
       if (!submission) {
-        console.log(`[DEBUG GET] Submission data is null or undefined`);
+        console.log(`[DEBUG GET] Submission with ID ${submissionId} not found in results`);
         return res.status(404).json({ message: 'Form submission not found' });
       }
+      
+      console.log(`[DEBUG GET] Found submission with ID ${submissionId} in results`)
       
       console.log(`[DEBUG GET] Submission found with ID: ${submission.id}`);
       console.log(`[DEBUG GET] Submission data keys: ${Object.keys(submission)}`);
@@ -267,13 +280,21 @@ router.get('/submissions/:id', async (req, res) => {
       
       res.json(processedSubmission);
     } catch (apiError: any) {
-      // Check if this is a 404 error from the FormSite API
-      if (apiError.response && apiError.response.status === 404) {
-        return res.status(404).json({ message: 'Form submission not found' });
+      // Log detailed error information
+      console.error('[DEBUG GET] API Error:', apiError.message);
+      
+      if (apiError.response) {
+        console.error('[DEBUG GET] Response status:', apiError.response.status);
+        console.error('[DEBUG GET] Response headers:', JSON.stringify(apiError.response.headers));
+        console.error('[DEBUG GET] Response data:', apiError.response.data);
+        
+        // Check if this is a 404 error from the FormSite API
+        if (apiError.response.status === 404) {
+          return res.status(404).json({ message: 'Form submission not found' });
+        }
       }
       
       // For other API errors, return an appropriate error response
-      console.error('FormSite API error:', apiError.message);
       return res.status(500).json({ 
         message: 'Error connecting to FormSite API', 
         error: apiError.message 
@@ -298,12 +319,19 @@ router.post('/webhook', async (req, res) => {
     console.log(`[DEBUG WEBHOOK] Processing webhook for resultId: ${resultId}`);
     
     try {
-      // Get submission from FormSite API
-      const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results/${resultId}`);
-      const submission = response.data;
+      // Get all submissions and find the one with matching ID
+      console.log(`[DEBUG WEBHOOK] Attempting to fetch submission ${resultId} via list`);
+      const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results`);
+      console.log(`[DEBUG WEBHOOK] Got list response with status: ${response.status}`);
+      
+      const allSubmissions = response.data.results || [];
+      console.log(`[DEBUG WEBHOOK] Found ${allSubmissions.length} total submissions`);
+      
+      // Find the specific submission by ID
+      const submission = allSubmissions.find((sub: any) => sub.id === resultId);
       
       if (!submission) {
-        console.log(`[DEBUG WEBHOOK] Submission data not found for ID: ${resultId}`);
+        console.log(`[DEBUG WEBHOOK] Submission with ID ${resultId} not found in results`);
         return res.status(404).json({ message: 'Form submission not found' });
       }
       
