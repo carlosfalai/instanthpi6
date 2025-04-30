@@ -31,8 +31,10 @@ router.get('/submissions', async (req, res) => {
   try {
     // Check if FormSite API key is available
     if (!FORMSITE_API_KEY) {
+      console.log('[DEBUG FORMSITE] API key is missing');
       return res.status(401).json({ message: 'FormSite API key not configured' });
     }
+    console.log(`[DEBUG FORMSITE] Using API key: ${FORMSITE_API_KEY.substring(0, 5)}...`);
     
     // Get submissions from FormSite API
     const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results`);
@@ -125,14 +127,24 @@ router.post('/submissions/:id/process', async (req, res) => {
     }
     console.log('[DEBUG] OpenAI API key is present');
     
+    // Get submission from FormSite API
+    console.log(`[DEBUG PROCESS] Attempting to fetch submission ${submissionId} for processing`);
+    console.log(`[DEBUG PROCESS] API URL path: /forms/${FORMSITE_FORM_ID}/results/${submissionId}`);
+    
     try {
-      // Get submission from FormSite API
       const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results/${submissionId}`);
+      console.log(`[DEBUG PROCESS] Response status: ${response.status}`);
+      console.log(`[DEBUG PROCESS] Response data available: ${!!response.data}`);
+      
       const submission = response.data;
       
       if (!submission) {
-        return res.status(404).json({ message: 'Form submission not found' });
+        console.log(`[DEBUG PROCESS] Submission data is null or undefined`);
+        return res.status(404).json({ message: 'Form submission not found', processed: false });
       }
+      
+      console.log(`[DEBUG PROCESS] Submission found with ID: ${submission.id}`);
+      console.log(`[DEBUG PROCESS] Submission data keys: ${Object.keys(submission)}`);
       
       // Extract form data
       const formData = submission.items || {};
@@ -223,14 +235,24 @@ router.get('/submissions/:id', async (req, res) => {
       return res.status(401).json({ message: 'FormSite API key not configured' });
     }
     
+    // Get submission from FormSite API
+    console.log(`[DEBUG GET] Attempting to fetch submission ${submissionId}`);
+    console.log(`[DEBUG GET] API URL path: /forms/${FORMSITE_FORM_ID}/results/${submissionId}`);
+    
     try {
-      // Get submission from FormSite API
       const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results/${submissionId}`);
+      console.log(`[DEBUG GET] Response status: ${response.status}`);
+      console.log(`[DEBUG GET] Response data available: ${!!response.data}`);
+      
       const submission = response.data;
       
       if (!submission) {
+        console.log(`[DEBUG GET] Submission data is null or undefined`);
         return res.status(404).json({ message: 'Form submission not found' });
       }
+      
+      console.log(`[DEBUG GET] Submission found with ID: ${submission.id}`);
+      console.log(`[DEBUG GET] Submission data keys: ${Object.keys(submission)}`);
       
       // Process and return the submission
       const processedSubmission = {
@@ -273,15 +295,19 @@ router.post('/webhook', async (req, res) => {
       return res.status(400).json({ message: 'Invalid form reference' });
     }
     
-    // Automatically process the new submission with AI
+    console.log(`[DEBUG WEBHOOK] Processing webhook for resultId: ${resultId}`);
+    
     try {
       // Get submission from FormSite API
       const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results/${resultId}`);
       const submission = response.data;
       
       if (!submission) {
+        console.log(`[DEBUG WEBHOOK] Submission data not found for ID: ${resultId}`);
         return res.status(404).json({ message: 'Form submission not found' });
       }
+      
+      console.log(`[DEBUG WEBHOOK] Submission found with ID: ${submission.id}`);
       
       // Extract form data
       const formData = submission.items || {};
@@ -317,17 +343,14 @@ router.post('/webhook', async (req, res) => {
       
       // Store the processed content with the submission
       // Note: In a real implementation, you would update the FormSite submission or store this in your database
-      console.log('Automatically processed new form submission:', {
-        id: resultId,
-        aiContent: aiProcessedContent
-      });
+      console.log(`[DEBUG WEBHOOK] Successfully processed submission ${resultId}`);
       
       res.status(200).json({ 
         message: 'Webhook received and processed successfully',
         processed: true
       });
-    } catch (aiError) {
-      console.error('Error automatically processing new submission:', aiError);
+    } catch (aiError: any) {
+      console.error('Error automatically processing new submission:', aiError.message);
       res.status(200).json({ 
         message: 'Webhook received, but failed to process automatically',
         processed: false
