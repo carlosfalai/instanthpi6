@@ -49,24 +49,29 @@ router.get('/', async (req, res) => {
     // Build conditions for filters
     const conditions = [];
     
-    // Apply filters if provided
-    if (status) {
-      conditions.push(eq(urgentCareRequests.status, status as string));
-    }
-    
-    if (type) {
-      conditions.push(eq(urgentCareRequests.requestType, type as string));
-    }
-    
     // Filter by timeframe (defaults to last 24 hours)
     const hours = timeframe ? parseInt(timeframe as string) : 24;
     const cutoffDate = new Date();
     cutoffDate.setHours(cutoffDate.getHours() - hours);
     
-    conditions.push(gte(urgentCareRequests.receivedAt, cutoffDate));
-    
-    // Apply all conditions with AND
-    query = query.where(and(...conditions));
+    // Apply all conditions
+    if (conditions.length === 0) {
+      // Just apply the timeframe filter if no other filters
+      query = query.where(gte(urgentCareRequests.receivedAt, cutoffDate));
+    } else {
+      // Apply status filter if provided
+      if (status) {
+        query = query.where(eq(urgentCareRequests.status, status as string));
+      }
+      
+      // Apply type filter if provided
+      if (type) {
+        query = query.where(eq(urgentCareRequests.requestType, type as string));
+      }
+      
+      // Apply timeframe filter 
+      query = query.where(gte(urgentCareRequests.receivedAt, cutoffDate));
+    }
     
     const requests = await query;
     
