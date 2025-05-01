@@ -385,6 +385,8 @@ export const urgentCareRequests = pgTable("urgent_care_requests", {
   }).notNull().default("new"),
   problemDescription: text("problem_description").notNull(),
   aiAnalysis: text("ai_analysis"),
+  waitingFor: text("waiting_for"), // What we're waiting for (lab results, patient reply, etc.)
+  waitingForDetails: text("waiting_for_details"), // Additional details about what we're waiting for
   receivedAt: timestamp("received_at").defaultNow(),
   respondedAt: timestamp("responded_at"),
   aiProcessedAt: timestamp("ai_processed_at"),
@@ -400,6 +402,8 @@ export const insertUrgentCareRequestSchema = createInsertSchema(urgentCareReques
   status: true,
   problemDescription: true,
   aiAnalysis: true,
+  waitingFor: true,
+  waitingForDetails: true,
   receivedAt: true,
   doctorAssignedId: true,
   notes: true,

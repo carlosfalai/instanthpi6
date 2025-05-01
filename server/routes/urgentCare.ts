@@ -217,6 +217,13 @@ router.post('/analyze-message', async (req, res) => {
     - Medium: Standard medical concerns needing attention within 24 hours
     - Low: Non-urgent matters that can be addressed in routine care
     
+    IMPORTANTLY, identify what we are currently waiting for in this conversation:
+    - If waiting for a patient's reply, specify what question(s) they need to answer
+    - If waiting for lab results, specify which tests and when they're expected
+    - If waiting for symptoms to resolve, specify which symptoms and expected timeframe
+    - If waiting for a medication effect, specify which medication and for how long
+    - If waiting for something else, specify clearly what it is
+    
     Provide a brief analysis of the patient's problem and what type of care they might need.
     
     Output a JSON object with the following fields:
@@ -225,7 +232,9 @@ router.post('/analyze-message', async (req, res) => {
       "isNewConsultation": true/false,
       "priority": "high" | "medium" | "low",
       "problemDescription": "Brief description of the patient's issue",
-      "analysisNotes": "Your analysis of what the patient needs"
+      "analysisNotes": "Your analysis of what the patient needs",
+      "waitingFor": "patient_reply" | "lab_results" | "symptoms_resolution" | "medication_effect" | "specialist_input" | "other",
+      "waitingForDetails": "Detailed description of what we're waiting for and why"
     }
     `;
     
@@ -255,6 +264,8 @@ router.post('/analyze-message', async (req, res) => {
           priority: analysis.priority,
           problemDescription: analysis.problemDescription,
           aiAnalysis: analysis.analysisNotes,
+          waitingFor: analysis.waitingFor || null,
+          waitingForDetails: analysis.waitingForDetails || null,
           aiProcessedAt: new Date()
         })
         .returning();
