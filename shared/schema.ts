@@ -10,12 +10,18 @@ export const users = pgTable("users", {
   fullName: text("full_name").notNull(),
   role: text("role").notNull().default("doctor"),
   avatarUrl: text("avatar_url"),
+  email: text("email"),
   createdAt: timestamp("created_at").defaultNow(),
   navPreferences: jsonb("nav_preferences").default({
     showChronicConditions: true,
     showMedicationRefills: true,
     showUrgentCare: true
   }),
+  // Stripe subscription fields
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  premiumUntil: timestamp("premium_until"),
+  isPremium: boolean("is_premium").default(false),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({

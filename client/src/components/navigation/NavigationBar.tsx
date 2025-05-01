@@ -16,7 +16,8 @@ import {
   FormInput,
   BookOpen,
   Receipt,
-  DollarSign
+  DollarSign,
+  CreditCard
 } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { User as UserType } from '@shared/schema';
@@ -90,7 +91,8 @@ export default function NavigationBar() {
     { id: 'medicationRefills', path: '/medication-refills', icon: <PillIcon className="h-5 w-5" />, label: 'Medication Refills', visible: navPreferences.showMedicationRefills, order: 3, row: 'secondary' },
     { id: 'urgentCare', path: '/urgent-care', icon: <AlertCircle className="h-5 w-5" />, label: 'Urgent Care', visible: navPreferences.showUrgentCare, order: 4, row: 'secondary' },
     { id: 'education', path: '/education', icon: <GraduationCap className="h-5 w-5" />, label: 'Education', visible: true, order: 5, row: 'secondary' },
-    { id: 'settings', path: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Settings', visible: true, order: 6, row: 'secondary' },
+    { id: 'subscription', path: '/subscription', icon: <CreditCard className="h-5 w-5" />, label: 'Subscription', visible: true, order: 6, row: 'secondary' },
+    { id: 'settings', path: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Settings', visible: true, order: 7, row: 'secondary' },
   ];
   
   // State for navigation items, initialized from user preferences or defaults

@@ -68,6 +68,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/billing", billingRouter);
   app.use("/api/pseudonym-links", pseudonymRouter);
   app.use("/api/urgent-care", urgentCareRouter);
+  app.use("/api/stripe", stripeRouter);
   app.use("/api", userRouter);
   
   // Error handling middleware for Zod validation errors
