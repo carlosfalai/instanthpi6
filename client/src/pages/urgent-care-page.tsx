@@ -24,7 +24,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { AlertCircle, Clock, FileCheck, MessageSquare, RefreshCw } from "lucide-react";
+import { AlertCircle, Clock, Edit, FileCheck, MessageSquare, RefreshCw, Save, X } from "lucide-react";
 import { getUrgentCareRequests, updateUrgentCareRequest } from "@/services/urgentCare";
 import { UrgentCareWithDetails } from "@/services/urgentCare";
 
@@ -47,7 +47,7 @@ export default function UrgentCarePage() {
     }),
   });
   
-  // Mutation for updating a request
+  // Mutation for updating a request status/notes
   const updateMutation = useMutation({
     mutationFn: (params: { id: number, status: string, notes?: string }) => 
       updateUrgentCareRequest(params.id, { 
@@ -72,6 +72,43 @@ export default function UrgentCarePage() {
     },
   });
   
+  // Mutation for updating waiting info
+  const waitingInfoMutation = useMutation({
+    mutationFn: (params: { 
+      id: number, 
+      waitingFor: string | null | undefined, 
+      waitingForDetails: string 
+    }) => updateUrgentCareRequest(params.id, { 
+      waitingFor: params.waitingFor === null ? undefined : params.waitingFor,
+      waitingForDetails: params.waitingForDetails
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/urgent-care"] });
+      toast({
+        title: "Waiting information updated",
+        description: "The waiting information has been updated successfully.",
+      });
+      setIsEditingWaitingFor(false);
+      
+      // Update selected request with new waiting info
+      if (selectedRequest) {
+        const updatedRequest = {
+          ...selectedRequest,
+          waitingFor,
+          waitingForDetails
+        };
+        setSelectedRequest(updatedRequest);
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: "Update failed",
+        description: `Failed to update waiting info: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+  
   // Handle status change
   const handleStatusChange = (id: number, status: string) => {
     updateMutation.mutate({ id, status, notes });
@@ -79,42 +116,14 @@ export default function UrgentCarePage() {
   
   // Handle waiting for updates
   const handleWaitingForUpdate = (id: number) => {
-    if (!waitingFor) return;
+    if (waitingFor === undefined) return;
     
-    const waitingData = {
-      waitingFor,
-      waitingForDetails,
-    };
-    
-    const updateMutationForWaiting = useMutation({
-      mutationFn: () => updateUrgentCareRequest(id, waitingData),
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ["/api/urgent-care"] });
-        toast({
-          title: "Request updated",
-          description: "Waiting information has been updated successfully.",
-        });
-        setIsEditingWaitingFor(false);
-        
-        // Update selected request with new waiting info
-        if (selectedRequest) {
-          setSelectedRequest({
-            ...selectedRequest, 
-            waitingFor,
-            waitingForDetails
-          });
-        }
-      },
-      onError: (error) => {
-        toast({
-          title: "Update failed",
-          description: `Failed to update waiting info: ${error.message}`,
-          variant: "destructive",
-        });
-      },
+    // Use the waitingInfoMutation we defined earlier
+    waitingInfoMutation.mutate({ 
+      id, 
+      waitingFor, 
+      waitingForDetails 
     });
-    
-    updateMutationForWaiting.mutate();
   };
   
   // Get badge color based on priority
@@ -328,17 +337,93 @@ export default function UrgentCarePage() {
                         </div>
                       )}
                       
-                      {selectedRequest.waitingFor && (
+                      {!isEditingWaitingFor && (
                         <div>
-                          <h3 className="text-sm font-medium flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-amber-500" />
-                            Waiting For: {selectedRequest.waitingFor.replace('_', ' ')}
-                          </h3>
-                          {selectedRequest.waitingForDetails && (
+                          <div className="flex justify-between items-center">
+                            <h3 className="text-sm font-medium flex items-center gap-2">
+                              <Clock className="h-4 w-4 text-amber-500" />
+                              {selectedRequest.waitingFor ? (
+                                <>Waiting For: {selectedRequest.waitingFor.replace('_', ' ')}</>
+                              ) : (
+                                <>Not waiting for any action</>
+                              )}
+                            </h3>
+                            {selectedRequest.status === "in_progress" && (
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => {
+                                  setIsEditingWaitingFor(true);
+                                  setWaitingFor(selectedRequest.waitingFor);
+                                  setWaitingForDetails(selectedRequest.waitingForDetails || "");
+                                }}
+                              >
+                                <Edit className="h-3 w-3 mr-1" />
+                                {selectedRequest.waitingFor ? "Update" : "Set"} Waiting Status
+                              </Button>
+                            )}
+                          </div>
+                          {selectedRequest.waitingFor && selectedRequest.waitingForDetails && (
                             <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md mt-1">
                               <p className="whitespace-pre-line text-amber-800 dark:text-amber-300">{selectedRequest.waitingForDetails}</p>
                             </div>
                           )}
+                        </div>
+                      )}
+                      
+                      {isEditingWaitingFor && (
+                        <div className="space-y-3">
+                          <div className="flex justify-between items-center">
+                            <h3 className="text-sm font-medium flex items-center gap-2">
+                              <Clock className="h-4 w-4 text-amber-500" />
+                              Update Waiting Status
+                            </h3>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => setIsEditingWaitingFor(false)}
+                            >
+                              <X className="h-3 w-3 mr-1" />
+                              Cancel
+                            </Button>
+                          </div>
+                          
+                          <div className="grid gap-3">
+                            <Select
+                              value={waitingFor || ""}
+                              onValueChange={(value) => setWaitingFor(value === "none" ? null : value)}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="What are you waiting for?" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">Not waiting for anything</SelectItem>
+                                <SelectItem value="patient_reply">Patient Reply</SelectItem>
+                                <SelectItem value="lab_results">Lab Results</SelectItem>
+                                <SelectItem value="symptoms_resolution">Symptoms Resolution</SelectItem>
+                                <SelectItem value="medication_effect">Medication Effect</SelectItem>
+                                <SelectItem value="specialist_input">Specialist Input</SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            
+                            {waitingFor && waitingFor !== "none" && (
+                              <Textarea
+                                placeholder="Add details about what you are waiting for..."
+                                value={waitingForDetails}
+                                onChange={(e) => setWaitingForDetails(e.target.value)}
+                                rows={3}
+                              />
+                            )}
+                            
+                            <Button 
+                              disabled={!selectedRequest || !waitingFor}
+                              onClick={() => selectedRequest && handleWaitingForUpdate(selectedRequest.id)}
+                            >
+                              <Save className="h-4 w-4 mr-2" />
+                              Save Waiting Status
+                            </Button>
+                          </div>
                         </div>
                       )}
                       
