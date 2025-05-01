@@ -78,16 +78,18 @@ router.get('/', async (req, res) => {
     // Get associated patient information for each request
     const requestsWithPatients = await Promise.all(
       requests.map(async (request) => {
-        const [patient] = await db.query.patients.findMany({
-          where: eq(db.query.patients.id, request.patientId)
-        });
+        // Use direct select with a where clause for the patient
+        const [patient] = await db.select()
+          .from(db.schema.patients)
+          .where(eq(db.schema.patients.id, request.patientId));
         
         // Get message content if available
         let messageContent = null;
         if (request.messageId) {
-          const [message] = await db.query.messages.findMany({
-            where: eq(db.query.messages.id, request.messageId)
-          });
+          // Use direct select with a where clause for the message
+          const [message] = await db.select()
+            .from(db.schema.messages)
+            .where(eq(db.schema.messages.id, request.messageId));
           messageContent = message?.content || null;
         }
         
@@ -120,16 +122,16 @@ router.get('/:id', async (req, res) => {
     }
     
     // Get associated patient information
-    const [patient] = await db.query.patients.findMany({
-      where: eq(db.query.patients.id, request.patientId)
-    });
+    const [patient] = await db.select()
+      .from(db.schema.patients)
+      .where(eq(db.schema.patients.id, request.patientId));
     
     // Get message content if available
     let messageContent = null;
     if (request.messageId) {
-      const [message] = await db.query.messages.findMany({
-        where: eq(db.query.messages.id, request.messageId)
-      });
+      const [message] = await db.select()
+        .from(db.schema.messages)
+        .where(eq(db.schema.messages.id, request.messageId));
       messageContent = message?.content || null;
     }
     

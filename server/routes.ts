@@ -34,6 +34,7 @@ import faxRouter from "./routes/fax";
 import { billingRouter } from "./routes/billing";
 import pseudonymRouter from "./routes/pseudonymLinks";
 import urgentCareRouter from "./routes/urgentCare";
+import stripeRouter from "./routes/stripe";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
