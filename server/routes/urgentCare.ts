@@ -295,7 +295,7 @@ router.post('/analyze-message', async (req, res) => {
 router.patch('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, notes, doctorAssignedId } = req.body;
+    const { status, notes, doctorAssignedId, waitingFor, waitingForDetails } = req.body;
     
     // First check if the request exists
     const [existingRequest] = await db.select()
@@ -312,10 +312,16 @@ router.patch('/:id', async (req, res) => {
     if (status) updateData.status = status;
     if (notes) updateData.notes = notes;
     if (doctorAssignedId) updateData.doctorAssignedId = doctorAssignedId;
+    if (waitingFor !== undefined) updateData.waitingFor = waitingFor;
+    if (waitingForDetails !== undefined) updateData.waitingForDetails = waitingForDetails;
     
     // If being marked as completed, add completion time
     if (status === 'completed' && existingRequest.status !== 'completed') {
       updateData.respondedAt = new Date();
+      
+      // Clear waiting for fields when completing a request
+      updateData.waitingFor = null;
+      updateData.waitingForDetails = null;
     }
     
     // Update the request

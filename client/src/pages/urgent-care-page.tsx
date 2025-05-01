@@ -34,6 +34,9 @@ export default function UrgentCarePage() {
   const [timeframe, setTimeframe] = useState(24);
   const [selectedRequest, setSelectedRequest] = useState<UrgentCareWithDetails | null>(null);
   const [notes, setNotes] = useState("");
+  const [isEditingWaitingFor, setIsEditingWaitingFor] = useState(false);
+  const [waitingFor, setWaitingFor] = useState<string | null>(null);
+  const [waitingForDetails, setWaitingForDetails] = useState<string>("");
   
   // Query for urgent care requests
   const { data: urgentRequests = [], isLoading, refetch } = useQuery({
@@ -72,6 +75,46 @@ export default function UrgentCarePage() {
   // Handle status change
   const handleStatusChange = (id: number, status: string) => {
     updateMutation.mutate({ id, status, notes });
+  };
+  
+  // Handle waiting for updates
+  const handleWaitingForUpdate = (id: number) => {
+    if (!waitingFor) return;
+    
+    const waitingData = {
+      waitingFor,
+      waitingForDetails,
+    };
+    
+    const updateMutationForWaiting = useMutation({
+      mutationFn: () => updateUrgentCareRequest(id, waitingData),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["/api/urgent-care"] });
+        toast({
+          title: "Request updated",
+          description: "Waiting information has been updated successfully.",
+        });
+        setIsEditingWaitingFor(false);
+        
+        // Update selected request with new waiting info
+        if (selectedRequest) {
+          setSelectedRequest({
+            ...selectedRequest, 
+            waitingFor,
+            waitingForDetails
+          });
+        }
+      },
+      onError: (error) => {
+        toast({
+          title: "Update failed",
+          description: `Failed to update waiting info: ${error.message}`,
+          variant: "destructive",
+        });
+      },
+    });
+    
+    updateMutationForWaiting.mutate();
   };
   
   // Get badge color based on priority
@@ -185,6 +228,7 @@ export default function UrgentCarePage() {
                         <TableHead>Patient</TableHead>
                         <TableHead>Type</TableHead>
                         <TableHead>Priority</TableHead>
+                        <TableHead>Status</TableHead>
                         <TableHead className="text-right">Time</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -210,6 +254,15 @@ export default function UrgentCarePage() {
                           </TableCell>
                           <TableCell>
                             {getPriorityBadge(request.priority)}
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(request.status)}
+                            {request.waitingFor && request.status === "in_progress" && (
+                              <div className="flex items-center mt-1 text-xs text-amber-700 dark:text-amber-400">
+                                <Clock className="h-3 w-3 mr-1" />
+                                {request.waitingFor.replace('_', ' ')}
+                              </div>
+                            )}
                           </TableCell>
                           <TableCell className="text-right">
                             {formatDate(request.receivedAt).split(',')[1]}
@@ -272,6 +325,20 @@ export default function UrgentCarePage() {
                           <div className="p-3 bg-muted rounded-md mt-1">
                             <p className="whitespace-pre-line">{selectedRequest.aiAnalysis}</p>
                           </div>
+                        </div>
+                      )}
+                      
+                      {selectedRequest.waitingFor && (
+                        <div>
+                          <h3 className="text-sm font-medium flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-amber-500" />
+                            Waiting For: {selectedRequest.waitingFor.replace('_', ' ')}
+                          </h3>
+                          {selectedRequest.waitingForDetails && (
+                            <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md mt-1">
+                              <p className="whitespace-pre-line text-amber-800 dark:text-amber-300">{selectedRequest.waitingForDetails}</p>
+                            </div>
+                          )}
                         </div>
                       )}
                       

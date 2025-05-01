@@ -21,6 +21,8 @@ export interface AnalyzeMessageResponse {
     priority: "high" | "medium" | "low";
     problemDescription: string;
     analysisNotes: string;
+    waitingFor: "patient_reply" | "lab_results" | "symptoms_resolution" | "medication_effect" | "specialist_input" | "other";
+    waitingForDetails: string;
   };
   request?: UrgentCareRequest;
 }
@@ -80,6 +82,8 @@ export async function updateUrgentCareRequest(
     status?: string;
     notes?: string;
     doctorAssignedId?: number;
+    waitingFor?: string;
+    waitingForDetails?: string;
   }
 ): Promise<UrgentCareRequest> {
   const response = await apiRequest("PATCH", `/api/urgent-care/${id}`, updates);
