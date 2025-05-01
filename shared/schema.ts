@@ -365,6 +365,43 @@ export const insertAiDocumentVerificationSchema = createInsertSchema(aiDocumentV
 export type AiDocumentVerification = typeof aiDocumentVerifications.$inferSelect;
 export type InsertAiDocumentVerification = z.infer<typeof insertAiDocumentVerificationSchema>;
 
+// Urgent Care Requests model
+export const urgentCareRequests = pgTable("urgent_care_requests", {
+  id: serial("id").primaryKey(),
+  patientId: integer("patient_id").notNull().references(() => patients.id),
+  messageId: integer("message_id").references(() => messages.id),
+  requestType: text("request_type", { 
+    enum: ["new_problem", "medication_refill", "follow_up", "symptom_check", "other"] 
+  }).notNull(),
+  priority: text("priority", { enum: ["high", "medium", "low"] }).notNull().default("medium"),
+  status: text("status", { 
+    enum: ["new", "in_progress", "completed", "cancelled"] 
+  }).notNull().default("new"),
+  problemDescription: text("problem_description").notNull(),
+  aiAnalysis: text("ai_analysis"),
+  receivedAt: timestamp("received_at").defaultNow(),
+  respondedAt: timestamp("responded_at"),
+  aiProcessedAt: timestamp("ai_processed_at"),
+  doctorAssignedId: integer("doctor_assigned_id").references(() => users.id),
+  notes: text("notes"),
+});
+
+export const insertUrgentCareRequestSchema = createInsertSchema(urgentCareRequests).pick({
+  patientId: true,
+  messageId: true,
+  requestType: true,
+  priority: true,
+  status: true,
+  problemDescription: true,
+  aiAnalysis: true,
+  receivedAt: true,
+  doctorAssignedId: true,
+  notes: true,
+});
+
+export type UrgentCareRequest = typeof urgentCareRequests.$inferSelect;
+export type InsertUrgentCareRequest = z.infer<typeof insertUrgentCareRequestSchema>;
+
 // AI Prompts model for customizing AI behavior
 export const aiPrompts = pgTable("ai_prompts", {
   id: serial("id").primaryKey(),
