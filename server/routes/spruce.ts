@@ -183,12 +183,12 @@ router.post('/refresh-patients', async (req, res) => {
         count: formattedPatients.length,
         patients: formattedPatients
       });
-    } catch (spruceError) {
+    } catch (spruceError: any) {
       console.error('Error refreshing data from Spruce API:', spruceError);
       res.status(500).json({
         success: false,
         message: 'Failed to refresh patient data from Spruce API',
-        error: spruceError.message
+        error: spruceError.message || 'Unknown error'
       });
     }
   } catch (error) {

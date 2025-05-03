@@ -387,7 +387,7 @@ const MedicationRefillsPage: React.FC = () => {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.open(selectedRefill.pdfUrl, '_blank')}
+                  onClick={() => window.open(`/api/medication-refills/${selectedRefill.id}/pdf`, '_blank')}
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Download PDF
@@ -398,7 +398,7 @@ const MedicationRefillsPage: React.FC = () => {
               <div className="flex-grow rounded overflow-hidden border border-[#333] bg-[#252525] mb-4">
                 <iframe
                   ref={pdfViewerRef}
-                  src={selectedRefill.pdfUrl}
+                  src={`/api/medication-refills/${selectedRefill.id}/pdf`}
                   className="w-full h-full"
                   title="PDF Viewer"
                 />

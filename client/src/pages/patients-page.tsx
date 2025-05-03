@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, User, Search } from 'lucide-react';
+import { Loader2, User, Search, RefreshCw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -23,10 +23,45 @@ export default function PatientsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   
-  // Using the enhanced search API that combines Spruce API and local database
+  // Refresh patients data mutation
+  const refreshPatientsMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch('/api/spruce/refresh-patients', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to refresh patient data');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Invalidate queries to force a refetch
+      queryClient.invalidateQueries({ queryKey: ['/api/spruce/search-patients'] });
+      
+      toast({
+        title: 'Patient data refreshed',
+        description: `Successfully refreshed ${data.count} patients from Spruce API.`,
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Refresh failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  });
+  
+  // Using the Spruce API for patient data
   const { 
-    data: patientsResponse = { patients: [], source: 'local' }, 
+    data: patientsResponse = { patients: [], source: 'spruce' }, 
     isLoading,
     error
   } = useQuery({
@@ -90,6 +125,15 @@ export default function PatientsPage() {
                   onChange={e => setSearchTerm(e.target.value)}
                 />
               </div>
+              <Button 
+                variant="outline"
+                onClick={() => refreshPatientsMutation.mutate()}
+                disabled={refreshPatientsMutation.isPending}
+                title="Refresh patient data from Spruce API"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${refreshPatientsMutation.isPending ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
               <Button 
                 className="bg-blue-600 hover:bg-blue-700 text-white"
               >

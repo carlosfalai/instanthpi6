@@ -39,6 +39,27 @@ router.get('/:id', async (req: Request, res: Response) => {
   }
 });
 
+// Get a medication refill PDF (without app layout)
+router.get('/:id/pdf', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const [refillRequest] = await db.select().from(medicationRefills).where(eq(medicationRefills.id, id));
+    
+    if (!refillRequest || !refillRequest.pdfUrl) {
+      return res.status(404).json({ error: 'Medication refill PDF not found' });
+    }
+    
+    // Extract the file path from the URL
+    const filePath = refillRequest.pdfUrl.replace(/^\//, ''); // Remove leading slash if present
+    
+    // Serve the file directly without the app layout
+    res.sendFile(filePath, { root: '.' });
+  } catch (error) {
+    console.error('Error serving medication refill PDF:', error);
+    res.status(500).json({ error: 'Failed to serve medication refill PDF' });
+  }
+});
+
 // Process a medication refill request
 router.post('/:id/process', async (req: Request, res: Response) => {
   try {
