@@ -5,6 +5,7 @@ import { queryClient } from '@/lib/queryClient';
 import { Toaster } from '@/components/ui/toaster';
 import NotFound from '@/pages/not-found';
 import ThreePanelLayout from '@/components/dashboard/ThreePanelLayout';
+import HomePage from '@/pages/home-page';
 import PatientsPage from '@/pages/patients-page';
 import DocumentsPage from '@/pages/documents-page';
 import EducationPage from '@/pages/education-page';
@@ -27,11 +28,14 @@ import LeadershipAssociationPage from '@/pages/leadership-association-page';
 import SettingsPage from '@/pages/settings-page';
 import OrganizationProfilePage from '@/pages/organization-profile-page';
 import TeammatesPage from '@/pages/teammates-page';
+// New Spruce-like layout
+import SpruceLikeLayout from '@/components/layout/SpruceLikeLayout';
+import SpruceLayoutDemo from '@/pages/spruce-layout-demo';
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={ThreePanelLayout} />
+      <Route path="/" component={HomePage} />
       <Route path="/patients" component={PatientsPage} />
       <Route path="/documents" component={DocumentsPage} />
       <Route path="/education" component={EducationPage} />
@@ -55,6 +59,8 @@ function Router() {
       <Route path="/settings" component={SettingsPage} />
       <Route path="/settings/organization-profile" component={OrganizationProfilePage} />
       <Route path="/settings/teammates" component={TeammatesPage} />
+      {/* Spruce-like layout demo */}
+      <Route path="/spruce-demo" component={SpruceLayoutDemo} />
       <Route component={NotFound} />
     </Switch>
   );
