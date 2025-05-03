@@ -22,6 +22,7 @@ import PatientTreatmentPage from '@/pages/patient-treatment-page';
 import AiBillingPage from '@/pages/ai-billing-page';
 import UrgentCarePage from '@/pages/urgent-care-page';
 import SubscriptionPage from '@/pages/subscription-page';
+import LeadershipAssociationPage from '@/pages/leadership-association-page';
 
 function Router() {
   return (
@@ -44,6 +45,7 @@ function Router() {
       <Route path="/ai-billing" component={AiBillingPage} />
       <Route path="/urgent-care" component={UrgentCarePage} />
       <Route path="/subscription" component={SubscriptionPage} />
+      <Route path="/leadership-association" component={LeadershipAssociationPage} />
       <Route path="/patient/:id/treatment" component={PatientTreatmentPage} />
       <Route component={NotFound} />
     </Switch>

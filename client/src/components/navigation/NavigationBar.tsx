@@ -17,7 +17,8 @@ import {
   BookOpen,
   Receipt,
   DollarSign,
-  CreditCard
+  CreditCard,
+  UsersIcon
 } from 'lucide-react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { User as UserType } from '@shared/schema';
@@ -46,7 +47,7 @@ interface NavItem {
   label: string;
   visible: boolean;
   order: number;
-  row: 'primary' | 'secondary';
+  row: 'primary' | 'secondary' | 'tertiary';
   notificationCount?: number;
 }
 
