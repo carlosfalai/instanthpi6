@@ -180,322 +180,326 @@ export default function UrgentCarePage() {
               value={timeframe.toString()}
               onValueChange={(value) => setTimeframe(parseInt(value))}
             >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Time period" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="4">Last 4 hours</SelectItem>
-              <SelectItem value="8">Last 8 hours</SelectItem>
-              <SelectItem value="12">Last 12 hours</SelectItem>
-              <SelectItem value="24">Last 24 hours</SelectItem>
-              <SelectItem value="48">Last 2 days</SelectItem>
-              <SelectItem value="72">Last 3 days</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button 
-            onClick={() => refetch()} 
-            variant="outline" 
-            size="icon"
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Time period" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="4">Last 4 hours</SelectItem>
+                <SelectItem value="8">Last 8 hours</SelectItem>
+                <SelectItem value="12">Last 12 hours</SelectItem>
+                <SelectItem value="24">Last 24 hours</SelectItem>
+                <SelectItem value="48">Last 2 days</SelectItem>
+                <SelectItem value="72">Last 3 days</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button 
+              onClick={() => refetch()} 
+              variant="outline" 
+              size="icon"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-      </div>
-      
-      <Tabs 
-        defaultValue="new" 
-        value={activeTab} 
-        onValueChange={setActiveTab}
-        className="w-full"
-      >
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="new">New</TabsTrigger>
-          <TabsTrigger value="in_progress">In Progress</TabsTrigger>
-          <TabsTrigger value="completed">Completed</TabsTrigger>
-          <TabsTrigger value="all">All Requests</TabsTrigger>
-        </TabsList>
         
-        <TabsContent value={activeTab} className="mt-6">
-          {isLoading ? (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" aria-label="Loading"/>
-            </div>
-          ) : urgentRequests.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-center">
-              <Clock className="h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium">No urgent care requests</h3>
-              <p className="text-muted-foreground max-w-md mt-2">
-                There are currently no {activeTab !== "all" ? activeTab : ""} urgent care requests 
-                within the selected time period.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-1 space-y-4">
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Patient</TableHead>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Priority</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Time</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {urgentRequests.map((request) => (
-                        <TableRow 
-                          key={request.id}
-                          className={`cursor-pointer ${selectedRequest?.id === request.id ? 'bg-accent' : ''}`}
-                          onClick={() => {
-                            setSelectedRequest(request);
-                            setNotes(request.notes || '');
-                          }}
-                        >
-                          <TableCell>
-                            {request.patient?.name || `Patient #${request.patientId}`}
-                          </TableCell>
-                          <TableCell>
-                            {request.requestType === "new_problem" ? "New Problem" :
-                             request.requestType === "medication_refill" ? "Medication Refill" :
-                             request.requestType === "follow_up" ? "Follow-up" :
-                             request.requestType === "symptom_check" ? "Symptom Check" :
-                             request.requestType}
-                          </TableCell>
-                          <TableCell>
-                            {getPriorityBadge(request.priority)}
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(request.status)}
-                            {request.waitingFor && request.status === "in_progress" && (
-                              <div className="flex items-center mt-1 text-xs text-amber-700 dark:text-amber-400">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {request.waitingFor.replace('_', ' ')}
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {formatDate(request.receivedAt).split(',')[1]}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+        <Tabs 
+          defaultValue="new" 
+          value={activeTab} 
+          onValueChange={setActiveTab}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="new">New</TabsTrigger>
+            <TabsTrigger value="in_progress">In Progress</TabsTrigger>
+            <TabsTrigger value="completed">Completed</TabsTrigger>
+            <TabsTrigger value="all">All Requests</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value={activeTab} className="mt-6">
+            {isLoading ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" aria-label="Loading"/>
               </div>
-              
-              <div className="md:col-span-2">
-                {selectedRequest ? (
-                  <Card>
-                    <CardHeader className="pb-3">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <CardTitle>
-                            {selectedRequest.patient?.name || `Patient #${selectedRequest.patientId}`}
-                          </CardTitle>
-                          <CardDescription>
-                            Received: {formatDate(selectedRequest.receivedAt)}
-                          </CardDescription>
-                        </div>
-                        <div className="flex gap-2">
-                          {getPriorityBadge(selectedRequest.priority)}
-                          {getStatusBadge(selectedRequest.status)}
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div>
-                        <h3 className="text-sm font-medium">Request Type</h3>
-                        <p>
-                          {selectedRequest.requestType === "new_problem" ? "New Medical Problem" :
-                           selectedRequest.requestType === "medication_refill" ? "Medication Refill Request" :
-                           selectedRequest.requestType === "follow_up" ? "Follow-up Visit" :
-                           selectedRequest.requestType === "symptom_check" ? "Symptom Check" :
-                           selectedRequest.requestType}
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <h3 className="text-sm font-medium">Problem Description</h3>
-                        <p className="whitespace-pre-line">{selectedRequest.problemDescription}</p>
-                      </div>
-                      
-                      {selectedRequest.messageContent && (
-                        <div>
-                          <h3 className="text-sm font-medium">Patient Message</h3>
-                          <div className="p-3 bg-muted rounded-md mt-1">
-                            <p className="whitespace-pre-line">{selectedRequest.messageContent}</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {selectedRequest.aiAnalysis && (
-                        <div>
-                          <h3 className="text-sm font-medium">AI Analysis</h3>
-                          <div className="p-3 bg-muted rounded-md mt-1">
-                            <p className="whitespace-pre-line">{selectedRequest.aiAnalysis}</p>
-                          </div>
-                        </div>
-                      )}
-                      
-                      {!isEditingWaitingFor && (
-                        <div>
-                          <div className="flex justify-between items-center">
-                            <h3 className="text-sm font-medium flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-amber-500" />
-                              {selectedRequest.waitingFor ? (
-                                <>Waiting For: {selectedRequest.waitingFor.replace('_', ' ')}</>
-                              ) : (
-                                <>Not waiting for any action</>
-                              )}
-                            </h3>
-                            {selectedRequest.status === "in_progress" && (
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
-                                onClick={() => {
-                                  setIsEditingWaitingFor(true);
-                                  setWaitingFor(selectedRequest.waitingFor);
-                                  setWaitingForDetails(selectedRequest.waitingForDetails || "");
-                                }}
-                              >
-                                <Edit className="h-3 w-3 mr-1" />
-                                {selectedRequest.waitingFor ? "Update" : "Set"} Waiting Status
-                              </Button>
-                            )}
-                          </div>
-                          {selectedRequest.waitingFor && selectedRequest.waitingForDetails && (
-                            <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md mt-1">
-                              <p className="whitespace-pre-line text-amber-800 dark:text-amber-300">{selectedRequest.waitingForDetails}</p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                      
-                      {isEditingWaitingFor && (
-                        <div className="space-y-3">
-                          <div className="flex justify-between items-center">
-                            <h3 className="text-sm font-medium flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-amber-500" />
-                              Update Waiting Status
-                            </h3>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              onClick={() => setIsEditingWaitingFor(false)}
-                            >
-                              <X className="h-3 w-3 mr-1" />
-                              Cancel
-                            </Button>
-                          </div>
-                          
-                          <div className="grid gap-3">
-                            <Select
-                              value={waitingFor || ""}
-                              onValueChange={(value) => setWaitingFor(value === "none" ? null : value)}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="What are you waiting for?" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="none">Not waiting for anything</SelectItem>
-                                <SelectItem value="patient_reply">Patient Reply</SelectItem>
-                                <SelectItem value="lab_results">Lab Results</SelectItem>
-                                <SelectItem value="symptoms_resolution">Symptoms Resolution</SelectItem>
-                                <SelectItem value="medication_effect">Medication Effect</SelectItem>
-                                <SelectItem value="specialist_input">Specialist Input</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            
-                            {waitingFor && waitingFor !== "none" && (
-                              <Textarea
-                                placeholder="Add details about what you are waiting for..."
-                                value={waitingForDetails}
-                                onChange={(e) => setWaitingForDetails(e.target.value)}
-                                rows={3}
-                              />
-                            )}
-                            
-                            <Button 
-                              disabled={!selectedRequest || !waitingFor}
-                              onClick={() => selectedRequest && handleWaitingForUpdate(selectedRequest.id)}
-                            >
-                              <Save className="h-4 w-4 mr-2" />
-                              Save Waiting Status
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                      
-                      <Separator />
-                      
-                      <div>
-                        <h3 className="text-sm font-medium mb-2">Notes</h3>
-                        <Textarea
-                          placeholder="Add notes about this request..."
-                          value={notes}
-                          onChange={(e) => setNotes(e.target.value)}
-                          rows={4}
-                        />
-                      </div>
-                    </CardContent>
-                    <CardFooter className="flex justify-between">
-                      <div className="space-x-2">
-                        {selectedRequest.status === "new" && (
-                          <Button
-                            variant="default"
-                            onClick={() => handleStatusChange(selectedRequest.id, "in_progress")}
-                            disabled={updateMutation.isPending}
+            ) : urgentRequests.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-center">
+                <Clock className="h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="text-lg font-medium">No urgent care requests</h3>
+                <p className="text-muted-foreground max-w-md mt-2">
+                  There are currently no {activeTab !== "all" ? activeTab : ""} urgent care requests 
+                  within the selected time period.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-1 space-y-4">
+                  <div className="rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Patient</TableHead>
+                          <TableHead>Type</TableHead>
+                          <TableHead>Priority</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead className="text-right">Time</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {urgentRequests.map((request) => (
+                          <TableRow 
+                            key={request.id}
+                            className={`cursor-pointer ${selectedRequest?.id === request.id ? 'bg-accent' : ''}`}
+                            onClick={() => {
+                              setSelectedRequest(request);
+                              setNotes(request.notes || '');
+                            }}
                           >
-                            <MessageSquare className="mr-2 h-4 w-4" />
-                            Start Consultation
-                          </Button>
+                            <TableCell>
+                              {request.patient?.name || `Patient #${request.patientId}`}
+                            </TableCell>
+                            <TableCell>
+                              {request.requestType === "new_problem" ? "New Problem" :
+                               request.requestType === "medication_refill" ? "Medication Refill" :
+                               request.requestType === "follow_up" ? "Follow-up" :
+                               request.requestType === "symptom_check" ? "Symptom Check" :
+                               request.requestType}
+                            </TableCell>
+                            <TableCell>
+                              {getPriorityBadge(request.priority)}
+                            </TableCell>
+                            <TableCell>
+                              {getStatusBadge(request.status)}
+                              {request.waitingFor && request.status === "in_progress" && (
+                                <div className="flex items-center mt-1 text-xs text-amber-700 dark:text-amber-400">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  {request.waitingFor.replace('_', ' ')}
+                                </div>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {formatDate(request.receivedAt).split(',')[1]}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+                
+                <div className="md:col-span-2">
+                  {selectedRequest ? (
+                    <Card>
+                      <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle>
+                              {selectedRequest.patient?.name || `Patient #${selectedRequest.patientId}`}
+                            </CardTitle>
+                            <CardDescription>
+                              Received: {formatDate(selectedRequest.receivedAt)}
+                            </CardDescription>
+                          </div>
+                          <div className="flex gap-2">
+                            {getPriorityBadge(selectedRequest.priority)}
+                            {getStatusBadge(selectedRequest.status)}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div>
+                          <h3 className="text-sm font-medium">Request Type</h3>
+                          <p>
+                            {selectedRequest.requestType === "new_problem" ? "New Medical Problem" :
+                             selectedRequest.requestType === "medication_refill" ? "Medication Refill Request" :
+                             selectedRequest.requestType === "follow_up" ? "Follow-up Visit" :
+                             selectedRequest.requestType === "symptom_check" ? "Symptom Check" :
+                             selectedRequest.requestType}
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="text-sm font-medium">Problem Description</h3>
+                          <p className="whitespace-pre-line">{selectedRequest.problemDescription}</p>
+                        </div>
+                        
+                        {selectedRequest.messageContent && (
+                          <div>
+                            <h3 className="text-sm font-medium">Patient Message</h3>
+                            <div className="p-3 bg-muted rounded-md mt-1">
+                              <p className="whitespace-pre-line">{selectedRequest.messageContent}</p>
+                            </div>
+                          </div>
                         )}
                         
-                        {(selectedRequest.status === "new" || selectedRequest.status === "in_progress") && (
-                          <Button
-                            variant="default"
-                            onClick={() => handleStatusChange(selectedRequest.id, "completed")}
-                            disabled={updateMutation.isPending}
-                          >
-                            <FileCheck className="mr-2 h-4 w-4" />
-                            Mark as Completed
-                          </Button>
+                        {selectedRequest.aiAnalysis && (
+                          <div>
+                            <h3 className="text-sm font-medium">AI Analysis</h3>
+                            <div className="p-3 bg-muted rounded-md mt-1">
+                              <p className="whitespace-pre-line">{selectedRequest.aiAnalysis}</p>
+                            </div>
+                          </div>
                         )}
-                      </div>
+                        
+                        {!isEditingWaitingFor && (
+                          <div>
+                            <div className="flex justify-between items-center">
+                              <h3 className="text-sm font-medium flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-amber-500" />
+                                {selectedRequest.waitingFor ? (
+                                  <>Waiting For: {selectedRequest.waitingFor.replace('_', ' ')}</>
+                                ) : (
+                                  <>Not waiting for any action</>
+                                )}
+                              </h3>
+                              {selectedRequest.status === "in_progress" && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm" 
+                                  onClick={() => {
+                                    setIsEditingWaitingFor(true);
+                                    setWaitingFor(selectedRequest.waitingFor);
+                                    setWaitingForDetails(selectedRequest.waitingForDetails || "");
+                                  }}
+                                >
+                                  <Edit className="h-3 w-3 mr-1" />
+                                  {selectedRequest.waitingFor ? "Update" : "Set"} Waiting Status
+                                </Button>
+                              )}
+                            </div>
+                            {selectedRequest.waitingFor && selectedRequest.waitingForDetails && (
+                              <div className="p-3 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md mt-1">
+                                <p className="whitespace-pre-line text-amber-800 dark:text-amber-300">{selectedRequest.waitingForDetails}</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
+                        {isEditingWaitingFor && (
+                          <div className="space-y-3">
+                            <div className="flex justify-between items-center">
+                              <h3 className="text-sm font-medium flex items-center gap-2">
+                                <Clock className="h-4 w-4 text-amber-500" />
+                                Update Waiting Status
+                              </h3>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => setIsEditingWaitingFor(false)}
+                              >
+                                <X className="h-3 w-3 mr-1" />
+                                Cancel
+                              </Button>
+                            </div>
+                            
+                            <div className="grid gap-3">
+                              <Select
+                                value={waitingFor || ""}
+                                onValueChange={(value) => setWaitingFor(value === "none" ? null : value)}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="What are you waiting for?" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="none">Not waiting for anything</SelectItem>
+                                  <SelectItem value="patient_reply">Patient Reply</SelectItem>
+                                  <SelectItem value="lab_results">Lab Results</SelectItem>
+                                  <SelectItem value="symptoms_resolution">Symptoms Resolution</SelectItem>
+                                  <SelectItem value="medication_effect">Medication Effect</SelectItem>
+                                  <SelectItem value="specialist_consult">Specialist Consult</SelectItem>
+                                  <SelectItem value="imaging_results">Imaging Results</SelectItem>
+                                  <SelectItem value="pharmacy_confirmation">Pharmacy Confirmation</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              
+                              <Textarea 
+                                placeholder="Enter any additional details about what you're waiting for..."
+                                value={waitingForDetails}
+                                onChange={(e) => setWaitingForDetails(e.target.value)}
+                                className="min-h-[100px]"
+                              />
+                              
+                              <Button 
+                                className="mt-2"
+                                onClick={() => handleWaitingForUpdate(selectedRequest.id)}
+                              >
+                                <Save className="h-4 w-4 mr-2" />
+                                Save Waiting Status
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                        
+                        <Separator />
+                        
+                        <div>
+                          <h3 className="text-sm font-medium">Notes</h3>
+                          <Textarea 
+                            placeholder="Add clinical notes here..."
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            className="min-h-[100px] mt-2"
+                          />
+                        </div>
+                      </CardContent>
                       
-                      <div>
-                        {selectedRequest.status !== "cancelled" && (
-                          <Button
-                            variant="outline"
-                            onClick={() => handleStatusChange(selectedRequest.id, "cancelled")}
-                            disabled={updateMutation.isPending}
+                      <CardFooter className="flex justify-between pt-2">
+                        <div className="flex items-center gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => setSelectedRequest(null)}
                           >
-                            Cancel Request
+                            Cancel
                           </Button>
-                        )}
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                          {selectedRequest.status === "new" && (
+                            <Button 
+                              variant="default"
+                              onClick={() => handleStatusChange(selectedRequest.id, "in_progress")}
+                              disabled={updateMutation.isPending}
+                            >
+                              {updateMutation.isPending ? 
+                                <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full mr-2" aria-label="Loading"/> : 
+                                <MessageSquare className="h-4 w-4 mr-2" />
+                              }
+                              Start Working
+                            </Button>
+                          )}
+                          
+                          {selectedRequest.status === "in_progress" && (
+                            <Button
+                              variant="default"
+                              onClick={() => handleStatusChange(selectedRequest.id, "completed")}
+                              disabled={updateMutation.isPending}
+                            >
+                              {updateMutation.isPending ? 
+                                <div className="animate-spin w-4 h-4 border-2 border-primary border-t-transparent rounded-full mr-2" aria-label="Loading"/> : 
+                                <FileCheck className="h-4 w-4 mr-2" />
+                              }
+                              Mark Completed
+                            </Button>
+                          )}
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  ) : (
+                    <Card>
+                      <div className="flex flex-col items-center justify-center p-12 text-center">
+                        <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
+                        <h3 className="text-lg font-medium">No request selected</h3>
+                        <p className="text-muted-foreground max-w-md mt-2">
+                          Select a request from the list to view details and manage the patient's urgent care needs.
+                        </p>
                       </div>
-                    </CardFooter>
-                  </Card>
-                ) : (
-                  <Card>
-                    <div className="flex flex-col items-center justify-center p-12 text-center">
-                      <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                      <h3 className="text-lg font-medium">No request selected</h3>
-                      <p className="text-muted-foreground max-w-md mt-2">
-                        Select a request from the list to view details and manage the patient's urgent care needs.
-                      </p>
-                    </div>
-                  </Card>
-                )}
+                    </Card>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-    </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
     </AppLayout>
   );
 }
