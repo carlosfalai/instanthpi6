@@ -46,8 +46,9 @@ const openai = new OpenAI({
 const spruceApi = axios.create({
   baseURL: 'https://api.sprucehealth.com/v1',
   headers: {
-    'Authorization': `Bearer ${process.env.SPRUCE_API_KEY}`,
-    'Content-Type': 'application/json'
+    'Authorization': `Bearer ${process.env.SPRUCE_API_KEY || 'YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0='}`,
+    'Content-Type': 'application/json',
+    's-access-id': process.env.SPRUCE_ACCESS_ID || 'aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I='
   }
 });
 
