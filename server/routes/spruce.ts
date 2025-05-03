@@ -15,6 +15,16 @@ interface SprucePatient {
   status?: string;
 }
 
+// Setup Spruce Health API
+const spruceApi = axios.create({
+  baseURL: 'https://api.sprucehealth.com/v1',
+  headers: {
+    'Authorization': 'Bearer YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0=',
+    'Content-Type': 'application/json',
+    's-access-id': 'aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I='
+  }
+});
+
 export const router = Router();
 
 // Search patients in real-time from Spruce API
@@ -71,14 +81,7 @@ router.get('/search-patients', async (req, res) => {
       console.log('Attempting to search patients via Spruce API');
       
       // According to the documentation, we should use the /contacts endpoint instead of /patients
-      const response = await axios.create({
-        baseURL: 'https://api.sprucehealth.com/v1',
-        headers: {
-          'Authorization': 'Bearer YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0=',
-          'Content-Type': 'application/json',
-          's-access-id': 'aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I='
-        }
-      }).get('/contacts', {
+      const response = await spruceApi.get('/contacts', {
         params: { query: searchTerm }
       });
       
@@ -143,16 +146,6 @@ router.get('/search-patients', async (req, res) => {
   } catch (error) {
     console.error('Error in patient search:', error);
     res.status(500).json({ message: 'Failed to search patients' });
-  }
-});
-
-// Setup Spruce Health API
-const spruceApi = axios.create({
-  baseURL: 'https://api.sprucehealth.com/v1',
-  headers: {
-    'Authorization': 'Bearer YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0=',
-    'Content-Type': 'application/json',
-    's-access-id': 'aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I='
   }
 });
 
