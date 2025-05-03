@@ -78,10 +78,12 @@ router.get('/search-patients', async (req, res) => {
           'Content-Type': 'application/json',
           's-access-id': 'aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I='
         }
-      }).get('/contacts');
+      }).get('/contacts', {
+        params: { query: searchTerm }
+      });
       
       // Filter patients based on query
-      const allPatients = response.data.patients || [];
+      const allPatients = response.data.contacts || [];
       console.log(`Received ${allPatients.length} patients from Spruce API`);
       
       const filteredPatients = allPatients.filter((patient: SprucePatient) => {
