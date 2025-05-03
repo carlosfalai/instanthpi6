@@ -27,44 +27,27 @@ const handleZodError = (error: unknown, res: any) => {
   return res.status(500).json({ message: "Internal server error" });
 };
 
-// Get all patients
+// Redirect all patient requests to Spruce API
 router.get('/', async (req, res) => {
   try {
     const { query } = req.query;
-    const patients = await storage.getAllPatients();
-    
-    if (query && typeof query === 'string') {
-      const searchTerm = query.toLowerCase();
-      const filteredPatients = patients.filter(patient => {
-        return (
-          patient.name.toLowerCase().includes(searchTerm) ||
-          patient.email.toLowerCase().includes(searchTerm) ||
-          patient.phone.includes(searchTerm)
-        );
-      });
-      return res.json(filteredPatients);
-    }
-    
-    res.json(patients);
+    // Redirect to Spruce API search endpoint
+    const url = `/api/spruce/search-patients${query ? `?query=${encodeURIComponent(String(query))}` : ''}`;
+    res.redirect(url);
   } catch (error) {
-    console.error('Error fetching patients:', error);
-    res.status(500).json({ message: 'Failed to fetch patients' });
+    console.error('Error redirecting patient search:', error);
+    res.status(500).json({ message: 'Failed to search patients' });
   }
 });
 
-// Get a specific patient
+// Get a specific patient - redirect to Spruce API
 router.get('/:id', async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
-    const patient = await storage.getPatient(id);
-    
-    if (!patient) {
-      return res.status(404).json({ message: 'Patient not found' });
-    }
-    
-    res.json(patient);
+    const id = req.params.id;
+    // Redirect to Spruce API endpoint for specific patient
+    res.redirect(`/api/spruce/patients/${id}`);
   } catch (error) {
-    console.error('Error fetching patient:', error);
+    console.error('Error redirecting to Spruce patient:', error);
     res.status(500).json({ message: 'Failed to fetch patient' });
   }
 });

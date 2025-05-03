@@ -31,9 +31,9 @@ export default function PatientSearchPanel({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Query to get patients from Spruce API with local DB fallback
+  // Query to get patients exclusively from Spruce API
   const { 
-    data: patientsResponse = { patients: [], source: 'local' }, 
+    data: patientsResponse = { patients: [], source: 'spruce' }, 
     isLoading,
     error
   } = useQuery({

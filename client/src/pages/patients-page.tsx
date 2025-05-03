@@ -73,11 +73,9 @@ export default function PatientsPage() {
               <h2 className="text-2xl font-bold">Patients</h2>
               <p className="text-gray-400">
                 View and manage your patients
-                {patientsResponse.source && (
-                  <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                    {patientsResponse.source === 'spruce' ? 'Spruce API' : 'Local database'}
-                  </span>
-                )}
+                <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                  Spruce API
+                </span>
               </p>
             </div>
             

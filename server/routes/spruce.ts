@@ -27,60 +27,27 @@ const spruceApi = axios.create({
 
 export const router = Router();
 
-// Search patients in real-time from Spruce API
+// Search patients in real-time from Spruce API only
 router.get('/search-patients', async (req, res) => {
   try {
     const { query } = req.query;
     
     if (!query || typeof query !== 'string') {
-      // If no query is provided, return all patients from local database
-      try {
-        const allPatients = await storage.getAllPatients();
-        return res.json({
-          patients: allPatients,
-          source: 'local'
-        });
-      } catch (dbError) {
-        console.error('Error fetching all patients:', dbError);
-        return res.status(500).json({ message: 'Failed to fetch patients' });
-      }
+      // If no query is provided, return empty list
+      return res.json({
+        patients: [],
+        source: 'spruce'
+      });
     }
     
     const searchTerm = query.toLowerCase();
     console.log(`Searching for patients with term: "${searchTerm}"`);
     
-    // API key is always available now (hardcoded)
-    if (false) {
-      console.log('No Spruce API key available, using local search only');
-      // If no API key, fall back to local search
-      try {
-        const localPatients = await storage.getAllPatients();
-        
-        const filteredPatients = localPatients.filter(patient => {
-          return (
-            (patient.name && patient.name.toLowerCase().includes(searchTerm)) ||
-            (patient.email && patient.email.toLowerCase().includes(searchTerm)) ||
-            (patient.phone && patient.phone && patient.phone.includes(searchTerm))
-          );
-        });
-        
-        console.log(`Found ${filteredPatients.length} matching patients in local database`);
-        
-        return res.json({
-          patients: filteredPatients,
-          source: 'local'
-        });
-      } catch (dbError) {
-        console.error('Error searching local patients:', dbError);
-        return res.status(500).json({ message: 'Failed to search local patients' });
-      }
-    }
-    
-    // Try to search using Spruce API
+    // Search using Spruce API only
     try {
-      console.log('Attempting to search patients via Spruce API');
+      console.log('Searching patients via Spruce API');
       
-      // According to the documentation, we should use the /contacts endpoint instead of /patients
+      // According to the documentation, we should use the /contacts endpoint
       const response = await spruceApi.get('/contacts', {
         params: { query: searchTerm }
       });
@@ -117,31 +84,12 @@ router.get('/search-patients', async (req, res) => {
       });
     } catch (spruceError) {
       console.error('Error searching patients in Spruce API:', spruceError);
-      console.log('Falling back to local search');
-      
-      // Fallback to local search if Spruce API fails
-      try {
-        const localPatients = await storage.getAllPatients();
-        
-        const filteredPatients = localPatients.filter(patient => {
-          return (
-            (patient.name && patient.name.toLowerCase().includes(searchTerm)) ||
-            (patient.email && patient.email.toLowerCase().includes(searchTerm)) ||
-            (patient.phone && patient.phone && patient.phone.includes(searchTerm))
-          );
-        });
-        
-        console.log(`Found ${filteredPatients.length} matching patients in local database (fallback)`);
-        
-        return res.json({
-          patients: filteredPatients,
-          source: 'local',
-          message: 'Using local search due to Spruce API error'
-        });
-      } catch (dbError) {
-        console.error('Error in fallback local search:', dbError);
-        return res.status(500).json({ message: 'Failed to search patients in both Spruce and local database' });
-      }
+      // Return empty list if Spruce API fails
+      return res.json({
+        patients: [],
+        source: 'spruce',
+        error: 'Failed to search patients in Spruce API'
+      });
     }
   } catch (error) {
     console.error('Error in patient search:', error);
