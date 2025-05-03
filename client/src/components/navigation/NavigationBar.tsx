@@ -160,25 +160,47 @@ export default function NavigationBar() {
   );
   
   return (
-    <nav className="w-full bg-[#1a1a1a] border-b border-gray-800 z-40">
-      {/* Single-row nav bar to match screenshot */}
-      <div className="container mx-auto">
-        <div className="flex items-center px-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2">
+    <nav className="w-full bg-[#1a1a1a] border-b border-gray-800 py-1 sticky top-14 z-40">
+      {/* Primary Nav Row - Must be visible */}
+      <div className="flex items-center px-4 mb-1 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2">
+        <div className="flex items-center space-x-2">
+          {primaryNavItems.map((item) => (
+            <div key={item.id} className="flex-shrink-0">
+              {renderNavItem(item)}
+            </div>
+          ))}
+        </div>
+        
+        <div className="ml-auto flex items-center pl-4 flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-[#262626] flex items-center justify-center">
+            <User className="h-4 w-4 text-gray-300" />
+          </div>
+        </div>
+      </div>
+      
+      {/* Secondary Nav Row */}
+      <div className="flex items-center px-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2 border-t border-gray-800">
+        <div className="flex items-center space-x-2">
+          {secondaryNavItems.map((item) => (
+            <div key={item.id} className="flex-shrink-0">
+              {renderNavItem(item)}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Tertiary Nav Row */}
+      {tertiaryNavItems.length > 0 && (
+        <div className="flex items-center px-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2 border-t border-gray-800">
           <div className="flex items-center space-x-2">
-            {primaryNavItems.map((item) => (
+            {tertiaryNavItems.map((item) => (
               <div key={item.id} className="flex-shrink-0">
                 {renderNavItem(item)}
               </div>
             ))}
           </div>
-          
-          <div className="ml-auto flex items-center pl-4 flex-shrink-0">
-            <div className="w-8 h-8 rounded-full bg-[#262626] flex items-center justify-center">
-              <User className="h-4 w-4 text-gray-300" />
-            </div>
-          </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 }
