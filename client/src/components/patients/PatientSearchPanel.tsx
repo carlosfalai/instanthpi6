@@ -79,7 +79,7 @@ export default function PatientSearchPanel({
     return () => clearInterval(intervalId);
   }, [queryClient]);
   
-  const filteredPatients = patients.filter(patient => {
+  const filteredPatients = patients.filter((patient: Patient) => {
     if (!debouncedSearchTerm) return true;
     
     const searchLower = debouncedSearchTerm.toLowerCase();
@@ -116,7 +116,7 @@ export default function PatientSearchPanel({
           </div>
         ) : filteredPatients.length > 0 ? (
           <div className="divide-y divide-gray-800">
-            {filteredPatients.map((patient) => (
+            {filteredPatients.map((patient: Patient) => (
               <div 
                 key={patient.id}
                 className={`p-3 cursor-pointer hover:bg-[#1e1e1e] ${selectedPatientId === patient.id ? 'bg-[#1e1e1e]' : ''}`}

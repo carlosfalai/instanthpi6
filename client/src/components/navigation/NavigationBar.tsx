@@ -94,6 +94,7 @@ export default function NavigationBar() {
     { id: 'education', path: '/education', icon: <GraduationCap className="h-5 w-5" />, label: 'Education', visible: true, order: 5, row: 'secondary' },
     { id: 'subscription', path: '/subscription', icon: <CreditCard className="h-5 w-5" />, label: 'Subscription', visible: true, order: 6, row: 'secondary' },
     { id: 'settings', path: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Settings', visible: true, order: 7, row: 'secondary' },
+    { id: 'leadershipAssociation', path: '/leadership-association', icon: <UsersIcon className="h-5 w-5" />, label: 'Leadership Association', visible: true, order: 1, row: 'tertiary' },
   ];
   
   // State for navigation items, initialized from user preferences or defaults
@@ -122,13 +123,17 @@ export default function NavigationBar() {
     }
   }, [notificationCounts]);
   
-  // Filter and sort items for primary and secondary rows
+  // Filter and sort items for primary, secondary, and tertiary rows
   const primaryNavItems = navItems
     .filter(item => item.visible && item.row === 'primary')
     .sort((a, b) => a.order - b.order);
     
   const secondaryNavItems = navItems
     .filter(item => item.visible && item.row === 'secondary')
+    .sort((a, b) => a.order - b.order);
+    
+  const tertiaryNavItems = navItems
+    .filter(item => item.visible && item.row === 'tertiary')
     .sort((a, b) => a.order - b.order);
   
   // Render navigation item with notification badge
@@ -183,6 +188,19 @@ export default function NavigationBar() {
           ))}
         </div>
       </div>
+
+      {/* Tertiary Nav Row */}
+      {tertiaryNavItems.length > 0 && (
+        <div className="flex items-center px-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2 border-t border-gray-800">
+          <div className="flex items-center space-x-2">
+            {tertiaryNavItems.map((item) => (
+              <div key={item.id} className="flex-shrink-0">
+                {renderNavItem(item)}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
