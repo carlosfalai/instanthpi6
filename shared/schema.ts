@@ -412,6 +412,93 @@ export const insertUrgentCareRequestSchema = createInsertSchema(urgentCareReques
 export type UrgentCareRequest = typeof urgentCareRequests.$inferSelect;
 export type InsertUrgentCareRequest = z.infer<typeof insertUrgentCareRequestSchema>;
 
+// Physician Priority AI - Track task interactions to learn behavior patterns
+export const taskInteractions = pgTable("task_interactions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  taskType: text("task_type").notNull(), // "pending_item", "message", "urgent_care", "medication_refill", etc.
+  taskId: text("task_id").notNull(), // ID of the task (could be from different tables)
+  action: text("action").notNull(), // "viewed", "prioritized", "completed", "postponed", "dismissed"
+  timestamp: timestamp("timestamp").defaultNow(),
+  sessionId: text("session_id"), // Group tasks handled in the same session
+  orderInSession: integer("order_in_session"), // Order in which tasks were addressed
+  timeSpent: integer("time_spent"), // Seconds spent on this task
+  context: jsonb("context").default({}), // Additional context (time of day, day of week, task properties)
+});
+
+// AI learned priority model for a physician
+export const priorityModels = pgTable("priority_models", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  modelVersion: integer("model_version").default(1),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  // Feature weights learned from physician behavior
+  patientFactorWeights: jsonb("patient_factor_weights").default({}), // How different patient attributes affect priority
+  taskTypeWeights: jsonb("task_type_weights").default({}), // How task types affect priority
+  urgencyWeights: jsonb("urgency_weights").default({}), // How urgency affects priority
+  timePatternWeights: jsonb("time_pattern_weights").default({}), // Time-based patterns (morning vs afternoon preferences)
+  contextualFactorWeights: jsonb("contextual_factor_weights").default({}), // Other contextual factors
+  active: boolean("active").default(true), // Is this model currently active
+  accuracy: real("accuracy"), // Model accuracy metric
+});
+
+// Tasks prioritized by AI for a physician
+export const prioritizedTasks = pgTable("prioritized_tasks", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  taskType: text("task_type").notNull(), // "pending_item", "message", "urgent_care", "medication_refill"
+  taskId: text("task_id").notNull(), // ID of the original task
+  priorityScore: real("priority_score").notNull(), // AI-calculated priority score (higher = more important)
+  reasoning: jsonb("reasoning").default({}), // Why this task was prioritized highly
+  suggestedAction: text("suggested_action"), // What the AI suggests the doctor do
+  calculatedAt: timestamp("calculated_at").defaultNow(),
+  displayed: boolean("displayed").default(false), // Has this been shown to the physician
+  actedUpon: boolean("acted_upon").default(false), // Has the physician acted on this item
+  modelVersionUsed: integer("model_version_used"), // Which version of the model made this prediction
+});
+
+export const insertTaskInteractionSchema = createInsertSchema(taskInteractions).pick({
+  userId: true,
+  taskType: true,
+  taskId: true,
+  action: true,
+  sessionId: true,
+  orderInSession: true,
+  timeSpent: true,
+  context: true,
+});
+
+export const insertPriorityModelSchema = createInsertSchema(priorityModels).pick({
+  userId: true,
+  modelVersion: true,
+  patientFactorWeights: true,
+  taskTypeWeights: true,
+  urgencyWeights: true,
+  timePatternWeights: true,
+  contextualFactorWeights: true,
+  active: true,
+});
+
+export const insertPrioritizedTaskSchema = createInsertSchema(prioritizedTasks).pick({
+  userId: true,
+  taskType: true,
+  taskId: true,
+  priorityScore: true,
+  reasoning: true,
+  suggestedAction: true,
+  modelVersionUsed: true,
+});
+
+export type TaskInteraction = typeof taskInteractions.$inferSelect;
+export type InsertTaskInteraction = z.infer<typeof insertTaskInteractionSchema>;
+
+export type PriorityModel = typeof priorityModels.$inferSelect;
+export type InsertPriorityModel = z.infer<typeof insertPriorityModelSchema>;
+
+export type PrioritizedTask = typeof prioritizedTasks.$inferSelect;
+export type InsertPrioritizedTask = z.infer<typeof insertPrioritizedTaskSchema>;
+
 // AI Prompts model for customizing AI behavior
 export const aiPrompts = pgTable("ai_prompts", {
   id: serial("id").primaryKey(),
