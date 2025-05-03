@@ -221,6 +221,15 @@ const PaymentForm = ({ clientSecret, onSuccess, onCancel }: any) => {
   );
 };
 
+// Define the user type to fix type errors
+interface User {
+  id: number;
+  email?: string;
+  isPremium?: boolean;
+  premiumUntil?: string;
+  stripeSubscriptionId?: string;
+}
+
 // Main subscription page component
 export default function SubscriptionPage() {
   const [selectedPlan, setSelectedPlan] = useState<any>(null);
@@ -229,7 +238,7 @@ export default function SubscriptionPage() {
   const { toast } = useToast();
 
   // Fetch current user subscription status
-  const { data: user, isLoading: isLoadingUser } = useQuery({
+  const { data: user, isLoading: isLoadingUser } = useQuery<User>({
     queryKey: ['/api/user'],
     retry: false,
   });
@@ -308,196 +317,198 @@ export default function SubscriptionPage() {
   };
 
   return (
-    <div className="container max-w-5xl py-8">
-      <h1 className="text-3xl font-bold mb-1">Subscriptions</h1>
-      <p className="text-muted-foreground mb-8">Manage your InstantHPI subscription</p>
+    <AppLayout>
+      <div className="container max-w-5xl py-8">
+        <h1 className="text-3xl font-bold mb-1">Subscriptions</h1>
+        <p className="text-muted-foreground mb-8">Manage your InstantHPI subscription</p>
 
-      <Tabs defaultValue="manage">
-        <TabsList className="mb-4">
-          <TabsTrigger value="manage">Manage Subscription</TabsTrigger>
-          <TabsTrigger value="plans">Subscription Plans</TabsTrigger>
-        </TabsList>
+        <Tabs defaultValue="manage">
+          <TabsList className="mb-4">
+            <TabsTrigger value="manage">Manage Subscription</TabsTrigger>
+            <TabsTrigger value="plans">Subscription Plans</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="manage">
-          <Card>
-            <CardHeader>
-              <CardTitle>Current Subscription</CardTitle>
-              <CardDescription>
-                View and manage your current subscription details
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {isLoadingUser ? (
-                <div className="space-y-4">
-                  <Skeleton className="h-5 w-[250px]" />
-                  <Skeleton className="h-5 w-[200px]" />
-                  <Skeleton className="h-5 w-[300px]" />
-                </div>
-              ) : user?.isPremium ? (
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <CheckCircle2 className="text-primary mr-2 h-5 w-5" />
-                    <h3 className="font-semibold">Active Subscription</h3>
+          <TabsContent value="manage">
+            <Card>
+              <CardHeader>
+                <CardTitle>Current Subscription</CardTitle>
+                <CardDescription>
+                  View and manage your current subscription details
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isLoadingUser ? (
+                  <div className="space-y-4">
+                    <Skeleton className="h-5 w-[250px]" />
+                    <Skeleton className="h-5 w-[200px]" />
+                    <Skeleton className="h-5 w-[300px]" />
                   </div>
-                  
-                  <div className="grid gap-1">
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-muted-foreground">Status:</div>
-                      <div>
-                        <Badge variant="outline" className="bg-primary/10 text-primary">
-                          Active
-                        </Badge>
-                      </div>
+                ) : user?.isPremium ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center">
+                      <CheckCircle2 className="text-primary mr-2 h-5 w-5" />
+                      <h3 className="font-semibold">Active Subscription</h3>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="text-muted-foreground">Renewal Date:</div>
-                      <div>{formatDate(user?.premiumUntil)}</div>
-                    </div>
-                    
-                    {user?.stripeSubscriptionId && (
+                    <div className="grid gap-1">
                       <div className="grid grid-cols-2 gap-2">
-                        <div className="text-muted-foreground">Subscription ID:</div>
-                        <div className="font-mono text-sm">{user.stripeSubscriptionId}</div>
+                        <div className="text-muted-foreground">Status:</div>
+                        <div>
+                          <Badge variant="outline" className="bg-primary/10 text-primary">
+                            Active
+                          </Badge>
+                        </div>
                       </div>
-                    )}
-                  </div>
+                      
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="text-muted-foreground">Renewal Date:</div>
+                        <div>{formatDate(user?.premiumUntil)}</div>
+                      </div>
+                      
+                      {user?.stripeSubscriptionId && (
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="text-muted-foreground">Subscription ID:</div>
+                          <div className="font-mono text-sm">{user.stripeSubscriptionId}</div>
+                        </div>
+                      )}
+                    </div>
 
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="outline" className="mt-4">
-                        Cancel Subscription
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This will cancel your subscription at the end of the current billing period. 
-                          You'll continue to have access until {formatDate(user?.premiumUntil)}.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Nevermind</AlertDialogCancel>
-                        <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button variant="outline" className="mt-4">
                           Cancel Subscription
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <AlertCircle className="text-muted-foreground mr-2 h-5 w-5" />
-                    <h3 className="font-semibold">No Active Subscription</h3>
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will cancel your subscription at the end of the current billing period. 
+                            You'll continue to have access until {formatDate(user?.premiumUntil)}.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Nevermind</AlertDialogCancel>
+                          <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                            Cancel Subscription
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
-                  <p className="text-muted-foreground">
-                    You don't have an active subscription. Subscribe to get full access to all features.
-                  </p>
-                  <Button onClick={() => document.getElementById('plans-tab')?.click()}>
-                    View Subscription Plans
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center">
+                      <AlertCircle className="text-muted-foreground mr-2 h-5 w-5" />
+                      <h3 className="font-semibold">No Active Subscription</h3>
+                    </div>
+                    <p className="text-muted-foreground">
+                      You don't have an active subscription. Subscribe to get full access to all features.
+                    </p>
+                    <Button onClick={() => document.getElementById('plans-tab')?.click()}>
+                      View Subscription Plans
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="plans" id="plans-tab">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Subscription Plans</CardTitle>
+                  <CardDescription>
+                    Choose a plan that works for you
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PlanSelection 
+                    plans={plansData} 
+                    isLoading={isLoadingPlans}
+                    selectedPlan={selectedPlan}
+                    onPlanSelect={handlePlanSelect}
+                  />
+                </CardContent>
+                <CardFooter className="flex justify-end">
+                  <Button 
+                    onClick={handleSubscribe} 
+                    disabled={
+                      !selectedPlan || 
+                      createSubscriptionMutation.isPending || 
+                      (user?.isPremium && user?.stripeSubscriptionId)
+                    }
+                  >
+                    {createSubscriptionMutation.isPending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      'Subscribe'
+                    )}
                   </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+                </CardFooter>
+              </Card>
 
-        <TabsContent value="plans" id="plans-tab">
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Subscription Plans</CardTitle>
-                <CardDescription>
-                  Choose a plan that works for you
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <PlanSelection 
-                  plans={plansData} 
-                  isLoading={isLoadingPlans}
-                  selectedPlan={selectedPlan}
-                  onPlanSelect={handlePlanSelect}
+              {/* Benefits section */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Subscription Benefits</CardTitle>
+                  <CardDescription>
+                    What you get with an InstantHPI subscription
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-2">
+                      <h3 className="font-semibold">Enhanced AI Processing</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Access to advanced AI models for faster and more accurate medical documentation
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold">Priority Support</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Get priority customer support for any technical issues or questions
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h3 className="font-semibold">Premium Features</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Unlock premium features like comprehensive billing optimization and advanced analytics
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* Payment modal */}
+        <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Complete Your Subscription</DialogTitle>
+              <DialogDescription>
+                Enter your payment details to start your subscription
+              </DialogDescription>
+            </DialogHeader>
+            
+            {clientSecret && (
+              <Elements stripe={stripePromise} options={{ clientSecret }}>
+                <PaymentForm 
+                  clientSecret={clientSecret}
+                  onSuccess={handlePaymentSuccess}
+                  onCancel={handlePaymentCancel}
                 />
-              </CardContent>
-              <CardFooter className="flex justify-end">
-                <Button 
-                  onClick={handleSubscribe} 
-                  disabled={
-                    !selectedPlan || 
-                    createSubscriptionMutation.isPending || 
-                    (user?.isPremium && user?.stripeSubscriptionId)
-                  }
-                >
-                  {createSubscriptionMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    'Subscribe'
-                  )}
-                </Button>
-              </CardFooter>
-            </Card>
-
-            {/* Benefits section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Subscription Benefits</CardTitle>
-                <CardDescription>
-                  What you get with an InstantHPI subscription
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-3">
-                  <div className="space-y-2">
-                    <h3 className="font-semibold">Enhanced AI Processing</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Access to advanced AI models for faster and more accurate medical documentation
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="font-semibold">Priority Support</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Get priority customer support for any technical issues or questions
-                    </p>
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="font-semibold">Premium Features</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Unlock premium features like comprehensive billing optimization and advanced analytics
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
-
-      {/* Payment modal */}
-      <Dialog open={paymentModalOpen} onOpenChange={setPaymentModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Complete Your Subscription</DialogTitle>
-            <DialogDescription>
-              Enter your payment details to start your subscription
-            </DialogDescription>
-          </DialogHeader>
-          
-          {clientSecret && (
-            <Elements stripe={stripePromise} options={{ clientSecret }}>
-              <PaymentForm 
-                clientSecret={clientSecret}
-                onSuccess={handlePaymentSuccess}
-                onCancel={handlePaymentCancel}
-              />
-            </Elements>
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
+              </Elements>
+            )}
+          </DialogContent>
+        </Dialog>
+      </div>
+    </AppLayout>
   );
 }
