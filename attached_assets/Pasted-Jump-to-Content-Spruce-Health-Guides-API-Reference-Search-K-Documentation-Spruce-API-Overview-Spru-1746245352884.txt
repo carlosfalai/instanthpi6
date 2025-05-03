@@ -1,0 +1,289 @@
+Jump to Content
+Spruce Health
+Guides
+API Reference
+
+Search
+⌘K
+Documentation
+Spruce API Overview
+Spruce CSV Data Export
+Spruce Webhooks Overview
+Powered by 
+Spruce Webhooks Overview
+Getting started with Spruce Webhooks
+
+What are Spruce Webhooks?
+Spruce Webhooks is a mechanism for notifying an application of changes to resources (contacts, conversations, messages, etc.) in an organization. Rather than polling the API for changes, a user can subscribe to changes by specifying a destination endpoint where the notification events should be delivered. Spruce will send an HTTP POST request to a configured endpoint when a create, update or delete event occurs in their organization. This "push" rather than "pull" model allows for an application to receive efficient and timely updates.
+
+Why should I use Webhooks?
+Webhooks are a powerful way to integrate Spruce with your application. They allow you to receive near real-time updates about changes in your organization, which can be used to trigger actions in your application. Taking action on individual events such as a new contact being created can help you keep your application in sync with Spruce.
+
+Requesting API Access
+Complete this form to request access to the API. The API is currently the only way to access Spruce Webhooks.
+
+Registering an Endpoint for Events
+After API access has been granted, an endpoint can be created using the corresponding Public API endpoint. After successful creation, the endpoint will begin receiving events. The dispatch of events to a registered endpoint can be paused or resumed using the corresponding Public API endpoint.
+
+At create time you will receive a secret key that will be used to verify the signature of the payload. This key should be kept secure and not shared with anyone. Future listing of existing endpoints will not return the secret key.
+
+Shell
+
+curl --request POST \
+--url https://api.sprucehealth.com/v1/webhooks/endpoints \
+--header 'accept: application/json' \
+--header 'authorization: Bearer <api-token>' \
+--header 'content-type: application/json' \
+--data '
+{
+  "name": "Events Endpoint",
+  "url": "https://example.com/webhooks"
+}
+'
+Types of events
+All events published to an endpoint are scoped to the context of their owning organization.
+
+Contact Events
+Event Type	Description
+contact.created	Occurs when a new contact is created.
+contact.updated	Occurs when a contact is modified.
+contact.deleted	Occurs when a contact is deleted.
+JSON
+
+{
+    "eventTime": "2024-05-15T00:00:00Z",
+    "object": "event",
+    "type": "contact.created",
+    "data": {
+        "object": {
+            "object": "contact",
+            "apiURL": "https://api.sprucehealth.com/v1/contacts/entity_28V8BV463XXXX",
+            "appURL": "https://api.sprucehealth.com/org/entity_28QNVEPK2XXXX/contact/entity_28V8BV463XXXX",
+            "canDelete": false,
+            "canEdit": true,
+            "category": "patient",
+            "created": "2024-05-15T00:00:00Z",
+            "customContactFields": [],
+            "displayName": "Patient Contact",
+            "emailAddresses": [],
+            "familyName": "Contact",
+            "gender": "unknown",
+            "givenName": "Patient",
+            "hasAccount": false,
+            "hasPendingInvite": true,
+            "id": "entity_28V8BV463XXXX",
+            "integrationLinks": [],
+            "organizationContactFields": [],
+            "phoneNumbers": [
+                {
+                    "displayValue": "(555) 555-5555",
+                    "label": "mobile",
+                    "value": "+15555555555"
+                }
+            ],
+            "tags": []
+        }
+    }
+}
+Conversation Events
+Event Type	Description
+conversation.created	Occurs when a new conversation is created.
+conversation.updated	Occurs when a conversation is modified.
+conversation.deleted	Occurs when a conversation is deleted.
+JSON
+
+{
+  "eventTime": "2024-05-15T00:00:00Z",
+  "object": "event",
+  "type": "conversation.created",
+  "data": {
+    "object": {
+      "apiURL": "https://api.sprucehealth.com/v1/conversations/t_29S7786ETXXXX",
+      "appURL": "https://api.sprucehealth.com/org/entity_28QNVEPK2XXXX/thread/t_29S7786ETXXXX",
+      "archived": false,
+      "associatedContactIds": null,
+      "createdAt": "2024-05-15T00:00:00Z",
+      "externalParticipants": [
+        {
+          "contact": "entity_28SQM2TF8XXXX",
+          "displayName": "Patient Contact"
+        }
+      ],
+      "id": "t_29S7786ETXXXX",
+      "internalEndpoint": {
+        "channel": "secure",
+        "displayValue": "https://api.sprucehealth.com/organizationendpoint",
+        "id": "ZW50aXR5XzI4UU5WRVBLMk9PMDI6XXXXYW5pemF0aW9uQ29kZV8yOFFOVkVRUElPTzAwOnNlY3XXXX==",
+        "isInternal": true,
+        "object": "endpoint",
+        "rawValue": "organizationendpoint"
+      },
+      "internalMemberIds": [],
+      "isReadOnly": false,
+      "lastMessageAt": "2024-05-15T00:00:00Z",
+      "object": "conversation",
+      "tags": [],
+      "title": "Example Conversation",
+      "type": "secure"
+    }
+  }
+}
+Conversation Item Events
+Event Type	Description
+conversationItem.created	Occurs when a new conversation item is created.
+conversationItem.updated	Occurs when a conversation item is modified.
+conversationItem.deleted	Occurs when a conversation item is deleted.
+conversationItem.restored	Occurs when a conversation item is restored.
+JSON
+
+{
+  "eventTime": "2024-05-15T00:00:00Z",
+  "object": "event",
+  "type": "conversationItem.created",
+  "data": {
+    "object": {
+      "apiURL": "https://api.sprucehealth.com/v1/conversationItems/ti_29PN3P8GEXXXX",
+      "appURL": "https://api.sprucehealth.com/org/entity_28QNVEPK2XXXX/thread/t_29BJ656OKLG00/message/ti_29PN3P8GEXXXX",
+      "attachments": [],
+      "author": {
+        "displayName": "Example Teammate"
+      },
+      "buttons": null,
+      "conversationId": "t_29S7786ETXXXX",
+      "createdAt": "2024-05-15T00:00:00Z",
+      "direction": "outbound",
+      "id": "ti_29PN3P8GEXXXX",
+      "isInternalNote": false,
+      "modifiedAt": "2024-05-15T00:00:00Z",
+      "object": "conversationItem",
+      "pages": [],
+      "text": "Hello!"
+    }
+  }
+}
+Mapping Conversation Item Events to Contacts
+When a conversation item event is received, the field containing the conversation id can be used in conjunction with the conversation endpoint to retrieve information about the containing thread.
+
+After fetching the containing conversation, the externalParticipants field of the conversation structure can be used to determine what (if any) contacts are participating in the conversation. The structure of the externalParticipants field is dependent on the conversation type.
+
+Mapping Conversations With Saved Contacts
+For conversations with saved contacts, the list of externalParticipants will contain a contact field. The contact field of each externalParticipant will contain the id of the corresponding Spruce contact. The id can be used to fetch the relevant contact information from the contact endpoint.
+
+Example Secure Conversation with Saved Contacts
+
+JSON
+
+{
+  "conversation": {
+    "type": "secure",
+    "externalParticipants": [
+      {
+        "displayName": "Patient Contact",
+        "contact": "entity_28SQM2TF8XXXX"
+      }
+    ],
+    ...
+  }
+}
+Example SMS Conversation with Saved Contacts
+
+JSON
+
+{
+  "conversation": {
+    "type": "phone",
+    "externalParticipants": [
+      {
+        "displayName": "Patient Contact",
+        "contact": "entity_28SQM2TF8XXXX",
+        "endpoint": {
+          "channel": "phone",
+          "displayValue": "(555) 555-5555",
+          ...
+        }
+      }
+    ],
+    ...
+  }
+}
+Mapping Conversations With Unsaved or Multiple Matching Contacts
+For conversations with unsaved contacts, or conversations with multiple matching contact, the externalParticipants field will contain information about the external endpoint that the conversation is associated with, but the contact field will be missing or empty.
+
+Example SMS conversation with Unsaved Contact or Multiple Matching Contacts
+
+JSON
+
+{
+  "conversation": {
+    "type": "phone",
+    "externalParticipants": [
+      {
+        "displayName": "(555) 555-5555",
+        "endpoint": {
+          "channel": "phone",
+          "rawValue": "+15555555555",
+          ...
+        }
+      }
+    ],
+    ...
+  }
+}
+For conversations with multiple matching contacts the rawValue field of the endpoint returned in the externalParticipant can be used to perform a contact search to retrieve the set of relevant potential contacts.
+
+Unsaved contacts cannot be fetched from the contact search endpoint. In this case an empty result set will be returned.
+
+Endpoint Requirements
+Spruce will only send events to endpoints that support HTTPS. The endpoint must be able to respond with a 2XX status code within 5 seconds.
+
+Event Ordering
+Events are sent in the order they occur. However, events may not always be delivered in the order they were created. Event recipients should be able to handle events that arrive out of order.
+
+Retry Behavior
+If your endpoint does not respond with a 2XX, we will continue to retry the event every 2 minutes for a maximum of 10 attempts.
+
+Signature Verification
+Spruce will sign the payload with a secret key that is provided to you at the time of registering an endpoint for events. The signature will be included in the X-Spruce-Signature header. You can verify the signature by hashing the payload with the secret key using the SHA256 algorithm and comparing it to the Base64 decoded signature.
+
+Go
+
+import (
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/base64"
+	"net/http"
+    "io"
+)
+
+func verifySignature(endpointSecret []byte, r *http.Request) (bool, error) {
+    signature, err := base64.StdEncoding.DecodeString(r.Header.Get("X-Spruce-Signature"))
+    if err != nil {
+        return false, err
+    }
+    body, err := io.ReadAll(r.Body)
+    if err != nil {
+        return false, err
+    }
+    h := hmac.New(sha256.New, endpointSecret)
+    h.Write(body)
+    return hmac.Equal(h.Sum(nil), signature), nil
+}
+Rate Limiting
+Endpoints are limited to receiving 1000 events per minute. If this limit is exceeded events will resume sending after the rate limit window has passed.
+
+Updated 8 months ago
+
+Spruce CSV Data Export
+Did this page help you?
+Table of Contents
+What are Spruce Webhooks?
+Why should I use Webhooks?
+Requesting API Access
+Registering an Endpoint for Events
+Types of events
+Mapping Conversation Item Events to Contacts
+Endpoint Requirements
+Event Ordering
+Retry Behavior
+Signature Verification
+Rate Limiting

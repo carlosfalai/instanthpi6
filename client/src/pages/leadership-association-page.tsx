@@ -24,16 +24,16 @@ export default function LeadershipAssociationPage() {
       bio: 'Leads marketing and sales initiatives, driving growth and adoption of InstantHPI technology in medical practices.'
     },
     {
-      name: 'Dr. Kogan',
+      name: 'Dr. Dan Kogan',
       role: 'California Leadership',
-      specialty: '',
-      bio: 'Provides leadership for California operations, implementing InstantHPI solutions across medical practices.'
+      specialty: 'Neurologist',
+      bio: 'Provides leadership for California operations as a practicing neurologist, implementing InstantHPI solutions across medical practices.'
     },
     {
       name: 'Dr. Kogan (Spouse)',
       role: 'California Leadership',
-      specialty: '',
-      bio: 'Works alongside spouse in leadership of California operations, specializing in practitioner training and support.'
+      specialty: 'Internist',
+      bio: 'Works alongside spouse in leadership of California operations as an internist, specializing in practitioner training and support.'
     }
   ];
 

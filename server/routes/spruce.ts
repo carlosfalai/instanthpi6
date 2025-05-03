@@ -39,8 +39,8 @@ router.get('/search-patients', async (req, res) => {
     const searchTerm = query.toLowerCase();
     console.log(`Searching for patients with term: "${searchTerm}"`);
     
-    // Check if Spruce API key is available
-    if (!process.env.SPRUCE_API_KEY) {
+    // API key is always available now (hardcoded)
+    if (false) {
       console.log('No Spruce API key available, using local search only');
       // If no API key, fall back to local search
       try {
@@ -70,14 +70,15 @@ router.get('/search-patients', async (req, res) => {
     try {
       console.log('Attempting to search patients via Spruce API');
       
-      // Spruce API doesn't have a search endpoint, so we need to get all patients and filter
+      // According to the documentation, we should use the /contacts endpoint instead of /patients
       const response = await axios.create({
         baseURL: 'https://api.sprucehealth.com/v1',
         headers: {
-          'Authorization': `Bearer ${process.env.SPRUCE_API_KEY}`,
-          'Content-Type': 'application/json'
+          'Authorization': 'Bearer YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0=',
+          'Content-Type': 'application/json',
+          's-access-id': 'aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I='
         }
-      }).get('/patients');
+      }).get('/contacts');
       
       // Filter patients based on query
       const allPatients = response.data.patients || [];
@@ -147,16 +148,17 @@ router.get('/search-patients', async (req, res) => {
 const spruceApi = axios.create({
   baseURL: 'https://api.sprucehealth.com/v1',
   headers: {
-    'Authorization': `Bearer ${process.env.SPRUCE_API_KEY}`,
-    'Content-Type': 'application/json'
+    'Authorization': 'Bearer YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0=',
+    'Content-Type': 'application/json',
+    's-access-id': 'aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I='
   }
 });
 
 // Sync patients from Spruce Health API (or return existing local patients)
 router.post('/sync-patients', async (req, res) => {
   try {
-    // Check if Spruce API key is available
-    if (!process.env.SPRUCE_API_KEY) {
+    // API key is always available now (hardcoded)
+    if (false) {
       // If no API key, just return the existing patients
       const localPatients = await storage.getAllPatients();
       return res.json({ 
@@ -167,9 +169,9 @@ router.post('/sync-patients', async (req, res) => {
     }
     
     try {
-      // Get patients from Spruce API
-      const response = await spruceApi.get('/patients');
-      const sprucePatients = response.data.patients || [];
+      // Get patients from Spruce API using /contacts endpoint
+      const response = await spruceApi.get('/contacts');
+      const sprucePatients = response.data.contacts || [];
       
       // Sync patients with our database
       const syncedPatients = [];
@@ -252,8 +254,8 @@ router.post('/messages', async (req, res) => {
       return res.status(400).json({ message: 'Missing required fields' });
     }
     
-    // Check if Spruce API key is available
-    if (!process.env.SPRUCE_API_KEY) {
+    // API key is always available now (hardcoded)
+    if (false) {
       // Create a local message instead
       const newMessage = await storage.createMessage({
         patientId,
@@ -313,8 +315,8 @@ router.get('/patients/:patientId/messages', async (req, res) => {
   try {
     const patientId = req.params.patientId;
     
-    // Check if Spruce API key is available
-    if (!process.env.SPRUCE_API_KEY) {
+    // API key is always available now (hardcoded)
+    if (false) {
       const messages = await storage.getMessagesByPatientId(parseInt(patientId));
       return res.json(messages);
     }
