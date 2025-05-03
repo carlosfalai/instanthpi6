@@ -93,7 +93,7 @@ export default function NavigationBar() {
     { id: 'urgentCare', path: '/urgent-care', icon: <AlertCircle className="h-5 w-5" />, label: 'Urgent Care', visible: navPreferences.showUrgentCare, order: 4, row: 'secondary' },
     { id: 'education', path: '/education', icon: <GraduationCap className="h-5 w-5" />, label: 'Education', visible: true, order: 5, row: 'secondary' },
     { id: 'subscription', path: '/subscription', icon: <CreditCard className="h-5 w-5" />, label: 'Subscription', visible: true, order: 6, row: 'secondary' },
-    { id: 'settings', path: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Settings', visible: true, order: 7, row: 'secondary' },
+    { id: 'settings', path: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Organization Settings', visible: true, order: 7, row: 'secondary' },
     { id: 'leadershipAssociation', path: '/leadership-association', icon: <UsersIcon className="h-5 w-5" />, label: 'Leadership Association', visible: true, order: 1, row: 'tertiary' },
   ];
   

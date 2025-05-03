@@ -1,541 +1,262 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import NavigationBar from '@/components/navigation/NavigationBar';
-import NavigationSettings from '@/components/settings/NavigationSettings';
-import DiagnosisSettings from '@/components/settings/DiagnosisSettings';
-import { Loader2, Plus, Save, Trash2, Heart, PillIcon, AlertCircle, Stethoscope } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Switch } from '@/components/ui/switch';
-import { Label } from '@/components/ui/label';
+import React, { useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import AppLayout from '@/components/layout/AppLayout';
+import { 
+  ChevronRight, 
+  Building, 
+  Users, 
+  UserCog, 
+  Tag, 
+  Phone, 
+  ShieldCheck,
+  Mail,
+  FileText,
+  Calendar,
+  Headphones,
+  MessageSquare,
+  PlugZap,
+  DatabaseIcon,
+  Share2,
+  Bell,
+  Settings as SettingsIcon,
+  CreditCard
+} from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { User } from '@shared/schema';
 
-// Define our AI settings interface
-interface AiSetting {
-  id: number;
-  name: string;
-  category: string;
-  enabled: boolean;
-  promptText: string;
-  order: number;
+interface SettingsSectionProps {
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  to: string;
 }
+
+const SettingsSection: React.FC<SettingsSectionProps> = ({ 
+  title, 
+  description, 
+  icon, 
+  to 
+}) => {
+  return (
+    <Link href={to}>
+      <div className="flex items-center justify-between py-4 px-4 rounded-md hover:bg-[#2a2a2a] transition-colors cursor-pointer">
+        <div className="flex items-start space-x-4">
+          <div className="text-blue-500 mt-1">{icon}</div>
+          <div>
+            <h3 className="font-medium text-white">{title}</h3>
+            <p className="text-sm text-gray-400">{description}</p>
+          </div>
+        </div>
+        <ChevronRight className="h-5 w-5 text-gray-500" />
+      </div>
+    </Link>
+  );
+};
 
 export default function SettingsPage() {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  // State for new prompt
-  const [newPromptName, setNewPromptName] = useState('');
-  const [newPromptCategory, setNewPromptCategory] = useState('documentation');
-  const [newPromptText, setNewPromptText] = useState('');
-  const [functionalMedicineEnabled, setFunctionalMedicineEnabled] = useState(false);
-  
-  // Query user data for navigation preferences
-  const { data: currentUser } = useQuery<User>({
-    queryKey: ['/api/user'],
-  });
-  
-  // Default navigation preferences if user not loaded yet
-  const navPreferences = currentUser?.navPreferences as {
-    showChronicConditions: boolean;
-    showMedicationRefills: boolean;
-    showUrgentCare: boolean;
-  } || {
-    showChronicConditions: true,
-    showMedicationRefills: true,
-    showUrgentCare: true
-  };
-  
-  // Query AI settings
-  const { 
-    data: aiSettings = [], 
-    isLoading 
-  } = useQuery<AiSetting[]>({
-    queryKey: ['/api/ai/settings'],
-  });
-  
-  // Update settings mutation
-  const updateSettingMutation = useMutation({
-    mutationFn: async (setting: Partial<AiSetting>) => {
-      const response = await fetch(`/api/ai/settings/${setting.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(setting),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update setting');
-      }
-      
-      return await response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/ai/settings'] });
-      toast({
-        title: 'Settings updated',
-        description: 'Your AI settings have been saved successfully.',
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: `Failed to update settings: ${error.message}`,
-        variant: 'destructive',
-      });
-    },
-  });
-  
-  // Add new prompt mutation
-  const addPromptMutation = useMutation({
-    mutationFn: async (newPrompt: Omit<AiSetting, 'id'>) => {
-      const response = await fetch('/api/ai/settings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newPrompt),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to add new prompt');
-      }
-      
-      return await response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/ai/settings'] });
-      setNewPromptName('');
-      setNewPromptText('');
-      toast({
-        title: 'Prompt added',
-        description: 'Your new AI prompt has been added successfully.',
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: `Failed to add prompt: ${error.message}`,
-        variant: 'destructive',
-      });
-    },
-  });
-  
-  // Delete prompt mutation
-  const deletePromptMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await fetch(`/api/ai/settings/${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to delete prompt');
-      }
-      
-      return id;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/ai/settings'] });
-      toast({
-        title: 'Prompt deleted',
-        description: 'The AI prompt has been deleted successfully.',
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: `Failed to delete prompt: ${error.message}`,
-        variant: 'destructive',
-      });
-    },
-  });
-  
-  // Update user navigation preferences mutation
-  const updateNavPreferencesMutation = useMutation({
-    mutationFn: async (preferences: typeof navPreferences) => {
-      const response = await fetch('/api/user/preferences', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ navPreferences: preferences }),
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update navigation preferences');
-      }
-      
-      return await response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/user'] });
-      toast({
-        title: 'Navigation updated',
-        description: 'Your navigation preferences have been saved successfully.',
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: 'Error',
-        description: `Failed to update navigation preferences: ${error.message}`,
-        variant: 'destructive',
-      });
-    },
-  });
-  
-  // Handle navigation preference toggle
-  const handleNavToggleChange = (key: string, enabled: boolean) => {
-    if (!currentUser) return;
-    
-    const updatedPreferences = {
-      ...navPreferences,
-      [key]: enabled
-    };
-    
-    updateNavPreferencesMutation.mutate(updatedPreferences);
-  };
-  
-  // Handle toggle change
-  const handleToggleChange = (setting: AiSetting, enabled: boolean) => {
-    updateSettingMutation.mutate({ id: setting.id, enabled });
-  };
-  
-  // Handle prompt text change
-  const handlePromptTextChange = (setting: AiSetting, promptText: string) => {
-    updateSettingMutation.mutate({ id: setting.id, promptText });
-  };
-  
-  // Handle add new prompt
-  const handleAddPrompt = () => {
-    if (!newPromptName || !newPromptText) {
-      toast({
-        title: 'Error',
-        description: 'Please provide both a name and text for the new prompt.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    // Calculate the next order value
-    const maxOrder = aiSettings.reduce(
-      (max, setting) => (setting.category === newPromptCategory && setting.order > max ? setting.order : max),
-      0
-    );
-    
-    addPromptMutation.mutate({
-      name: newPromptName,
-      category: newPromptCategory,
-      enabled: true,
-      promptText: newPromptText,
-      order: maxOrder + 1,
-    });
-  };
-  
-  // Filter settings by category
-  const documentationSettings = aiSettings.filter(s => s.category === 'documentation').sort((a, b) => a.order - b.order);
-  const responseSettings = aiSettings.filter(s => s.category === 'response').sort((a, b) => a.order - b.order);
-  const analysisSettings = aiSettings.filter(s => s.category === 'analysis').sort((a, b) => a.order - b.order);
+  const [location, setLocation] = useLocation();
   
   return (
-    <div className="min-h-screen flex flex-col bg-[#121212] text-white">
-      {/* Header */}
-      <header className="h-14 flex items-center px-4 bg-[#1e1e1e] border-b border-gray-800">
-        <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">InstantHPI</h1>
-        <div className="ml-6 flex-1">
-          <NavigationBar />
-        </div>
-      </header>
-      
-      {/* Main Content */}
-      <div className="flex-1 p-6">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold">AI Behavior Settings</h2>
-          <p className="text-gray-400">Customize how the AI generates content and responds to inputs</p>
-        </div>
-        
-        {isLoading ? (
-          <div className="flex items-center justify-center h-64">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+    <AppLayout>
+      <div className="container mx-auto p-6 max-w-5xl">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Left sidebar */}
+          <div className="md:col-span-1 space-y-4">
+            <div className="bg-[#1e1e1e] rounded-lg border border-[#333] p-4">
+              <h2 className="text-xl font-semibold mb-2">Centre Médical Font</h2>
+              <div className="space-y-1">
+                <Button variant="ghost" className="w-full justify-start">
+                  <Building className="h-4 w-4 mr-2" /> Organization Profile
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <Tag className="h-4 w-4 mr-2" /> Organization Preferences
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <Users className="h-4 w-4 mr-2" /> Teammates
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <Users className="h-4 w-4 mr-2" /> Teams
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <CreditCard className="h-4 w-4 mr-2" /> Billing
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <PlugZap className="h-4 w-4 mr-2" /> Integrations & API
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <DatabaseIcon className="h-4 w-4 mr-2" /> Data Exports
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <Share2 className="h-4 w-4 mr-2" /> Referral Program
+                </Button>
+              </div>
+            </div>
+            
+            <div className="bg-[#1e1e1e] rounded-lg border border-[#333] p-4">
+              <h2 className="text-xl font-semibold mb-2">Account</h2>
+              <div className="space-y-1">
+                <Button variant="ghost" className="w-full justify-start">
+                  <UserCog className="h-4 w-4 mr-2" /> Profile
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <SettingsIcon className="h-4 w-4 mr-2" /> Personal Preferences
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <Bell className="h-4 w-4 mr-2" /> Notifications
+                </Button>
+              </div>
+            </div>
+            
+            <div className="bg-[#1e1e1e] rounded-lg border border-[#333] p-4">
+              <h2 className="text-xl font-semibold mb-2">Communication</h2>
+              <div className="space-y-1">
+                <Button variant="ghost" className="w-full justify-start">
+                  <Phone className="h-4 w-4 mr-2" /> Phone System
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <ShieldCheck className="h-4 w-4 mr-2" /> Secure Messaging
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <FileText className="h-4 w-4 mr-2" /> Fax
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <Mail className="h-4 w-4 mr-2" /> Email
+                </Button>
+                <Button variant="ghost" className="w-full justify-start">
+                  <Calendar className="h-4 w-4 mr-2" /> Schedules
+                </Button>
+              </div>
+            </div>
           </div>
-        ) : (
-          <Tabs defaultValue="documentation" className="w-full">
-            <TabsList className="mb-6 bg-[#1e1e1e]">
-              <TabsTrigger value="documentation">Documentation</TabsTrigger>
-              <TabsTrigger value="response">Patient Responses</TabsTrigger>
-              <TabsTrigger value="analysis">Analysis</TabsTrigger>
-              <TabsTrigger value="application">Application</TabsTrigger>
-              <TabsTrigger value="navigation">Navigation</TabsTrigger>
-              <TabsTrigger value="add">Add New Prompt</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="documentation">
-              <div className="space-y-6">
-                {documentationSettings.map((setting) => (
-                  <SettingCard
-                    key={setting.id}
-                    setting={setting}
-                    onToggleChange={handleToggleChange}
-                    onPromptTextChange={handlePromptTextChange}
-                    onDelete={() => deletePromptMutation.mutate(setting.id)}
-                  />
-                ))}
+          
+          {/* Main content */}
+          <div className="md:col-span-2">
+            {/* Organization section */}
+            <div className="bg-[#1e1e1e] rounded-lg border border-[#333] mb-6">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold mb-6">Centre Médical Font</h2>
+                
+                <SettingsSection
+                  title="Organization Profile"
+                  description="Manage your organization's profile that's visible to patients."
+                  icon={<Building className="h-5 w-5" />}
+                  to="/settings/organization-profile"
+                />
+                
+                <Separator className="my-2 bg-gray-800" />
+                
+                <SettingsSection
+                  title="Organization Preferences"
+                  description="Manage your organization's tags and custom contact fields."
+                  icon={<Tag className="h-5 w-5" />}
+                  to="/settings/organization-preferences"
+                />
+                
+                <Separator className="my-2 bg-gray-800" />
+                
+                <SettingsSection
+                  title="Teammates"
+                  description="Add and manage your organization's teammates."
+                  icon={<Users className="h-5 w-5" />}
+                  to="/settings/teammates"
+                />
+                
+                <Separator className="my-2 bg-gray-800" />
+                
+                <SettingsSection
+                  title="Teams"
+                  description="Create and manage teams within your organization."
+                  icon={<Users className="h-5 w-5" />}
+                  to="/settings/teams"
+                />
+                
+                <Separator className="my-2 bg-gray-800" />
+                
+                <SettingsSection
+                  title="Billing"
+                  description="View and manage your billing information and plan."
+                  icon={<CreditCard className="h-5 w-5" />}
+                  to="/settings/billing"
+                />
               </div>
-            </TabsContent>
+            </div>
             
-            <TabsContent value="response">
-              <div className="space-y-6">
-                {responseSettings.map((setting) => (
-                  <SettingCard
-                    key={setting.id}
-                    setting={setting}
-                    onToggleChange={handleToggleChange}
-                    onPromptTextChange={handlePromptTextChange}
-                    onDelete={() => deletePromptMutation.mutate(setting.id)}
-                  />
-                ))}
+            {/* Account section */}
+            <div className="bg-[#1e1e1e] rounded-lg border border-[#333] mb-6">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold mb-6">Account</h2>
+                <p className="text-gray-400 mb-4">cmf@centremedicalfont.ca</p>
+                
+                <SettingsSection
+                  title="Profile"
+                  description="Manage your profile that's visible to patients and teammates."
+                  icon={<UserCog className="h-5 w-5" />}
+                  to="/settings/profile"
+                />
+                
+                <Separator className="my-2 bg-gray-800" />
+                
+                <SettingsSection
+                  title="Personal Preferences"
+                  description="Customize your experience with InstantHPI."
+                  icon={<SettingsIcon className="h-5 w-5" />}
+                  to="/settings/personal-preferences"
+                />
+                
+                <Separator className="my-2 bg-gray-800" />
+                
+                <SettingsSection
+                  title="Notifications"
+                  description="Manage your notification settings."
+                  icon={<Bell className="h-5 w-5" />}
+                  to="/settings/notifications"
+                />
               </div>
-            </TabsContent>
+            </div>
             
-            <TabsContent value="analysis">
-              <div className="space-y-6">
-                {analysisSettings.map((setting) => (
-                  <SettingCard
-                    key={setting.id}
-                    setting={setting}
-                    onToggleChange={handleToggleChange}
-                    onPromptTextChange={handlePromptTextChange}
-                    onDelete={() => deletePromptMutation.mutate(setting.id)}
-                  />
-                ))}
+            {/* Communication section */}
+            <div className="bg-[#1e1e1e] rounded-lg border border-[#333]">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold mb-6">Communication</h2>
+                
+                <SettingsSection
+                  title="Phone System"
+                  description="Configure your phone system settings."
+                  icon={<Phone className="h-5 w-5" />}
+                  to="/settings/phone-system"
+                />
+                
+                <Separator className="my-2 bg-gray-800" />
+                
+                <SettingsSection
+                  title="Secure Messaging"
+                  description="Manage your secure messaging settings."
+                  icon={<MessageSquare className="h-5 w-5" />}
+                  to="/settings/secure-messaging"
+                />
+                
+                <Separator className="my-2 bg-gray-800" />
+                
+                <SettingsSection
+                  title="Fax"
+                  description="Configure fax settings and numbers."
+                  icon={<FileText className="h-5 w-5" />}
+                  to="/settings/fax"
+                />
+                
+                <Separator className="my-2 bg-gray-800" />
+                
+                <SettingsSection
+                  title="Email"
+                  description="Manage email integration settings."
+                  icon={<Mail className="h-5 w-5" />}
+                  to="/settings/email"
+                />
               </div>
-            </TabsContent>
-
-
-            
-            <TabsContent value="application">
-              <Card className="bg-[#1e1e1e] border-gray-800">
-                <CardHeader>
-                  <CardTitle>Application Settings</CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Configure general application behavior and features
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
-                    <div className="border-b border-gray-800 pb-6">
-                      <h3 className="text-lg font-medium mb-4">Specialized Medicine Options</h3>
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <h4 className="font-medium text-base">Functional Medicine Mode</h4>
-                          <p className="text-sm text-gray-400">
-                            When enabled, AI recommendations will include functional medicine labs and explanations
-                          </p>
-                        </div>
-                        <Switch
-                          id="toggle-functional-medicine"
-                          checked={functionalMedicineEnabled}
-                          onCheckedChange={(checked) => {
-                            setFunctionalMedicineEnabled(checked);
-                            const setting = aiSettings.find(s => s.name === "functionalMedicine");
-                            if (setting) {
-                              handleToggleChange(setting, checked);
-                              toast({
-                                title: checked ? 'Functional Medicine Enabled' : 'Functional Medicine Disabled',
-                                description: checked 
-                                  ? 'AI will now include specialized functional medicine recommendations'
-                                  : 'AI will no longer include functional medicine recommendations',
-                              });
-                            }
-                          }}
-                        />
-                      </div>
-                      
-                      <div className="mt-2 p-3 bg-[#262626] rounded-md">
-                        <p className="text-sm text-gray-300">
-                          Enabling functional medicine mode will expand AI analysis to include specialized laboratory tests, 
-                          nutritional assessments, and root-cause analysis explanations in the middle column.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-            
-            <TabsContent value="navigation">
-              <NavigationSettings currentUser={currentUser} />
-            </TabsContent>
-            
-            <TabsContent value="add">
-              <Card className="bg-[#1e1e1e] border-gray-800">
-                <CardHeader>
-                  <CardTitle>Add New Prompt</CardTitle>
-                  <CardDescription className="text-gray-400">
-                    Create a new AI prompt to customize the application's behavior
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="prompt-name">Prompt Name</Label>
-                        <Input
-                          id="prompt-name"
-                          placeholder="Enter a descriptive name..."
-                          value={newPromptName}
-                          onChange={(e) => setNewPromptName(e.target.value)}
-                          className="bg-[#262626] border-gray-700 text-white"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="prompt-category">Category</Label>
-                        <select
-                          id="prompt-category"
-                          value={newPromptCategory}
-                          onChange={(e) => setNewPromptCategory(e.target.value)}
-                          className="w-full px-3 py-2 rounded-md bg-[#262626] border border-gray-700 text-white"
-                        >
-                          <option value="documentation">Documentation</option>
-                          <option value="response">Patient Response</option>
-                          <option value="analysis">Analysis</option>
-                        </select>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="prompt-text">Prompt Text</Label>
-                      <Textarea
-                        id="prompt-text"
-                        placeholder="Enter the prompt text with any variables enclosed in {curly braces}..."
-                        value={newPromptText}
-                        onChange={(e) => setNewPromptText(e.target.value)}
-                        rows={8}
-                        className="bg-[#262626] border-gray-700 text-white min-h-[200px]"
-                      />
-                      <p className="text-sm text-gray-500">
-                        Use variables like {"{patient_name}"}, {"{condition}"}, {"{symptoms}"}, etc. These will be replaced with actual data when the prompt is used.
-                      </p>
-                    </div>
-                    
-                    <Button 
-                      onClick={handleAddPrompt} 
-                      className="mt-4 bg-blue-600 hover:bg-blue-700"
-                      disabled={addPromptMutation.isPending}
-                    >
-                      {addPromptMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      <Plus className="mr-2 h-4 w-4" />
-                      Add Prompt
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
-        )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  );
-}
-
-// Setting Card Component
-interface SettingCardProps {
-  setting: AiSetting;
-  onToggleChange: (setting: AiSetting, enabled: boolean) => void;
-  onPromptTextChange: (setting: AiSetting, promptText: string) => void;
-  onDelete: () => void;
-}
-
-function SettingCard({ setting, onToggleChange, onPromptTextChange, onDelete }: SettingCardProps) {
-  const [editedText, setEditedText] = useState(setting.promptText);
-  const [isEditing, setIsEditing] = useState(false);
-  
-  // Reset edited text when setting changes
-  useEffect(() => {
-    setEditedText(setting.promptText);
-  }, [setting.promptText]);
-  
-  const handleSave = () => {
-    onPromptTextChange(setting, editedText);
-    setIsEditing(false);
-  };
-  
-  return (
-    <Card className="bg-[#1e1e1e] border-gray-800">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle>{setting.name}</CardTitle>
-            <CardDescription className="text-gray-400">
-              Category: {setting.category.charAt(0).toUpperCase() + setting.category.slice(1)}
-            </CardDescription>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Label htmlFor={`toggle-${setting.id}`} className="mr-2">
-              Enabled
-            </Label>
-            <Switch
-              id={`toggle-${setting.id}`}
-              checked={setting.enabled}
-              onCheckedChange={(checked) => onToggleChange(setting, checked)}
-            />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {isEditing ? (
-          <div className="space-y-4">
-            <Textarea
-              value={editedText}
-              onChange={(e) => setEditedText(e.target.value)}
-              className="bg-[#262626] border-gray-700 text-white min-h-[150px]"
-              rows={5}
-            />
-            <div className="flex justify-end space-x-2">
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setEditedText(setting.promptText);
-                  setIsEditing(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-                <Save className="mr-2 h-4 w-4" />
-                Save Changes
-              </Button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="p-3 bg-[#262626] rounded-md text-sm text-gray-300 whitespace-pre-wrap">
-              {setting.promptText}
-            </div>
-            <div className="flex justify-end space-x-2">
-              <Button 
-                variant="outline" 
-                onClick={() => setIsEditing(true)}
-                className="border-gray-700 text-gray-300"
-              >
-                Edit
-              </Button>
-              <Button 
-                variant="destructive" 
-                onClick={onDelete}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </Button>
-            </div>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    </AppLayout>
   );
 }
