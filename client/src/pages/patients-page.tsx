@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, User, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { useDebounce } from '@/hooks/use-debounce';
 import AppLayout from '@/components/layout/AppLayout';
 
 interface Patient {
@@ -14,34 +16,52 @@ interface Patient {
   dateOfBirth: string;
   gender: string;
   language: 'english' | 'french' | null;
+  spruceId?: string | null;
 }
 
 export default function PatientsPage() {
-  const { data: allPatients, isLoading } = useQuery<Patient[]>({
-    queryKey: ['/api/patients'],
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const { toast } = useToast();
+  
+  // Using the enhanced search API that combines Spruce API and local database
+  const { 
+    data: patientsResponse = { patients: [], source: 'local' }, 
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ['/api/spruce/search-patients', debouncedSearchTerm],
+    queryFn: async () => {
+      let url = '/api/spruce/search-patients';
+      
+      // Add query parameter if available
+      if (debouncedSearchTerm) {
+        url += `?query=${encodeURIComponent(debouncedSearchTerm)}`;
+      }
+      
+      const res = await fetch(url);
+      
+      if (!res.ok) {
+        throw new Error('Failed to fetch patients');
+      }
+      
+      return res.json();
+    }
   });
   
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
-  
-  // Filter patients when search term or patient data changes
-  useEffect(() => {
-    if (!allPatients) return;
-    
-    if (!searchTerm) {
-      setFilteredPatients(allPatients);
-      return;
+  // Show error toast if patient fetching fails
+  React.useEffect(() => {
+    if (error) {
+      toast({
+        title: "Error loading patients",
+        description: "Please try again later",
+        variant: "destructive"
+      });
     }
-    
-    const term = searchTerm.toLowerCase();
-    const filtered = allPatients.filter(patient => 
-      patient.name.toLowerCase().includes(term) ||
-      (patient.email && patient.email.toLowerCase().includes(term)) ||
-      (patient.phone && patient.phone.includes(term))
-    );
-    
-    setFilteredPatients(filtered);
-  }, [searchTerm, allPatients]);
+  }, [error, toast]);
+  
+  // Extract patients array from response
+  const filteredPatients = patientsResponse.patients || [];
 
   return (
     <AppLayout>
@@ -51,7 +71,14 @@ export default function PatientsPage() {
           <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="mb-4 md:mb-0">
               <h2 className="text-2xl font-bold">Patients</h2>
-              <p className="text-gray-400">View and manage your patients</p>
+              <p className="text-gray-400">
+                View and manage your patients
+                {patientsResponse.source && (
+                  <span className="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                    {patientsResponse.source === 'spruce' ? 'Spruce API' : 'Local database'}
+                  </span>
+                )}
+              </p>
             </div>
             
             <div className="flex space-x-2 w-full md:w-auto">
@@ -80,7 +107,7 @@ export default function PatientsPage() {
             </div>
           ) : filteredPatients && filteredPatients.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredPatients.map((patient) => (
+              {filteredPatients.map((patient: Patient) => (
                 <Card key={patient.id} className="bg-[#1e1e1e] border-gray-800 hover:border-gray-700 cursor-pointer transition-colors">
                   <CardHeader className="pb-2">
                     <CardTitle className="flex items-center">
