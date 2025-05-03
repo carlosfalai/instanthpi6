@@ -26,7 +26,8 @@ import {
   Plus,
   Menu,
   UserCog,
-  ChevronDown
+  ChevronDown,
+  BrainCircuit
 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
@@ -117,7 +118,8 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     { id: 'insurancePaperwork', path: '/insurance-paperwork', icon: <FileCheck className="h-5 w-5" />, label: 'Insurance', visible: true, order: 3, row: 'tertiary' },
     { id: 'knowledgeBase', path: '/knowledge-base', icon: <Brain className="h-5 w-5" />, label: 'Knowledge Base', visible: true, order: 4, row: 'tertiary' },
     { id: 'aiBilling', path: '/ai-billing', icon: <DollarSign className="h-5 w-5" />, label: 'AI Billing', visible: true, order: 5, row: 'tertiary' },
-    { id: 'leadershipAssociation', path: '/leadership-association', icon: <Users className="h-5 w-5" />, label: 'Leadership', visible: true, order: 6, row: 'tertiary' },
+    { id: 'priorityTasks', path: '/priority-tasks', icon: <BrainCircuit className="h-5 w-5" />, label: 'Priority AI', visible: true, order: 6, row: 'tertiary' },
+    { id: 'leadershipAssociation', path: '/leadership-association', icon: <Users className="h-5 w-5" />, label: 'Leadership', visible: true, order: 7, row: 'tertiary' },
   ];
 
   // The main navigation sections for the left sidebar
@@ -128,6 +130,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     { id: 'forms', label: 'Forms', icon: <LayoutList className="h-5 w-5" />, badge: notificationCounts.forms || 0, path: '/forms' },
     { id: 'scheduler', label: 'Scheduler', icon: <Clock className="h-5 w-5" />, badge: 0, path: '/scheduler' },
     { id: 'treatment', label: 'Treatment', icon: <Stethoscope className="h-5 w-5" />, badge: 0, path: '/treatment' },
+    { id: 'priorityTasks', label: 'Priority AI', icon: <BrainCircuit className="h-5 w-5" />, badge: 0, path: '/priority-tasks' },
     { id: 'settings', label: 'Settings', icon: <Settings className="h-5 w-5" />, badge: 0, path: '/settings' },
   ];
 

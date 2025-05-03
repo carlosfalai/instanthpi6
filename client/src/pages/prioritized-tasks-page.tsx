@@ -24,7 +24,7 @@ import { Loader2, BrainCircuit, CheckCircle, BellRing, AlertTriangle, MessageSqu
 import { Skeleton } from '@/components/ui/skeleton';
 import { Progress } from '@/components/ui/progress';
 import { format, formatDistanceToNow } from 'date-fns';
-import AppLayout from '@/components/layout/AppLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 
 // Type for prioritized tasks
 interface PrioritizedTask {
@@ -192,7 +192,7 @@ const PrioritizedTasksPage: React.FC = () => {
   // Loading state
   if (isLoading) {
     return (
-      <AppLayout>
+      <AppLayoutSpruce>
         <div className="container py-8">
           <Card>
             <CardHeader>
@@ -208,14 +208,14 @@ const PrioritizedTasksPage: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-      </AppLayout>
+      </AppLayoutSpruce>
     );
   }
 
   // Error state
   if (error) {
     return (
-      <AppLayout>
+      <AppLayoutSpruce>
         <div className="container py-8">
           <Card className="border-red-300">
             <CardHeader>
@@ -237,12 +237,12 @@ const PrioritizedTasksPage: React.FC = () => {
             </CardContent>
           </Card>
         </div>
-      </AppLayout>
+      </AppLayoutSpruce>
     );
   }
 
   return (
-    <AppLayout>
+    <AppLayoutSpruce>
       <div className="container py-6">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -404,7 +404,7 @@ const PrioritizedTasksPage: React.FC = () => {
           </CardFooter>
         </Card>
       </div>
-    </AppLayout>
+    </AppLayoutSpruce>
   );
 };
 
