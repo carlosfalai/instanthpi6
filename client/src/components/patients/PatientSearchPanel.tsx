@@ -31,19 +31,19 @@ export default function PatientSearchPanel({
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Simplified direct query to our own database (no Spruce sync attempts)
+  // Query to get patients from Spruce API with local DB fallback
   const { 
-    data: patients = [], 
+    data: patientsResponse = { patients: [], source: 'local' }, 
     isLoading,
     error
-  } = useQuery<Patient[]>({
-    queryKey: ['/api/patients', debouncedSearchTerm],
+  } = useQuery({
+    queryKey: ['/api/spruce/search-patients', debouncedSearchTerm],
     queryFn: async () => {
-      let url = '/api/patients';
+      let url = '/api/spruce/search-patients';
       
-      // Add search parameter if available
+      // Add query parameter if available
       if (debouncedSearchTerm) {
-        url += `?search=${encodeURIComponent(debouncedSearchTerm)}`;
+        url += `?query=${encodeURIComponent(debouncedSearchTerm)}`;
       }
       
       const res = await fetch(url);
@@ -55,6 +55,9 @@ export default function PatientSearchPanel({
       return res.json();
     }
   });
+  
+  // Extract patients array from response
+  const patients = patientsResponse.patients || [];
   
   // Show error toast if patient fetching fails
   useEffect(() => {
@@ -70,7 +73,7 @@ export default function PatientSearchPanel({
   // Refresh data every 30 seconds to ensure it's current
   useEffect(() => {
     const intervalId = setInterval(() => {
-      queryClient.invalidateQueries({ queryKey: ['/api/patients'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/spruce/search-patients'] });
     }, 30000);
 
     return () => clearInterval(intervalId);
