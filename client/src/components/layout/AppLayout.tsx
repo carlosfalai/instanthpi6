@@ -1,6 +1,5 @@
-import React, { ReactNode, useState, useEffect } from 'react';
+import React, { ReactNode } from 'react';
 import { Link, useLocation } from 'wouter';
-import NavigationBar from '@/components/navigation/NavigationBar';
 import { 
   Home, 
   Users, 
@@ -11,19 +10,21 @@ import {
   Bell,
   MessageSquare,
   User,
-  Menu,
-  X,
-  ChevronDown,
+  ClipboardList,
   Heart,
   PillIcon,
   AlertCircle,
-  CreditCard
+  GraduationCap,
+  CreditCard,
+  BookOpen,
+  Receipt,
+  FormInput,
+  UserIcon
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useQuery } from '@tanstack/react-query';
 import { User as UserType } from '@shared/schema';
 
@@ -44,79 +45,16 @@ const NotificationBadge = ({ count }: { count: number }) => {
 
 export default function AppLayout({ children }: AppLayoutProps) {
   const [location] = useLocation();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    patients: false,
-    documents: false,
-    settings: false
-  });
-  
-  // Fetch current user for avatar and preferences
-  const { data: currentUser } = useQuery<UserType>({
-    queryKey: ['/api/user'],
-  });
   
   // Fetch notification counts
   const { data: notificationCounts = {} } = useQuery<Record<string, number>>({
     queryKey: ['/api/notifications/counts'],
   });
   
-  // Determine active section based on URL
-  const getActiveSection = () => {
-    const path = location.split('/')[1] || 'home';
-    if (path === 'patients' || path === 'chronic-conditions' || path === 'medication-refills') {
-      return 'patients';
-    } else if (path === 'documents') {
-      return 'documents';
-    } else if (path === 'settings') {
-      return 'settings';
-    } else if (path === 'scheduler') {
-      return 'scheduler';
-    }
-    return path;
-  };
-  
-  const activeSection = getActiveSection();
-  
-  // Toggle expanded state for a section
-  const toggleSectionExpanded = (sectionId: string) => {
-    setExpandedSections(prev => ({
-      ...prev,
-      [sectionId]: !prev[sectionId]
-    }));
-  };
-
-  // Main navigation sections for the left sidebar
-  const mainNavSections = [
-    { id: 'home', label: 'Home', icon: <Home className="h-5 w-5" />, badge: 0, path: '/' },
-    { id: 'patients', label: 'Patients', icon: <Users className="h-5 w-5" />, badge: notificationCounts.patients || 0, path: '/patients', hasSubmenu: true },
-    { id: 'documents', label: 'Documents', icon: <FileText className="h-5 w-5" />, badge: notificationCounts.documents || 0, path: '/documents', hasSubmenu: true },
-    { id: 'messages', label: 'Messages', icon: <MessageSquare className="h-5 w-5" />, badge: 0, path: '/messages' },
-    { id: 'scheduler', label: 'Scheduler', icon: <Calendar className="h-5 w-5" />, badge: 0, path: '/scheduler' },
-    { id: 'settings', label: 'Settings', icon: <Settings className="h-5 w-5" />, badge: 0, path: '/settings', hasSubmenu: true },
-  ];
-  
-  // Patient subsections
-  const patientSubSections = [
-    { id: 'all-patients', label: 'All Patients', path: '/patients' },
-    { id: 'chronic-conditions', label: 'Chronic Conditions', path: '/chronic-conditions', badge: notificationCounts.chronicConditions || 0 },
-    { id: 'medication-refills', label: 'Medication Refills', path: '/medication-refills', badge: notificationCounts.medicationRefills || 0 },
-    { id: 'urgent-care', label: 'Urgent Care', path: '/urgent-care', badge: notificationCounts.urgentCare || 0 },
-  ];
-  
-  // Document subsections
-  const documentSubSections = [
-    { id: 'all-documents', label: 'All Documents', path: '/documents' },
-    { id: 'insurance-paperwork', label: 'Insurance Paperwork', path: '/insurance-paperwork' },
-  ];
-  
-  // Settings subsections
-  const settingsSubSections = [
-    { id: 'organization-profile', label: 'Organization Profile', path: '/settings/organization-profile' },
-    { id: 'teammates', label: 'Teammates', path: '/settings/teammates' },
-    { id: 'education', label: 'Education', path: '/education' },
-    { id: 'subscription', label: 'Subscription', path: '/subscription' },
-  ];
+  // Fetch current user data
+  const { data: currentUser } = useQuery<UserType>({
+    queryKey: ['/api/user'],
+  });
   
   // Generate initials for avatar
   const getInitials = (name?: string) => {
@@ -128,328 +66,125 @@ export default function AppLayout({ children }: AppLayoutProps) {
       .toUpperCase();
   };
   
-  // User name and role
-  const userName = currentUser?.fullName || 'User';
-  const userRole = 'Family Medicine';
+  // Navigation items - matching the tree structure in screenshot
+  const primaryNavItems = [
+    { id: 'home', path: '/', icon: <Home className="h-5 w-5" />, label: 'Home', badge: 0 },
+    { id: 'patients', path: '/patients', icon: <Users className="h-5 w-5" />, label: 'Patients', badge: notificationCounts.patients || 0 },
+    { id: 'documents', path: '/documents', icon: <FileText className="h-5 w-5" />, label: 'Documents', badge: notificationCounts.documents || 0 },
+    { id: 'messages', path: '/messages', icon: <MessageSquare className="h-5 w-5" />, label: 'Messages', badge: 0 },
+    { id: 'scheduler', path: '/scheduler', icon: <Calendar className="h-5 w-5" />, label: 'Scheduler', badge: 0 },
+    { id: 'formsite', path: '/formsite', icon: <FormInput className="h-5 w-5" />, label: 'formsite', badge: 0 },
+    { id: 'knowledgeBase', path: '/knowledge-base', icon: <BookOpen className="h-5 w-5" />, label: 'Knowledge Base', badge: 0 },
+    { id: 'aiBilling', path: '/ai-billing', icon: <Receipt className="h-5 w-5" />, label: 'AI Billing', badge: 0 },
+  ];
+  
+  const secondaryNavItems = [
+    { id: 'forms', path: '/forms', icon: <ClipboardList className="h-5 w-5" />, label: 'Forms', badge: 0 },
+    { id: 'chronicConditions', path: '/chronic-conditions', icon: <Heart className="h-5 w-5" />, label: 'Chronic Conditions', badge: notificationCounts.chronicConditions || 0 },
+    { id: 'medicationRefills', path: '/medication-refills', icon: <PillIcon className="h-5 w-5" />, label: 'Medication Refills', badge: notificationCounts.medicationRefills || 0 },
+    { id: 'urgentCare', path: '/urgent-care', icon: <AlertCircle className="h-5 w-5" />, label: 'Urgent Care', badge: notificationCounts.urgentCare || 0 },
+    { id: 'education', path: '/education', icon: <GraduationCap className="h-5 w-5" />, label: 'Education', badge: 0 },
+    { id: 'subscription', path: '/subscription', icon: <CreditCard className="h-5 w-5" />, label: 'Subscription', badge: 0 },
+    { id: 'settings', path: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Organization Settings', badge: 0 },
+  ];
+  
+  const tertiaryNavItems = [
+    { id: 'leadershipAssociation', path: '/leadership-association', icon: <UserIcon className="h-5 w-5" />, label: 'Leadership Association', badge: 0 },
+  ];
+  
+  // Render navigation item
+  const renderNavItem = (item: typeof primaryNavItems[0], active: boolean) => (
+    <Link 
+      key={item.id} 
+      href={item.path}
+      className={cn(
+        "relative flex items-center p-2 px-3 text-sm rounded-md transition-colors",
+        active 
+          ? 'bg-blue-600 text-white font-medium shadow-sm' 
+          : 'text-gray-200 bg-[#2a2a2a] hover:bg-[#333333] shadow-sm',
+        "min-w-fit mr-2 my-1"
+      )}
+    >
+      <div className="relative mr-2">
+        {item.icon}
+        {item.badge > 0 && (
+          <NotificationBadge count={item.badge} />
+        )}
+      </div>
+      <span className="truncate">{item.label}</span>
+    </Link>
+  );
 
   return (
-    <div className="min-h-screen flex bg-[#121212] text-white overflow-hidden">
-      {/* Left Sidebar - Main Navigation */}
-      <div className="w-64 border-r border-[#333] bg-[#1a1a1a] hidden md:flex flex-col">
-        {/* Organization name header */}
-        <div className="p-4 border-b border-[#333] flex items-center justify-between">
-          <h1 className="text-lg font-semibold">InstantHPI</h1>
-        </div>
+    <div className="min-h-screen flex flex-col bg-[#121212] text-white">
+      {/* Header */}
+      <header className="h-14 flex items-center px-4 bg-[#1e1e1e] border-b border-gray-800 fixed top-0 left-0 right-0 z-50">
+        <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">InstantHPI</h1>
         
-        {/* Main navigation sections */}
-        <div className="overflow-y-auto flex-grow px-2 py-3">
-          {mainNavSections.map((section) => (
-            <div key={section.id} className="mb-1">
-              <button
-                className={cn(
-                  "flex items-center w-full py-2 px-3 rounded-md text-sm transition-colors",
-                  activeSection === section.id 
-                    ? "bg-[#2a2a2a] text-white" 
-                    : "text-gray-300 hover:bg-[#252525]",
-                  section.hasSubmenu ? "justify-between" : ""
-                )}
-                onClick={() => {
-                  if (section.hasSubmenu) {
-                    toggleSectionExpanded(section.id);
-                  } else {
-                    window.location.href = section.path;
-                  }
-                }}
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0 mr-3 relative">
-                    {section.icon}
-                    {section.badge > 0 && (
-                      <NotificationBadge count={section.badge} />
-                    )}
-                  </div>
-                  <span className="truncate">{section.label}</span>
-                </div>
-                
-                {section.hasSubmenu && (
-                  <ChevronDown
-                    className={cn(
-                      "h-4 w-4 transition-transform",
-                      expandedSections[section.id] ? "transform rotate-180" : ""
-                    )}
-                  />
-                )}
-              </button>
-              
-              {/* Patient subsections */}
-              {section.id === 'patients' && expandedSections.patients && (
-                <div className="ml-8 mt-1 space-y-1">
-                  {patientSubSections.map((subsection) => (
-                    <Link key={subsection.id} href={subsection.path}>
-                      <a
-                        className={cn(
-                          "flex items-center justify-between text-sm py-1 px-3 rounded-md hover:bg-[#252525] cursor-pointer",
-                          location === subsection.path
-                            ? "text-white bg-[#252525]"
-                            : "text-gray-300"
-                        )}
-                      >
-                        <span>{subsection.label}</span>
-                        {subsection.badge && subsection.badge > 0 && (
-                          <Badge variant="destructive" className="text-xs h-5">
-                            {subsection.badge}
-                          </Badge>
-                        )}
-                      </a>
-                    </Link>
-                  ))}
-                </div>
-              )}
-              
-              {/* Document subsections */}
-              {section.id === 'documents' && expandedSections.documents && (
-                <div className="ml-8 mt-1 space-y-1">
-                  {documentSubSections.map((subsection) => (
-                    <Link key={subsection.id} href={subsection.path}>
-                      <a
-                        className={cn(
-                          "flex items-center justify-between text-sm py-1 px-3 rounded-md hover:bg-[#252525] cursor-pointer",
-                          location === subsection.path
-                            ? "text-white bg-[#252525]"
-                            : "text-gray-300"
-                        )}
-                      >
-                        <span>{subsection.label}</span>
-                      </a>
-                    </Link>
-                  ))}
-                </div>
-              )}
-              
-              {/* Settings subsections */}
-              {section.id === 'settings' && expandedSections.settings && (
-                <div className="ml-8 mt-1 space-y-1">
-                  {settingsSubSections.map((subsection) => (
-                    <Link key={subsection.id} href={subsection.path}>
-                      <a
-                        className={cn(
-                          "flex items-center justify-between text-sm py-1 px-3 rounded-md hover:bg-[#252525] cursor-pointer",
-                          location === subsection.path
-                            ? "text-white bg-[#252525]"
-                            : "text-gray-300"
-                        )}
-                      >
-                        <span>{subsection.label}</span>
-                      </a>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-        
-        {/* User profile */}
-        <div className="p-4 border-t border-[#333] flex items-center">
-          <Avatar className="h-8 w-8 mr-3">
-            <AvatarImage src="" alt={userName} />
-            <AvatarFallback className="bg-blue-700 text-xs">
-              {getInitials(userName)}
+        <div className="ml-auto flex items-center space-x-4">
+          <div className="relative hidden md:block">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Search..."
+              className="pl-10 py-1 h-9 w-64 bg-[#252525] border-[#444] rounded-md text-sm"
+            />
+          </div>
+          <div className="relative">
+            <Bell className="h-5 w-5 text-gray-300 cursor-pointer" />
+            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+          </div>
+          <Avatar className="h-8 w-8">
+            <AvatarImage src="" alt={currentUser?.fullName || "User"} />
+            <AvatarFallback className="bg-indigo-700">
+              {getInitials(currentUser?.fullName)}
             </AvatarFallback>
           </Avatar>
-          <div className="overflow-hidden">
-            <p className="text-sm font-medium truncate">{userName}</p>
-            <p className="text-xs text-gray-400 truncate">{userRole}</p>
+        </div>
+      </header>
+      
+      {/* Navigation Bar - First row */}
+      <nav className="w-full bg-[#1a1a1a] border-b border-gray-800 py-1 sticky top-14 z-40 mt-14">
+        {/* Primary Nav Row - Must be visible */}
+        <div className="flex items-center px-4 mb-1 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2">
+          <div className="flex items-center space-x-2">
+            {primaryNavItems.map((item) => (
+              <div key={item.id} className="flex-shrink-0">
+                {renderNavItem(item, location === item.path)}
+              </div>
+            ))}
           </div>
         </div>
-      </div>
-      
-      {/* Mobile menu button - top bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[#1a1a1a] border-b border-[#333] p-3 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">InstantHPI</h1>
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-1"
-        >
-          {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
-      </div>
-      
-      {/* Mobile sidebar - slides in from left */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-40" onClick={() => setIsMobileMenuOpen(false)}>
-          <div 
-            className="fixed inset-y-0 left-0 w-64 bg-[#1a1a1a] z-50"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-4 border-b border-[#333] flex items-center justify-between">
-              <h1 className="text-lg font-semibold">InstantHPI</h1>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-1"
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-            
-            {/* Mobile navigation - same as desktop */}
-            <div className="overflow-y-auto h-full px-2 py-3">
-              {mainNavSections.map((section) => (
-                <div key={section.id} className="mb-1">
-                  <button
-                    className={cn(
-                      "flex items-center w-full py-2 px-3 rounded-md text-sm transition-colors",
-                      activeSection === section.id 
-                        ? "bg-[#2a2a2a] text-white" 
-                        : "text-gray-300 hover:bg-[#252525]",
-                      section.hasSubmenu ? "justify-between" : ""
-                    )}
-                    onClick={() => {
-                      if (section.hasSubmenu) {
-                        toggleSectionExpanded(section.id);
-                      } else {
-                        window.location.href = section.path;
-                        setIsMobileMenuOpen(false);
-                      }
-                    }}
-                  >
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 mr-3 relative">
-                        {section.icon}
-                        {section.badge > 0 && (
-                          <NotificationBadge count={section.badge} />
-                        )}
-                      </div>
-                      <span className="truncate">{section.label}</span>
-                    </div>
-                    
-                    {section.hasSubmenu && (
-                      <ChevronDown
-                        className={cn(
-                          "h-4 w-4 transition-transform",
-                          expandedSections[section.id] ? "transform rotate-180" : ""
-                        )}
-                      />
-                    )}
-                  </button>
-                  
-                  {/* Subsections - same as desktop */}
-                  {section.id === 'patients' && expandedSections.patients && (
-                    <div className="ml-8 mt-1 space-y-1">
-                      {patientSubSections.map((subsection) => (
-                        <Link key={subsection.id} href={subsection.path}>
-                          <a
-                            className={cn(
-                              "flex items-center justify-between text-sm py-1 px-3 rounded-md hover:bg-[#252525] cursor-pointer",
-                              location === subsection.path
-                                ? "text-white bg-[#252525]"
-                                : "text-gray-300"
-                            )}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <span>{subsection.label}</span>
-                            {subsection.badge && subsection.badge > 0 && (
-                              <Badge variant="destructive" className="text-xs h-5">
-                                {subsection.badge}
-                              </Badge>
-                            )}
-                          </a>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {/* Other subsections - same pattern */}
-                  {section.id === 'documents' && expandedSections.documents && (
-                    <div className="ml-8 mt-1 space-y-1">
-                      {documentSubSections.map((subsection) => (
-                        <Link key={subsection.id} href={subsection.path}>
-                          <a
-                            className={cn(
-                              "flex items-center justify-between text-sm py-1 px-3 rounded-md hover:bg-[#252525] cursor-pointer",
-                              location === subsection.path
-                                ? "text-white bg-[#252525]"
-                                : "text-gray-300"
-                            )}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <span>{subsection.label}</span>
-                          </a>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {section.id === 'settings' && expandedSections.settings && (
-                    <div className="ml-8 mt-1 space-y-1">
-                      {settingsSubSections.map((subsection) => (
-                        <Link key={subsection.id} href={subsection.path}>
-                          <a
-                            className={cn(
-                              "flex items-center justify-between text-sm py-1 px-3 rounded-md hover:bg-[#252525] cursor-pointer",
-                              location === subsection.path
-                                ? "text-white bg-[#252525]"
-                                : "text-gray-300"
-                            )}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                          >
-                            <span>{subsection.label}</span>
-                          </a>
-                        </Link>
-                      ))}
-                    </div>
-                  )}
+        
+        {/* Secondary Nav Row */}
+        <div className="flex items-center px-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2 border-t border-gray-800">
+          <div className="flex items-center space-x-2">
+            {secondaryNavItems.map((item) => (
+              <div key={item.id} className="flex-shrink-0">
+                {renderNavItem(item, location === item.path)}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Tertiary Nav Row */}
+        {tertiaryNavItems.length > 0 && (
+          <div className="flex items-center px-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2 border-t border-gray-800">
+            <div className="flex items-center space-x-2">
+              {tertiaryNavItems.map((item) => (
+                <div key={item.id} className="flex-shrink-0">
+                  {renderNavItem(item, location === item.path)}
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </nav>
       
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden md:ml-0 mt-14 md:mt-0">
-        {/* Top Navigation Bar */}
-        <header className="h-14 border-b border-[#333] bg-[#1a1a1a] flex items-center px-4">
-          <div className="flex-1 flex items-center">
-            <h1 className="text-lg font-medium ml-2">
-              {/* Dynamic title based on active section */}
-              {mainNavSections.find(section => section.id === activeSection)?.label || 'InstantHPI'}
-            </h1>
-          </div>
-          <div className="flex items-center space-x-3">
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input
-                type="text"
-                placeholder="Search..."
-                className="pl-10 py-1 h-9 w-64 bg-[#252525] border-[#444] rounded-md text-sm"
-              />
-            </div>
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </Button>
-            <Avatar className="h-8 w-8">
-              <AvatarImage src="" alt={userName} />
-              <AvatarFallback className="bg-blue-700 text-xs">
-                {getInitials(userName)}
-              </AvatarFallback>
-            </Avatar>
-          </div>
-        </header>
-        
-        {/* Keep our existing navigation bar for the tabs interface */}
-        <NavigationBar />
-        
-        {/* Main Content - This will change per page */}
-        <main className="flex-1 overflow-auto bg-[#151515]">
-          {children}
-        </main>
-      </div>
+      {/* Main Content */}
+      <main className="flex-1 overflow-auto">
+        {children}
+      </main>
     </div>
   );
 }
