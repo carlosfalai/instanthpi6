@@ -137,6 +137,70 @@ router.post('/sync-patients', async (req, res) => {
   }
 });
 
+// One-click refresh for patient data from Spruce API
+router.post('/refresh-patients', async (req, res) => {
+  try {
+    console.log('One-click patient data refresh requested');
+    
+    // Create timestamp for logging
+    const timestamp = new Date().toISOString();
+    
+    // Attempt to get fresh patient data from Spruce API
+    try {
+      const response = await spruceApi.get('/contacts', {
+        params: {
+          // Add cache-busting parameter to ensure we get fresh data
+          _ts: timestamp
+        },
+        headers: {
+          // Add cache control headers
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      
+      const sprucePatients = response.data.contacts || [];
+      console.log(`Successfully refreshed ${sprucePatients.length} patients from Spruce API`);
+      
+      // Format and return the patient data
+      const formattedPatients = sprucePatients.map((patient: SprucePatient) => ({
+        id: parseInt(patient.id) || Math.floor(Math.random() * 10000) + 1000,
+        name: patient.name || 'Unknown Name',
+        email: patient.email || '',
+        phone: patient.phone || '',
+        dateOfBirth: patient.date_of_birth || '',
+        gender: patient.gender || 'unknown',
+        language: patient.language || null,
+        spruceId: patient.id
+      }));
+      
+      res.json({
+        success: true,
+        message: `Successfully refreshed ${formattedPatients.length} patients from Spruce API`,
+        timestamp: timestamp,
+        source: 'spruce',
+        count: formattedPatients.length,
+        patients: formattedPatients
+      });
+    } catch (spruceError) {
+      console.error('Error refreshing data from Spruce API:', spruceError);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to refresh patient data from Spruce API',
+        error: spruceError.message
+      });
+    }
+  } catch (error) {
+    console.error('Error in refresh-patients endpoint:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error processing refresh request',
+      error: error.message
+    });
+  }
+});
+
 // Send a message exclusively via Spruce Health API
 router.post('/messages', async (req, res) => {
   try {
