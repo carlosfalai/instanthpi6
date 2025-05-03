@@ -191,12 +191,12 @@ router.post('/refresh-patients', async (req, res) => {
         error: spruceError.message || 'Unknown error'
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in refresh-patients endpoint:', error);
     res.status(500).json({
       success: false,
       message: 'Error processing refresh request',
-      error: error.message
+      error: error.message || 'Unknown error'
     });
   }
 });
