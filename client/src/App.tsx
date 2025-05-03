@@ -24,6 +24,7 @@ import AiBillingPage from '@/pages/ai-billing-page';
 import UrgentCarePage from '@/pages/urgent-care-page';
 import SubscriptionPage from '@/pages/subscription-page';
 import LeadershipAssociationPage from '@/pages/leadership-association-page';
+import PrioritizedTasksPage from '@/pages/prioritized-tasks-page';
 // New settings pages
 import SettingsPage from '@/pages/settings-page';
 import OrganizationProfilePage from '@/pages/organization-profile-page';
@@ -55,6 +56,7 @@ function Router() {
       <Route path="/subscription" component={SubscriptionPage} />
       <Route path="/leadership-association" component={LeadershipAssociationPage} />
       <Route path="/patient/:id/treatment" component={PatientTreatmentPage} />
+      <Route path="/priority-tasks" component={PrioritizedTasksPage} />
       {/* Settings Routes */}
       <Route path="/settings" component={SettingsPage} />
       <Route path="/settings/organization-profile" component={OrganizationProfilePage} />

@@ -35,6 +35,7 @@ import { billingRouter } from "./routes/billing";
 import pseudonymRouter from "./routes/pseudonymLinks";
 import urgentCareRouter from "./routes/urgentCare";
 import stripeRouter from "./routes/stripe";
+import priorityAIRouter from "./routes/priority-ai-routes";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -70,6 +71,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/pseudonym-links", pseudonymRouter);
   app.use("/api/urgent-care", urgentCareRouter);
   app.use("/api/stripe", stripeRouter);
+  app.use("/api/priority-ai", priorityAIRouter);
   app.use("/api", userRouter);
   
   // Error handling middleware for Zod validation errors
