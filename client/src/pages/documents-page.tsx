@@ -1,31 +1,22 @@
 import React from 'react';
 import { FileText, Search } from 'lucide-react';
-import NavigationBar from '@/components/navigation/NavigationBar';
 import { Input } from '@/components/ui/input';
+import AppLayout from '@/components/layout/AppLayout';
 
 export default function DocumentsPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#121212] text-white">
-      {/* Header */}
-      <header className="h-14 flex items-center px-4 bg-[#1e1e1e] border-b border-gray-800">
-        <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">InstantHPI</h1>
-        <div className="ml-6 flex-1">
-          <NavigationBar />
-        </div>
-      </header>
-      
-      {/* Main Content */}
-      <div className="flex-1 p-6">
-        <div className="mb-6 flex justify-between items-center">
-          <div>
+    <AppLayout>
+      <div className="p-6">
+        <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center">
+          <div className="mb-4 md:mb-0">
             <h2 className="text-2xl font-bold">Documents</h2>
             <p className="text-gray-400">Access patient documents and medical records</p>
           </div>
-          <div className="relative w-64">
+          <div className="relative w-full md:w-64">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
             <Input 
               placeholder="Search documents..." 
-              className="pl-8 bg-[#1e1e1e] border-gray-800 text-white"
+              className="pl-8 bg-[#1e1e1e] border-gray-800 text-white w-full"
             />
           </div>
         </div>
@@ -98,6 +89,6 @@ export default function DocumentsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }

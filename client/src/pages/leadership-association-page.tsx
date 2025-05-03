@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import NavigationBar from '@/components/navigation/NavigationBar';
 import { Users } from 'lucide-react';
+import AppLayout from '@/components/layout/AppLayout';
 
 export default function LeadershipAssociationPage() {
   const leadershipMembers = [
@@ -38,17 +38,8 @@ export default function LeadershipAssociationPage() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#121212] text-white">
-      {/* Header */}
-      <header className="h-14 flex items-center px-6 bg-[#1e1e1e] border-b border-gray-800">
-        <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">InstantHPI</h1>
-      </header>
-      
-      {/* Navigation Bar */}
-      <NavigationBar />
-      
-      {/* Main Content */}
-      <div className="flex-1 p-6">
+    <AppLayout>
+      <div className="p-6">
         <div className="container mx-auto mb-6">
           <h2 className="text-2xl font-bold">Leadership Association</h2>
           <p className="text-gray-400">Meet the team behind InstantHPI's innovation and vision</p>
@@ -90,6 +81,6 @@ export default function LeadershipAssociationPage() {
           </div>
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }

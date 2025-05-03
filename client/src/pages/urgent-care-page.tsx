@@ -27,6 +27,7 @@ import { Input } from "@/components/ui/input";
 import { AlertCircle, Clock, Edit, FileCheck, MessageSquare, RefreshCw, Save, X } from "lucide-react";
 import { getUrgentCareRequests, updateUrgentCareRequest } from "@/services/urgentCare";
 import { UrgentCareWithDetails } from "@/services/urgentCare";
+import AppLayout from "@/components/layout/AppLayout";
 
 export default function UrgentCarePage() {
   const { toast } = useToast();
@@ -165,19 +166,20 @@ export default function UrgentCarePage() {
   };
   
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Urgent Care Requests</h1>
-          <p className="text-muted-foreground">
-            View and manage time-sensitive patient requests that require attention.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Select
-            value={timeframe.toString()}
-            onValueChange={(value) => setTimeframe(parseInt(value))}
-          >
+    <AppLayout>
+      <div className="container mx-auto py-6 space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Urgent Care Requests</h1>
+            <p className="text-muted-foreground">
+              View and manage time-sensitive patient requests that require attention.
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Select
+              value={timeframe.toString()}
+              onValueChange={(value) => setTimeframe(parseInt(value))}
+            >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Time period" />
             </SelectTrigger>
@@ -494,5 +496,6 @@ export default function UrgentCarePage() {
         </TabsContent>
       </Tabs>
     </div>
+    </AppLayout>
   );
 }
