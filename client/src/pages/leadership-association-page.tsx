@@ -9,19 +9,19 @@ export default function LeadershipAssociationPage() {
       name: 'Dr. Carlos Faviel Font',
       role: 'Founder',
       specialty: 'Family Medicine',
-      bio: 'Founder of InstantHPI, specializing in Family Medicine with a focus on innovative healthcare delivery systems.'
+      bio: 'Founder of InstantHPI, specializing in Family Medicine with a focus on innovative healthcare delivery systems. Based in La Prairie, Quebec.'
     },
     {
       name: 'Dr. Sonia Font del Pino',
       role: 'Co-Founder',
-      specialty: '',
-      bio: 'Co-founder of InstantHPI, bringing expertise in medical practice management and patient care coordination.'
+      specialty: 'Anesthesiology & Chronic Pain Management',
+      bio: 'Co-founder of InstantHPI, specializing in anesthesiology and chronic pain management. Brings expert insight on pain treatment protocols and medical practice management. Based in St-Jean-sur-Richelieu, Quebec.'
     },
     {
       name: 'Mme Sonia Truchon',
       role: 'Marketing/Sales Director',
       specialty: '',
-      bio: 'Leads marketing and sales initiatives, driving growth and adoption of InstantHPI technology in medical practices.'
+      bio: 'Leads marketing and sales initiatives, driving growth and adoption of InstantHPI technology in medical practices. Based in Brossard, Quebec.'
     },
     {
       name: 'Dr. Dan Kogan',
