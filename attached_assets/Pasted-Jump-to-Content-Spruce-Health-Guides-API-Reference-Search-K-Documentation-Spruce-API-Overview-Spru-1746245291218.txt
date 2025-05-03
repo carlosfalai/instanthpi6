@@ -1,0 +1,59 @@
+Jump to Content
+Spruce Health
+Guides
+API Reference
+
+Search
+⌘K
+Documentation
+Spruce API Overview
+Spruce CSV Data Export
+Spruce Webhooks Overview
+Powered by 
+Spruce API Overview
+Getting started with the Spruce API
+
+Introduction
+This Spruce API provides the ability to manage contacts and conversations in an Organization. We are constantly adding to the API and will keep this documentation up to date with the latest additions.
+
+Requesting Access
+Please contact Spruce Support to request access to the API. After access has been granted, an administrator user in an organization can generate and manage credentials from the API Access section under Settings in the web application.
+
+Authentication
+When utilizing the API the authentication token generated for your organization need to be provided in the header format Authorization: Bearer <your-token>. Use of an incorrect or disabled token will result in a 403 response.
+
+Pagination
+API calls that result in a variable size list of results (e.g. listing all contacts) may provide a limit field in the input structure and a paginationToken field in both the input and response structures. Providing a limit value in the input will bound the size of the result set to a maximum set. Providing the empty string or omitting the paginationToken field on an input will start the result set from the beginning of available data. Setting thepaginationToken field on an input to the non-empty value provided by a previous response will have the request return the next set of available results.
+
+Idempotency
+All POST and PATCH requests take an optional header parameter in the format s-idempotency-key: <caller-generated-key>, with a maximum key length of 255 characters. Multiple requests to the same path with a duplicate idempotency-key will be rejected and return an error status of 422. Keys are stored for a 24 hour period.
+
+Rate Limiting
+Responses from the API will provide two headers to relay rate limiting information to the caller. Rate limit periods are measured and reported in windows of 60 seconds for all requests and also in windows of 24 hours for others. If a given throttling header is not present, it indicates that the request is not rate limited on that dimension.
+Rate limits are applied on a per-organization basis NOT per-credential.
+
+s-ratelimit-limit indicates the current maximum amount of calls currently allowed in a given minute window.
+s-ratelimit-remaining indicates the current remaining calls available in the current minute window.
+s-ratelimit-daily-limit indicates the current maximum amount of calls currently allowed in a given 24 hour window.
+s-ratelimit-daily-remaining indicates the current remaining calls available in the current 24 hour window.
+Errors
+Structured errors returned from the API will always follow a common format described in the example below and also available in the specification.
+
+
+{
+    "statusCode": 400,
+    "type": "invalid_input",
+    "message": "invalid input"
+}
+Updated 5 months ago
+
+Spruce CSV Data Export
+Did this page help you?
+Table of Contents
+Introduction
+Requesting Access
+Authentication
+Pagination
+Idempotency
+Rate Limiting
+Errors
