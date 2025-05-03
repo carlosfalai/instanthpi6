@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, User, Search } from 'lucide-react';
-import NavigationBar from '@/components/navigation/NavigationBar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import AppLayout from '@/components/layout/AppLayout';
 
 interface Patient {
   id: number;
@@ -44,17 +44,8 @@ export default function PatientsPage() {
   }, [searchTerm, allPatients]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#121212] text-white">
-      {/* Header area matching screenshot */}
-      <header className="h-14 flex items-center px-4 bg-[#1e1e1e] border-b border-gray-800">
-        <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">InstantHPI</h1>
-      </header>
-      
-      {/* Navigation Bar */}
-      <NavigationBar />
-      
-      {/* Main Content */}
-      <div className="flex-1 p-6">
+    <AppLayout>
+      <div className="p-6">
         <div className="container mx-auto">
           {/* Page Title and Search */}
           <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -126,6 +117,6 @@ export default function PatientsPage() {
           )}
         </div>
       </div>
-    </div>
+    </AppLayout>
   );
 }
