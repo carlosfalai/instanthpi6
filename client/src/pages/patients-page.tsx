@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/use-debounce';
-import AppLayout from '@/components/layout/AppLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 
 interface Patient {
   id: number;
@@ -99,7 +99,7 @@ export default function PatientsPage() {
   const filteredPatients = patientsResponse.patients || [];
 
   return (
-    <AppLayout>
+    <AppLayoutSpruce>
       <div className="p-6">
         <div className="container mx-auto">
           {/* Page Title and Search */}
@@ -186,6 +186,6 @@ export default function PatientsPage() {
           )}
         </div>
       </div>
-    </AppLayout>
+    </AppLayoutSpruce>
   );
 }
