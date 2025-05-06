@@ -1,5 +1,5 @@
 import React from 'react';
-import AppLayout from '@/components/layout/AppLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'wouter';
@@ -11,12 +11,13 @@ import {
   Heart, 
   AlertTriangle, 
   GraduationCap,
-  CreditCard
+  CreditCard,
+  BrainCircuit
 } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <AppLayout>
+    <AppLayoutSpruce>
       <div className="container mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6">Welcome to InstantHPI</h1>
         <p className="text-gray-400 mb-8">
@@ -173,6 +174,6 @@ export default function HomePage() {
           </CardContent>
         </Card>
       </div>
-    </AppLayout>
+    </AppLayoutSpruce>
   );
 }

@@ -87,12 +87,21 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     }
   };
 
-  // Mock notification counts
-  const notificationCounts = {
+  // Mock notification counts as Record<string, number> to allow dynamic access
+  const notificationCounts: Record<string, number> = {
     patients: 3,
     medicationRefills: 2,
     documents: 5,
-    forms: 1
+    forms: 1,
+    education: 0,
+    scheduler: 0,
+    formsite: 0,
+    knowledge: 0,
+    aiBilling: 0,
+    priorityTasks: 0,
+    leadership: 0,
+    subscription: 0,
+    settings: 0
   };
 
   // Default navigation items
@@ -124,13 +133,18 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
 
   // The main navigation sections for the left sidebar
   const mainNavSections = [
-    { id: 'inbox', label: 'Inbox', icon: <MessageSquare className="h-5 w-5" />, badge: 4, path: '/messages' },
+    { id: 'home', label: 'Home', icon: <Home className="h-5 w-5" />, badge: 0, path: '/' },
     { id: 'patients', label: 'Patients', icon: <Users className="h-5 w-5" />, badge: notificationCounts.patients || 0, path: '/patients' },
     { id: 'documents', label: 'Documents', icon: <FileText className="h-5 w-5" />, badge: notificationCounts.documents || 0, path: '/documents' },
     { id: 'forms', label: 'Forms', icon: <LayoutList className="h-5 w-5" />, badge: notificationCounts.forms || 0, path: '/forms' },
-    { id: 'scheduler', label: 'Scheduler', icon: <Clock className="h-5 w-5" />, badge: 0, path: '/scheduler' },
-    { id: 'treatment', label: 'Treatment', icon: <Stethoscope className="h-5 w-5" />, badge: 0, path: '/treatment' },
+    { id: 'education', label: 'Education', icon: <GraduationCap className="h-5 w-5" />, badge: 0, path: '/education' },
+    { id: 'scheduler', label: 'Scheduler', icon: <Calendar className="h-5 w-5" />, badge: 0, path: '/scheduler' },
+    { id: 'formsite', label: 'Formsite', icon: <FilePlus2 className="h-5 w-5" />, badge: 0, path: '/formsite' },
+    { id: 'knowledge', label: 'Knowledge Base', icon: <Brain className="h-5 w-5" />, badge: 0, path: '/knowledge-base' },
+    { id: 'aiBilling', label: 'AI Billing', icon: <DollarSign className="h-5 w-5" />, badge: 0, path: '/ai-billing' },
     { id: 'priorityTasks', label: 'Priority AI', icon: <BrainCircuit className="h-5 w-5" />, badge: 0, path: '/priority-tasks' },
+    { id: 'leadership', label: 'Leadership', icon: <Users className="h-5 w-5" />, badge: 0, path: '/leadership-association' },
+    { id: 'subscription', label: 'Subscription', icon: <CreditCard className="h-5 w-5" />, badge: 0, path: '/subscription' },
     { id: 'settings', label: 'Settings', icon: <Settings className="h-5 w-5" />, badge: 0, path: '/settings' },
   ];
 
@@ -179,14 +193,27 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
   // Determine which section is active based on URL
   useEffect(() => {
     const path = location.split('/')[1] || 'home';
+    
+    // Handle special cases where subsections should highlight parent section
     if (path === 'settings' || path === 'organization-profile' || path === 'teammates') {
       setActiveSection('settings');
     } else if (path === 'patients' || path === 'chronic-conditions' || path === 'medication-refills' || path === 'urgent-care') {
       setActiveSection('patients');
     } else if (path === 'documents' || path === 'insurance-paperwork') {
       setActiveSection('documents');
+    } else if (path === 'knowledge-base') {
+      setActiveSection('knowledge');
+    } else if (path === 'leadership-association') {
+      setActiveSection('leadership');
+    } else if (path === 'ai-billing') {
+      setActiveSection('aiBilling');
+    } else if (path === 'priority-tasks') {
+      setActiveSection('priorityTasks');
+    } else if (path === '') {
+      // Handle root path
+      setActiveSection('home');
     } else {
-      // Find the matching section or default to 'inbox'
+      // Find the matching section based on exact path match
       const matchingSection = mainNavSections.find(section => 
         section.path.substring(1) === path
       );
