@@ -535,12 +535,12 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden md:ml-0 mt-14 md:mt-0">
-        {/* Top Navigation Bar */}
+        {/* Top Navigation Bar with Branding */}
         <header className="h-14 border-b border-[#333] bg-[#1a1a1a] flex items-center px-4">
           <div className="flex-1 flex items-center">
-            <h1 className="text-lg font-medium ml-2">
-              {/* Dynamic title based on active section */}
-              {mainNavSections.find(section => section.id === activeSection)?.label || 'InstantHPI'}
+            <h1 className="text-lg font-bold text-blue-500 ml-2">
+              {/* InstantHPI Branding */}
+              InstantHPI
             </h1>
           </div>
           <div className="flex items-center space-x-3">
@@ -564,6 +564,9 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
             </Avatar>
           </div>
         </header>
+        
+        {/* Spruce-style Top Navigation Menu */}
+        <SpruceTopNavbar />
         
         {/* Content Area */}
         <main className="flex-1 overflow-auto bg-[#151515] p-6">

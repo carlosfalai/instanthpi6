@@ -4,7 +4,7 @@ import { queryClient } from '@/lib/queryClient';
 import { Loader2, FileText, Check, X, RefreshCw, AlertCircle, Search, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
-import BaseLayout from '@/components/layout/BaseLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -178,7 +178,7 @@ const MedicationRefillsPage: React.FC = () => {
   });
 
   return (
-    <BaseLayout>
+    <AppLayoutSpruce>
       {/* Header */}
       <div className="mb-6 flex justify-between items-center">
         <div>
@@ -449,7 +449,7 @@ const MedicationRefillsPage: React.FC = () => {
           )}
         </div>
       </div>
-    </BaseLayout>
+    </AppLayoutSpruce>
   );
 };
 
