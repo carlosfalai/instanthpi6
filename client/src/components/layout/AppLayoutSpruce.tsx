@@ -1,5 +1,6 @@
 import React, { useState, ReactNode, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
+import SpruceTopNavbar from './SpruceTopNavbar';
 import {
   Users,
   FileText,
@@ -131,21 +132,25 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     { id: 'leadershipAssociation', path: '/leadership-association', icon: <Users className="h-5 w-5" />, label: 'Leadership', visible: true, order: 7, row: 'tertiary' },
   ];
 
-  // The main navigation sections for the left sidebar
+  // The main navigation sections for the left sidebar exactly as shown in the screenshot
   const mainNavSections = [
     { id: 'home', label: 'Home', icon: <Home className="h-5 w-5" />, badge: 0, path: '/' },
-    { id: 'patients', label: 'Patients', icon: <Users className="h-5 w-5" />, badge: notificationCounts.patients || 0, path: '/patients' },
-    { id: 'documents', label: 'Documents', icon: <FileText className="h-5 w-5" />, badge: notificationCounts.documents || 0, path: '/documents' },
-    { id: 'forms', label: 'Forms', icon: <LayoutList className="h-5 w-5" />, badge: notificationCounts.forms || 0, path: '/forms' },
-    { id: 'education', label: 'Education', icon: <GraduationCap className="h-5 w-5" />, badge: 0, path: '/education' },
+    { id: 'patients', label: 'Patients', icon: <Users className="h-5 w-5" />, badge: notificationCounts.patients || 0, path: '/patients', hasSubmenu: true },
+    { id: 'documents', label: 'Documents', icon: <FileText className="h-5 w-5" />, badge: notificationCounts.documents || 0, path: '/documents', hasSubmenu: true },
+    { id: 'messages', label: 'Messages', icon: <MessageSquare className="h-5 w-5" />, badge: 0, path: '/messages' },
     { id: 'scheduler', label: 'Scheduler', icon: <Calendar className="h-5 w-5" />, badge: 0, path: '/scheduler' },
-    { id: 'formsite', label: 'Formsite', icon: <FilePlus2 className="h-5 w-5" />, badge: 0, path: '/formsite' },
-    { id: 'knowledge', label: 'Knowledge Base', icon: <Brain className="h-5 w-5" />, badge: 0, path: '/knowledge-base' },
+    { id: 'formsite', label: 'Formsite', icon: <FileText className="h-5 w-5" />, badge: 0, path: '/formsite' },
+    { id: 'knowledgeBase', label: 'Knowledge Base', icon: <Brain className="h-5 w-5" />, badge: 0, path: '/knowledge-base' },
     { id: 'aiBilling', label: 'AI Billing', icon: <DollarSign className="h-5 w-5" />, badge: 0, path: '/ai-billing' },
-    { id: 'priorityTasks', label: 'Priority AI', icon: <BrainCircuit className="h-5 w-5" />, badge: 0, path: '/priority-tasks' },
-    { id: 'leadership', label: 'Leadership', icon: <Users className="h-5 w-5" />, badge: 0, path: '/leadership-association' },
+    { id: 'forms', label: 'Forms', icon: <LayoutList className="h-5 w-5" />, badge: notificationCounts.forms || 0, path: '/forms' },
+    { id: 'chronicConditions', label: 'Chronic Conditions', icon: <Heart className="h-5 w-5" />, badge: 0, path: '/chronic-conditions' },
+    { id: 'medicationRefills', label: 'Medication Refills', icon: <PillIcon className="h-5 w-5" />, badge: notificationCounts.medicationRefills || 0, path: '/medication-refills' },
+    { id: 'urgentCare', label: 'Urgent Care', icon: <AlertCircle className="h-5 w-5" />, badge: 0, path: '/urgent-care' },
+    { id: 'education', label: 'Education', icon: <GraduationCap className="h-5 w-5" />, badge: 0, path: '/education' },
     { id: 'subscription', label: 'Subscription', icon: <CreditCard className="h-5 w-5" />, badge: 0, path: '/subscription' },
-    { id: 'settings', label: 'Settings', icon: <Settings className="h-5 w-5" />, badge: 0, path: '/settings' },
+    { id: 'orgSettings', label: 'Organization Settings', icon: <Settings className="h-5 w-5" />, badge: 0, path: '/settings' },
+    { id: 'priorityAI', label: 'Priority AI', icon: <BrainCircuit className="h-5 w-5" />, badge: 0, path: '/priority-tasks' },
+    { id: 'leadership', label: 'Leadership', icon: <Users className="h-5 w-5" />, badge: 0, path: '/leadership-association' },
   ];
 
   // Sub-sections for patient-related items
@@ -236,10 +241,15 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     <div className="flex h-screen bg-[#121212] text-white overflow-hidden">
       {/* Left Sidebar - Main Navigation */}
       <div className="w-64 border-r border-[#333] flex flex-col bg-[#1a1a1a] hidden md:flex">
-        {/* Organization name and new button */}
+        {/* Organization name and clinic switcher button */}
         <div className="p-4 border-b border-[#333] flex items-center justify-between">
           <h1 className="text-lg font-semibold">Centre Médical Font</h1>
-          <Button size="sm" variant="ghost" className="p-1 h-8 w-8 rounded-full">
+          <Button 
+            size="sm" 
+            variant="ghost" 
+            className="p-1 h-8 w-8 rounded-full"
+            title="Switch clinics"
+          >
             <Plus className="h-5 w-5" />
           </Button>
         </div>
