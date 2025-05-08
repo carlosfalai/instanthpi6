@@ -59,8 +59,11 @@ export async function summarizeText(
       messages: [{ role: 'user', content: prompt }],
     });
 
-    return response.content[0].text;
-  } catch (error) {
+    if (response.content[0].type === 'text') {
+      return response.content[0].text;
+    }
+    return 'No text content returned from Claude AI.';
+  } catch (error: any) {
     console.error('Error summarizing text with Claude:', error);
     throw new Error(`Failed to summarize text with Claude: ${error.message}`);
   }
