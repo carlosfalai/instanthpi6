@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Edit, FileText, Save, X, ChevronDown, ChevronUp } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import BaseLayout from "@/components/layout/BaseLayout";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 import { 
   Dialog, 
   DialogTrigger, 
@@ -903,7 +903,7 @@ export default function FormsPage() {
   const [activeTab, setActiveTab] = useState("builder");
   
   return (
-    <BaseLayout>
+    <AppLayoutSpruce>
       <div className="container mx-auto py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6">
@@ -920,6 +920,6 @@ export default function FormsPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </BaseLayout>
+    </AppLayoutSpruce>
   );
 }

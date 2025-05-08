@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { queryClient } from "@/lib/queryClient";
 import { Book, CheckCircle, Clock, Lock, Video } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
-import BaseLayout from "@/components/layout/BaseLayout";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 
 interface EducationModule {
   id: number;

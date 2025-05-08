@@ -27,7 +27,7 @@ import { Input } from "@/components/ui/input";
 import { AlertCircle, Clock, Edit, FileCheck, MessageSquare, RefreshCw, Save, X } from "lucide-react";
 import { getUrgentCareRequests, updateUrgentCareRequest } from "@/services/urgentCare";
 import { UrgentCareWithDetails } from "@/services/urgentCare";
-import AppLayout from "@/components/layout/AppLayout";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 
 export default function UrgentCarePage() {
   const { toast } = useToast();
@@ -166,7 +166,7 @@ export default function UrgentCarePage() {
   };
   
   return (
-    <AppLayout>
+    <AppLayoutSpruce>
       <div className="container mx-auto py-6 space-y-6">
         <div className="flex justify-between items-center">
           <div>
@@ -500,6 +500,6 @@ export default function UrgentCarePage() {
           </TabsContent>
         </Tabs>
       </div>
-    </AppLayout>
+    </AppLayoutSpruce>
   );
 }

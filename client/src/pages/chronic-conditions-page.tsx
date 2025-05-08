@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useQuery } from '@tanstack/react-query';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import BaseLayout from '@/components/layout/BaseLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -39,7 +39,7 @@ export default function ChronicConditionsPage() {
   const resolved = conditions?.filter(c => c.status === 'resolved').length || 0;
   
   return (
-    <BaseLayout>
+    <AppLayoutSpruce>
       <div className="container mx-auto py-6">
         <h1 className="text-3xl font-bold mb-6">Chronic Conditions</h1>
         
@@ -155,7 +155,7 @@ export default function ChronicConditionsPage() {
           </>
         )}
       </div>
-    </BaseLayout>
+    </AppLayoutSpruce>
   );
 }
 
