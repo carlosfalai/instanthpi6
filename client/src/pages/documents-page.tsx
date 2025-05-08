@@ -1,11 +1,11 @@
 import React from 'react';
 import { FileText, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import AppLayout from '@/components/layout/AppLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 
 export default function DocumentsPage() {
   return (
-    <AppLayout>
+    <AppLayoutSpruce>
       <div className="p-6">
         <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center">
           <div className="mb-4 md:mb-0">
@@ -89,6 +89,6 @@ export default function DocumentsPage() {
           </div>
         </div>
       </div>
-    </AppLayout>
+    </AppLayoutSpruce>
   );
 }
