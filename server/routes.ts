@@ -23,6 +23,7 @@ import { router as patientsRouter } from "./routes/patients";
 import { router as spruceRouter } from "./routes/spruce";
 import { router as educationRouter } from "./routes/education";
 import { router as userRouter } from "./routes/user";
+import { router as anthropicRouter } from "./routes/anthropic";
 import formsRouter from "./routes/forms";
 import { schedulerRouter } from "./routes/scheduler";
 import { messagingRouter } from "./routes/messaging";
@@ -56,6 +57,7 @@ const spruceApi = axios.create({
 export async function registerRoutes(app: Express): Promise<Server> {
   // Register our API routers
   app.use("/api/ai", aiRouter);
+  app.use("/api/anthropic", anthropicRouter);
   app.use("/api/patients", patientsRouter);
   app.use("/api/spruce", spruceRouter);
   app.use("/api/education", educationRouter);
