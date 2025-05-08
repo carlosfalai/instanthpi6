@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-// Initialize Anthropic client with API key
+// Initialize the Anthropic client
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
@@ -8,99 +8,123 @@ const anthropic = new Anthropic({
 // The newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
 const DEFAULT_MODEL = 'claude-3-7-sonnet-20250219';
 
-// Helper function to safely extract text from Anthropic response
-function getTextFromContentBlock(block: any): string {
-  if (block.type === 'text' && typeof block.text === 'string') {
-    return block.text;
-  }
-  return '';
-}
-
 /**
- * Generate a response using Claude
- * @param prompt The user prompt to send to Claude
- * @param options Additional options for the request
- * @returns The generated response text
+ * Generate text based on a prompt using Claude AI
+ * @param prompt The prompt to generate text from
+ * @param model Optional model identifier (defaults to latest Claude model)
+ * @param maxTokens Optional max tokens to generate (defaults to 1024)
+ * @returns The generated text
  */
-export async function generateText(prompt: string, options?: {
-  model?: string,
-  system?: string,
-  maxTokens?: number,
-  temperature?: number,
-}) {
+export async function generateText(
+  prompt: string,
+  model: string = DEFAULT_MODEL,
+  maxTokens: number = 1024
+): Promise<string> {
   try {
     const response = await anthropic.messages.create({
-      model: options?.model || DEFAULT_MODEL,
-      system: options?.system,
-      max_tokens: options?.maxTokens || 1024,
-      temperature: options?.temperature || 0.7,
+      max_tokens: maxTokens,
+      model: model,
       messages: [{ role: 'user', content: prompt }],
     });
 
-    return getTextFromContentBlock(response.content[0]);
-  } catch (error) {
+    // Extract and return the content from the first message part
+    if (response.content[0].type === 'text') {
+      return response.content[0].text;
+    }
+    return 'No text content returned from Claude AI.';
+  } catch (error: any) {
     console.error('Error generating text with Claude:', error);
-    throw error;
+    throw new Error(`Failed to generate text with Claude: ${error.message}`);
   }
 }
 
 /**
- * Generate a JSON response using Claude
- * @param prompt The user prompt to send to Claude
- * @param schema A system message explaining the expected JSON schema
- * @param options Additional options for the request
- * @returns The parsed JSON response
+ * Summarize a text using Claude AI
+ * @param text The text to summarize
+ * @param wordLimit Optional word limit for the summary
+ * @param model Optional model identifier (defaults to latest Claude model)
+ * @returns The summarized text
  */
-export async function generateJson<T>(prompt: string, schema: string, options?: {
-  model?: string,
-  maxTokens?: number,
-  temperature?: number,
-}) {
+export async function summarizeText(
+  text: string,
+  wordLimit: number = 250,
+  model: string = DEFAULT_MODEL
+): Promise<string> {
   try {
-    const systemMessage = `${schema}\nYou must respond with valid JSON only, with no other text or explanation.`;
+    const prompt = `Please summarize the following text in about ${wordLimit} words:\n\n${text}`;
     
     const response = await anthropic.messages.create({
-      model: options?.model || DEFAULT_MODEL,
-      system: systemMessage,
-      max_tokens: options?.maxTokens || 1024,
-      temperature: options?.temperature || 0.7,
+      max_tokens: 1024,
+      model: model,
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const textContent = getTextFromContentBlock(response.content[0]);
-    if (!textContent) {
-      throw new Error("Failed to generate JSON response");
-    }
-    return JSON.parse(textContent) as T;
+    return response.content[0].text;
   } catch (error) {
-    console.error('Error generating JSON with Claude:', error);
-    throw error;
+    console.error('Error summarizing text with Claude:', error);
+    throw new Error(`Failed to summarize text with Claude: ${error.message}`);
   }
 }
 
 /**
- * Analyze an image using Claude's multimodal capabilities
- * @param imageBase64 The base64-encoded image data
- * @param prompt The prompt describing what to analyze in the image
- * @param options Additional options for the request
- * @returns The analysis response
+ * Analyze the sentiment of a text using Claude AI
+ * @param text The text to analyze
+ * @param model Optional model identifier (defaults to latest Claude model)
+ * @returns Object with sentiment and confidence values
  */
-export async function analyzeImage(imageBase64: string, prompt: string, options?: {
-  model?: string,
-  maxTokens?: number,
-  temperature?: number,
-}) {
+export async function analyzeSentiment(
+  text: string,
+  model: string = DEFAULT_MODEL
+): Promise<{ sentiment: string; confidence: number }> {
   try {
     const response = await anthropic.messages.create({
-      model: options?.model || DEFAULT_MODEL,
-      max_tokens: options?.maxTokens || 1024,
-      temperature: options?.temperature || 0.7,
+      model: model,
+      system: `You're a Customer Insights AI. Analyze this feedback and output in JSON format with keys: "sentiment" (positive/negative/neutral) and "confidence" (number between 0 and 1).`,
+      max_tokens: 1024,
+      messages: [{ role: 'user', content: text }],
+    });
+
+    const jsonMatch = response.content[0].text.match(/\{[\s\S]*\}/);
+    const jsonString = jsonMatch ? jsonMatch[0] : '{"sentiment": "neutral", "confidence": 0.5}';
+    
+    try {
+      const result = JSON.parse(jsonString);
+      return {
+        sentiment: result.sentiment,
+        confidence: Math.max(0, Math.min(1, result.confidence)),
+      };
+    } catch (jsonError) {
+      console.error('Error parsing sentiment JSON response:', jsonError);
+      return { sentiment: 'neutral', confidence: 0.5 };
+    }
+  } catch (error) {
+    console.error('Error analyzing sentiment with Claude:', error);
+    throw new Error(`Failed to analyze sentiment with Claude: ${error.message}`);
+  }
+}
+
+/**
+ * Analyze an image using Claude Vision capabilities
+ * @param imageBase64 Base64-encoded image data
+ * @param prompt The prompt to use for image analysis
+ * @param model Optional model identifier (defaults to latest Claude model)
+ * @returns The analysis text
+ */
+export async function analyzeImage(
+  imageBase64: string,
+  prompt: string,
+  model: string = DEFAULT_MODEL
+): Promise<string> {
+  try {
+    const response = await anthropic.messages.create({
+      model: model,
+      max_tokens: 1024,
       messages: [{
         role: 'user',
         content: [
           {
             type: 'text',
-            text: prompt
+            text: prompt || 'Analyze this image in detail and describe its key elements, context, and any notable aspects.'
           },
           {
             type: 'image',
@@ -114,170 +138,119 @@ export async function analyzeImage(imageBase64: string, prompt: string, options?
       }]
     });
 
-    return getTextFromContentBlock(response.content[0]);
+    return response.content[0].text;
   } catch (error) {
     console.error('Error analyzing image with Claude:', error);
-    throw error;
+    throw new Error(`Failed to analyze image with Claude: ${error.message}`);
   }
 }
 
 /**
- * Get sentiment analysis for a text
- * @param text The text to analyze
- * @param options Additional options for the request
- * @returns A sentiment analysis object with sentiment and confidence
- */
-export async function analyzeSentiment(text: string, options?: {
-  model?: string,
-  maxTokens?: number,
-  temperature?: number,
-}): Promise<{ sentiment: string, confidence: number }> {
-  try {
-    const response = await anthropic.messages.create({
-      model: options?.model || DEFAULT_MODEL,
-      system: `You're a Sentiment Analysis AI. Analyze this text and output in JSON format with keys: "sentiment" (positive/negative/neutral) and "confidence" (number, 0 through 1).`,
-      max_tokens: options?.maxTokens || 1024,
-      temperature: options?.temperature || 0.7,
-      messages: [
-        { role: 'user', content: text }
-      ],
-    });
-
-    const textContent = getTextFromContentBlock(response.content[0]);
-    if (!textContent) {
-      throw new Error("Failed to analyze sentiment");
-    }
-    const result = JSON.parse(textContent);
-    return {
-      sentiment: result.sentiment,
-      confidence: Math.max(0, Math.min(1, result.confidence))
-    };
-  } catch (error) {
-    console.error('Error analyzing sentiment with Claude:', error);
-    throw error;
-  }
-}
-
-/**
- * Summarize text using Claude
- * @param text The text to summarize
- * @param options Additional options for the request
- * @returns The summarized text
- */
-export async function summarizeText(text: string, options?: {
-  model?: string,
-  maxTokens?: number,
-  temperature?: number,
-  wordLimit?: number,
-}) {
-  const wordLimit = options?.wordLimit || 250;
-  const systemPrompt = `You are an expert summarizer. Create a clear, concise summary of the following text in ${wordLimit} words or less.`;
-
-  try {
-    const response = await anthropic.messages.create({
-      model: options?.model || DEFAULT_MODEL,
-      system: systemPrompt,
-      max_tokens: options?.maxTokens || 1024,
-      temperature: options?.temperature || 0.7,
-      messages: [{ role: 'user', content: text }],
-    });
-
-    return getTextFromContentBlock(response.content[0]);
-  } catch (error) {
-    console.error('Error summarizing text with Claude:', error);
-    throw error;
-  }
-}
-
-/**
- * Generate medical documentation using Claude
- * @param patientData Data about the patient and their condition
- * @param options Additional options for the request
+ * Generate medical documentation based on patient data
+ * @param patientData Patient data including symptoms, chief complaint, etc.
+ * @param options Options like document type (SOAP, etc.)
+ * @param model Optional model identifier (defaults to latest Claude model)
  * @returns The generated medical documentation
  */
-export async function generateMedicalDocumentation(patientData: {
-  symptoms: string,
-  medicalHistory?: string,
-  vitalSigns?: string,
-  chiefComplaint: string,
-  patientLanguage?: string,
-}, options?: {
-  model?: string,
-  maxTokens?: number,
-  temperature?: number,
-  documentType?: 'soap' | 'hpi' | 'progress' | 'discharge',
-}) {
-  const documentType = options?.documentType || 'soap';
-  let systemPrompt = `You are a medical documentation assistant. Create a detailed ${documentType.toUpperCase()} note based on the patient information provided.`;
-  
-  if (patientData.patientLanguage && patientData.patientLanguage.toLowerCase() === 'french') {
-    systemPrompt += ' Please write the documentation in French.';
-  }
-
+export async function generateMedicalDocumentation(
+  patientData: any,
+  options: any = { documentType: 'soap' },
+  model: string = DEFAULT_MODEL
+): Promise<string> {
   try {
+    let prompt = `Please create a ${options.documentType.toUpperCase()} note for a patient with the following information:\n\n`;
+    
+    if (patientData.chiefComplaint) {
+      prompt += `Chief Complaint: ${patientData.chiefComplaint}\n`;
+    }
+    
+    if (patientData.symptoms) {
+      prompt += `Symptoms: ${patientData.symptoms}\n`;
+    }
+    
+    if (patientData.medicalHistory) {
+      prompt += `Medical History: ${patientData.medicalHistory}\n`;
+    }
+    
+    if (patientData.medications) {
+      prompt += `Current Medications: ${patientData.medications}\n`;
+    }
+    
+    if (patientData.allergies) {
+      prompt += `Allergies: ${patientData.allergies}\n`;
+    }
+    
+    if (patientData.vitals) {
+      prompt += `Vitals: ${patientData.vitals}\n`;
+    }
+    
+    prompt += `\nPlease format the note professionally and include all relevant sections for a ${options.documentType.toUpperCase()} note.`;
+    
     const response = await anthropic.messages.create({
-      model: options?.model || DEFAULT_MODEL,
-      system: systemPrompt,
-      max_tokens: options?.maxTokens || 2048,
-      temperature: options?.temperature || 0.3, // Lower temperature for medical documentation
-      messages: [{ 
-        role: 'user', 
-        content: `Patient presents with: ${patientData.chiefComplaint}\n\nSymptoms: ${patientData.symptoms}\n\n${patientData.medicalHistory ? `Medical History: ${patientData.medicalHistory}\n\n` : ''}${patientData.vitalSigns ? `Vital Signs: ${patientData.vitalSigns}` : ''}`
-      }],
+      max_tokens: 2048,
+      model: model,
+      messages: [{ role: 'user', content: prompt }],
     });
 
-    return getTextFromContentBlock(response.content[0]);
+    return response.content[0].text;
   } catch (error) {
     console.error('Error generating medical documentation with Claude:', error);
-    throw error;
+    throw new Error(`Failed to generate medical documentation with Claude: ${error.message}`);
   }
 }
 
 /**
- * Generate a treatment plan using Claude
- * @param diagnosis The diagnosis for which to generate a treatment plan
- * @param patientDetails Additional details about the patient
- * @param options Additional options for the request
+ * Generate a treatment plan based on a diagnosis
+ * @param diagnosis The patient's diagnosis
+ * @param patientDetails Optional additional patient details
+ * @param model Optional model identifier (defaults to latest Claude model)
  * @returns The generated treatment plan
  */
-export async function generateTreatmentPlan(diagnosis: string, patientDetails: {
-  age?: number,
-  medicalHistory?: string,
-  allergies?: string[],
-  currentMedications?: string[],
-  patientLanguage?: string,
-}, options?: {
-  model?: string,
-  maxTokens?: number,
-  temperature?: number,
-}) {
-  const systemPrompt = `You are a medical treatment plan generator. Create a comprehensive treatment plan for the given diagnosis considering the patient's details. ${patientDetails.patientLanguage?.toLowerCase() === 'french' ? 'Please write the treatment plan in French.' : ''}`;
-
+export async function generateTreatmentPlan(
+  diagnosis: string,
+  patientDetails: any = {},
+  model: string = DEFAULT_MODEL
+): Promise<string> {
   try {
+    let prompt = `Please create a comprehensive treatment plan for a patient with the following diagnosis: ${diagnosis}\n\n`;
+    
+    if (patientDetails.age) {
+      prompt += `Patient Age: ${patientDetails.age}\n`;
+    }
+    
+    if (patientDetails.sex) {
+      prompt += `Patient Sex: ${patientDetails.sex}\n`;
+    }
+    
+    if (patientDetails.medicalHistory) {
+      prompt += `Medical History: ${patientDetails.medicalHistory}\n`;
+    }
+    
+    if (patientDetails.medications) {
+      prompt += `Current Medications: ${patientDetails.medications}\n`;
+    }
+    
+    if (patientDetails.allergies) {
+      prompt += `Allergies: ${patientDetails.allergies}\n`;
+    }
+    
+    prompt += `\nPlease include the following in the treatment plan:
+1. Medication recommendations (with dosages if appropriate)
+2. Lifestyle modifications
+3. Follow-up care instructions
+4. Potential referrals to specialists if needed
+5. Patient education points
+6. Warning signs that would require immediate medical attention`;
+    
     const response = await anthropic.messages.create({
-      model: options?.model || DEFAULT_MODEL,
-      system: systemPrompt,
-      max_tokens: options?.maxTokens || 2048,
-      temperature: options?.temperature || 0.3, // Lower temperature for medical advice
-      messages: [{ 
-        role: 'user', 
-        content: `Diagnosis: ${diagnosis}\n\n${patientDetails.age ? `Patient Age: ${patientDetails.age}\n\n` : ''}${patientDetails.medicalHistory ? `Medical History: ${patientDetails.medicalHistory}\n\n` : ''}${patientDetails.allergies?.length ? `Allergies: ${patientDetails.allergies.join(', ')}\n\n` : ''}${patientDetails.currentMedications?.length ? `Current Medications: ${patientDetails.currentMedications.join(', ')}` : ''}`
-      }],
+      max_tokens: 2048,
+      model: model,
+      messages: [{ role: 'user', content: prompt }],
     });
 
-    return getTextFromContentBlock(response.content[0]);
+    return response.content[0].text;
   } catch (error) {
     console.error('Error generating treatment plan with Claude:', error);
-    throw error;
+    throw new Error(`Failed to generate treatment plan with Claude: ${error.message}`);
   }
 }
-
-export default {
-  generateText,
-  generateJson,
-  analyzeImage,
-  analyzeSentiment,
-  summarizeText,
-  generateMedicalDocumentation,
-  generateTreatmentPlan
-};

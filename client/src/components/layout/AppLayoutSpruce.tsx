@@ -101,6 +101,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     aiBilling: 0,
     priorityTasks: 0,
     leadership: 0,
+    claudeAI: 0,
     subscription: 0,
     settings: 0
   };
@@ -129,7 +130,8 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     { id: 'knowledgeBase', path: '/knowledge-base', icon: <Brain className="h-5 w-5" />, label: 'Knowledge Base', visible: true, order: 4, row: 'tertiary' },
     { id: 'aiBilling', path: '/ai-billing', icon: <DollarSign className="h-5 w-5" />, label: 'AI Billing', visible: true, order: 5, row: 'tertiary' },
     { id: 'priorityTasks', path: '/priority-tasks', icon: <BrainCircuit className="h-5 w-5" />, label: 'Priority AI', visible: true, order: 6, row: 'tertiary' },
-    { id: 'leadershipAssociation', path: '/leadership-association', icon: <Users className="h-5 w-5" />, label: 'Leadership', visible: true, order: 7, row: 'tertiary' },
+    { id: 'claudeAI', path: '/claude-ai', icon: <Brain className="h-5 w-5" />, label: 'Claude AI', visible: true, order: 7, row: 'tertiary' },
+    { id: 'leadershipAssociation', path: '/leadership-association', icon: <Users className="h-5 w-5" />, label: 'Leadership', visible: true, order: 8, row: 'tertiary' },
   ];
 
   // The main navigation sections for the left sidebar exactly as shown in the screenshot
@@ -150,6 +152,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     { id: 'subscription', label: 'Subscription', icon: <CreditCard className="h-5 w-5" />, badge: 0, path: '/subscription' },
     { id: 'orgSettings', label: 'Organization Settings', icon: <Settings className="h-5 w-5" />, badge: 0, path: '/settings' },
     { id: 'priorityAI', label: 'Priority AI', icon: <BrainCircuit className="h-5 w-5" />, badge: 0, path: '/priority-tasks' },
+    { id: 'claudeAI', label: 'Claude AI', icon: <Brain className="h-5 w-5" />, badge: notificationCounts.claudeAI || 0, path: '/claude-ai' },
     { id: 'leadership', label: 'Leadership', icon: <Users className="h-5 w-5" />, badge: 0, path: '/leadership-association' },
   ];
 
@@ -214,6 +217,8 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
       setActiveSection('aiBilling');
     } else if (path === 'priority-tasks') {
       setActiveSection('priorityTasks');
+    } else if (path === 'claude-ai') {
+      setActiveSection('claudeAI');
     } else if (path === '') {
       // Handle root path
       setActiveSection('home');
