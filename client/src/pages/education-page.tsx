@@ -178,7 +178,7 @@ export default function EducationPage() {
   }
 
   return (
-    <BaseLayout>
+    <AppLayoutSpruce>
       <div className="container mx-auto max-w-6xl px-6 py-8">
         <div className="flex flex-col space-y-8">
           {/* Header and Progress Overview */}
@@ -339,6 +339,6 @@ export default function EducationPage() {
           )}
         </div>
       </div>
-    </BaseLayout>
+    </AppLayoutSpruce>
   );
 }

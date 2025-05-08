@@ -4,7 +4,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import AppLayout from '@/components/layout/AppLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 
 // Components
 import {
@@ -317,7 +317,7 @@ export default function SubscriptionPage() {
   };
 
   return (
-    <AppLayout>
+    <AppLayoutSpruce>
       <div className="container max-w-5xl py-8">
         <h1 className="text-3xl font-bold mb-1">Subscriptions</h1>
         <p className="text-muted-foreground mb-8">Manage your InstantHPI subscription</p>
@@ -509,6 +509,6 @@ export default function SubscriptionPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </AppLayout>
+    </AppLayoutSpruce>
   );
 }
