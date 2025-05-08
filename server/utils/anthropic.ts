@@ -182,7 +182,7 @@ export async function summarizeText(text: string, options?: {
       messages: [{ role: 'user', content: text }],
     });
 
-    return response.content[0].text;
+    return getTextFromContentBlock(response.content[0]);
   } catch (error) {
     console.error('Error summarizing text with Claude:', error);
     throw error;
@@ -226,7 +226,7 @@ export async function generateMedicalDocumentation(patientData: {
       }],
     });
 
-    return response.content[0].text;
+    return getTextFromContentBlock(response.content[0]);
   } catch (error) {
     console.error('Error generating medical documentation with Claude:', error);
     throw error;
@@ -265,7 +265,7 @@ export async function generateTreatmentPlan(diagnosis: string, patientDetails: {
       }],
     });
 
-    return response.content[0].text;
+    return getTextFromContentBlock(response.content[0]);
   } catch (error) {
     console.error('Error generating treatment plan with Claude:', error);
     throw error;
