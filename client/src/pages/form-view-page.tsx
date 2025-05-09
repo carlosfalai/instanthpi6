@@ -159,7 +159,7 @@ export default function FormViewPage() {
   }
   
   return (
-    <BaseLayout>
+    <AppLayoutSpruce>
       <div className="container mx-auto py-6">
         <div className="mb-4">
           <Link href="/forms">
@@ -341,6 +341,6 @@ export default function FormViewPage() {
           </CardFooter>
         </Card>
       </div>
-    </BaseLayout>
+    </AppLayoutSpruce>
   );
 }

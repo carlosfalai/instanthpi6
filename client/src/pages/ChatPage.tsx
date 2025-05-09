@@ -86,44 +86,44 @@ export default function ChatPage() {
   return (
     <AppLayoutSpruce>
       <div className="flex flex-col h-full bg-[#121212] text-white">
-      {/* Header */}
-      <header className="flex justify-between items-center p-4 border-b border-gray-800">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10 bg-blue-500">
-            <AvatarFallback>NG</AvatarFallback>
-          </Avatar>
-          <div>
-            <h1 className="font-semibold">{patientName}</h1>
-            <p className="text-sm text-gray-400">Last active: 07:34 AM</p>
+        {/* Header */}
+        <header className="flex justify-between items-center p-4 border-b border-gray-800">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-10 w-10 bg-blue-500">
+              <AvatarFallback>NG</AvatarFallback>
+            </Avatar>
+            <div>
+              <h1 className="font-semibold">{patientName}</h1>
+              <p className="text-sm text-gray-400">Last active: 07:34 AM</p>
+            </div>
           </div>
-        </div>
-        <div className="flex gap-2">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-400">
-                  <MessageSquare size={20} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>New conversation</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-gray-400">
-                  <Check size={20} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Mark as resolved</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+          <div className="flex gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="text-gray-400">
+                    <MessageSquare size={20} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>New conversation</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" className="text-gray-400">
+                    <Check size={20} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Mark as resolved</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
       </header>
       
       {/* Messages Container */}
