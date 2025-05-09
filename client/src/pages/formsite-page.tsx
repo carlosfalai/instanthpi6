@@ -53,8 +53,8 @@ const FormsitePage: React.FC = () => {
 
   // Process submission with AI mutation
   const processSubmissionMutation = useMutation({
-    mutationFn: async (submissionId: string) => {
-      return await formsiteService.processFormSubmission(submissionId);
+    mutationFn: async (params: { submissionId: string, modelType: 'both' | 'gpt' | 'claude' }) => {
+      return await formsiteService.processFormSubmission(params);
     },
     onSuccess: (data) => {
       // Update the selected submission with the processed content
@@ -62,14 +62,32 @@ const FormsitePage: React.FC = () => {
         setSelectedSubmission({
           ...selectedSubmission,
           processed: true,
-          aiProcessedContent: data.aiContent,
-          claudeContent: data.claudeContent,
+          aiProcessedContent: data.aiContent || selectedSubmission.aiProcessedContent,
+          claudeContent: data.claudeContent || selectedSubmission.claudeContent,
         });
       }
-      toast({
-        title: 'Form Processed',
-        description: 'The form submission has been processed successfully with both AI models.',
-      });
+      
+      // Show different toast messages based on what was processed
+      const hasGpt = !!data.aiContent;
+      const hasClaude = !!data.claudeContent;
+      
+      if (hasGpt && hasClaude) {
+        toast({
+          title: 'Form Processed',
+          description: 'The form submission has been processed successfully with both AI models.',
+        });
+      } else if (hasGpt) {
+        toast({
+          title: 'GPT-4o Processing Complete',
+          description: 'The form submission has been processed with GPT-4o.',
+        });
+      } else if (hasClaude) {
+        toast({
+          title: 'Claude 3.7 Processing Complete',
+          description: 'The form submission has been processed with Claude 3.7 Sonnet.',
+        });
+      }
+      
       // Invalidate the submissions query to refresh the list
       queryClient.invalidateQueries({ queryKey: ['/api/formsite/submissions'] });
     },
@@ -113,8 +131,8 @@ const FormsitePage: React.FC = () => {
   };
 
   // Handle processing a submission with AI
-  const handleProcessSubmission = (submissionId: string) => {
-    processSubmissionMutation.mutate(submissionId);
+  const handleProcessSubmission = (submissionId: string, modelType: 'both' | 'gpt' | 'claude' = 'both') => {
+    processSubmissionMutation.mutate({ submissionId, modelType });
   };
 
   // Handle selecting a submission for viewing
@@ -406,7 +424,7 @@ const FormsitePage: React.FC = () => {
                   </p>
                 </div>
                 <Button
-                  onClick={() => handleProcessSubmission(selectedSubmission.id)}
+                  onClick={() => handleProcessSubmission(selectedSubmission.id, 'both')}
                   disabled={processSubmissionMutation.isPending}
                   variant="default"
                   className="bg-blue-600 hover:bg-blue-700"
@@ -418,7 +436,7 @@ const FormsitePage: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <Zap className="h-4 w-4 mr-2" /> Process with your AI assistant
+                      <Zap className="h-4 w-4 mr-2" /> Process with both AI models
                     </>
                   )}
                 </Button>
@@ -427,8 +445,8 @@ const FormsitePage: React.FC = () => {
               <Tabs defaultValue="form-data" className="flex-grow flex flex-col">
                 <TabsList className="w-full bg-[#252525] mb-4">
                   <TabsTrigger value="form-data" className="flex-1">Form Data</TabsTrigger>
-                  <TabsTrigger value="ai-content" className="flex-1">GPT-4o Output</TabsTrigger>
                   <TabsTrigger value="claude-content" className="flex-1">Claude 3.7 Output</TabsTrigger>
+                  <TabsTrigger value="ai-content" className="flex-1">GPT-4o Output</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="form-data" className="flex-grow data-[state=active]:flex flex-col mt-0">

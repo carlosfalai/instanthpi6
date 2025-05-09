@@ -50,13 +50,16 @@ export const formsiteService = {
 
   /**
    * Process a form submission with AI
+   * @param params Object containing submissionId and modelType
+   * @returns Object with processed status and AI-generated content
    */
-  async processFormSubmission(id: string): Promise<{ processed: boolean, aiContent: string, claudeContent: string }> {
+  async processFormSubmission(params: { submissionId: string, modelType: 'both' | 'gpt' | 'claude' }): Promise<{ processed: boolean, aiContent: string, claudeContent: string }> {
     try {
-      const response = await apiRequest('POST', `/api/formsite/submissions/${id}/process`, {});
+      const { submissionId, modelType } = params;
+      const response = await apiRequest('POST', `/api/formsite/submissions/${submissionId}/process`, { modelType });
       return await response.json();
     } catch (error) {
-      console.error(`Error processing form submission ${id}:`, error);
+      console.error(`Error processing form submission ${params.submissionId}:`, error);
       throw error;
     }
   },
