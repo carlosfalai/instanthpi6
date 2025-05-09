@@ -523,6 +523,17 @@ const diagnosisList: Diagnosis[] = [
     ]
   },
   { id: '36', name: 'Suspected ADHD in Adults (Diagnostic Evaluation Phase)', category: 'mental', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '44', name: 'Vaginitis/Vaginosis', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '45', name: 'Urethritis', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '46', name: 'Testicular Pain', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '47', name: 'Rectal STIs', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '48', name: 'Asymptomatic STI Testing', category: 'examination', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '49', name: 'Syphilis', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '50', name: 'Hepatitis B', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '51', name: 'Hepatitis C', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '52', name: 'HIV', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '53', name: 'Dysuria', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { id: '54', name: 'Abnormal Vaginal Discharge', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   {
     id: '37', 
     name: 'Upper Respiratory Infection (Cold, Sinusitis)', 
