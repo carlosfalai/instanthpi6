@@ -124,21 +124,21 @@ export default function ChatPage() {
               </Tooltip>
             </TooltipProvider>
           </div>
-      </header>
+        </header>
       
-      {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
-        <div className="flex justify-center">
-          <div className="bg-gray-800 text-gray-300 rounded-full px-4 py-1 text-sm">
-            Today
+        {/* Messages Container */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-6">
+          <div className="flex justify-center">
+            <div className="bg-gray-800 text-gray-300 rounded-full px-4 py-1 text-sm">
+              Today
+            </div>
           </div>
-        </div>
-        
-        {messages.map(message => (
-          <div 
-            key={message.id} 
-            className={`flex items-start gap-2 ${message.isFromDoctor ? 'justify-end' : 'justify-start'}`}
-          >
+          
+          {messages.map(message => (
+            <div 
+              key={message.id} 
+              className={`flex items-start gap-2 ${message.isFromDoctor ? 'justify-end' : 'justify-start'}`}
+            >
             {!message.isFromDoctor && (
               <Avatar className="h-10 w-10 mt-1 bg-blue-500">
                 <AvatarFallback>NG</AvatarFallback>
@@ -168,26 +168,26 @@ export default function ChatPage() {
             )}
           </div>
         ))}
-        <div ref={messagesEndRef} />
-      </div>
-      
-      {/* Message Input */}
-      <div className="p-4 border-t border-gray-800">
-        <div className="flex items-center gap-2">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              placeholder="Type your message..."
-              className="w-full px-4 py-2 rounded-full bg-[#2a2a2a] border border-gray-700 text-white focus:outline-none focus:border-blue-500"
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-            />
+          <div ref={messagesEndRef} />
+        </div>
+        
+        {/* Message Input */}
+        <div className="p-4 border-t border-gray-800">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <input
+                type="text"
+                placeholder="Type your message..."
+                className="w-full px-4 py-2 rounded-full bg-[#2a2a2a] border border-gray-700 text-white focus:outline-none focus:border-blue-500"
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }
+                }}
+              />
             
             <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
               <TooltipProvider>
