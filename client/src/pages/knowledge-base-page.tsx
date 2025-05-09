@@ -18,7 +18,7 @@ import {
   Beaker,
   CheckCircle
 } from 'lucide-react';
-import BaseLayout from '@/components/layout/BaseLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';

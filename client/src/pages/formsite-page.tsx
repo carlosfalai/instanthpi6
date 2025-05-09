@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
-import BaseLayout from '@/components/layout/BaseLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -248,8 +248,6 @@ const FormsitePage: React.FC = () => {
                     </div>
                   )}
                 </div>
-                
-
               </div>
             </div>
           );
@@ -259,7 +257,7 @@ const FormsitePage: React.FC = () => {
   };
 
   return (
-    <BaseLayout>
+    <AppLayoutSpruce>
       {/* Header */}
       <div className="mb-6 flex justify-between items-center">
         <div className="flex items-center">
@@ -522,7 +520,7 @@ const FormsitePage: React.FC = () => {
                             </>
                           ) : (
                             <>
-                              <Zap className="h-4 w-4 mr-2" /> Process with Claude 3.7
+                              <Zap className="h-4 w-4 mr-2" /> Process with your AI assistant
                             </>
                           )}
                         </Button>
@@ -535,7 +533,7 @@ const FormsitePage: React.FC = () => {
           )}
         </div>
       </div>
-    </BaseLayout>
+    </AppLayoutSpruce>
   );
 };
 
