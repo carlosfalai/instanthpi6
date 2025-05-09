@@ -84,7 +84,8 @@ export default function ChatPage() {
   const today = new Date().toLocaleDateString();
   
   return (
-    <div className="flex flex-col h-screen bg-[#121212] text-white">
+    <AppLayoutSpruce>
+      <div className="flex flex-col h-full bg-[#121212] text-white">
       {/* Header */}
       <header className="flex justify-between items-center p-4 border-b border-gray-800">
         <div className="flex items-center gap-3">
@@ -235,6 +236,6 @@ export default function ChatPage() {
           </Button>
         </div>
       </div>
-    </div>
+    </AppLayoutSpruce>
   );
 }
