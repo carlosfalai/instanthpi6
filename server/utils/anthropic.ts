@@ -97,9 +97,8 @@ export async function summarizeText(
       messages: [{ role: 'user', content: prompt }],
     });
 
-    const content = response.content[0];
-    if (content.type === 'text') {
-      return content.text;
+    if (response.content.length > 0 && response.content[0].type === 'text') {
+      return response.content[0].text;
     }
     return 'No text content returned from Claude AI.';
   } catch (error: any) {
@@ -126,8 +125,13 @@ export async function analyzeSentiment(
       messages: [{ role: 'user', content: text }],
     });
 
-    const jsonMatch = response.content[0].text.match(/\{[\s\S]*\}/);
-    const jsonString = jsonMatch ? jsonMatch[0] : '{"sentiment": "neutral", "confidence": 0.5}';
+    let jsonString = '{"sentiment": "neutral", "confidence": 0.5}';
+    if (response.content.length > 0 && response.content[0].type === 'text') {
+      const jsonMatch = response.content[0].text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        jsonString = jsonMatch[0];
+      }
+    }
     
     try {
       const result = JSON.parse(jsonString);
@@ -139,7 +143,7 @@ export async function analyzeSentiment(
       console.error('Error parsing sentiment JSON response:', jsonError);
       return { sentiment: 'neutral', confidence: 0.5 };
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error analyzing sentiment with Claude:', error);
     throw new Error(`Failed to analyze sentiment with Claude: ${error.message}`);
   }
@@ -180,8 +184,11 @@ export async function analyzeImage(
       }]
     });
 
-    return response.content[0].text;
-  } catch (error) {
+    if (response.content.length > 0 && response.content[0].type === 'text') {
+      return response.content[0].text;
+    }
+    return 'No text content returned from Claude AI.';
+  } catch (error: any) {
     console.error('Error analyzing image with Claude:', error);
     throw new Error(`Failed to analyze image with Claude: ${error.message}`);
   }
@@ -234,8 +241,11 @@ export async function generateMedicalDocumentation(
       messages: [{ role: 'user', content: prompt }],
     });
 
-    return response.content[0].text;
-  } catch (error) {
+    if (response.content.length > 0 && response.content[0].type === 'text') {
+      return response.content[0].text;
+    }
+    return 'No text content returned from Claude AI.';
+  } catch (error: any) {
     console.error('Error generating medical documentation with Claude:', error);
     throw new Error(`Failed to generate medical documentation with Claude: ${error.message}`);
   }
@@ -290,8 +300,11 @@ export async function generateTreatmentPlan(
       messages: [{ role: 'user', content: prompt }],
     });
 
-    return response.content[0].text;
-  } catch (error) {
+    if (response.content.length > 0 && response.content[0].type === 'text') {
+      return response.content[0].text;
+    }
+    return 'No text content returned from Claude AI.';
+  } catch (error: any) {
     console.error('Error generating treatment plan with Claude:', error);
     throw new Error(`Failed to generate treatment plan with Claude: ${error.message}`);
   }
@@ -366,7 +379,10 @@ Be comprehensive and medically accurate. Include checkbox (☐) symbols before e
       messages: [{ role: 'user', content: prompt }],
     });
 
-    return response.content[0].text;
+    if (response.content.length > 0 && response.content[0].type === 'text') {
+      return response.content[0].text;
+    }
+    return 'No text content returned from Claude AI.';
   } catch (error: any) {
     console.error('Error generating standard protocol with Claude:', error);
     throw new Error(`Failed to generate standard protocol with Claude: ${error.message}`);
