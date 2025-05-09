@@ -1,0 +1,535 @@
+🩺 ADHD in Adults (Established Diagnosis)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: suicidal ideation, psychosis, severe medication side effects, significant cardiovascular symptoms, substance abuse)
+
+Investigations and initial evaluation:
+☐ Vital signs including blood pressure and heart rate
+☐ ADHD symptom rating scales (ASRS, CAARS)
+☐ Mood disorder screening (PHQ-9, GAD-7)
+☐ Substance use screening
+☐ ECG (if on stimulant medication)
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests
+☐ Urine drug screen
+☐ Liver function tests
+☐ Functional assessment (work, academic, relationship impact)
+
+Medications:
+□ Methylphenidate IR □ 5mg PO BID, □ 10mg PO BID, □ 20mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Methylphenidate ER □ 18mg PO daily, □ 27mg PO daily, □ 36mg PO daily, □ 54mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Amphetamine/dextroamphetamine IR □ 5mg PO BID, □ 10mg PO BID, □ 20mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Amphetamine/dextroamphetamine ER □ 10mg PO daily, □ 20mg PO daily, □ 30mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lisdexamfetamine □ 20mg PO daily, □ 30mg PO daily, □ 50mg PO daily, □ 70mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Atomoxetine □ 25mg PO daily, □ 40mg PO daily, □ 60mg PO daily, □ 80mg PO daily, □ 100mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Bupropion XL □ 150mg PO daily, □ 300mg PO daily, □ 450mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Guanfacine ER □ 1mg PO daily, □ 2mg PO daily, □ 3mg PO daily, □ 4mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Clonidine ER □ 0.1mg PO daily, □ 0.2mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Cognitive behavioral therapy (CBT) for ADHD
+☐ ADHD coaching
+☐ Organizational skills training
+☐ Time management strategies
+☐ Mindfulness training
+☐ Exercise program
+☐ Sleep hygiene education
+☐ Digital planning tools training
+☐ Workplace accommodations
+☐ Nutritional counseling
+
+Referral options:
+☐ Referral to psychiatry
+☐ Referral to psychology
+☐ Referral to ADHD coaching
+☐ Referral to neuropsychological testing
+☐ Referral to occupational therapy
+☐ Referral to vocational rehabilitation
+☐ Referral to support group
+☐ Referral to social work
+☐ Referral to cardiology (if cardiovascular concerns)
+☐ Referral to substance abuse treatment (if needed)
+
+☐ Counseling: ADHD is a chronic condition requiring consistent management. Take medications as prescribed, at the same time each day. Report any concerning side effects promptly. Use organizational strategies like planners, reminders, and breaking tasks into smaller steps. Maintain regular sleep schedule, healthy diet, and exercise routine. Limit alcohol and avoid recreational drugs which can worsen symptoms. Return if experiencing increased symptoms despite medication, significant side effects, or if developing symptoms of depression or anxiety.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Anxiety
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: suicidal ideation, psychosis, severe panic attacks with physical symptoms, agoraphobia preventing basic needs, recent significant trauma, substance withdrawal)
+
+Investigations and initial evaluation:
+☐ Anxiety screening tools (GAD-7, BAI, SPIN)
+☐ Depression screening (PHQ-9)
+☐ Substance use screening
+☐ Trauma screening (PCL-5)
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests
+☐ ECG
+☐ Vitamin B12 and folate levels
+☐ Vitamin D level
+☐ Sleep assessment
+☐ Medication review for anxiety-inducing effects
+
+Medications:
+□ Sertraline □ 25mg PO daily, □ 50mg PO daily, □ 100mg PO daily, □ 150mg PO daily, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Escitalopram □ 5mg PO daily, □ 10mg PO daily, □ 20mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Fluoxetine □ 10mg PO daily, □ 20mg PO daily, □ 40mg PO daily, □ 60mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Venlafaxine XR □ 37.5mg PO daily, □ 75mg PO daily, □ 150mg PO daily, □ 225mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Duloxetine □ 20mg PO daily, □ 30mg PO daily, □ 60mg PO daily, □ 90mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Buspirone □ 5mg PO BID, □ 10mg PO BID, □ 15mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Hydroxyzine □ 10mg PO TID PRN, □ 25mg PO TID PRN, □ 50mg PO TID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Propranolol □ 10mg PO PRN, □ 20mg PO PRN, □ 40mg PO PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lorazepam □ 0.5mg PO TID PRN, □ 1mg PO TID PRN, Ren: □ 1, □ 2, □ 3 (short-term use only)
+□ Clonazepam □ 0.25mg PO BID PRN, □ 0.5mg PO BID PRN, Ren: □ 1, □ 2, □ 3 (short-term use only)
+
+Treatment options:
+☐ Cognitive behavioral therapy (CBT)
+☐ Exposure and response prevention (ERP)
+☐ Mindfulness-based stress reduction (MBSR)
+☐ Relaxation techniques training
+☐ Breathing exercises
+☐ Progressive muscle relaxation
+☐ Biofeedback
+☐ Regular exercise program
+☐ Sleep hygiene education
+☐ Stress management training
+
+Referral options:
+☐ Referral to psychiatry
+☐ Referral to psychology/psychotherapy
+☐ Referral to group therapy
+☐ Referral to anxiety support group
+☐ Referral to social work
+☐ Referral to intensive outpatient program
+☐ Referral to partial hospitalization program
+☐ Referral to complementary medicine (yoga, tai chi)
+☐ Referral to occupational therapy
+☐ Referral to substance abuse treatment (if needed)
+
+☐ Counseling: Anxiety disorders respond well to a combination of medication and therapy. Maintain consistent sleep schedule and regular exercise. Practice relaxation techniques daily. Limit caffeine, alcohol, and recreational drugs which can worsen anxiety. Take medications as prescribed - antidepressants may take 4-6 weeks for full effect. Use benzodiazepines sparingly and only as prescribed. Return if experiencing worsening anxiety despite treatment, medication side effects, or if developing thoughts of self-harm.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Burnout
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: suicidal ideation, severe depression, substance abuse, physical health deterioration, significant insomnia, inability to perform activities of daily living)
+
+Investigations and initial evaluation:
+☐ Burnout screening (MBI - Maslach Burnout Inventory)
+☐ Depression screening (PHQ-9)
+☐ Anxiety screening (GAD-7)
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests
+☐ Vitamin D level
+☐ Vitamin B12 and folate levels
+☐ Ferritin/iron studies
+☐ Sleep assessment
+☐ Insomnia Severity Index
+☐ Substance use screening
+
+Medications:
+□ Sertraline □ 25mg PO daily, □ 50mg PO daily, □ 100mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Escitalopram □ 5mg PO daily, □ 10mg PO daily, □ 20mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Bupropion XL □ 150mg PO daily, □ 300mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Trazodone □ 50mg PO QHS PRN, □ 100mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Mirtazapine □ 7.5mg PO QHS, □ 15mg PO QHS, □ 30mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Melatonin □ 3mg PO QHS, □ 5mg PO QHS, □ 10mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Hydroxyzine □ 25mg PO QHS PRN, □ 50mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ L-theanine □ 200mg PO daily, □ 200mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Magnesium glycinate □ 200mg PO daily, □ 400mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Time off work/medical leave
+☐ Work hours reduction
+☐ Workload modification
+☐ Cognitive behavioral therapy (CBT)
+☐ Mindfulness-based stress reduction (MBSR)
+☐ Stress management training
+☐ Sleep hygiene education
+☐ Regular exercise program
+☐ Relaxation techniques
+☐ Boundary-setting training
+
+Referral options:
+☐ Referral to psychiatry
+☐ Referral to psychology/psychotherapy
+☐ Referral to occupational therapy
+☐ Referral to career counseling
+☐ Referral to employee assistance program
+☐ Referral to life coach
+☐ Referral to support group
+☐ Referral to complementary medicine (yoga, tai chi)
+☐ Referral to sleep medicine
+☐ Referral to nutritionist
+
+☐ Counseling: Burnout results from chronic workplace stress and requires addressing both work environment and personal wellbeing. Consider temporary reduction in work responsibilities or leave of absence. Set boundaries between work and personal life. Schedule regular breaks and time for self-care. Prioritize adequate sleep, regular exercise, and healthy nutrition. Practice stress management techniques daily. Return if experiencing worsening mood, anxiety, sleep disturbance, or if developing thoughts of self-harm.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Depression
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: active suicidal ideation with plan, psychotic features, severe functional impairment, inability to maintain nutrition/hydration, catatonia, treatment-resistant depression)
+
+Investigations and initial evaluation:
+☐ Depression screening (PHQ-9)
+☐ Suicide risk assessment (C-SSRS)
+☐ Anxiety screening (GAD-7)
+☐ Bipolar disorder screening (MDQ)
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests
+☐ Vitamin B12 and folate levels
+☐ Vitamin D level
+☐ Ferritin/iron studies
+☐ Substance use screening
+☐ Sleep assessment
+☐ Medication review for depression-inducing effects
+
+Medications:
+□ Sertraline □ 25mg PO daily, □ 50mg PO daily, □ 100mg PO daily, □ 150mg PO daily, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Escitalopram □ 5mg PO daily, □ 10mg PO daily, □ 20mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Fluoxetine □ 10mg PO daily, □ 20mg PO daily, □ 40mg PO daily, □ 60mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Venlafaxine XR □ 37.5mg PO daily, □ 75mg PO daily, □ 150mg PO daily, □ 225mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Duloxetine □ 20mg PO daily, □ 30mg PO daily, □ 60mg PO daily, □ 90mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Bupropion XL □ 150mg PO daily, □ 300mg PO daily, □ 450mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Mirtazapine □ 7.5mg PO QHS, □ 15mg PO QHS, □ 30mg PO QHS, □ 45mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Trazodone □ 50mg PO QHS PRN, □ 100mg PO QHS PRN, □ 150mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Aripiprazole □ 2mg PO daily, □ 5mg PO daily, □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Quetiapine □ 25mg PO QHS, □ 50mg PO QHS, □ 100mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Cognitive behavioral therapy (CBT)
+☐ Interpersonal therapy (IPT)
+☐ Behavioral activation
+☐ Mindfulness-based cognitive therapy (MBCT)
+☐ Regular exercise program
+☐ Light therapy (for seasonal pattern)
+☐ Sleep hygiene education
+☐ Social rhythm therapy
+☐ Electroconvulsive therapy (ECT) referral
+☐ Transcranial magnetic stimulation (TMS) referral
+
+Referral options:
+☐ Referral to psychiatry
+☐ Referral to psychology/psychotherapy
+☐ Referral to crisis intervention services
+☐ Referral to intensive outpatient program
+☐ Referral to partial hospitalization program
+☐ Referral to inpatient psychiatric care
+☐ Referral to social work
+☐ Referral to support group
+☐ Referral to nutritionist
+☐ Referral to substance abuse treatment (if needed)
+
+☐ Counseling: Depression is a treatable medical condition. Take medications as prescribed - antidepressants may take 4-6 weeks for full effect. Do not abruptly stop medications. Maintain a structured daily routine. Engage in regular physical activity. Prioritize sleep hygiene and social connections. Set small, achievable daily goals. Avoid alcohol and recreational drugs which can worsen depression. Contact emergency services or crisis line immediately if experiencing thoughts of harming yourself or others.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Suspected ADHD in Adults (Diagnostic Evaluation Phase)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: suicidal ideation, severe functional impairment, psychosis, substance abuse, significant mood instability)
+
+Investigations and initial evaluation:
+☐ Comprehensive clinical interview
+☐ ADHD symptom rating scales (ASRS, CAARS)
+☐ Collateral information from family/significant others
+☐ Review of childhood/academic records
+☐ Mood disorder screening (PHQ-9, GAD-7)
+☐ Neuropsychological testing
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests
+☐ Urine drug screen
+☐ Sleep assessment
+☐ Functional assessment (work, academic, relationship impact)
+
+Medications:
+□ Non-stimulant trial if indicated during evaluation:
+□ Atomoxetine □ 25mg PO daily, □ 40mg PO daily, □ 80mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Bupropion XL □ 150mg PO daily, □ 300mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Guanfacine ER □ 1mg PO daily, □ 2mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ For comorbid anxiety/depression if present:
+□ Escitalopram □ 5mg PO daily, □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Sertraline □ 25mg PO daily, □ 50mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Buspirone □ 5mg PO BID, □ 10mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Organizational skills training
+☐ Time management strategies
+☐ Calendar/reminder system implementation
+☐ Mindfulness training
+☐ Regular exercise program
+☐ Sleep hygiene education
+☐ Stress management techniques
+☐ Digital planning tools training
+☐ Environmental modifications
+☐ Regular daily routine establishment
+
+Referral options:
+☐ Referral to psychiatry for diagnostic evaluation
+☐ Referral to neuropsychological testing
+☐ Referral to psychology
+☐ Referral to ADHD coaching
+☐ Referral to occupational therapy
+☐ Referral to speech therapy (if language processing issues)
+☐ Referral to support group
+☐ Referral to social work
+☐ Referral to sleep specialist (if sleep disorder suspected)
+☐ Referral to substance abuse treatment (if needed)
+
+☐ Counseling: ADHD evaluation is comprehensive and may require multiple appointments and testing. Bring documentation of childhood symptoms if available. Consider bringing a family member who knew you as a child to provide information. During evaluation, work on organizational strategies and routine establishment. Maintain regular sleep schedule, healthy diet, and exercise routine. Limit alcohol and avoid recreational drugs which can mimic or exacerbate ADHD symptoms. Return if experiencing worsening symptoms, mood changes, or if developing thoughts of self-harm.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Adjustment Disorder
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: suicidal ideation, severe functional impairment, psychotic features, dangerous behavior, substance abuse as coping mechanism)
+
+Investigations and initial evaluation:
+☐ Depression screening (PHQ-9)
+☐ Anxiety screening (GAD-7)
+☐ Suicide risk assessment
+☐ Life Events Checklist
+☐ Substance use screening
+☐ Sleep assessment
+☐ Comprehensive stressor assessment
+☐ Pre-existing mental health evaluation
+☐ Social support assessment
+☐ Coping strategies assessment
+☐ Functional impairment assessment
+
+Medications:
+□ Short-term medication options if indicated:
+□ Sertraline □ 25mg PO daily, □ 50mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Escitalopram □ 5mg PO daily, □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Buspirone □ 5mg PO BID, □ 10mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Hydroxyzine □ 10mg PO TID PRN, □ 25mg PO TID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Trazodone □ 50mg PO QHS PRN, □ 100mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Propranolol □ 10mg PO PRN, □ 20mg PO PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lorazepam □ 0.5mg PO TID PRN, □ 1mg PO TID PRN, Ren: □ 1 (short-term use only)
+
+Treatment options:
+☐ Brief supportive psychotherapy
+☐ Cognitive behavioral therapy (CBT)
+☐ Problem-solving therapy
+☐ Mindfulness-based stress reduction
+☐ Relaxation techniques training
+☐ Stress management training
+☐ Sleep hygiene education
+☐ Regular exercise program
+☐ Social support strengthening
+☐ Practical resource assistance (financial, legal, etc.)
+
+Referral options:
+☐ Referral to psychiatry
+☐ Referral to psychology/psychotherapy
+☐ Referral to social work
+☐ Referral to crisis intervention services
+☐ Referral to support group
+☐ Referral to spiritual counseling
+☐ Referral to financial counseling
+☐ Referral to legal services
+☐ Referral to vocational rehabilitation
+☐ Referral to substance abuse treatment (if needed)
+
+☐ Counseling: Adjustment disorder is a time-limited response to stressful life events and typically improves with time and supportive care. Focus on healthy coping strategies like exercise, relaxation techniques, and maintaining social connections. Avoid alcohol and recreational drugs which can worsen symptoms. Establish a regular sleep schedule and routine. Set realistic goals and priorities during this challenging time. Return if experiencing worsening symptoms, inability to function in daily roles, or if developing thoughts of self-harm.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Panic Attacks/Panic Disorder
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: medical emergency mimicking panic attack, severe agoraphobia preventing basic needs, suicidal ideation, substance abuse, significant functional impairment)
+
+Investigations and initial evaluation:
+☐ Panic and Agoraphobia Scale
+☐ Anxiety Sensitivity Index
+☐ Depression screening (PHQ-9)
+☐ ECG
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests
+☐ Cardiac work-up if indicated
+☐ Substance use screening
+☐ Caffeine intake assessment
+☐ Cardiac markers as needed
+☐ Pulmonary function tests if indicated
+☐ Sleep study if indicated
+
+Medications:
+□ Sertraline □ 25mg PO daily, □ 50mg PO daily, □ 100mg PO daily, □ 150mg PO daily, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Escitalopram □ 5mg PO daily, □ 10mg PO daily, □ 20mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Paroxetine □ 10mg PO daily, □ 20mg PO daily, □ 30mg PO daily, □ 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Venlafaxine XR □ 37.5mg PO daily, □ 75mg PO daily, □ 150mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Propranolol □ 10mg PO PRN, □ 20mg PO PRN, □ 10mg PO BID, □ 20mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Hydroxyzine □ 10mg PO TID PRN, □ 25mg PO TID PRN, □ 50mg PO TID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Clonazepam □ 0.25mg PO BID PRN, □ 0.5mg PO BID PRN, Ren: □ 1, □ 2, □ 3 (short-term use only)
+□ Alprazolam □ 0.25mg PO TID PRN, □ 0.5mg PO TID PRN, Ren: □ 1, □ 2, □ 3 (short-term use only)
+□ Lorazepam □ 0.5mg PO TID PRN, □ 1mg PO TID PRN, Ren: □ 1, □ 2, □ 3 (short-term use only)
+
+Treatment options:
+☐ Cognitive behavioral therapy (CBT)
+☐ Panic-focused psychodynamic psychotherapy
+☐ Breathing retraining
+☐ Progressive muscle relaxation
+☐ Applied relaxation
+☐ Mindfulness-based stress reduction
+☐ Interoceptive exposure
+☐ In vivo exposure for agoraphobia
+☐ Regular exercise program
+☐ Caffeine reduction/elimination
+
+Referral options:
+☐ Referral to psychiatry
+☐ Referral to psychology/psychotherapy
+☐ Referral to cardiology
+☐ Referral to pulmonology
+☐ Referral to endocrinology
+☐ Referral to support group
+☐ Referral to intensive outpatient program
+☐ Referral to biofeedback therapy
+☐ Referral to complementary medicine (yoga, tai chi)
+☐ Referral to substance abuse treatment (if needed)
+
+☐ Counseling: Panic attacks, while frightening, are not physically harmful and typically last 5-20 minutes. During an attack, focus on slow, deep breathing and remind yourself it will pass. Avoid caffeine, alcohol, and recreational drugs which can trigger attacks. Maintain regular exercise and sleep schedule. Take medications as prescribed - antidepressants may take 4-6 weeks for full effect. Use benzodiazepines sparingly and only as prescribed. Return if experiencing increased frequency of attacks, medication side effects, or if developing depression or thoughts of self-harm.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Bipolar Disorder
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: suicidal ideation, severe mania, psychotic features, risk-taking behavior, inability to care for self, medication non-adherence)
+
+Investigations and initial evaluation:
+☐ Mood disorder questionnaire (MDQ)
+☐ Young Mania Rating Scale (if manic symptoms)
+☐ Montgomery-Åsberg Depression Rating Scale (if depressive symptoms)
+☐ Suicide risk assessment
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests
+☐ Lipid panel
+☐ Medication levels (if on mood stabilizers)
+☐ ECG (if on certain medications)
+☐ Substance use screening
+☐ Sleep assessment
+☐ Medication adherence assessment
+
+Medications:
+□ Lithium □ 300mg PO BID, □ 300mg PO TID, □ 450mg PO BID, □ 600mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Valproic acid □ 250mg PO BID, □ 500mg PO BID, □ 750mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lamotrigine □ 25mg PO daily, □ 50mg PO daily, □ 100mg PO daily, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Carbamazepine □ 200mg PO BID, □ 400mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Quetiapine □ 50mg PO QHS, □ 100mg PO QHS, □ 200mg PO QHS, □ 300mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Risperidone □ 0.5mg PO BID, □ 1mg PO BID, □ 2mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Olanzapine □ 2.5mg PO QHS, □ 5mg PO QHS, □ 10mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Aripiprazole □ 5mg PO daily, □ 10mg PO daily, □ 15mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lurasidone □ 20mg PO daily, □ 40mg PO daily, □ 80mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lorazepam □ 0.5mg PO TID PRN, □ 1mg PO TID PRN, Ren: □ 1, □ 2, □ 3 (short-term use only)
+
+Treatment options:
+☐ Psychoeducation
+☐ Cognitive behavioral therapy for bipolar disorder
+☐ Interpersonal and social rhythm therapy
+☐ Family-focused therapy
+☐ Sleep hygiene education
+☐ Regular daily routine
+☐ Mood charting
+☐ Stress management techniques
+☐ Regular exercise program
+☐ Relapse prevention planning
+
+Referral options:
+☐ Referral to psychiatry
+☐ Referral to psychology/psychotherapy
+☐ Referral to intensive outpatient program
+☐ Referral to partial hospitalization program
+☐ Referral to inpatient psychiatric care
+☐ Referral to support group
+☐ Referral to case management
+☐ Referral to social work
+☐ Referral to occupational therapy
+☐ Referral to substance abuse treatment (if needed)
+
+☐ Counseling: Bipolar disorder is a chronic condition requiring consistent medication management and lifestyle habits. Take medications exactly as prescribed - never stop or adjust without consulting your provider. Maintain regular sleep schedule and daily routine. Avoid alcohol and recreational drugs which can trigger mood episodes. Recognize early warning signs of both mania and depression. Monitor mood changes daily. Engage support system when noticing mood shifts. Contact emergency services immediately if experiencing thoughts of harming yourself or others.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Shift Work Sleep Disorder
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe insomnia leading to safety concerns, significant depression/suicidal ideation, substance abuse/dependence, unsafe driving due to sleepiness)
+
+Investigations and initial evaluation:
+☐ Sleep diary (2 weeks minimum)
+☐ Pittsburgh Sleep Quality Index
+☐ Epworth Sleepiness Scale
+☐ Insomnia Severity Index
+☐ Depression screening (PHQ-9)
+☐ Anxiety screening (GAD-7)
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests
+☐ Home sleep study
+☐ Polysomnography if indicated
+☐ Actigraphy monitoring
+☐ Substance use screening
+☐ Sleep habits assessment
+☐ Work schedule assessment
+
+Medications:
+□ Melatonin □ 3mg PO prior to sleep, □ 5mg PO prior to sleep, □ 10mg PO prior to sleep, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Modafinil □ 100mg PO daily, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Armodafinil □ 150mg PO daily, □ 250mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ramelteon □ 8mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Trazodone □ 50mg PO QHS, □ 100mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Zolpidem □ 5mg PO QHS PRN, □ 10mg PO QHS PRN, Ren: □ 1, □ 2, □ 3 (short-term use only)
+□ Eszopiclone □ 1mg PO QHS PRN, □ 2mg PO QHS PRN, □ 3mg PO QHS PRN, Ren: □ 1, □ 2, □ 3 (short-term use only)
+□ Temazepam □ 15mg PO QHS PRN, □ 30mg PO QHS PRN, Ren: □ 1, □ 2, □ 3 (short-term use only)
+□ Caffeine □ 200mg PO at start of shift, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Sleep hygiene education tailored to shift work
+☐ Light therapy (bright light during work, darkness during sleep)
+☐ Consistent sleep-wake schedule on days off
+☐ Bedroom environment optimization
+☐ Blackout curtains for daytime sleeping
+☐ White noise machine
+☐ Eye mask and earplugs
+☐ Avoid caffeine in hours before sleep time
+☐ Strategic napping
+☐ Chronotherapy if transitioning shifts
+
+Referral options:
+☐ Referral to sleep medicine specialist
+☐ Referral to occupational health
+☐ Referral to psychology/CBT for insomnia
+☐ Referral to psychiatry
+☐ Referral to nutritionist
+☐ Referral to support group
+☐ Referral to employee assistance program
+☐ Referral to social work
+☐ Referral to integrative medicine
+☐ Referral to substance abuse treatment (if needed)
+
+☐ Counseling: Shift work sleep disorder is caused by a misalignment between work schedule and the body's natural circadian rhythm. Maintain a consistent sleep schedule even on days off. Create a dark, quiet, cool sleeping environment. Limit exposure to screens 1-2 hours before sleep. Consider light blocking glasses when returning home in daylight. Use strategic caffeine only early in shift. Avoid alcohol as sleep aid. Exercise regularly but not within 3 hours of sleep time. Monitor for signs of excessive sleepiness while driving or operating machinery. Return if experiencing persistent insomnia, excessive sleepiness despite treatment, or if developing symptoms of depression or anxiety.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
