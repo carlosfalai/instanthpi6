@@ -373,3 +373,84 @@ Be comprehensive and medically accurate. Include checkbox (☐) symbols before e
     throw new Error(`Failed to generate standard protocol with Claude: ${error.message}`);
   }
 }
+
+/**
+ * Process a FormSite submission with Claude AI
+ * @param formData The form data from FormSite submission
+ * @param model Optional model identifier (defaults to latest Claude model)
+ * @returns The processed HTML content
+ */
+export async function processFormSubmission(
+  formData: Record<string, any>,
+  model: string = DEFAULT_MODEL
+): Promise<string> {
+  try {
+    console.log(`[DEBUG] Processing FormSite submission with Claude ${model}`);
+    
+    // Get the medical transcription template HTML
+    const templateHTML = `<!-- Medical Transcription Output Template in HTML (Multilingual, Gmail-Safe) -->
+
+<h2>Table of Contents</h2>
+<ol>
+  <li><a href="#section1">HPI Confirmation Summary</a></li>
+  <li><a href="#section2">Super Spartan SOAP Note</a></li>
+  <li><a href="#section3">Follow-Up Questions</a></li>
+  <li><a href="#section4">Plan – Bullet Points</a>
+    <ol>
+      <li><a href="#section4-1">Medications</a></li>
+      <li><a href="#section4-2">Imaging</a></li>
+      <li><a href="#section4-3">Labs</a></li>
+      <li><a href="#section4-4">Referrals</a></li>
+    </ol>
+  </li>
+  <li><a href="#section5">Spartan Clinical Strategy</a></li>
+  <li><a href="#section6">Work Leave Declaration</a></li>
+  <li><a href="#section7">Work Modification Recommendations</a></li>
+  <li><a href="#section8">Insurance & Short-Term Disability Declaration</a></li>
+</ol>
+
+<h3><a name="section1">1. HPI Confirmation Summary</a></h3>
+<p><strong>English (Physician Language):</strong><br>
+Just to verify this with you beforehand, you are a {{Age}}-year-old {{Gender}} experiencing {{Description}} located in the {{Location}} that began on {{Symptom}}{{Onset}}. The symptom is rated {{Severity}} (0–10) out of 10, worsens with {{Aggravating}}{{Factors}}, and is relieved by {{Relieving}}{{Factors}}. You also report {{Associated}}{{Symptoms}}. No treatments have been tried yet. You have the following chronic conditions: {{Chronic}}{{Conditions}}. No medication allergies reported.
+</p>
+
+<p><strong>Patient Language ({{PatientLanguage}}):</strong><br>
+Vamos a confirmar su información médica. Usted tiene {{Age}} años y presenta {{Description}} en {{Location}} desde {{Symptom}}{{Onset}}. El dolor es de {{Severity}} sobre 10, empeora con {{Aggravating}}{{Factors}} y mejora con {{Relieving}}{{Factors}}. También tiene {{Associated}}{{Symptoms}}. Hasta ahora no ha probado tratamientos. Tiene antecedentes de {{Chronic}}{{Conditions}}. No reporta alergias a medicamentos. ¿Es correcta esta información?</p>`;
+    
+    // Generate system prompt
+    const systemPrompt = `You are an expert medical transcription AI assistant. You'll help doctors convert form submissions from patients into structured, professional medical documentation that follows a specific template format.
+
+Use the patient's submitted information to generate a comprehensive medical documentation following the exact HTML template structure provided, but fill in the actual values based on the form data.
+
+The template contains placeholders like {{Age}}, {{Gender}}, etc. Replace these with the appropriate information from the form data. If information is missing, use "not reported" or similar appropriate text. Be thorough and professional.`;
+
+    // Create the user prompt with form data
+    const userPrompt = `Here is a FormSite submission with patient data. Please process this and create a complete medical documentation following the HTML template structure.
+
+Form Data:
+${JSON.stringify(formData, null, 2)}
+
+Template Structure (follow this exactly):
+${templateHTML}
+
+Please fill in all placeholders with information from the form data. Generate all sections including the HPI confirmation, SOAP note, follow-up questions, and plan bullet points. Be thorough and professional.`;
+
+    // Call Claude AI to generate the processed content
+    const response = await anthropic.messages.create({
+      model: model,
+      system: systemPrompt,
+      max_tokens: 4000,
+      messages: [{ role: 'user', content: userPrompt }],
+    });
+
+    // Extract and return the content
+    const content = response.content[0];
+    if (content.type === 'text') {
+      return content.text;
+    }
+    return 'No text content returned from Claude AI.';
+  } catch (error: any) {
+    console.error('Error processing FormSite submission with Claude:', error);
+    throw new Error(`Failed to process FormSite submission with Claude: ${error.message}`);
+  }
+}

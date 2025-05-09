@@ -2,6 +2,7 @@ import { Router } from 'express';
 import axios from 'axios';
 import { storage } from '../storage';
 import OpenAI from 'openai';
+import * as anthropicUtils from '../utils/anthropic';
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -125,111 +126,123 @@ router.post('/submissions/:id/process', async (req, res) => {
     }
     console.log('[DEBUG] FormSite API key is present');
     
-    // Check if OpenAI API key is available
+    // Check if OpenAI API key is available (for backward compatibility)
     if (!process.env.OPENAI_API_KEY) {
       console.log('[DEBUG] OpenAI API key not configured');
       return res.status(401).json({ message: 'OpenAI API key not configured' });
     }
     console.log('[DEBUG] OpenAI API key is present');
     
+    // Check if Anthropic API key is available
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.log('[DEBUG] Anthropic API key not configured');
+      return res.status(401).json({ message: 'Anthropic API key not configured' });
+    }
+    console.log('[DEBUG] Anthropic API key is present');
+    
     // Get submission from FormSite API (using list and filter approach)
     console.log(`[DEBUG PROCESS] Attempting to fetch submission ${submissionId} for processing via list`);
     
-    try {
-      // Get all submissions and find the one with matching ID
-      const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results`);
-      console.log(`[DEBUG PROCESS] Got list response with status: ${response.status}`);
-      
-      const allSubmissions = response.data.results || [];
-      console.log(`[DEBUG PROCESS] Found ${allSubmissions.length} total submissions`);
-      
-      // Find the specific submission by ID
-      const submission = allSubmissions.find((sub: any) => sub.id === submissionId);
-      
-      if (!submission) {
-        console.log(`[DEBUG PROCESS] Submission with ID ${submissionId} not found in results`);
-        return res.status(404).json({ message: 'Form submission not found', processed: false });
-      }
-      
-      console.log(`[DEBUG PROCESS] Submission found with ID: ${submission.id}`);
-      console.log(`[DEBUG PROCESS] Submission data keys: ${Object.keys(submission)}`);
-      
-      // Extract form data
-      const formData = submission.items || {};
-      
-      // Generate HPI Confirmation Summary using OpenAI
-      const prompt = `
-      <role>system</role>
-      <task>You are a medical transcription AI. Output is in HTML format for History of Present Illness (HPI) confirmation summaries.</task>
-      <format>
-      <h3>HPI Confirmation Summary</h3>
-      <p>Just to confirm what you've told me about your current medical concerns:</p>
-      <ul>
-        <li>Key issues extracted from patient input</li>
-        <li>Include onset, duration, severity, etc.</li>
-        <li>Include any relevant past medical history mentioned</li>
-      </ul>
-      <p>Is this correct? [Yes] [No, there are corrections needed]</p>
-      </format>
-      
-      <example>
-      <patient_input>
-      I've been having chest pain for about 3 days now. It's mostly on the left side and gets worse when I take a deep breath. Started after I was moving some heavy boxes. I have asthma but this feels different. My dad had a heart attack when he was 62, I'm 58 now.
-      </patient_input>
-      <hpi_confirmation>
-      <h3>HPI Confirmation Summary</h3>
-      <p>Just to confirm what you've told me about your current medical concerns:</p>
-      <ul>
-        <li>You've been experiencing chest pain for approximately 3 days</li>
-        <li>The pain is predominantly on the left side</li>
-        <li>Pain worsens with deep breathing</li>
-        <li>Symptoms began after moving heavy boxes</li>
-        <li>You have a history of asthma but feel this is different</li>
-        <li>Family history includes father with heart attack at age 62</li>
-        <li>You are currently 58 years old</li>
-      </ul>
-      <p>Is this correct? [Yes] [No, there are corrections needed]</p>
-      </hpi_confirmation>
-      </example>
-      
-      Now, generate an HPI confirmation summary based on the following patient form submission data:
-      ${JSON.stringify(formData, null, 2)}
-      `;
-      
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "user", content: prompt }
-        ],
-        max_tokens: 1000
-      });
-      
-      const aiProcessedContent = completion.choices[0].message.content || '';
-      
-      // Return the processed content
-      res.json({ 
-        processed: true, 
-        aiContent: aiProcessedContent 
-      });
-    } catch (apiError: any) {
-      // If FormSite API returns a 404 for this submission
-      if (apiError.response && apiError.response.status === 404) {
-        return res.status(404).json({ 
-          message: 'Form submission not found',
-          processed: false
-        });
-      }
-      
-      // For other API errors
-      console.error('FormSite API error during processing:', apiError.message);
-      return res.status(500).json({
-        message: 'Error connecting to FormSite API during processing',
-        error: apiError.message
+    // Get all submissions and find the one with matching ID
+    const response = await formsiteApi.get(`/forms/${FORMSITE_FORM_ID}/results`);
+    console.log(`[DEBUG PROCESS] Got list response with status: ${response.status}`);
+    
+    const allSubmissions = response.data.results || [];
+    console.log(`[DEBUG PROCESS] Found ${allSubmissions.length} total submissions`);
+    
+    // Find the specific submission by ID
+    const submission = allSubmissions.find((sub: any) => sub.id === submissionId);
+    
+    if (!submission) {
+      console.log(`[DEBUG PROCESS] Submission with ID ${submissionId} not found in results`);
+      return res.status(404).json({ message: 'Form submission not found', processed: false });
+    }
+    
+    console.log(`[DEBUG PROCESS] Submission found with ID: ${submission.id}`);
+    console.log(`[DEBUG PROCESS] Submission data keys: ${Object.keys(submission)}`);
+    
+    // Extract form data
+    const formData = submission.items || {};
+    
+    // Process form submission with Claude 3.7 Sonnet
+    console.log(`[DEBUG PROCESS] Processing form data with Claude 3.7 Sonnet`);
+    
+    // Use the anthropic utility function to process the form submission
+    const claudeContent = await anthropicUtils.processFormSubmission(formData);
+    console.log(`[DEBUG PROCESS] Successfully processed with Claude`);
+    
+    // Generate HPI Confirmation Summary using OpenAI for backward compatibility
+    const prompt = `
+    <role>system</role>
+    <task>You are a medical transcription AI. Output is in HTML format for History of Present Illness (HPI) confirmation summaries.</task>
+    <format>
+    <h3>HPI Confirmation Summary</h3>
+    <p>Just to confirm what you've told me about your current medical concerns:</p>
+    <ul>
+      <li>Key issues extracted from patient input</li>
+      <li>Include onset, duration, severity, etc.</li>
+      <li>Include any relevant past medical history mentioned</li>
+    </ul>
+    <p>Is this correct? [Yes] [No, there are corrections needed]</p>
+    </format>
+    
+    <example>
+    <patient_input>
+    I've been having chest pain for about 3 days now. It's mostly on the left side and gets worse when I take a deep breath. Started after I was moving some heavy boxes. I have asthma but this feels different. My dad had a heart attack when he was 62, I'm 58 now.
+    </patient_input>
+    <hpi_confirmation>
+    <h3>HPI Confirmation Summary</h3>
+    <p>Just to confirm what you've told me about your current medical concerns:</p>
+    <ul>
+      <li>You've been experiencing chest pain for approximately 3 days</li>
+      <li>The pain is predominantly on the left side</li>
+      <li>Pain worsens with deep breathing</li>
+      <li>Symptoms began after moving heavy boxes</li>
+      <li>You have a history of asthma but feel this is different</li>
+      <li>Family history includes father with heart attack at age 62</li>
+      <li>You are currently 58 years old</li>
+    </ul>
+    <p>Is this correct? [Yes] [No, there are corrections needed]</p>
+    </hpi_confirmation>
+    </example>
+    
+    Now, generate an HPI confirmation summary based on the following patient form submission data:
+    ${JSON.stringify(formData, null, 2)}
+    `;
+    
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "user", content: prompt }
+      ],
+      max_tokens: 1000
+    });
+    
+    const openaiContent = completion.choices[0].message.content || '';
+    
+    // Return the processed content with both formats
+    res.json({ 
+      processed: true, 
+      aiContent: openaiContent,
+      claudeContent: claudeContent
+    });
+    
+  } catch (error: any) {
+    console.error('Error processing form submission with AI:', error);
+    
+    // Check for FormSite API errors
+    if (error.response && error.response.status === 404) {
+      return res.status(404).json({ 
+        message: 'Form submission not found',
+        processed: false
       });
     }
-  } catch (error) {
-    console.error('Error processing form submission with AI:', error);
-    res.status(500).json({ message: 'Failed to process form submission' });
+    
+    // For all other errors
+    res.status(500).json({ 
+      message: 'Failed to process form submission',
+      error: error.message
+    });
   }
 });
 
