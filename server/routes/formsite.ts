@@ -54,7 +54,8 @@ router.get('/submissions', async (req, res) => {
       date_submitted: submission.date_created || new Date().toISOString(),
       results: submission.items || {},
       processed: Boolean(submission.processed),
-      aiProcessedContent: submission.aiProcessedContent || ''
+      aiProcessedContent: submission.aiProcessedContent || '',
+      claudeContent: submission.claudeContent || ''
     }));
     
     res.json(processedSubmissions);
@@ -101,7 +102,8 @@ router.get('/submissions/search', async (req, res) => {
       date_submitted: submission.date_created || new Date().toISOString(),
       results: submission.items || {},
       processed: Boolean(submission.processed),
-      aiProcessedContent: submission.aiProcessedContent || ''
+      aiProcessedContent: submission.aiProcessedContent || '',
+      claudeContent: submission.claudeContent || ''
     }));
     
     // Always return an array, even if no results were found
@@ -288,7 +290,8 @@ router.get('/submissions/:id', async (req, res) => {
         date_submitted: submission.date_created || new Date().toISOString(),
         results: submission.items || {},
         processed: Boolean(submission.processed),
-        aiProcessedContent: submission.aiProcessedContent || ''
+        aiProcessedContent: submission.aiProcessedContent || '',
+        claudeContent: submission.claudeContent || ''
       };
       
       res.json(processedSubmission);
@@ -382,13 +385,26 @@ router.post('/webhook', async (req, res) => {
       
       const aiProcessedContent = completion.choices[0].message.content || '';
       
+      // Process form submission with Claude 3.7 Sonnet
+      console.log(`[DEBUG WEBHOOK] Processing form data with Claude 3.7 Sonnet`);
+      let claudeContent = '';
+      try {
+        claudeContent = await anthropicUtils.processFormSubmission(formData);
+        console.log(`[DEBUG WEBHOOK] Successfully processed with Claude`);
+      } catch (claudeError) {
+        console.error('[DEBUG WEBHOOK] Error processing with Claude:', claudeError);
+        claudeContent = 'Error processing with Claude AI';
+      }
+      
       // Store the processed content with the submission
       // Note: In a real implementation, you would update the FormSite submission or store this in your database
       console.log(`[DEBUG WEBHOOK] Successfully processed submission ${resultId}`);
       
       res.status(200).json({ 
         message: 'Webhook received and processed successfully',
-        processed: true
+        processed: true,
+        aiContent: aiProcessedContent,
+        claudeContent: claudeContent
       });
     } catch (aiError: any) {
       console.error('Error automatically processing new submission:', aiError.message);
