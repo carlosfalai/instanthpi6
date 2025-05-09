@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
-import BaseLayout from "@/components/layout/BaseLayout";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 import { 
   Card, 
   CardContent, 
@@ -945,7 +945,7 @@ export default function SchedulerPage() {
   const [activeTab, setActiveTab] = useState("recommendations");
   
   return (
-    <BaseLayout>
+    <AppLayoutSpruce>
       <div className="container py-8 max-w-6xl">
         <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent mb-8">
           AI Scheduler
@@ -977,6 +977,6 @@ export default function SchedulerPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </BaseLayout>
+    </AppLayoutSpruce>
   );
 }

@@ -747,7 +747,7 @@ export default function KnowledgeBasePage() {
   }, {} as Record<string, Treatment[]>) || {};
 
   return (
-    <BaseLayout>
+    <AppLayoutSpruce>
       <div className="container mx-auto py-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
@@ -1082,6 +1082,6 @@ export default function KnowledgeBasePage() {
           )}
         </div>
       </div>
-    </BaseLayout>
+    </AppLayoutSpruce>
   );
 }
