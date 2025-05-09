@@ -443,10 +443,10 @@ const FormsitePage: React.FC = () => {
               </div>
               
               <Tabs defaultValue="form-data" className="flex-grow flex flex-col">
-                <TabsList className="w-full bg-[#252525] mb-4">
-                  <TabsTrigger value="form-data" className="flex-1">Form Data</TabsTrigger>
-                  <TabsTrigger value="claude-content" className="flex-1">Claude 3.7 Output</TabsTrigger>
-                  <TabsTrigger value="ai-content" className="flex-1">GPT-4o Output</TabsTrigger>
+                <TabsList className="w-full bg-[#252525] mb-4 grid grid-cols-3">
+                  <TabsTrigger value="form-data" className="flex items-center justify-center">Form Data</TabsTrigger>
+                  <TabsTrigger value="claude-content" className="flex items-center justify-center">Claude 3.7 Output</TabsTrigger>
+                  <TabsTrigger value="ai-content" className="flex items-center justify-center">GPT-4o Output</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="form-data" className="flex-grow data-[state=active]:flex flex-col mt-0">
