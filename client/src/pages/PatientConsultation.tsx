@@ -3,8 +3,7 @@ import { useParams } from 'wouter';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { queryClient } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
-import Sidebar from '@/components/layout/Sidebar';
-import Navbar from '@/components/layout/Navbar';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import LeftPanel from '@/components/consultation/LeftPanel';
 import MiddlePanel from '@/components/consultation/MiddlePanel';
 import RightPanel from '@/components/consultation/RightPanel';
@@ -193,54 +192,46 @@ export default function PatientConsultation() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
-      <Sidebar />
-      
-      <div className="flex flex-col w-0 flex-1 overflow-hidden">
-        <Navbar />
+    <AppLayoutSpruce>
+      <div className="container py-6">
+        <h1 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+          Patient Consultation
+        </h1>
         
-        <main className="flex-1 relative overflow-y-auto focus:outline-none">
-          <div className="py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-              <h1 className="text-2xl font-semibold text-gray-900">Patient Consultation</h1>
-            </div>
+        <div className="w-full">
+          {/* Three-panel layout */}
+          <div className="flex flex-col lg:flex-row h-[calc(100vh-12rem)]">
+            {/* Left Panel: Manual Input */}
+            <LeftPanel 
+              onSendMessage={(message, messageType) => 
+                sendMessage.mutate({ message, messageType })
+              }
+              isSending={sendMessage.isPending}
+            />
             
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-              {/* Three-panel layout */}
-              <div className="mt-4 flex flex-col lg:flex-row h-[calc(100vh-12rem)]">
-                {/* Left Panel: Manual Input */}
-                <LeftPanel 
-                  onSendMessage={(message, messageType) => 
-                    sendMessage.mutate({ message, messageType })
-                  }
-                  isSending={sendMessage.isPending}
-                />
-                
-                {/* Middle Panel: AI Suggestions */}
-                <MiddlePanel 
-                  patient={patient}
-                  documentation={documentation}
-                  isLoading={isLoadingPatient || generateDocumentation.isPending}
-                  onRegenerateDocumentation={() => generateDocumentation.mutate()}
-                  onUpdateDocumentation={(id, updates) => 
-                    updateDocumentation.mutate({ id, ...updates })
-                  }
-                  onSendApprovedItems={sendApprovedItems}
-                  isUpdating={updateDocumentation.isPending}
-                  isSending={sendMessage.isPending}
-                />
-                
-                {/* Right Panel: Patient Messages */}
-                <RightPanel 
-                  messages={messages || []}
-                  isLoading={isLoadingMessages}
-                  patient={patient}
-                />
-              </div>
-            </div>
+            {/* Middle Panel: AI Suggestions */}
+            <MiddlePanel 
+              patient={patient}
+              documentation={documentation}
+              isLoading={isLoadingPatient || generateDocumentation.isPending}
+              onRegenerateDocumentation={() => generateDocumentation.mutate()}
+              onUpdateDocumentation={(id, updates) => 
+                updateDocumentation.mutate({ id, ...updates })
+              }
+              onSendApprovedItems={sendApprovedItems}
+              isUpdating={updateDocumentation.isPending}
+              isSending={sendMessage.isPending}
+            />
+            
+            {/* Right Panel: Patient Messages */}
+            <RightPanel 
+              messages={messages || []}
+              isLoading={isLoadingMessages}
+              patient={patient}
+            />
           </div>
-        </main>
+        </div>
       </div>
-    </div>
+    </AppLayoutSpruce>
   );
 }
