@@ -18,7 +18,7 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import BaseLayout from "@/components/layout/BaseLayout";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 
 export default function FormViewPage() {
   const [, params] = useRoute('/forms/:id');
@@ -125,17 +125,17 @@ export default function FormViewPage() {
   
   if (isLoadingTemplate) {
     return (
-      <BaseLayout>
+      <AppLayoutSpruce>
         <div className="container mx-auto py-6 flex justify-center items-center min-h-[calc(100vh-10rem)]">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
-      </BaseLayout>
+      </AppLayoutSpruce>
     );
   }
   
   if (error || !formTemplate) {
     return (
-      <BaseLayout>
+      <AppLayoutSpruce>
         <div className="container mx-auto py-6">
           <div className="mb-4">
             <Link href="/forms">
@@ -154,7 +154,7 @@ export default function FormViewPage() {
             </Button>
           </div>
         </div>
-      </BaseLayout>
+      </AppLayoutSpruce>
     );
   }
   

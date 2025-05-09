@@ -3,7 +3,7 @@ import { useParams, useLocation } from 'wouter';
 import { useQuery } from '@tanstack/react-query';
 import { Loader2 } from 'lucide-react';
 
-import ThreePanelLayout from '@/components/dashboard/ThreePanelLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import SpruceConversation from '@/components/conversation/SpruceConversation';
 
 export default function SpruceChatPage() {
@@ -35,43 +35,49 @@ export default function SpruceChatPage() {
   // If no patient is selected, show a placeholder
   if (!patientId) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#121212] text-white">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-3">Select a Patient</h2>
-          <p className="text-gray-400 max-w-md">
-            Use the search button in the top right to find and select a patient to begin.
-          </p>
+      <AppLayoutSpruce>
+        <div className="flex items-center justify-center min-h-[60vh] bg-[#121212] text-white">
+          <div className="text-center">
+            <h2 className="text-xl font-semibold mb-3">Select a Patient</h2>
+            <p className="text-gray-400 max-w-md">
+              Use the search button in the top right to find and select a patient to begin.
+            </p>
+          </div>
         </div>
-      </div>
+      </AppLayoutSpruce>
     );
   }
   
   // Loading state
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#121212] text-white">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-      </div>
+      <AppLayoutSpruce>
+        <div className="flex items-center justify-center min-h-[60vh] bg-[#121212] text-white">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        </div>
+      </AppLayoutSpruce>
     );
   }
   
   // Error state
   if (error || !patient) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-[#121212] text-white">
-        <div className="text-center text-red-400">
-          <h2 className="text-xl font-semibold mb-3">Error Loading Patient</h2>
-          <p className="max-w-md">
-            Failed to load patient data. Please try again or select a different patient.
-          </p>
-          <button 
-            className="mt-4 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-md"
-            onClick={() => setLocation('/')}
-          >
-            Go Back
-          </button>
+      <AppLayoutSpruce>
+        <div className="flex items-center justify-center min-h-[60vh] bg-[#121212] text-white">
+          <div className="text-center text-red-400">
+            <h2 className="text-xl font-semibold mb-3">Error Loading Patient</h2>
+            <p className="max-w-md">
+              Failed to load patient data. Please try again or select a different patient.
+            </p>
+            <button 
+              className="mt-4 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-md"
+              onClick={() => setLocation('/')}
+            >
+              Go Back
+            </button>
+          </div>
         </div>
-      </div>
+      </AppLayoutSpruce>
     );
   }
   
@@ -79,16 +85,11 @@ export default function SpruceChatPage() {
   const patientLanguage = patient?.language === 'french' ? 'french' : 'english';
   
   return (
-    <ThreePanelLayout
-      patientId={patientId}
-      patientLanguage={patientLanguage}
-      onSendMessage={handleSendMessage}
-      onPatientSelect={handlePatientSelect}
-    >
+    <AppLayoutSpruce>
       <SpruceConversation
         patientId={patientId}
         doctorName="Dr. Font"
       />
-    </ThreePanelLayout>
+    </AppLayoutSpruce>
   );
 }
