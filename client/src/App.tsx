@@ -25,6 +25,7 @@ import UrgentCarePage from '@/pages/urgent-care-page';
 import SubscriptionPage from '@/pages/subscription-page';
 import LeadershipAssociationPage from '@/pages/leadership-association-page';
 import PrioritizedTasksPage from '@/pages/prioritized-tasks-page';
+import MessagesPage from '@/pages/messages-page';
 import ClaudeAIPage from '@/pages/claude-ai-page';
 import ClaudeCodeAssistantPage from '@/pages/claude-code-assistant-page';
 // New settings pages
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/" component={HomePage} />
       <Route path="/patients" component={PatientsPage} />
       <Route path="/documents" component={DocumentsPage} />
+      <Route path="/messages" component={MessagesPage} />
       <Route path="/education" component={EducationPage} />
       <Route path="/forms" component={FormsPage} />
       <Route path="/forms/new" component={FormBuilderPage} />

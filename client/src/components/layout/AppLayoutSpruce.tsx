@@ -1,6 +1,5 @@
 import React, { useState, ReactNode, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import SpruceTopNavbar from './SpruceTopNavbar';
 import {
   Users,
   FileText,
@@ -575,9 +574,6 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
             </Avatar>
           </div>
         </header>
-        
-        {/* Spruce-style Top Navigation Menu */}
-        <SpruceTopNavbar />
         
         {/* Content Area */}
         <main className="flex-1 overflow-auto bg-[#151515] p-6">
