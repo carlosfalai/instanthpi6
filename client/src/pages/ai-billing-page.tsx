@@ -40,7 +40,7 @@ import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import AppLayout from '@/components/layout/AppLayout';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 
 interface BillingEntry {
   id: number;
@@ -156,7 +156,7 @@ export default function AiBillingPage() {
   };
 
   return (
-    <AppLayout>
+    <AppLayoutSpruce>
       <div className="p-4">
         <div className="max-w-7xl mx-auto">
           <header className="mb-6">
@@ -497,6 +497,6 @@ export default function AiBillingPage() {
           </main>
         </div>
       </div>
-    </AppLayout>
+    </AppLayoutSpruce>
   );
 }
