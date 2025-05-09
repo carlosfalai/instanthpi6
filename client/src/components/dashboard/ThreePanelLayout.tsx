@@ -6,7 +6,7 @@ import PendingItemsPanel from './PendingItemsPanel';
 import AiAssistantPanel from '@/components/ai/AiAssistantPanel';
 import PatientSearchPanel from '@/components/patients/PatientSearchPanel';
 import SpruceConversation from '@/components/conversation/SpruceConversation';
-import NavigationBar from '@/components/navigation/NavigationBar';
+// NavigationBar now provided by AppLayoutSpruce
 
 // Interfaces
 interface Patient {
@@ -75,15 +75,7 @@ export default function ThreePanelLayout() {
   };
   
   return (
-    <div className="h-screen flex flex-col bg-[#121212] text-white">
-      {/* Header */}
-      <header className="h-14 flex items-center px-6 bg-[#1e1e1e] border-b border-gray-800">
-        <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">InstantHPI</h1>
-      </header>
-      
-      {/* Navigation Bar */}
-      <NavigationBar />
-      
+    <div className="h-full flex flex-col bg-[#121212] text-white">
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <ResizablePanelGroup direction="horizontal">
@@ -131,6 +123,8 @@ export default function ThreePanelLayout() {
                     </div>
                   ) : (
                     <SpruceConversation 
+                      patientId={selectedPatientId}
+                      doctorName="Dr. Font"
                       messages={messages}
                       onSendMessage={handleSendMessage}
                       patientName={selectedPatient?.name || 'Patient'}
