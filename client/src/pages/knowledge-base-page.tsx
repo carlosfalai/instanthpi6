@@ -287,7 +287,30 @@ const diagnosisList: Diagnosis[] = [
   },
   { id: '13', name: 'Conjunctivitis (Infectious, Allergic, Viral, Bacterial)', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '14', name: 'Depression', category: 'mental', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
-  { id: '16', name: 'Fatigue', category: 'common', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
+  { 
+    id: '16', 
+    name: 'Fatigue', 
+    category: 'common', 
+    standardProtocol: '🩺 Fatigue\n☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)\n☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating \'Examen: Non réalisé\'. Keep the plan to only essential interventions, ideally in one line.)\n☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.\n☐ Prepare message since I suspect severe anemia or other critical cause requiring urgent evaluation (red flags: syncope, chest pain, dyspnea, pallor, hemodynamic instability, significant weight loss, neurological symptoms)\n\nInvestigations and initial evaluation:\n☐ Complete blood count (CBC) with differential\n☐ Comprehensive metabolic panel (CMP)\n☐ Thyroid function tests (TSH, Free T4)\n☐ Iron studies (Ferritin, TIBC, Iron, % Saturation)\n☐ B12 and Folate levels\n☐ Vitamin D level\n☐ Erythrocyte sedimentation rate (ESR)\n☐ C-reactive protein (CRP)\n☐ HbA1c\n☐ Urinalysis\n☐ EKG\n☐ Chest X-ray\n☐ Sleep apnea screening\n☐ Epstein-Barr virus antibodies\n☐ HIV testing\n☐ Hepatitis panel\n☐ ANA and other autoimmune panels\n☐ Cortisol level (AM)\n☐ Testosterone (males)/Estradiol (females)\n\nMedications:\n□ Iron supplement □ Ferrous sulfate 325mg PO daily, □ Ferrous sulfate 325mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24\n□ Vitamin B12 □ 1000mcg PO daily, □ 1000mcg IM weekly x4 then monthly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24\n□ Vitamin D3 □ 1000IU PO daily, □ 2000IU PO daily, □ 5000IU PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24\n□ Folate □ 1mg PO daily, □ 5mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24\n□ Caffeine □ 100mg PO BID, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24\n□ Modafinil □ 100mg PO daily, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24\n□ Multivitamin □ 1 tablet PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24\n\nTreatment options:\n☐ Sleep hygiene education\n☐ Graduated exercise program\n☐ Stress reduction techniques\n☐ Cognitive behavioral therapy\n☐ Nutritional counseling\n☐ Regular sleep schedule\n☐ Hydration guidance (2-3 liters daily)\n☐ Energy conservation techniques\n☐ Reduce caffeine and alcohol intake\n☐ Regular meals with balanced nutrition\n\nReferral options:\n☐ Referral to sleep medicine\n☐ Referral to endocrinology\n☐ Referral to hematology\n☐ Referral to psychiatry/psychology\n☐ Referral to neurology\n☐ Referral to rheumatology\n☐ Referral to cardiology\n☐ Referral to integrative medicine\n☐ Referral to infectious disease\n☐ Referral to nutritionist/dietitian\n\n☐ Counseling: Fatigue is a complex symptom with many possible causes. Investigations may take time to identify the underlying cause. Maintain regular sleep schedule, balanced nutrition, and moderate physical activity. Avoid excessive caffeine, alcohol, and processed foods. Practice stress management techniques. Return if symptoms worsen, new symptoms develop, or no improvement after 4 weeks.\n\nFollow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you', 
+    standardProtocolEnabled: false, 
+    treatments: [
+      { id: '16-1', name: 'Complete blood count (CBC)', category: 'testing', enabled: true },
+      { id: '16-2', name: 'Comprehensive metabolic panel (CMP)', category: 'testing', enabled: true },
+      { id: '16-3', name: 'Thyroid function tests', category: 'testing', enabled: true },
+      { id: '16-4', name: 'Iron studies', category: 'testing', enabled: true },
+      { id: '16-5', name: 'B12 and Folate levels', category: 'testing', enabled: true },
+      { id: '16-6', name: 'Vitamin D level', category: 'testing', enabled: true },
+      { id: '16-7', name: 'Sleep apnea screening', category: 'testing', enabled: true },
+      { id: '16-8', name: 'Iron supplementation', category: 'medication', enabled: false },
+      { id: '16-9', name: 'Vitamin B12 supplementation', category: 'medication', enabled: false },
+      { id: '16-10', name: 'Sleep hygiene education', category: 'lifestyle', enabled: true },
+      { id: '16-11', name: 'Graduated exercise program', category: 'lifestyle', enabled: true },
+      { id: '16-12', name: 'Stress reduction techniques', category: 'lifestyle', enabled: true },
+      { id: '16-13', name: 'Referral to sleep medicine', category: 'referral', enabled: false },
+      { id: '16-14', name: 'Referral to endocrinology', category: 'referral', enabled: false },
+      { id: '16-15', name: 'Referral to hematology', category: 'referral', enabled: false },
+    ]
+  },
   { id: '17', name: 'GERD (Gastroesophageal Reflux Disease)', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '18', name: 'Gout', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { 
@@ -331,24 +354,7 @@ const diagnosisList: Diagnosis[] = [
   { id: '21', name: 'Hyperlipidemia', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '23', name: 'Hypothyroidism', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '24', name: 'Insomnia', category: 'common', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
-  {
-    id: '24-sp',
-    name: 'Shoulder Pain',
-    category: 'acute',
-    standardProtocol: '🩺 Shoulder Pain\n☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)\n☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating \'Examen: Non réalisé\'. Keep the plan to only essential interventions, ideally in one line.)\n☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.\n\nInvestigations and initial evaluation:\n☐ Shoulder X-ray AP, lateral, axillary views\n☐ MRI of shoulder without contrast if persistent pain, suspicion of rotator cuff tear, labral tear, or instability\n\nPain management (prescriptions for 14 days):\n  ☐ Acetaminophen 500–1000 mg PO QID PRN x 14 days\n  ☐ Ibuprofen 400 mg PO QID PRN x 14 days\n\nTreatment options:\n  ☐ Physical therapy referral for rotator cuff strengthening and shoulder stabilization\n  ☐ Subacromial corticosteroid injection if persistent bursitis\n  ☐ Short-term sling use if acute trauma (limit immobilization)\n\n☐ Referral to orthopedics if rotator cuff tear, labral injury, or refractory symptoms\n\n☐ Counseling and hydration: Counsel on gentle mobilization of shoulder to avoid adhesive capsulitis, avoid heavy lifting until reassessment, maintain hydration by drinking approximately 2–3 liters of water daily adjusted to thirst and body size.\n\n• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you',
-    standardProtocolEnabled: false,
-    treatments: [
-      { id: 'sp-1', name: 'Shoulder X-ray (AP, lateral, axillary views)', category: 'testing', enabled: true },
-      { id: 'sp-2', name: 'MRI of shoulder without contrast', category: 'testing', enabled: false },
-      { id: 'sp-3', name: 'Acetaminophen 500-1000 mg PO QID PRN x 14 days', category: 'medication', enabled: true },
-      { id: 'sp-4', name: 'Ibuprofen 400 mg PO QID PRN x 14 days', category: 'medication', enabled: false },
-      { id: 'sp-5', name: 'Physical therapy referral', category: 'referral', enabled: true },
-      { id: 'sp-6', name: 'Subacromial corticosteroid injection', category: 'medication', enabled: false },
-      { id: 'sp-7', name: 'Short-term sling use if acute trauma', category: 'lifestyle', enabled: false },
-      { id: 'sp-8', name: 'Orthopedics referral if severe', category: 'referral', enabled: false },
-      { id: 'sp-9', name: 'Patient education on shoulder care', category: 'lifestyle', enabled: true }
-    ]
-  },
+  // Removed duplicate Shoulder Pain entry with ID 24-sp
   { id: '25', name: 'Irregular Periods/Amenorrhea', category: 'common', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '26', name: 'Knee Pain', category: 'common', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '27', name: 'Laryngitis', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
@@ -357,7 +363,6 @@ const diagnosisList: Diagnosis[] = [
   { id: '30', name: 'Osteoarthritis', category: 'chronic', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '31', name: 'Paronychia', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
   { id: '32', name: 'Pharyngitis (Strep throat)', category: 'acute', standardProtocol: '', standardProtocolEnabled: false, treatments: [] },
-  // Removed duplicate entry for Shingles/Herpes Zoster - using the comprehensive protocol already added
   { 
     id: '34', 
     name: 'Shoulder Pain', 
@@ -377,7 +382,7 @@ const diagnosisList: Diagnosis[] = [
       { id: '34-10', name: 'Short-term sling if acute trauma', category: 'lifestyle', enabled: false },
       { id: '34-11', name: 'Orthopedics referral if indicated', category: 'referral', enabled: false },
       { id: '34-12', name: 'Patient education on gentle mobilization', category: 'lifestyle', enabled: true },
-      { id: '34-13', name: 'SOAP note preparation', category: 'examination', enabled: true },
+      { id: '34-13', name: 'SOAP note preparation', category: 'examination', enabled: true }
     ]
   },
   { 

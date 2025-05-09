@@ -1,0 +1,370 @@
+🩺 Fatigue
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect severe anemia or other critical cause requiring urgent evaluation (red flags: syncope, chest pain, dyspnea, pallor, hemodynamic instability, significant weight loss, neurological symptoms)
+
+Investigations and initial evaluation:
+☐ Complete blood count (CBC) with differential
+☐ Comprehensive metabolic panel (CMP)
+☐ Thyroid function tests (TSH, Free T4)
+☐ Iron studies (Ferritin, TIBC, Iron, % Saturation)
+☐ B12 and Folate levels
+☐ Vitamin D level
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ HbA1c
+☐ Urinalysis
+☐ EKG
+☐ Chest X-ray
+☐ Sleep apnea screening
+☐ Epstein-Barr virus antibodies
+☐ HIV testing
+☐ Hepatitis panel
+☐ ANA and other autoimmune panels
+☐ Cortisol level (AM)
+☐ Testosterone (males)/Estradiol (females)
+
+Medications:
+□ Iron supplement □ Ferrous sulfate 325mg PO daily, □ Ferrous sulfate 325mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Vitamin B12 □ 1000mcg PO daily, □ 1000mcg IM weekly x4 then monthly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Vitamin D3 □ 1000IU PO daily, □ 2000IU PO daily, □ 5000IU PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Folate □ 1mg PO daily, □ 5mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Caffeine □ 100mg PO BID, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Modafinil □ 100mg PO daily, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Multivitamin □ 1 tablet PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Sleep hygiene education
+☐ Graduated exercise program
+☐ Stress reduction techniques
+☐ Cognitive behavioral therapy
+☐ Nutritional counseling
+☐ Regular sleep schedule
+☐ Hydration guidance (2-3 liters daily)
+☐ Energy conservation techniques
+☐ Reduce caffeine and alcohol intake
+☐ Regular meals with balanced nutrition
+
+Referral options:
+☐ Referral to sleep medicine
+☐ Referral to endocrinology
+☐ Referral to hematology
+☐ Referral to psychiatry/psychology
+☐ Referral to neurology
+☐ Referral to rheumatology
+☐ Referral to cardiology
+☐ Referral to integrative medicine
+☐ Referral to infectious disease
+☐ Referral to nutritionist/dietitian
+
+☐ Counseling: Fatigue is a complex symptom with many possible causes. Investigations may take time to identify the underlying cause. Maintain regular sleep schedule, balanced nutrition, and moderate physical activity. Avoid excessive caffeine, alcohol, and processed foods. Practice stress management techniques. Return if symptoms worsen, new symptoms develop, or no improvement after 4 weeks.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Headache – Tension Type
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect secondary headache requiring urgent evaluation (red flags: thunderclap onset, worst headache of life, fever, altered mental status, focal neurological deficits, sudden onset in patient >50, associated with exertion/sexual activity, immunocompromised)
+
+Investigations and initial evaluation:
+☐ Brain MRI without contrast
+☐ Brain MRI with contrast
+☐ CT head without contrast
+☐ Cervical spine X-ray
+☐ Cervical spine MRI
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ Thyroid function tests
+☐ Sleep study
+☐ Sinus CT
+☐ Visual field testing
+☐ Fundoscopic examination
+☐ Temporal artery biopsy (if giant cell arteritis suspected)
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 1500mg daily)
+□ Cyclobenzaprine □ 5mg PO TID, □ 10mg PO TID, □ 10mg PO QHS, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 30mg daily)
+□ Amitriptyline □ 10mg PO QHS, □ 25mg PO QHS, □ 50mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Nortriptyline □ 10mg PO QHS, □ 25mg PO QHS, □ 50mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Propranolol □ 20mg PO BID, □ 40mg PO BID, □ 60mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Topiramate □ 25mg PO QHS, □ 50mg PO BID, □ 100mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Heat or cold therapy to neck/shoulders
+☐ Stress management techniques
+☐ Regular exercise program
+☐ Proper ergonomics
+☐ Sleep hygiene education
+☐ Trigger point therapy
+☐ Massage therapy
+☐ Biofeedback
+☐ Acupuncture
+☐ Relaxation techniques
+☐ Headache diary
+
+Referral options:
+☐ Referral to neurology
+☐ Referral to physical therapy
+☐ Referral to pain management
+☐ Referral to psychiatry/psychology
+☐ Referral to sleep medicine
+☐ Referral to neuro-ophthalmology
+☐ Referral to rheumatology
+☐ Referral to chiropractor
+☐ Referral to acupuncturist
+☐ Referral to massage therapy
+
+☐ Counseling: Tension headaches are often triggered by stress, poor posture, irregular sleep, and eye strain. Maintain regular sleep schedule, practice good posture, take regular breaks from computer work, and manage stress. Use proper lighting when reading. Stay hydrated and avoid skipping meals. Limit caffeine and alcohol intake. Return if headache pattern changes, severe sudden headache occurs, or associated symptoms like fever, vision changes, or neurological symptoms develop.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Insomnia
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious medical condition causing insomnia (red flags: severe depression with suicidal ideation, significant breathing disruption during sleep, violent behaviors during sleep, narcolepsy symptoms, severe medication side effects)
+
+Investigations and initial evaluation:
+☐ Sleep diary (2 weeks)
+☐ Insomnia Severity Index
+☐ Sleep apnea screening
+☐ Home sleep study
+☐ Polysomnography
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ Thyroid function tests
+☐ Iron studies
+☐ Vitamin D level
+☐ Depression screening (PHQ-9)
+☐ Anxiety screening (GAD-7)
+☐ Substance use screening
+☐ Assessment of medications for sleep-disrupting effects
+☐ Actigraphy monitoring
+
+Medications:
+□ Melatonin □ 1mg PO QHS, □ 3mg PO QHS, □ 5mg PO QHS, □ 10mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Zolpidem □ 5mg PO QHS PRN, □ 10mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (short-term use only)
+□ Eszopiclone □ 1mg PO QHS PRN, □ 2mg PO QHS PRN, □ 3mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (short-term use only)
+□ Trazodone □ 25mg PO QHS PRN, □ 50mg PO QHS PRN, □ 100mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Mirtazapine □ 7.5mg PO QHS, □ 15mg PO QHS, □ 30mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Doxepin □ 3mg PO QHS, □ 6mg PO QHS, □ 10mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Diphenhydramine □ 25mg PO QHS PRN, □ 50mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (short-term use only)
+□ Magnesium glycinate □ 200mg PO QHS, □ 400mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Sleep hygiene education
+☐ Cognitive behavioral therapy for insomnia (CBT-I)
+☐ Stimulus control therapy
+☐ Sleep restriction therapy
+☐ Relaxation techniques
+☐ Regular exercise program (not within 3 hours of bedtime)
+☐ Blue light reduction in evenings
+☐ Consistent sleep schedule
+☐ Limit caffeine after noon
+☐ Avoid alcohol near bedtime
+☐ Bedroom environment optimization
+
+Referral options:
+☐ Referral to sleep medicine
+☐ Referral to psychiatry/psychology
+☐ Referral to behavioral therapist for CBT-I
+☐ Referral to endocrinology
+☐ Referral to neurology
+☐ Referral to pain management
+☐ Referral to ENT (if sleep apnea suspected)
+☐ Referral to pulmonology (if sleep apnea suspected)
+☐ Referral to integrative medicine
+☐ Referral to nutritionist
+
+☐ Counseling: Insomnia can have many underlying causes including stress, poor sleep habits, medical conditions, and medications. Maintain a regular sleep schedule with consistent bedtime and wake time, even on weekends. Create a relaxing bedtime routine. Avoid electronic screens 1-2 hours before bed. Keep bedroom dark, quiet, and cool. Use bed only for sleep and intimacy. Limit caffeine, alcohol, and large meals before bedtime. Exercise regularly but not close to bedtime. If unable to fall asleep after 20 minutes, get up and do a quiet activity until sleepy. Return if symptoms worsen or depression/anxiety develop.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Irregular Periods/Amenorrhea
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe pelvic pain, heavy bleeding, signs of premature menopause in young patient, suspected pregnancy with bleeding, positive pregnancy test with severe pain)
+
+Investigations and initial evaluation:
+☐ Pregnancy test (urine/serum)
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ Thyroid function tests (TSH, Free T4)
+☐ Prolactin level
+☐ Follicle-stimulating hormone (FSH)
+☐ Luteinizing hormone (LH)
+☐ Estradiol
+☐ Progesterone level
+☐ Total and free testosterone
+☐ Sex hormone binding globulin (SHBG)
+☐ Dehydroepiandrosterone sulfate (DHEAS)
+☐ 17-hydroxyprogesterone
+☐ Androstenedione
+☐ Pelvic ultrasound
+☐ Transvaginal ultrasound
+☐ Endometrial biopsy
+☐ HbA1c
+☐ Lipid panel
+☐ Ferritin/iron studies
+
+Medications:
+□ Combined oral contraceptive pill □ Specify: ________________, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Progestin-only pill □ Specify: ________________, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Medroxyprogesterone □ 5mg PO daily x10 days, □ 10mg PO daily x10 days, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Norethindrone acetate □ 5mg PO daily, □ 5mg PO BID, □ 5mg PO TID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Levonorgestrel IUD □ Prescribe for insertion, Ren: □ 1
+□ Spironolactone □ 25mg PO daily, □ 50mg PO daily, □ 100mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Metformin □ 500mg PO daily, □ 500mg PO BID, □ 1000mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Iron supplement □ Ferrous sulfate 325mg PO daily, □ Ferrous sulfate 325mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Regular exercise program
+☐ Weight management counseling
+☐ Nutritional counseling
+☐ Stress reduction techniques
+☐ Track menstrual cycles
+☐ Balanced diet with adequate protein and healthy fats
+☐ Avoid excessive exercise
+☐ Maintain healthy BMI
+
+Referral options:
+☐ Referral to gynecology
+☐ Referral to reproductive endocrinology
+☐ Referral to endocrinology
+☐ Referral to nutritionist/dietitian
+☐ Referral to psychiatry/psychology
+☐ Referral to eating disorder specialist
+☐ Referral to fertility specialist
+☐ Referral to integrative medicine
+☐ Referral to genetics
+
+☐ Counseling: Irregular periods can have many causes including hormonal imbalances, stress, weight changes, thyroid disorders, and polycystic ovary syndrome (PCOS). Maintain a menstrual calendar to track cycles. Maintain healthy weight through balanced nutrition and regular exercise. Manage stress through relaxation techniques. Return if severe pain occurs, heavy bleeding develops, or no period for more than 3 months after normal cycles.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Knee Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe trauma, inability to bear weight, significant joint effusion, fever, erythema/warmth suggesting infection, locked knee, popliteal mass)
+
+Investigations and initial evaluation:
+☐ Knee X-ray (weight-bearing, AP, lateral, sunrise, tunnel views)
+☐ Knee MRI without contrast
+☐ Knee MRI with contrast
+☐ Knee ultrasound
+☐ Complete blood count (CBC)
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ Uric acid level
+☐ Rheumatoid factor
+☐ Anti-CCP antibodies
+☐ ANA panel
+☐ HLA-B27
+☐ Joint aspiration with synovial fluid analysis
+☐ Blood cultures (if infection suspected)
+☐ CT scan of knee
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 1500mg daily)
+□ Meloxicam □ 7.5mg PO daily, □ 15mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Celecoxib □ 100mg PO daily, □ 200mg PO daily, □ 200mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Diclofenac gel 1% □ apply to affected area QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Cyclobenzaprine □ 5mg PO TID, □ 10mg PO TID, □ 10mg PO QHS, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 30mg daily)
+□ Tramadol □ 50mg PO Q6H PRN, □ 50mg PO TID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 400mg daily)
+
+Treatment options:
+☐ RICE protocol (Rest, Ice, Compression, Elevation)
+☐ Physical therapy referral
+☐ Knee brace/support
+☐ Cane or crutches for ambulation
+☐ Weight management strategies
+☐ Low-impact exercise program
+☐ Aquatic therapy
+☐ Intra-articular corticosteroid injection
+☐ Hyaluronic acid injection
+☐ Platelet-rich plasma injection
+☐ Activity modification
+
+Referral options:
+☐ Referral to orthopedic surgery
+☐ Referral to sports medicine
+☐ Referral to physical therapy
+☐ Referral to rheumatology
+☐ Referral to pain management
+☐ Referral to physiatry (PM&R)
+☐ Referral to integrative medicine
+☐ Referral to weight management
+☐ Referral to occupational therapy
+☐ Referral to podiatry (for gait/alignment issues)
+
+☐ Counseling: Knee pain can result from injury, arthritis, or overuse. Apply ice for acute pain (15-20 minutes several times daily) and heat for chronic pain. Avoid activities that worsen pain. Use proper footwear with good support. Lose weight if overweight to reduce stress on knees. Strengthen quadriceps and hamstring muscles through approved exercises. Modify activities to avoid high-impact movements. Return if pain worsens, swelling increases, knee locks or gives way, unable to bear weight, or fever develops.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Shoulder Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect rotator cuff tear requiring urgent orthopedic evaluation (red flags: traumatic injury with immediate weakness, significant night pain, inability to raise arm, positive drop arm test, audible pop during injury)
+
+Investigations and initial evaluation:
+☐ Shoulder X-ray AP, lateral, axillary views
+☐ Ultrasound MSK of shoulder for rotator cuff pathology, bursitis, or impingement
+☐ MRI of shoulder without contrast
+☐ MRI of shoulder with contrast (for labral tears)
+☐ MR arthrogram of shoulder
+☐ CT scan of shoulder
+☐ EMG/NCS for suspected nerve involvement
+☐ Complete blood count (CBC)
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ Rheumatoid factor
+☐ Anti-CCP antibodies
+☐ HLA-B27
+
+Medications:
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 1500mg daily)
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Cyclobenzaprine □ 5mg PO TID, □ 10mg PO TID, □ 10mg PO QHS, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 30mg daily)
+□ Methocarbamol □ 500mg PO QID, □ 750mg PO QID, □ 750mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Diclofenac gel 1% □ apply to affected area QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lidocaine patch 5% □ apply to affected area daily for 12 hours, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Ice 20 minutes QID for first 48 hours, then heat
+☐ Physical therapy referral for rotator cuff strengthening and shoulder stabilization
+☐ Subacromial corticosteroid injection if persistent bursitis
+☐ Short-term sling use if acute trauma (limit immobilization)
+☐ Gentle pendulum exercises after 3-5 days as tolerated
+☐ Ultrasound-guided glenohumeral joint injection
+☐ Transcutaneous electrical nerve stimulation (TENS)
+☐ Acupuncture
+☐ Massage therapy
+☐ Kinesio taping
+
+Referral options:
+☐ Referral to orthopedics
+☐ Referral to sports medicine
+☐ Referral to physical therapy
+☐ Referral to occupational therapy
+☐ Referral to pain management
+☐ Referral to rheumatology
+☐ Referral to physiatry (PM&R)
+☐ Referral to massage therapy
+☐ Referral to acupuncture
+☐ Referral to chiropractic
+
+☐ Counseling: Counsel on gentle mobilization of shoulder to avoid adhesive capsulitis, avoid heavy lifting until reassessment, maintain hydration by drinking approximately 2–3 liters of water daily adjusted to thirst and body size. Gradually return to activities as tolerated. May require 4-6 weeks for significant improvement. Sleep with pillow supporting affected arm if helpful. Avoid overhead activities until pain improves.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you

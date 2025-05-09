@@ -1,0 +1,149 @@
+🩺 Laryngitis
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect epiglottitis or other airway emergency (red flags: stridor, respiratory distress, difficulty swallowing, drooling, sitting in tripod position, rapid onset, high fever)
+
+Investigations and initial evaluation:
+☐ Rapid strep test
+☐ Throat culture
+☐ Influenza testing
+☐ COVID-19 testing
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ C-reactive protein (CRP)
+☐ Viral respiratory panel
+☐ Chest X-ray
+☐ Lateral neck X-ray
+☐ Neck CT with contrast
+☐ Laryngoscopy
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily) 
+□ Dextromethorphan-guaifenesin □ 10-20mg/200-400mg PO Q4H PRN, □ 20-40mg/400-800mg PO Q4H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 120mg/2400mg daily)
+□ Benzocaine lozenges □ 1 lozenge dissolved in mouth Q2H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 10 lozenges daily)
+□ Amoxicillin □ 500mg PO TID, □ 875mg PO BID, for 7-10 days, Ren: □ 1, □ 2, □ 3
+□ Azithromycin □ 500mg PO day 1, then 250mg PO daily for 4 days, Ren: □ 1
+□ Prednisone □ 20mg PO daily, □ 40mg PO daily, for 5 days, Ren: □ 1
+□ Proton pump inhibitor □ Omeprazole 20mg PO daily, □ Pantoprazole 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Voice rest - minimize talking for 3-7 days
+☐ Humidifier use, especially at night
+☐ Avoid irritants (smoking, alcohol, spicy foods)
+☐ Warm salt water gargles QID
+☐ Steam inhalation for 10-15 minutes several times daily
+☐ Stay well hydrated with warm, non-caffeinated fluids
+☐ Avoid throat clearing and excessive coughing if possible
+☐ Limit caffeine and alcohol intake
+
+Referral options:
+☐ Referral to otolaryngology (ENT)
+☐ Referral to speech therapy
+☐ Referral to pulmonology
+☐ Referral to gastroenterology (if suspected GERD component)
+☐ Referral to infectious disease (if severe infection)
+☐ Referral to emergency department (if airway compromise suspected)
+
+☐ Counseling: Complete voice rest is ideal but impractical for most; whisper rather than strain to talk when necessary. Laryngitis typically resolves within 7-10 days. Return if severe throat pain, difficulty breathing, drooling, stridor, or inability to swallow develops. Maintain adequate hydration. Avoid vocal strain (shouting, singing, whispering) until symptoms resolve.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Oral Herpes
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect severe infection requiring hospitalization in immunocompromised patient (red flags: extensive lesions, lesions spreading to eyes, severe pain preventing eating/drinking, immunocompromised state, high fever)
+
+Investigations and initial evaluation:
+☐ HSV PCR swab from lesion
+☐ HSV IgM and IgG antibodies
+☐ Tzanck smear
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ HIV testing
+☐ CD4 count (if immunocompromised)
+☐ Culture for bacterial superinfection
+☐ Viral culture
+
+Medications:
+□ Valacyclovir □ 1g PO BID for 7-10 days (initial outbreak), □ 2g PO BID for 1 day (recurrence), □ 500mg PO daily (suppression), Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Acyclovir □ 400mg PO TID for 7-10 days (initial), □ 800mg PO TID for 2 days (recurrence), □ 400mg PO BID (suppression), Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Famciclovir □ 250mg PO TID for 7-10 days (initial), □ 1000mg PO BID for 1 day (recurrence), □ 250mg PO BID (suppression), Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Docosanol 10% cream □ apply 5x daily to lesions until healed, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Benzocaine gel □ apply to lesions QID PRN pain, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lidocaine viscous 2% □ apply to lesions QID PRN pain, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ L-lysine □ 1000mg PO daily, □ 1000mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+
+Treatment options:
+☐ Avoid triggers (stress, sun exposure, fatigue, illness)
+☐ Apply cold compress to lesions PRN for comfort
+☐ Maintain adequate hydration
+☐ Soft, non-acidic diet while lesions present
+☐ Lip sunblock SPF 30+ for sun-triggered outbreaks
+☐ Petroleum jelly to keep lesions moist and prevent cracking
+☐ Avoid touching lesions to prevent spread
+
+Referral options:
+☐ Referral to infectious disease (if immunocompromised or severe recurrent outbreaks)
+☐ Referral to dermatology
+☐ Referral to ophthalmology (if periocular lesions or eye involvement)
+☐ Referral to oral medicine/oral surgery (if severe intraoral lesions)
+☐ Referral to immunology (if frequent recurrences)
+☐ Referral to emergency department (if severe systemic symptoms or dehydration)
+
+☐ Counseling: Highly contagious from prodrome until complete healing; avoid kissing, oral sex, and sharing utensils/towels/lip products during outbreaks. Identify and avoid triggers. Start medication at first sign of prodrome (tingling, burning) for best results. Most outbreaks resolve within 7-14 days. Return if severe pain, eye involvement, or lesions worsening despite treatment.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Paronychia
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect severe infection requiring surgical intervention (red flags: extensive cellulitis, ascending lymphangitis, fever, immunocompromised status, significant pain, failed conservative treatment)
+
+Investigations and initial evaluation:
+☐ Culture of drainage
+☐ Gram stain of drainage
+☐ Fungal culture (for chronic paronychia)
+☐ KOH preparation (for suspected fungal infection)
+☐ Complete blood count (CBC)
+☐ C-reactive protein (CRP)
+☐ X-ray of affected digit (if osteomyelitis suspected)
+☐ Blood cultures (if systemic infection suspected)
+☐ Glucose level (if diabetic patient)
+
+Medications:
+□ Cephalexin □ 500mg PO QID, □ 250mg PO QID, for 7-10 days, Ren: □ 1, □ 2, □ 3 (max 4g daily)
+□ Clindamycin □ 300mg PO QID, □ 150mg PO QID, for 7-10 days, Ren: □ 1, □ 2, □ 3 (if penicillin-allergic, max 1.8g daily)
+□ Trimethoprim-sulfamethoxazole □ 1 DS tab PO BID, □ 1 SS tab PO BID, for 7-10 days, Ren: □ 1, □ 2, □ 3 (if MRSA suspected)
+□ Amoxicillin-clavulanate □ 875mg/125mg PO BID, □ 500mg/125mg PO TID, for 7-10 days, Ren: □ 1, □ 2, □ 3
+□ Mupirocin 2% ointment □ apply to affected area TID for 7-10 days, Ren: □ 1, □ 2, □ 3
+□ Ciclopirox 0.77% solution □ apply to affected area BID for 4 weeks, Ren: □ 1, □ 2, □ 3 (for fungal involvement)
+□ Ketoconazole 2% cream □ apply to affected area BID for 2-4 weeks, Ren: □ 1, □ 2, □ 3 (for fungal involvement)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+
+Treatment options:
+☐ Warm soaks in antibacterial soap solution 3-4 times daily for 15 minutes
+☐ Elevation of affected digit to reduce swelling
+☐ Incision and drainage if fluctuant
+☐ Avoid water exposure except during therapeutic soaks
+☐ Avoid trauma to affected digit
+☐ Vinegar soaks (1:4 dilution) for chronic paronychia
+☐ Protective gloves for wet work (chronic paronychia)
+☐ Removal of artificial nails (if present)
+
+Referral options:
+☐ Referral to hand surgery
+☐ Referral to dermatology
+☐ Referral to infectious disease
+☐ Referral to rheumatology (if underlying inflammatory condition)
+☐ Referral to endocrinology (if poorly controlled diabetes)
+☐ Referral to emergency department (if severe infection or systemic symptoms)
+
+☐ Counseling: Keep affected area clean and dry between soaks. Avoid nail biting, finger sucking, and manicures until healed. Complete full course of antibiotics even if symptoms improve. Return if redness spreads, increasing pain, purulent drainage, fever, or no improvement after 48 hours of treatment. For chronic paronychia, avoid frequent water exposure and irritants (soaps, chemicals).
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you

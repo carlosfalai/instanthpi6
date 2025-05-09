@@ -1,0 +1,160 @@
+🩺 Pharyngitis (Strep throat)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect peritonsillar abscess or epiglottitis requiring emergency evaluation (red flags: severe unilateral pain, trismus, muffled voice, drooling, respiratory distress, stridor, inability to swallow, neck swelling)
+
+Investigations and initial evaluation:
+☐ Rapid strep test
+☐ Throat culture
+☐ Mononucleosis testing (Monospot or EBV serology)
+☐ Complete blood count (CBC)
+☐ COVID-19 testing
+☐ Influenza testing
+☐ C-reactive protein (CRP)
+☐ Respiratory viral panel
+☐ Lateral neck X-ray
+☐ Neck CT with contrast
+☐ Throat swab for gonorrhea/chlamydia PCR
+
+Medications:
+□ Amoxicillin □ 500mg PO TID, □ 875mg PO BID, for 10 days, Ren: □ 1, □ 2, □ 3
+□ Penicillin VK □ 250mg PO QID, □ 500mg PO QID, for 10 days, Ren: □ 1, □ 2, □ 3
+□ Azithromycin □ 500mg PO day 1, then 250mg PO daily for 4 days, Ren: □ 1
+□ Clindamycin □ 300mg PO TID, □ 450mg PO TID, for 10 days, Ren: □ 1, □ 2, □ 3
+□ Cephalexin □ 500mg PO BID, □ 500mg PO TID, for 10 days, Ren: □ 1, □ 2, □ 3
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Benzocaine lozenges □ 1 lozenge dissolved in mouth Q2H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 10 lozenges daily)
+□ Phenol throat spray □ 1-2 sprays to throat Q2H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Salt water gargles QID
+☐ Warm liquids (tea with honey, broth)
+☐ Cold foods/beverages for sore throat relief
+☐ Humidifier use, especially at night
+☐ Adequate hydration
+☐ Voice rest as needed
+☐ Avoid irritants (smoking, alcohol)
+☐ Soft diet as tolerated
+
+Referral options:
+☐ Referral to otolaryngology (ENT)
+☐ Referral to infectious disease
+☐ Referral to emergency department
+☐ Referral to pediatrics (for children)
+☐ Referral to allergy/immunology (for recurrent infections)
+☐ Referral to hematology/oncology (for suspicion of malignancy)
+
+☐ Counseling: Complete full course of antibiotics even after symptoms improve. Replace toothbrush after 24-48 hours of antibiotic therapy. Stay home from work/school for 24 hours after starting antibiotics. Return if symptoms worsen, difficulty breathing/swallowing develops, persistent fever, or no improvement after 48-72 hours of treatment. Rest voice as needed and maintain adequate hydration.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Upper Respiratory Infection (Cold, Sinusitis)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect complications requiring emergency evaluation (red flags: severe headache, altered mental status, focal neurological deficits, periorbital swelling/erythema, high fever, respiratory distress)
+
+Investigations and initial evaluation:
+☐ COVID-19 testing
+☐ Influenza testing
+☐ Rapid strep test
+☐ Respiratory viral panel
+☐ Complete blood count (CBC)
+☐ Sinus X-ray
+☐ Sinus CT without contrast
+☐ Chest X-ray
+☐ Nasal endoscopy
+☐ Blood cultures
+☐ Nasal culture
+☐ Sputum culture
+
+Medications:
+□ Amoxicillin □ 500mg PO TID, □ 875mg PO BID, for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Amoxicillin-clavulanate □ 875mg/125mg PO BID, □ 500mg/125mg PO TID, for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Azithromycin □ 500mg PO day 1, then 250mg PO daily for 4 days, Ren: □ 1
+□ Doxycycline □ 100mg PO BID for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Levofloxacin □ 500mg PO daily for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Pseudoephedrine □ 30mg PO Q4-6H PRN, □ 60mg PO Q6H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 240mg daily)
+□ Guaifenesin □ 400mg PO Q4H PRN, □ 600mg PO Q6H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Dextromethorphan □ 10-20mg PO Q4H PRN, □ 30mg PO Q6-8H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 120mg daily)
+□ Fluticasone nasal spray □ 1-2 sprays each nostril daily, □ 1-2 sprays each nostril BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Saline nasal spray □ 1-2 sprays each nostril 3-4 times daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Oxymetazoline nasal spray □ 1-2 sprays each nostril BID for maximum 3 days, Ren: □ 1
+
+Treatment options:
+☐ Nasal saline irrigation BID
+☐ Steam inhalation 10-15 minutes QID
+☐ Humidifier use, especially at night
+☐ Adequate hydration
+☐ Rest
+☐ Warm compress to sinuses TID-QID
+☐ Elevation of head while sleeping
+☐ Avoid allergens and irritants
+
+Referral options:
+☐ Referral to otolaryngology (ENT)
+☐ Referral to allergy/immunology
+☐ Referral to pulmonology
+☐ Referral to infectious disease
+☐ Referral to emergency department
+☐ Referral to neurology (for complicated sinusitis with neurological symptoms)
+
+☐ Counseling: Viral URIs typically resolve within 7-10 days. Acute sinusitis may take 2-3 weeks for complete resolution. Complete full course of antibiotics when prescribed. Avoid antihistamines with viral illnesses as they may thicken secretions. Limit decongestant nasal spray use to 3 days maximum to prevent rebound congestion. Return if symptoms worsen, high fever develops, severe headache, visual changes, facial swelling, or symptoms persist beyond 10-14 days.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Urinary Tract Infection (UTI)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect pyelonephritis or urosepsis requiring emergency evaluation (red flags: high fever, flank pain, severe nausea/vomiting, altered mental status, hypotension, pregnancy, immunocompromised)
+
+Investigations and initial evaluation:
+☐ Urinalysis with microscopy
+☐ Urine culture and sensitivity
+☐ Complete blood count (CBC)
+☐ Basic metabolic panel (BMP)
+☐ Blood cultures
+☐ C-reactive protein (CRP)
+☐ Kidney ultrasound
+☐ CT abdomen/pelvis with contrast
+☐ Pregnancy test for females of reproductive age
+☐ Post-void residual ultrasound
+☐ STI testing
+☐ Prostate-specific antigen (PSA) for males
+
+Medications:
+□ Nitrofurantoin □ 100mg PO BID for 5 days, □ 100mg PO QID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Trimethoprim-sulfamethoxazole □ 1 DS tab PO BID for 3 days, □ 1 DS tab PO BID for 7-14 days, Ren: □ 1, □ 2, □ 3
+□ Fosfomycin □ 3g PO single dose, Ren: □ 1
+□ Ciprofloxacin □ 250mg PO BID for 3 days, □ 500mg PO BID for 7-14 days, Ren: □ 1, □ 2, □ 3
+□ Cephalexin □ 500mg PO QID for 7-14 days, Ren: □ 1, □ 2, □ 3
+□ Amoxicillin-clavulanate □ 500mg/125mg PO TID for 7-14 days, □ 875mg/125mg PO BID for 7-14 days, Ren: □ 1, □ 2, □ 3
+□ Phenazopyridine □ 100mg PO TID for 2 days, □ 200mg PO TID for 2 days, Ren: □ 1
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+
+Treatment options:
+☐ Increased fluid intake (2-3 liters daily)
+☐ Avoid bladder irritants (caffeine, alcohol, spicy foods)
+☐ Void every 2-3 hours during waking hours
+☐ Complete emptying of bladder with each void
+☐ Void before and after sexual activity
+☐ Warm compress to lower abdomen for comfort
+☐ Cranberry supplements (not juice)
+
+Referral options:
+☐ Referral to urology
+☐ Referral to nephrology
+☐ Referral to gynecology (females)
+☐ Referral to infectious disease
+☐ Referral to emergency department
+☐ Referral to pelvic floor physical therapy
+
+☐ Counseling: Complete full course of antibiotics even after symptoms improve. Phenazopyridine will turn urine orange-red; this is normal and not harmful. Increase fluid intake to 2-3 liters daily. Urinate promptly when feeling the urge. For females: wipe front to back, void before and after sexual activity, avoid irritating feminine products. Return if symptoms worsen, fever develops, flank pain occurs, blood in urine, or symptoms persist despite 48-72 hours of antibiotics.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you

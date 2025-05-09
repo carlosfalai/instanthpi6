@@ -1,0 +1,377 @@
+🩺 Chronic Abdominal Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe unremitting pain, significant weight loss, nocturnal symptoms, jaundice, melena/hematochezia, severe persistent vomiting, age >50 with new onset symptoms)
+
+Investigations and initial evaluation:
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ Liver function tests (AST, ALT, alkaline phosphatase, GGT, bilirubin)
+☐ Lipase and amylase
+☐ Thyroid function tests
+☐ Celiac disease panel (tTG-IgA, EMA, DGP antibodies, total IgA)
+☐ H. pylori testing (stool antigen or urea breath test)
+☐ Stool studies (occult blood, calprotectin, culture, ova/parasites, C. difficile)
+☐ Abdominal ultrasound
+☐ CT abdomen/pelvis with contrast
+☐ MRI abdomen with and without contrast
+☐ Upper endoscopy (EGD)
+☐ Colonoscopy
+☐ HIDA scan
+☐ Gastric emptying study
+☐ Small bowel follow-through
+☐ ASCA/ANCA (for IBD suspicion)
+☐ IBS blood test panel
+
+Medications:
+□ Omeprazole □ 20mg PO daily, □ 40mg PO daily, □ 40mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Pantoprazole □ 40mg PO daily, □ 40mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Sucralfate □ 1g PO QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Dicyclomine □ 10mg PO QID, □ 20mg PO QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Hyoscyamine □ 0.125mg SL QID PRN, □ 0.375mg ER PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Amitriptyline □ 10mg PO QHS, □ 25mg PO QHS, □ 50mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Nortriptyline □ 10mg PO QHS, □ 25mg PO QHS, □ 50mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Rifaximin □ 550mg PO TID x 14 days, Ren: □ 1, □ 2, □ 3
+□ Linaclotide □ 72mcg PO daily, □ 145mcg PO daily, □ 290mcg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lubiprostone □ 8mcg PO BID, □ 24mcg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Low FODMAP diet
+☐ Elimination diet with guided reintroduction
+☐ Stress management techniques
+☐ Regular exercise program
+☐ Cognitive behavioral therapy
+☐ Gut-directed hypnotherapy
+☐ Probiotic supplementation
+☐ Identify and avoid trigger foods
+☐ Regular meal pattern
+☐ Small frequent meals
+☐ Adequate hydration (2-3 liters daily)
+
+Referral options:
+☐ Referral to gastroenterology
+☐ Referral to pain management
+☐ Referral to psychiatry/psychology
+☐ Referral to dietitian/nutritionist
+☐ Referral to integrative medicine
+☐ Referral to general surgery
+☐ Referral to gynecology (if pelvic pain component)
+☐ Referral to neurogastroenterology
+☐ Referral to rheumatology
+☐ Referral to physical therapy (for visceral manipulation)
+
+☐ Counseling: Chronic abdominal pain can have multiple causes and may require a multidisciplinary approach. Keep a symptom diary noting pain triggers, intensity, timing, and associated symptoms. Avoid identified trigger foods. Manage stress through relaxation techniques. Maintain regular physical activity. Take medications as prescribed. Return if experiencing severe pain, persistent vomiting, blood in stool, significant weight loss, or new symptoms.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Asthma
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect status asthmaticus or severe exacerbation requiring urgent evaluation (red flags: severe respiratory distress, inability to speak in full sentences, altered mental status, silent chest, oxygen saturation <92%, poor response to rescue inhaler)
+
+Investigations and initial evaluation:
+☐ Pulmonary function tests (spirometry with bronchodilator response)
+☐ Peak flow monitoring
+☐ Chest X-ray
+☐ Complete blood count with differential
+☐ IgE level
+☐ Allergy testing
+☐ FeNO (fractional exhaled nitric oxide) testing
+☐ Sputum analysis
+☐ CT chest (if complications or alternate diagnosis suspected)
+☐ Bronchoprovocation test (methacholine challenge)
+☐ Allergy skin testing
+☐ RAST (RadioAllergoSorbent Test)
+☐ Arterial blood gas (if severe exacerbation)
+
+Medications:
+□ Albuterol HFA □ 2 puffs Q4-6H PRN, □ 2 puffs QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Fluticasone HFA □ 44mcg 2 puffs BID, □ 110mcg 2 puffs BID, □ 220mcg 2 puffs BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Fluticasone/Salmeterol □ 100/50mcg 1 puff BID, □ 250/50mcg 1 puff BID, □ 500/50mcg 1 puff BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Budesonide/Formoterol □ 80/4.5mcg 2 puffs BID, □ 160/4.5mcg 2 puffs BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Montelukast □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Prednisone □ 40mg PO daily x5 days, □ 40mg PO daily x5 days then taper, Ren: □ 1, □ 2, □ 3
+□ Tiotropium Respimat □ 2.5mcg 2 puffs daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ipratropium HFA □ 2 puffs QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Dupilumab □ 200mg SC Q2 weeks, □ 300mg SC Q2 weeks, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Asthma action plan development
+☐ Inhaler technique education
+☐ Peak flow monitoring
+☐ Identification and avoidance of triggers
+☐ Environmental control measures (HEPA filters, allergen covers)
+☐ Smoking cessation
+☐ Vaccinations (influenza, pneumococcal)
+☐ Pulmonary rehabilitation
+☐ Weight management if overweight/obese
+☐ Regular exercise program tailored to asthma control level
+
+Referral options:
+☐ Referral to pulmonology
+☐ Referral to allergy/immunology
+☐ Referral to otolaryngology (ENT)
+☐ Referral to respiratory therapy
+☐ Referral to cardiology
+☐ Referral to speech therapy (for vocal cord dysfunction)
+☐ Referral to sleep medicine
+☐ Referral to psychology (for breathing retraining techniques)
+☐ Referral to social work (for assistance with medication costs)
+☐ Referral to integrative medicine
+
+☐ Counseling: Asthma is a chronic condition requiring regular monitoring and consistent medication use, even when feeling well. Take controller medications daily as prescribed. Use rescue inhaler for acute symptoms. Know your asthma action plan and triggers. Check inhaler technique regularly. Keep rescue medications readily available. Return immediately if experiencing severe shortness of breath, inability to speak in complete sentences, symptoms not improving with rescue inhaler, or deteriorating peak flow measurements.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Diabetes Mellitus Type 2
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect hyperglycemic crisis or severe complications requiring urgent evaluation (red flags: altered mental status, severe dehydration, persistent vomiting, abdominal pain, fruity breath odor, blood glucose >400mg/dL, new onset visual changes)
+
+Investigations and initial evaluation:
+☐ Hemoglobin A1C
+☐ Fasting blood glucose
+☐ Complete metabolic panel
+☐ Lipid panel
+☐ Urinalysis with microalbumin/creatinine ratio
+☐ Serum C-peptide
+☐ GAD65 antibodies (if LADA suspected)
+☐ Thyroid function tests
+☐ Liver function tests
+☐ ECG
+☐ 2-hour oral glucose tolerance test
+☐ Comprehensive eye examination
+☐ Foot examination with monofilament testing
+☐ Continuous glucose monitoring
+☐ eGFR
+
+Medications:
+□ Metformin □ 500mg PO daily, □ 500mg PO BID, □ 1000mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Glipizide □ 5mg PO daily, □ 10mg PO daily, □ 10mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Glimepiride □ 1mg PO daily, □ 2mg PO daily, □ 4mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Empagliflozin □ 10mg PO daily, □ 25mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Dapagliflozin □ 5mg PO daily, □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Semaglutide □ 0.25mg SC weekly, □ 0.5mg SC weekly, □ 1.0mg SC weekly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Dulaglutide □ 0.75mg SC weekly, □ 1.5mg SC weekly, □ 3mg SC weekly, □ 4.5mg SC weekly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Insulin glargine □ ___ units SC daily at bedtime, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Insulin lispro □ ___ units SC with meals, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Sitagliptin □ 25mg PO daily, □ 50mg PO daily, □ 100mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Medical nutrition therapy
+☐ Weight management program
+☐ Regular physical activity plan
+☐ Blood glucose monitoring education
+☐ Continuous glucose monitoring
+☐ Diabetes self-management education
+☐ Foot care education
+☐ Carbohydrate counting training
+☐ Medication adherence strategies
+☐ Healthcare maintenance schedule
+
+Referral options:
+☐ Referral to endocrinology
+☐ Referral to certified diabetes educator
+☐ Referral to dietitian/nutritionist
+☐ Referral to ophthalmology
+☐ Referral to podiatry
+☐ Referral to nephrology
+☐ Referral to cardiology
+☐ Referral to wound care
+☐ Referral to bariatric surgery
+☐ Referral to mental health services
+
+☐ Counseling: Diabetes is a chronic condition requiring consistent self-management. Monitor blood glucose as directed. Follow meal plan and exercise regularly. Take medications consistently. Inspect feet daily for cuts or sores. Wear medical alert identification. Have annual eye examinations. Know the signs of high and low blood sugar and how to treat each. Return immediately if experiencing consistent blood glucose >300mg/dL, inability to keep fluids down, high fever, confusion, or severe illness.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Hypertension
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect hypertensive emergency requiring urgent evaluation (red flags: BP >180/120, headache, vision changes, chest pain, shortness of breath, altered mental status, focal neurological deficits, pregnancy with BP >160/110)
+
+Investigations and initial evaluation:
+☐ Comprehensive metabolic panel
+☐ Lipid panel
+☐ Urinalysis with microalbumin/creatinine ratio
+☐ Thyroid function tests
+☐ ECG
+☐ Echocardiogram
+☐ 24-hour ambulatory blood pressure monitoring
+☐ Home blood pressure log review
+☐ Renal ultrasound
+☐ Renal artery duplex ultrasound
+☐ Plasma aldosterone to renin ratio
+☐ 24-hour urine collection for metanephrines (if pheochromocytoma suspected)
+☐ Sleep study (if sleep apnea suspected)
+☐ CT angiogram of renal arteries
+
+Medications:
+□ Lisinopril □ 5mg PO daily, □ 10mg PO daily, □ 20mg PO daily, □ 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Losartan □ 25mg PO daily, □ 50mg PO daily, □ 100mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Amlodipine □ 2.5mg PO daily, □ 5mg PO daily, □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Hydrochlorothiazide □ 12.5mg PO daily, □ 25mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Chlorthalidone □ 12.5mg PO daily, □ 25mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Metoprolol tartrate □ 25mg PO BID, □ 50mg PO BID, □ 100mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Metoprolol succinate □ 25mg PO daily, □ 50mg PO daily, □ 100mg PO daily, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Carvedilol □ 3.125mg PO BID, □ 6.25mg PO BID, □ 12.5mg PO BID, □ 25mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Spironolactone □ 12.5mg PO daily, □ 25mg PO daily, □ 50mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Olmesartan □ 10mg PO daily, □ 20mg PO daily, □ 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ DASH diet education
+☐ Sodium restriction (<2000mg daily)
+☐ Regular physical activity (150+ minutes/week)
+☐ Weight management strategies
+☐ Alcohol limitation
+☐ Home blood pressure monitoring
+☐ Smoking cessation
+☐ Stress management techniques
+☐ Sleep hygiene education
+☐ Medication adherence strategies
+
+Referral options:
+☐ Referral to cardiology
+☐ Referral to nephrology
+☐ Referral to endocrinology
+☐ Referral to sleep medicine
+☐ Referral to dietitian/nutritionist
+☐ Referral to bariatric surgery
+☐ Referral to behavioral health
+☐ Referral to vascular surgery
+☐ Referral to pharmacist (for medication management)
+☐ Referral to integrative medicine
+
+☐ Counseling: Hypertension is often asymptomatic but requires consistent management to prevent complications. Take medications at the same time daily, even when feeling well. Monitor and record blood pressure regularly. Follow DASH diet with sodium restriction. Maintain healthy weight through diet and regular exercise. Limit alcohol intake. Avoid NSAIDs which can raise blood pressure. Return immediately if experiencing severe headache, chest pain, vision changes, shortness of breath, or consistently elevated readings >180/110 mmHg.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 COPD (Chronic Obstructive Pulmonary Disease)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect severe exacerbation requiring urgent evaluation (red flags: severe respiratory distress, inability to speak in sentences, cyanosis, altered mental status, oxygen saturation <88%, no response to rescue inhaler)
+
+Investigations and initial evaluation:
+☐ Pulmonary function tests (spirometry with bronchodilator response)
+☐ Chest X-ray
+☐ Complete blood count
+☐ Basic metabolic panel
+☐ Arterial blood gas
+☐ CT chest
+☐ Sputum culture
+☐ Alpha-1 antitrypsin level
+☐ Echocardiogram
+☐ ECG
+☐ 6-minute walk test
+☐ Oxygen saturation at rest and with exertion
+☐ Sleep study
+☐ DLCO (diffusing capacity)
+
+Medications:
+□ Albuterol HFA □ 2 puffs Q4-6H PRN, □ 2 puffs QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ipratropium HFA □ 2 puffs QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Albuterol/Ipratropium □ 2 puffs QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Tiotropium □ 18mcg inhaled daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Umeclidinium □ 62.5mcg inhaled daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Fluticasone/Vilanterol □ 100/25mcg inhaled daily, □ 200/25mcg inhaled daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Budesonide/Formoterol □ 160/4.5mcg 2 puffs BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Umeclidinium/Vilanterol □ 62.5/25mcg inhaled daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Roflumilast □ 500mcg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Azithromycin □ 250mg PO MWF, □ 500mg PO MWF, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Pulmonary rehabilitation
+☐ Smoking cessation counseling
+☐ Supplemental oxygen therapy
+☐ Airway clearance techniques
+☐ Vaccinations (influenza, pneumococcal, COVID-19)
+☐ Nutritional counseling
+☐ Energy conservation techniques
+☐ Inhaler technique education
+☐ COPD action plan development
+☐ Exercise program tailored to exertional capacity
+
+Referral options:
+☐ Referral to pulmonology
+☐ Referral to respiratory therapy
+☐ Referral to pulmonary rehabilitation
+☐ Referral to oxygen supply company
+☐ Referral to smoking cessation program
+☐ Referral to sleep medicine
+☐ Referral to cardiology
+☐ Referral to thoracic surgery (for lung volume reduction)
+☐ Referral to nutritionist
+☐ Referral to palliative care (for advanced disease)
+
+☐ Counseling: COPD is a progressive condition requiring ongoing management. Smoking cessation is the most important intervention to slow disease progression. Take medications as prescribed, even when feeling well. Use proper inhaler technique. Save rescue medications for symptom relief. Complete pulmonary rehabilitation program if prescribed. Get recommended vaccinations. Maintain good nutrition and hydration. Return immediately if experiencing increased shortness of breath not relieved by rescue inhalers, change in sputum color/amount, increased coughing, fever, or worsening fatigue.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Chronic Constipation
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious complication requiring urgent evaluation (red flags: severe abdominal pain, obstruction, significant weight loss, rectal bleeding, age >50 with new onset, positive family history of colorectal cancer, anemia)
+
+Investigations and initial evaluation:
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests
+☐ Celiac disease panel
+☐ Serum calcium
+☐ Iron studies
+☐ Stool studies (occult blood, calprotectin)
+☐ Colonoscopy
+☐ Abdominal X-ray
+☐ CT abdomen/pelvis
+☐ Anorectal manometry
+☐ Balloon expulsion test
+☐ Defecography
+☐ Colonic transit study
+☐ Endoscopic ultrasound
+☐ MRI of pelvis
+
+Medications:
+□ Polyethylene glycol 3350 □ 17g PO daily, □ 17g PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Docusate sodium □ 100mg PO daily, □ 100mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Senna □ 8.6mg PO daily, □ 8.6mg PO BID, □ 17.2mg PO daily, □ 17.2mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Bisacodyl □ 5mg PO daily, □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lactulose □ 10mL PO daily, □ 20mL PO daily, □ 20mL PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Linaclotide □ 72mcg PO daily, □ 145mcg PO daily, □ 290mcg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lubiprostone □ 8mcg PO BID, □ 24mcg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Plecanatide □ 3mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Magnesium oxide □ 400mg PO daily, □ 400mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Methylnaltrexone □ 12mg SC daily, □ 12mg SC every other day, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ High-fiber diet (25-30g daily)
+☐ Adequate fluid intake (2-3 liters daily)
+☐ Regular physical activity
+☐ Scheduled toilet time
+☐ Proper toilet posture (use of footstool)
+☐ Bowel training program
+☐ Biofeedback therapy
+☐ Pelvic floor physical therapy
+☐ Fiber supplementation
+☐ Probiotic supplementation
+
+Referral options:
+☐ Referral to gastroenterology
+☐ Referral to colorectal surgery
+☐ Referral to pelvic floor physical therapy
+☐ Referral to dietitian/nutritionist
+☐ Referral to psychology/psychiatry
+☐ Referral to pain management
+☐ Referral to neurogastroenterology
+☐ Referral to gynecology (for pelvic floor issues)
+☐ Referral to integrative medicine
+☐ Referral to biofeedback specialist
+
+☐ Counseling: Chronic constipation can have multiple causes and may require lifestyle modifications and medications. Increase dietary fiber gradually to prevent bloating. Maintain adequate hydration. Establish a regular bowel routine, preferably after breakfast. Respond promptly to the urge to defecate. Exercise regularly. Review medications that may contribute to constipation. Return if experiencing severe abdominal pain, rectal bleeding, unintentional weight loss, or worsening constipation despite treatment.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you

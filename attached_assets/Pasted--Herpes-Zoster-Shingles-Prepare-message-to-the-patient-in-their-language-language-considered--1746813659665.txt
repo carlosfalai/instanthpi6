@@ -1,0 +1,45 @@
+🩺 Herpes Zoster (Shingles)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+
+Investigations and initial evaluation:
+☐ VZV PCR from lesion swab
+☐ Tzanck smear
+☐ Direct fluorescent antibody (DFA) testing
+☐ VZV IgM and IgG antibodies
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ HIV testing
+☐ Chest X-ray (if disseminated zoster suspected)
+
+Antiviral therapy (initiate within 72 hours of rash onset):
+□ Valacyclovir □ 1000mg PO TID x7 days, □ 500mg PO TID x7 days, Ren: □ 1, □ 2, □ 3
+□ Famciclovir □ 500mg PO TID x7 days, □ 250mg PO TID x7 days, Ren: □ 1, □ 2, □ 3
+□ Acyclovir □ 800mg PO 5 times daily x7 days, □ 400mg PO 5 times daily x7 days, Ren: □ 1, □ 2, □ 3
+
+Pain management:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Gabapentin □ 300mg PO QHS, □ 300mg PO BID, □ 300mg PO TID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 3600mg daily)
+□ Pregabalin □ 75mg PO BID, □ 150mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 600mg daily)
+□ Lidocaine 5% patch □ apply to affected area daily for 12 hours, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Keep lesions clean and dry
+☐ Apply calamine lotion to lesions PRN
+☐ Loose-fitting clothing over affected area
+☐ Cool compresses for comfort
+☐ Shingrix® vaccine - 2-dose series, first dose now, second dose 2-6 months after first dose
+
+Referral options:
+☐ Referral to ophthalmology (if ophthalmic involvement)
+☐ Referral to neurology (if persistent postherpetic neuralgia)
+☐ Referral to infectious disease (if disseminated zoster or immunocompromised)
+☐ Referral to pain management (if severe or persistent pain)
+☐ Referral to dermatology (if diagnosis uncertain or severe cutaneous involvement)
+☐ Referral to emergency department (if systemic symptoms or suspected complications)
+
+☐ Counseling: Recommend shingles vaccination (Shingrix®) for patients ≥50 years old or immunocompromised ≥18 years old, maintain contact precautions by keeping rash covered until all lesions are crusted over, avoid contact with pregnant women, newborns, and immunocompromised persons, practice strict hand hygiene after touching lesions, if pain or discomfort persists after rash resolution patient should reach back to the clinic, maintain hydration by drinking approximately 2–3 liters of water daily adjusted to thirst and body size.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you

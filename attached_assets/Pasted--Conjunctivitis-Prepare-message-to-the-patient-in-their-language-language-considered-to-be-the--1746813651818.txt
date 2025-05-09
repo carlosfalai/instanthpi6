@@ -1,0 +1,46 @@
+🩺 Conjunctivitis
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect other eye pathology requiring slit lamp exam in ED (uveitis, keratitis, acute angle-closure glaucoma, scleritis, iritis - red flags: moderate/severe eye pain, vision changes, photophobia, halos around lights, pupil abnormalities, circumcorneal redness, eye trauma history)
+
+Investigations and initial evaluation:
+☐ Culture of eye discharge
+☐ Gram stain of eye discharge
+☐ Viral PCR testing of eye discharge
+☐ Tear film evaluation
+☐ Visual acuity testing
+☐ Fluorescein staining
+☐ Conjunctival scraping for cytology
+☐ Allergen testing (for suspected allergic conjunctivitis)
+
+Medications:
+□ Polymyxin B-trimethoprim drops □ 1 drop OU QID, □ 1 drop OU Q3H, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ciprofloxacin 0.3% drops □ 1 drop OU Q2H while awake x2 days then QID x5 days, □ 1 drop OU QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Moxifloxacin 0.5% drops □ 1 drop OU TID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Erythromycin 0.5% ointment □ apply thin ribbon OU QID, □ apply thin ribbon OU BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Olopatadine 0.1% □ 1 drop OU BID, □ 1 drop OU daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Artificial tears □ 1-2 drops OU PRN, □ 1-2 drops OU QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ketotifen 0.025% □ 1 drop OU BID, □ 1 drop OU TID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Loteprednol 0.5% □ 1 drop OU QID, □ 1 drop OU BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Prednisolone acetate 1% □ 1 drop OU QID, □ 1 drop OU BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Cool compresses to affected eye(s) QID for 5-10 minutes
+☐ Strict hand hygiene, avoid touching or rubbing eyes
+☐ Avoid contact lens wear until resolved
+☐ Avoid sharing towels, washcloths, eye makeup
+☐ Daily cleaning of eyelid margins with baby shampoo
+☐ Discard eye makeup used during infection
+☐ Discard contact lenses used during infection
+
+Referral options:
+☐ Referral to ophthalmology
+☐ Referral to allergist (if suspected allergic component)
+☐ Referral to infectious disease (if severe or unusual infection)
+☐ Referral to rheumatology (if associated autoimmune condition)
+☐ Referral to emergency department for slit lamp examination
+
+☐ Counseling: Highly contagious if bacterial/viral; avoid close contact and sharing personal items until discharge resolves. Discard contact lenses used during infection. Discard eye makeup used during infection. May return to work/school 24 hours after starting treatment if bacterial conjunctivitis. Return if symptoms worsen or no improvement after 3 days of treatment.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you

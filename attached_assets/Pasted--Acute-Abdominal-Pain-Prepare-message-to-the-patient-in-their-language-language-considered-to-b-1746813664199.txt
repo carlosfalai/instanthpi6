@@ -1,0 +1,59 @@
+🩺 Acute Abdominal Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+
+Investigations and initial evaluation:
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ Liver function tests (AST, ALT, alkaline phosphatase, GGT, bilirubin)
+☐ Lipase
+☐ Amylase
+☐ Urinalysis
+☐ Urine culture
+☐ Pregnancy test for females of reproductive age
+☐ Anti-tissue transglutaminase (tTG) antibodies
+☐ Anti-endomysial antibodies (EMA)
+☐ Anti-deamidated gliadin peptide (DGP) antibodies
+☐ Total IgA (to rule out IgA deficiency)
+☐ ASCA (Anti-Saccharomyces cerevisiae antibodies)
+☐ ANCA (Anti-neutrophil cytoplasmic antibodies)
+☐ Stool studies (occult blood, culture, ova and parasites, calprotectin, C. difficile)
+☐ Helicobacter pylori testing (urease breath test or stool antigen)
+☐ Abdominal ultrasound
+☐ Liver ultrasound/elastography
+☐ CT abdomen/pelvis with contrast
+☐ CT abdomen/pelvis without contrast
+☐ MRI abdomen with and without contrast
+☐ Abdominal X-ray (KUB)
+☐ Pelvic ultrasound for females
+☐ HIDA scan for gallbladder function
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Dicyclomine □ 10mg PO QID PRN, □ 20mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 160mg daily)
+□ Omeprazole □ 20mg PO daily, □ 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ondansetron □ 4mg PO TID PRN, □ 8mg PO TID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 24mg daily)
+□ Pantoprazole □ 20mg PO daily, □ 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Metoclopramide □ 5mg PO QID PRN, □ 10mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 40mg daily)
+
+Treatment options:
+☐ Clear liquid diet progressing to full diet as tolerated
+☐ Avoid NSAIDs and alcohol
+☐ Rest and monitor symptoms
+☐ Warm compress to abdomen for comfort
+☐ Maintenance of hydration with 2-3 liters of clear fluids daily
+☐ Avoid heavy lifting until pain resolves
+
+Referral options:
+☐ Referral to gastroenterology
+☐ Referral to general surgery
+☐ Referral to gynecology
+☐ Referral to urology
+☐ Referral to pain management
+☐ Referral to nutritionist
+☐ Referral to emergency department
+
+☐ Counseling: Maintain hydration with 2-3 liters of clear fluids daily, apply warm compress to abdomen for comfort, return if symptoms worsen or fail to improve within 48 hours, avoid heavy lifting until pain resolves.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you

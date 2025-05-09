@@ -1,0 +1,57 @@
+🩺 Shoulder Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect rotator cuff tear requiring urgent orthopedic evaluation (red flags: traumatic injury with immediate weakness, significant night pain, inability to raise arm, positive drop arm test, audible pop during injury)
+
+Investigations and initial evaluation:
+☐ Shoulder X-ray AP, lateral, axillary views
+☐ Ultrasound MSK of shoulder for rotator cuff pathology, bursitis, or impingement
+☐ MRI of shoulder without contrast
+☐ MRI of shoulder with contrast (for labral tears)
+☐ MR arthrogram of shoulder
+☐ CT scan of shoulder
+☐ EMG/NCS for suspected nerve involvement
+☐ Complete blood count (CBC)
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ Rheumatoid factor
+☐ Anti-CCP antibodies
+☐ HLA-B27
+
+Pain management (prescriptions for 14 days):
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 1500mg daily)
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Cyclobenzaprine □ 5mg PO TID, □ 10mg PO TID, □ 10mg PO QHS, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 30mg daily)
+□ Methocarbamol □ 500mg PO QID, □ 750mg PO QID, □ 750mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Diclofenac gel 1% □ apply to affected area QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lidocaine patch 5% □ apply to affected area daily for 12 hours, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Ice 20 minutes QID for first 48 hours, then heat
+☐ Physical therapy referral for rotator cuff strengthening and shoulder stabilization
+☐ Subacromial corticosteroid injection if persistent bursitis
+☐ Short-term sling use if acute trauma (limit immobilization)
+☐ Gentle pendulum exercises after 3-5 days as tolerated
+☐ Ultrasound-guided glenohumeral joint injection
+☐ Transcutaneous electrical nerve stimulation (TENS)
+☐ Acupuncture
+☐ Massage therapy
+☐ Kinesio taping
+
+Referral options:
+☐ Referral to orthopedics
+☐ Referral to sports medicine
+☐ Referral to physical therapy
+☐ Referral to occupational therapy
+☐ Referral to pain management
+☐ Referral to rheumatology
+☐ Referral to physiatry (PM&R)
+☐ Referral to massage therapy
+☐ Referral to acupuncture
+☐ Referral to chiropractic
+
+☐ Counseling: Counsel on gentle mobilization of shoulder to avoid adhesive capsulitis, avoid heavy lifting until reassessment, maintain hydration by drinking approximately 2–3 liters of water daily adjusted to thirst and body size. Gradually return to activities as tolerated. May require 4-6 weeks for significant improvement. Sleep with pillow supporting affected arm if helpful. Avoid overhead activities until pain improves.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
