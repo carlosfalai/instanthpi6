@@ -1,0 +1,789 @@
+🩺 Preventative Care
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+
+Investigations and initial evaluation:
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ Lipid panel
+☐ Hemoglobin A1C
+☐ Thyroid stimulating hormone (TSH)
+☐ Urinalysis
+☐ Stool occult blood test
+☐ Electrocardiogram (ECG)
+☐ Chest X-ray (if indicated)
+☐ Bone density scan (DEXA) for women >65 and men >70
+☐ Colorectal cancer screening (colonoscopy, FIT, Cologuard)
+☐ Lung cancer screening LDCT (if smoking history)
+☐ Prostate-specific antigen (PSA) for men
+☐ Mammogram for women
+☐ Pap smear for women
+☐ HIV testing
+☐ Hepatitis B and C screening
+☐ Tuberculosis (TB) screening
+
+Immunizations:
+□ Influenza vaccine □ annually, Ren: □ 1
+□ COVID-19 vaccine □ primary series, □ booster, Ren: □ 1
+□ Tetanus-diphtheria-pertussis (Tdap) □ every 10 years, Ren: □ 1
+□ Pneumococcal vaccines □ PCV13, □ PPSV23, Ren: □ 1
+□ Shingles vaccine (Shingrix) □ 2-dose series, Ren: □ 1, □ 2
+□ Human papillomavirus (HPV) □ 2-3 dose series, Ren: □ 1, □ 2, □ 3
+□ Hepatitis A vaccine □ 2-dose series, Ren: □ 1, □ 2
+□ Hepatitis B vaccine □ 3-dose series, Ren: □ 1, □ 2, □ 3
+□ Meningococcal vaccines □ MenACWY, □ MenB, Ren: □ 1, □ 2
+
+Preventive medications:
+□ Aspirin □ 81mg PO daily, □ 162mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (if indicated)
+□ Statin □ Atorvastatin 10mg PO daily, □ Atorvastatin 20mg PO daily, □ Rosuvastatin 5mg PO daily, □ Rosuvastatin 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (if indicated)
+□ Multivitamin □ 1 tablet PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Vitamin D3 □ 1000IU PO daily, □ 2000IU PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Calcium supplement □ 500mg PO daily, □ 1000mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Health maintenance:
+☐ Blood pressure monitoring
+☐ Weight management
+☐ Smoking cessation counseling
+☐ Alcohol use screening and counseling
+☐ Depression screening
+☐ Fall risk assessment
+☐ Diabetes risk assessment
+☐ Cardiovascular risk assessment
+☐ Vision screening
+☐ Hearing evaluation
+☐ Dental examination
+
+Referral options:
+☐ Referral to ophthalmology for eye examination
+☐ Referral to dental care
+☐ Referral to nutritionist/dietitian
+☐ Referral to smoking cessation program
+☐ Referral to exercise physiologist
+☐ Referral to physical therapy for fall prevention
+☐ Referral to sleep medicine
+☐ Referral to dermatology for skin cancer screening
+☐ Referral to behavioral health for mental wellness
+☐ Referral to social work for community resources
+
+☐ Counseling: Preventive care focuses on maintaining health and preventing disease. Maintain a balanced diet with plenty of fruits, vegetables, and whole grains. Engage in at least 150 minutes of moderate exercise weekly. Limit alcohol intake, avoid tobacco products, and get 7-8 hours of sleep nightly. Keep up with recommended screenings and vaccinations. Practice safe sun exposure with SPF 30+ sunscreen. Maintain social connections and engage in stress management techniques. Return annually for routine preventive care or sooner if new health concerns arise.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Chronic Cough
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: hemoptysis, weight loss, night sweats, shortness of breath, cough with significant findings on imaging, immunocompromised state)
+
+Investigations and initial evaluation:
+☐ Chest X-ray
+☐ Pulmonary function tests (spirometry with bronchodilator response)
+☐ Complete blood count with differential
+☐ Comprehensive metabolic panel
+☐ FeNO (fractional exhaled nitric oxide) testing
+☐ Sputum culture and sensitivity
+☐ CT chest
+☐ Sinus CT
+☐ Modified barium swallow study
+☐ 24-hour esophageal pH monitoring
+☐ Upper endoscopy (EGD)
+☐ Bronchoscopy
+☐ Allergy testing
+☐ ACE level (for sarcoidosis)
+☐ Echocardiogram
+
+Medications:
+□ Proton pump inhibitor trial:
+□ Omeprazole □ 20mg PO daily, □ 40mg PO daily, □ 40mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Pantoprazole □ 40mg PO daily, □ 40mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Inhaled corticosteroid trial:
+□ Fluticasone □ 44mcg 2 puffs BID, □ 110mcg 2 puffs BID, □ 220mcg 2 puffs BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Budesonide □ 90mcg 2 puffs BID, □ 180mcg 2 puffs BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Antihistamine/decongestant trial:
+□ Fluticasone nasal spray □ 1-2 sprays each nostril daily, □ 1-2 sprays each nostril BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Montelukast □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Benzonatate □ 100mg PO TID, □ 200mg PO TID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Codeine/guaifenesin □ 10-100mg/5mL 5-10mL PO Q4-6H PRN, Ren: □ 1, □ 2, □ 3 (short-term use only)
+□ Azithromycin □ 250mg PO daily MWF, □ 500mg PO daily MWF, Ren: □ 1, □ 2, □ 3 (for chronic bronchitis)
+
+Treatment options:
+☐ Smoking cessation
+☐ Avoidance of known triggers
+☐ Nasal saline irrigation
+☐ Elevated head of bed 30 degrees
+☐ Dietary modifications for GERD
+☐ Pulmonary rehabilitation
+☐ Airway clearance techniques
+☐ Humidifier use
+☐ Adequate hydration
+☐ Vocal cord therapy
+
+Referral options:
+☐ Referral to pulmonology
+☐ Referral to otolaryngology (ENT)
+☐ Referral to gastroenterology
+☐ Referral to allergy/immunology
+☐ Referral to speech therapy
+☐ Referral to cardiology
+☐ Referral to infectious disease
+☐ Referral to thoracic surgery
+☐ Referral to respiratory therapy
+☐ Referral to smoking cessation program
+
+☐ Counseling: Chronic cough has many potential causes including asthma, GERD, post-nasal drip, and chronic bronchitis. Diagnostic testing and therapeutic trials help identify the cause. Avoid known triggers including smoking, allergens, and irritants. Stay well-hydrated. Sleep with head elevated. Take medications as prescribed and complete full therapeutic trials before determining effectiveness. Return if experiencing worsening symptoms, shortness of breath, chest pain, fever, hemoptysis, or weight loss.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Chronic Diarrhea
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: bloody diarrhea, severe dehydration, significant weight loss, fever, travel to endemic areas, immunocompromised state)
+
+Investigations and initial evaluation:
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ C-reactive protein (CRP)
+☐ Erythrocyte sedimentation rate (ESR)
+☐ Thyroid function tests
+☐ Celiac disease panel (tTG-IgA, EMA, DGP antibodies, total IgA)
+☐ Stool studies (culture, ova and parasites, C. difficile, calprotectin, occult blood)
+☐ Stool osmotic gap
+☐ Stool pH and reducing substances
+☐ Stool elastase
+☐ H. pylori testing
+☐ Colonoscopy with biopsies
+☐ Upper endoscopy with biopsies
+☐ CT abdomen/pelvis
+☐ Abdominal ultrasound
+☐ Hydrogen/methane breath test (for SIBO/carbohydrate malabsorption)
+
+Medications:
+□ Loperamide □ 2mg PO after each loose stool (max 8mg/day), □ 2mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Diphenoxylate/atropine □ 1 tablet PO QID PRN, □ 2 tablets PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Cholestyramine □ 4g PO BID, □ 4g PO TID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Bismuth subsalicylate □ 524mg PO QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Rifaximin □ 550mg PO TID x14 days, Ren: □ 1, □ 2, □ 3 (for SIBO)
+□ Budesonide □ 9mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (for microscopic colitis)
+□ Pancreatic enzyme replacement □ 1-2 capsules with meals and snacks, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Probiotic supplement □ 1 capsule PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Metronidazole □ 500mg PO TID x10-14 days, Ren: □ 1, □ 2, □ 3 (for specific infections)
+
+Treatment options:
+☐ Low FODMAP diet trial
+☐ Gluten-free diet trial
+☐ Lactose-free diet trial
+☐ High soluble fiber supplementation
+☐ Adequate hydration
+☐ Elimination diet with guided reintroduction
+☐ Stress management techniques
+☐ Electrolyte replacement
+☐ Bile acid sequestrant trial
+☐ Caffeine and alcohol restriction
+
+Referral options:
+☐ Referral to gastroenterology
+☐ Referral to dietitian/nutritionist
+☐ Referral to infectious disease
+☐ Referral to rheumatology
+☐ Referral to endocrinology
+☐ Referral to psychology/psychiatry
+☐ Referral to pain management
+☐ Referral to integrative medicine
+☐ Referral to colorectal surgery
+☐ Referral to support group
+
+☐ Counseling: Chronic diarrhea has many potential causes including irritable bowel syndrome, inflammatory bowel disease, celiac disease, and malabsorption disorders. Keep a food and symptom diary to identify triggers. Maintain adequate hydration with water and electrolyte solutions. Avoid known trigger foods, caffeine, and alcohol. Take medications as prescribed. Follow recommended dietary modifications. Return if experiencing bloody stools, fever, severe abdominal pain, signs of dehydration, or significant weight loss.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 GERD (Gastroesophageal Reflux Disease)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: dysphagia, odynophagia, hematemesis, unexplained weight loss, persistent vomiting, anemia, age >50 with new onset symptoms)
+
+Investigations and initial evaluation:
+☐ Upper endoscopy (EGD)
+☐ 24-hour esophageal pH monitoring
+☐ Esophageal manometry
+☐ Barium swallow
+☐ Gastric emptying study
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ H. pylori testing
+☐ Chest X-ray
+☐ ECG (if cardiac symptoms)
+☐ Thyroid function tests
+☐ CT chest (if pulmonary symptoms)
+☐ Laryngoscopy (if ENT symptoms)
+☐ Impedance-pH testing
+
+Medications:
+□ Proton pump inhibitors:
+□ Omeprazole □ 20mg PO daily, □ 40mg PO daily, □ 40mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Pantoprazole □ 40mg PO daily, □ 40mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Esomeprazole □ 20mg PO daily, □ 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ H2 receptor antagonists:
+□ Famotidine □ 20mg PO BID, □ 40mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ranitidine □ 150mg PO BID, □ 300mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Antacids:
+□ Aluminum hydroxide/magnesium hydroxide □ 10-20mL PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Calcium carbonate □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Prokinetic agents:
+□ Metoclopramide □ 5mg PO QID before meals and QHS, □ 10mg PO QID before meals and QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Sucralfate □ 1g PO QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Dietary modifications (avoid trigger foods)
+☐ Weight management
+☐ Elevate head of bed 6-8 inches
+☐ Avoid lying down 2-3 hours after meals
+☐ Smoking cessation
+☐ Alcohol limitation
+☐ Caffeine reduction
+☐ Loose-fitting clothing
+☐ Stress management techniques
+☐ Small, frequent meals
+
+Referral options:
+☐ Referral to gastroenterology
+☐ Referral to surgery (for fundoplication evaluation)
+☐ Referral to otolaryngology (ENT)
+☐ Referral to pulmonology
+☐ Referral to cardiology
+☐ Referral to dietitian/nutritionist
+☐ Referral to sleep medicine
+☐ Referral to integrative medicine
+☐ Referral to allergist
+☐ Referral to psychology (for stress management)
+
+☐ Counseling: GERD is a chronic condition where stomach contents flow back into the esophagus, causing irritation. Elevate the head of your bed by 6-8 inches. Avoid lying down for 2-3 hours after eating. Maintain healthy weight. Avoid trigger foods including spicy/fatty foods, citrus, chocolate, caffeine, and alcohol. Take medications as prescribed - timing matters for maximal effectiveness. Wear loose-fitting clothing. Return if experiencing difficulty swallowing, food sticking in throat, persistent vomiting, unexplained weight loss, or blood in vomit or stools.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Gout
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: septic joint, severe multiple joint involvement, fever, significant tophi with skin breakdown, renal failure)
+
+Investigations and initial evaluation:
+☐ Serum uric acid level
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ Joint aspiration with synovial fluid analysis
+☐ Joint X-ray
+☐ Musculoskeletal ultrasound
+☐ Dual-energy CT scan
+☐ 24-hour urine uric acid
+☐ Renal function tests
+☐ Liver function tests
+☐ Lipid panel
+☐ Fasting blood glucose
+☐ HbA1c
+
+Medications:
+□ Acute gout attack:
+□ Colchicine □ 1.2mg PO x1, then 0.6mg 1 hour later, then 0.6mg PO daily-BID, Ren: □ 1, □ 2, □ 3
+□ Indomethacin □ 50mg PO TID for 2-3 days, then 25mg PO TID for 3-5 days, Ren: □ 1, □ 2, □ 3
+□ Naproxen □ 500mg PO BID for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Prednisone □ 40mg PO daily x5 days, □ taper over 10-14 days, Ren: □ 1, □ 2, □ 3
+□ Methylprednisolone □ 4mg dose pack, Ren: □ 1, □ 2, □ 3
+□ Urate-lowering therapy:
+□ Allopurinol □ 100mg PO daily, □ 300mg PO daily, □ 600mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Febuxostat □ 40mg PO daily, □ 80mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Probenecid □ 250mg PO BID, □ 500mg PO BID, □ 1000mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Prophylaxis during initiation of urate-lowering therapy:
+□ Colchicine □ 0.6mg PO daily, □ 0.6mg PO BID, for 3-6 months, Ren: □ 1, □ 2, □ 3, □ 6
+□ Prednisone □ 5mg PO daily for 3-6 months, Ren: □ 1, □ 2, □ 3, □ 6
+
+Treatment options:
+☐ Low purine diet
+☐ Weight management
+☐ Alcohol limitation (especially beer)
+☐ High sugar beverage limitation
+☐ Increased water intake (2-3 liters daily)
+☐ Moderate physical activity
+☐ Soft shoes and proper footwear
+☐ Joint protection techniques
+☐ Apply ice to affected joints during acute attack
+☐ Red meat and seafood limitation
+
+Referral options:
+☐ Referral to rheumatology
+☐ Referral to nephrology
+☐ Referral to dietitian/nutritionist
+☐ Referral to podiatry
+☐ Referral to orthopedics
+☐ Referral to physical therapy
+☐ Referral to occupational therapy
+☐ Referral to pain management
+☐ Referral to cardiology (for cardiovascular risk)
+☐ Referral to weight management program
+
+☐ Counseling: Gout is caused by elevated uric acid levels forming crystals in joints. During acute attacks, rest the affected joint, apply ice for 20-minute periods, and take prescribed medications. For long-term management, take urate-lowering medications consistently even when pain-free. Maintain normal weight, limit alcohol and sugary beverages, and reduce intake of high-purine foods including organ meats, shellfish, and red meat. Stay well-hydrated with water. Return if experiencing fever with joint pain, joint becomes warm and red, or new joint involvement.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Headache – Migraine
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: thunderclap onset, "worst headache of life," fever, altered mental status, focal neurological deficits, new onset after age 50, papilledema)
+
+Investigations and initial evaluation:
+☐ Brain MRI with and without contrast
+☐ MR angiography (MRA)
+☐ CT head without contrast (if acute)
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ Thyroid function tests
+☐ Visual field testing
+☐ Fundoscopic examination
+☐ Temporal artery biopsy (if giant cell arteritis suspected)
+☐ EEG (if seizure activity suspected)
+☐ Lumbar puncture (if indicated)
+☐ Headache diary review
+☐ Sleep study
+
+Medications:
+□ Acute treatment:
+□ Sumatriptan □ 50mg PO PRN, □ 100mg PO PRN, □ 6mg SC PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Rizatriptan □ 5mg PO PRN, □ 10mg PO PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Zolmitriptan □ 2.5mg PO PRN, □ 5mg PO PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Naproxen □ 500mg PO BID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Dihydroergotamine □ 1mg nasal spray PRN, □ 1mg SC/IM PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ubrogepant □ 50mg PO PRN, □ 100mg PO PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lasmiditan □ 50mg PO PRN, □ 100mg PO PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Preventive treatment:
+□ Propranolol □ 20mg PO BID, □ 40mg PO BID, □ 80mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Topiramate □ 25mg PO QHS, □ 50mg PO BID, □ 100mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Amitriptyline □ 10mg PO QHS, □ 25mg PO QHS, □ 50mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Valproic acid □ 250mg PO BID, □ 500mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Erenumab □ 70mg SC monthly, □ 140mg SC monthly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Galcanezumab □ 120mg SC monthly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Headache diary maintenance
+☐ Trigger identification and avoidance
+☐ Regular sleep schedule
+☐ Regular meal schedule
+☐ Stress management techniques
+☐ Consistent exercise program
+☐ Caffeine limitation
+☐ Biofeedback
+☐ Cognitive behavioral therapy
+☐ Acupuncture
+
+Referral options:
+☐ Referral to neurology
+☐ Referral to pain management
+☐ Referral to headache specialist
+☐ Referral to psychology/psychiatry
+☐ Referral to physical therapy
+☐ Referral to occupational therapy
+☐ Referral to integrative medicine
+☐ Referral to sleep medicine
+☐ Referral to optometry/ophthalmology
+☐ Referral to pain procedure specialist (for nerve blocks)
+
+☐ Counseling: Migraine is a neurological condition with genetic components. Identify and avoid personal triggers which may include certain foods, stress, sleep changes, hormonal fluctuations, weather changes, bright lights, and strong smells. Maintain a regular sleep schedule. Take acute medications at earliest sign of migraine. Limit use of acute medications to 2-3 days per week to prevent medication overuse headache. Take preventive medications daily as prescribed. Return immediately if experiencing "worst headache of life," fever with headache, confusion, vision loss, weakness, or speech difficulties.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Hyperlipidemia
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: xanthomas, xanthelasmas, corneal arcus at young age, family history of premature cardiovascular disease, signs of metabolic syndrome, abnormal liver enzymes)
+
+Investigations and initial evaluation:
+☐ Fasting lipid panel (total cholesterol, LDL, HDL, triglycerides)
+☐ Apolipoprotein B
+☐ Lipoprotein(a)
+☐ Fasting blood glucose
+☐ HbA1c
+☐ Liver function tests
+☐ Thyroid function tests
+☐ Comprehensive metabolic panel
+☐ Complete blood count
+☐ Urine protein to creatinine ratio
+☐ ASCVD risk calculation
+☐ ECG
+☐ Carotid ultrasound
+☐ Coronary calcium score
+☐ Echocardiogram
+
+Medications:
+□ Statins:
+□ Atorvastatin □ 10mg PO daily, □ 20mg PO daily, □ 40mg PO daily, □ 80mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Rosuvastatin □ 5mg PO daily, □ 10mg PO daily, □ 20mg PO daily, □ 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Simvastatin □ 10mg PO daily, □ 20mg PO daily, □ 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Pravastatin □ 10mg PO daily, □ 20mg PO daily, □ 40mg PO daily, □ 80mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ezetimibe □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ PCSK9 inhibitors:
+□ Evolocumab □ 140mg SC every 2 weeks, □ 420mg SC monthly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Alirocumab □ 75mg SC every 2 weeks, □ 150mg SC every 2 weeks, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Fibrates:
+□ Fenofibrate □ 48mg PO daily, □ 145mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Gemfibrozil □ 600mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Omega-3 fatty acids □ 2g PO BID, □ 4g PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Niacin □ 500mg PO daily, □ 1000mg PO daily, □ 2000mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Mediterranean diet
+☐ DASH diet
+☐ Weight management
+☐ Regular physical activity (150+ minutes/week)
+☐ Smoking cessation
+☐ Alcohol limitation
+☐ Plant stanols/sterols supplementation
+☐ Omega-3 rich foods
+☐ Soluble fiber increase
+☐ Trans fat and saturated fat limitation
+
+Referral options:
+☐ Referral to cardiology
+☐ Referral to lipid specialist
+☐ Referral to endocrinology
+☐ Referral to dietitian/nutritionist
+☐ Referral to exercise physiologist
+☐ Referral to genetic counseling (for familial hypercholesterolemia)
+☐ Referral to cardiac rehabilitation
+☐ Referral to bariatric surgery evaluation
+☐ Referral to smoking cessation program
+☐ Referral to behavioral health
+
+☐ Counseling: Hyperlipidemia increases risk for cardiovascular disease including heart attack and stroke. Adopt heart-healthy eating with emphasis on fruits, vegetables, whole grains, lean proteins, and healthy fats. Limit saturated and trans fats, processed foods, and added sugars. Engage in regular physical activity, minimum 150 minutes of moderate exercise weekly. Maintain healthy weight. Take medications as prescribed - statins work best when taken in the evening. Return for follow-up lipid testing to monitor response to treatment, and report muscle pain/weakness while on statins.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Hypothyroidism
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: myxedema coma, severe bradycardia, altered mental status, severe hypothermia, pericardial effusion)
+
+Investigations and initial evaluation:
+☐ Thyroid stimulating hormone (TSH)
+☐ Free T4
+☐ Free T3
+☐ Thyroid antibodies (TPO, TgAb)
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Lipid panel
+☐ HbA1c
+☐ Vitamin B12
+☐ Vitamin D
+☐ Ferritin/iron studies
+☐ Thyroid ultrasound
+☐ ECG
+☐ Prolactin
+
+Medications:
+□ Levothyroxine □ 25mcg PO daily, □ 50mcg PO daily, □ 75mcg PO daily, □ 88mcg PO daily, □ 100mcg PO daily, □ 112mcg PO daily, □ 125mcg PO daily, □ 137mcg PO daily, □ 150mcg PO daily, □ 175mcg PO daily, □ 200mcg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Liothyronine □ 5mcg PO daily, □ 5mcg PO BID, □ 25mcg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Desiccated thyroid □ 15mg PO daily, □ 30mg PO daily, □ 60mg PO daily, □ 90mg PO daily, □ 120mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Vitamin D □ 1000IU PO daily, □ 2000IU PO daily, □ 5000IU PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Vitamin B12 □ 1000mcg PO daily, □ 1000mcg IM monthly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Iron supplement □ Ferrous sulfate 325mg PO daily, □ Ferrous sulfate 325mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Calcium supplement □ 500mg PO daily, □ 1000mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Medication administration on empty stomach
+☐ Consistent daily medication time
+☐ Separation from interfering medications and supplements
+☐ Regular thyroid function monitoring
+☐ Gluten-free diet (if celiac disease present)
+☐ Regular physical activity
+☐ Stress management techniques
+☐ Temperature regulation strategies
+☐ Energy conservation techniques
+☐ Nutritional counseling
+
+Referral options:
+☐ Referral to endocrinology
+☐ Referral to dietitian/nutritionist
+☐ Referral to sleep medicine
+☐ Referral to cardiology
+☐ Referral to psychiatry/psychology
+☐ Referral to gastroenterology (if celiac disease suspected)
+☐ Referral to rheumatology (if autoimmune disorder suspected)
+☐ Referral to physical therapy
+☐ Referral to reproductive endocrinology (for fertility issues)
+☐ Referral to integrative medicine
+
+☐ Counseling: Hypothyroidism is a chronic condition requiring consistent medication management. Take thyroid medication on an empty stomach, 30-60 minutes before breakfast or 3-4 hours after last meal of the day. Avoid taking calcium, iron, antacids, and some other medications within 4 hours of thyroid medication. Have annual thyroid function tests. Report symptoms of under-treatment (fatigue, cold intolerance, constipation, weight gain) or over-treatment (palpitations, anxiety, insomnia, heat intolerance). Return for follow-up 6-8 weeks after medication changes.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Obesity
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe sleep apnea, obesity hypoventilation syndrome, severe mobility limitations, suicidal ideation, severe eating disorder)
+
+Investigations and initial evaluation:
+☐ Comprehensive metabolic panel
+☐ Lipid panel
+☐ Thyroid function tests
+☐ HbA1c
+☐ Fasting blood glucose
+☐ Fasting insulin level
+☐ ECG
+☐ Sleep study
+☐ Vitamin D level
+☐ Complete blood count
+☐ Liver function tests
+☐ Urinalysis
+☐ Depression screening (PHQ-9)
+☐ Eating disorder screening
+☐ Body composition analysis
+
+Medications:
+□ Phentermine □ 15mg PO daily, □ 30mg PO daily, □ 37.5mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Orlistat □ 60mg PO TID with meals, □ 120mg PO TID with meals, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Phentermine/topiramate ER □ 3.75/23mg PO daily, □ 7.5/46mg PO daily, □ 11.25/69mg PO daily, □ 15/92mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Naltrexone/bupropion ER □ 8/90mg PO daily, □ 16/180mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Liraglutide □ 0.6mg SC daily, □ 1.2mg SC daily, □ 1.8mg SC daily, □ 2.4mg SC daily, □ 3.0mg SC daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Semaglutide □ 0.25mg SC weekly, □ 0.5mg SC weekly, □ 1.0mg SC weekly, □ 2.0mg SC weekly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Tirzepatide □ 2.5mg SC weekly, □ 5mg SC weekly, □ 7.5mg SC weekly, □ 10mg SC weekly, □ 12.5mg SC weekly, □ 15mg SC weekly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Metformin □ 500mg PO BID, □ 1000mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Vitamin D □ 1000IU PO daily, □ 2000IU PO daily, □ 5000IU PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Personalized nutrition plan
+☐ Regular physical activity plan
+☐ Behavioral therapy
+☐ Cognitive behavioral therapy
+☐ Food journaling
+☐ Regular self-monitoring
+☐ Meal planning/preparation strategies
+☐ Sleep optimization
+☐ Stress management techniques
+☐ Social support enhancement
+
+Referral options:
+☐ Referral to dietitian/nutritionist
+☐ Referral to weight management program
+☐ Referral to bariatric surgery evaluation
+☐ Referral to psychology/behavioral health
+☐ Referral to endocrinology
+☐ Referral to sleep medicine
+☐ Referral to physical therapy
+☐ Referral to exercise physiologist
+☐ Referral to psychiatry
+☐ Referral to eating disorder specialist
+
+☐ Counseling: Obesity is a chronic medical condition requiring long-term management. Focus on sustainable lifestyle changes rather than rapid weight loss. Aim for 150-300 minutes of moderate exercise weekly, combining cardiovascular and strength training. Practice portion control and mindful eating. Balance diet with lean proteins, fruits, vegetables, whole grains, and healthy fats. Maintain adequate hydration. Monitor progress with regular weigh-ins. Seek social support through friends, family, or support groups. Return for follow-up weight checks and monitoring of related health conditions.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Osteoarthritis
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: acute joint inflammation suggestive of infection, severe deformity, rapid progression, systemic symptoms, neurological compromise)
+
+Investigations and initial evaluation:
+☐ X-rays of affected joint(s)
+☐ Complete blood count
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ Rheumatoid factor
+☐ Anti-CCP antibodies
+☐ Uric acid level
+☐ Joint aspiration with synovial fluid analysis (if indicated)
+☐ MRI of affected joint(s) if indicated
+☐ CT scan if indicated
+☐ Bone scan if indicated
+☐ Functional assessment
+☐ Pain assessment
+☐ Range of motion assessment
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 1500mg daily)
+□ Meloxicam □ 7.5mg PO daily, □ 15mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Diclofenac gel 1% □ apply to affected area QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Capsaicin cream 0.025% □ apply to affected area TID-QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Duloxetine □ 30mg PO daily, □ 60mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Tramadol □ 50mg PO Q6H PRN, □ 50mg PO TID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 400mg daily)
+□ Intra-articular corticosteroid injection, Ren: □ 1 (schedule procedure)
+□ Intra-articular hyaluronic acid injection, Ren: □ 1 (schedule procedure)
+
+Treatment options:
+☐ Physical therapy
+☐ Occupational therapy
+☐ Weight management
+☐ Regular low-impact exercise
+☐ Aquatic therapy
+☐ Joint protection techniques
+☐ Assistive devices (canes, braces, orthotics)
+☐ Heat/cold therapy
+☐ Tai chi or yoga
+☐ TENS unit
+
+Referral options:
+☐ Referral to rheumatology
+☐ Referral to orthopedic surgery
+☐ Referral to physical therapy
+☐ Referral to occupational therapy
+☐ Referral to pain management
+☐ Referral to physiatry (PM&R)
+☐ Referral to weight management
+☐ Referral to nutritionist
+☐ Referral to integrative medicine
+☐ Referral to acupuncture
+
+☐ Counseling: Osteoarthritis is a degenerative joint condition that develops with age and use. Maintain a healthy weight to reduce stress on affected joints. Engage in regular low-impact exercise like swimming, walking, or cycling to maintain joint mobility. Apply heat for stiffness and cold for pain/swelling. Use assistive devices as recommended. Pace activities and take breaks to avoid overuse. Wear supportive footwear. Take medications as prescribed. Return if experiencing significant increase in pain, joint swelling, redness, warmth, or decreased mobility.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Eczema (Atopic Dermatitis)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: widespread infection, erythroderma, eczema herpeticum, severe sleep disruption, significant quality of life impact)
+
+Investigations and initial evaluation:
+☐ Comprehensive skin examination
+☐ Eczema Area and Severity Index (EASI)
+☐ Complete blood count
+☐ IgE level
+☐ Allergen-specific IgE testing
+☐ Patch testing
+☐ Skin scraping for fungal elements
+☐ Skin biopsy (if diagnosis uncertain)
+☐ Skin culture (if infection suspected)
+☐ Viral swab (if viral infection suspected)
+☐ Food allergy testing (if indicated)
+☐ Quality of life assessment
+☐ Sleep assessment
+☐ Itch severity scale
+
+Medications:
+□ Topical corticosteroids:
+□ Hydrocortisone 1% cream □ apply to affected areas BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Triamcinolone 0.1% cream/ointment □ apply to affected areas BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Mometasone 0.1% cream/ointment □ apply to affected areas daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Fluocinonide 0.05% cream/ointment □ apply to affected areas BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Topical calcineurin inhibitors:
+□ Tacrolimus 0.03% ointment □ apply to affected areas BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Tacrolimus 0.1% ointment □ apply to affected areas BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Pimecrolimus 1% cream □ apply to affected areas BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Phosphodiesterase inhibitors:
+□ Crisaborole 2% ointment □ apply to affected areas BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Antihistamines:
+□ Hydroxyzine □ 10mg PO TID PRN, □ 25mg PO TID PRN, □ 50mg PO TID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Cetirizine □ 5mg PO daily, □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Biologics/systemic:
+□ Dupilumab □ 300mg SC every 2 weeks, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Cyclosporine □ 2.5mg/kg/day PO divided BID, □ 5mg/kg/day PO divided BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Gentle skin care regimen
+☐ Fragrance-free moisturizers
+☐ Lukewarm (not hot) showers/baths
+☐ Bleach baths (if indicated)
+☐ Wet wrap therapy
+☐ Trigger avoidance
+☐ Cotton clothing
+☐ Dust mite control measures
+☐ Humidifier use
+☐ Stress management techniques
+
+Referral options:
+☐ Referral to dermatology
+☐ Referral to allergy/immunology
+☐ Referral to patch testing
+☐ Referral to nutrition/dietitian
+☐ Referral to psychology/psychiatry
+☐ Referral to sleep medicine
+☐ Referral to integrative medicine
+☐ Referral to infectious disease (if severe infection)
+☐ Referral to support group
+☐ Referral to wound care (if needed)
+
+☐ Counseling: Eczema is a chronic inflammatory skin condition with periods of flare and remission. Maintain daily skin care with gentle, fragrance-free cleansers and liberal use of moisturizers, especially after bathing. Apply medications as directed - topical steroids only to affected areas to minimize side effects. Identify and avoid triggers which may include certain fabrics, soaps, foods, stress, and temperature changes. Keep fingernails short to prevent damage from scratching. Wear loose-fitting cotton clothing. Return if skin becomes infected (increased redness, warmth, pain, pus) or if condition significantly worsens despite treatment.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+🩺 Psoriasis
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: erythrodermic psoriasis, pustular psoriasis, severe joint involvement, significant depression with suicidal ideation)
+
+Investigations and initial evaluation:
+☐ Comprehensive skin examination
+☐ Psoriasis Area and Severity Index (PASI)
+☐ Joint examination
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Lipid panel
+☐ Fasting blood glucose
+☐ HbA1c
+☐ Liver function tests
+☐ Hepatitis B and C testing (if considering biologics)
+☐ TB testing (if considering biologics)
+☐ Skin biopsy (if diagnosis uncertain)
+☐ X-rays (if joint involvement)
+☐ Depression screening (PHQ-9)
+☐ Quality of life assessment
+
+Medications:
+□ Topical corticosteroids:
+□ Triamcinolone 0.1% cream/ointment □ apply to affected areas BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Clobetasol 0.05% cream/ointment □ apply to affected areas BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Vitamin D analogues:
+□ Calcipotriene 0.005% cream/ointment □ apply to affected areas BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Combination products:
+□ Calcipotriene/betamethasone dipropionate ointment □ apply to affected areas daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Retinoids:
+□ Tazarotene 0.1% cream/gel □ apply to affected areas QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Systemic treatments:
+□ Methotrexate □ 10mg PO weekly, □ 15mg PO weekly, □ 20mg PO weekly, □ 25mg PO weekly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Cyclosporine □ 2.5mg/kg/day PO divided BID, □ 5mg/kg/day PO divided BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Acitretin □ 10mg PO daily, □ 25mg PO daily, □ 50mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Apremilast □ 30mg PO BID (after titration), Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Biologics:
+□ Adalimumab □ 40mg SC every 2 weeks, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Etanercept □ 50mg SC weekly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ustekinumab □ 45mg SC initial, week 4, then every 12 weeks, □ 90mg SC initial, week 4, then every 12 weeks, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Secukinumab □ 300mg SC weekly x5 then monthly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Gentle skin care regimen
+☐ Regular moisturization
+☐ Medicated shampoos (for scalp psoriasis)
+☐ Phototherapy (narrowband UVB)
+☐ Stress management techniques
+☐ Smoking cessation
+☐ Alcohol limitation
+☐ Weight management
+☐ Avoiding skin trauma
+☐ Coal tar preparations
+
+Referral options:
+☐ Referral to dermatology
+☐ Referral to rheumatology (if joint involvement)
+☐ Referral to phototherapy
+☐ Referral to psychology/psychiatry
+☐ Referral to nutritionist/dietitian
+☐ Referral to cardiology (if cardiovascular risk factors)
+☐ Referral to gastroenterology (if GI symptoms)
+☐ Referral to integrative medicine
+☐ Referral to support group
+☐ Referral to smoking cessation program
+
+☐ Counseling: Psoriasis is a chronic inflammatory condition affecting skin and sometimes joints. It may worsen with stress, infections, certain medications, skin injuries, smoking, and alcohol. Keep skin well-moisturized. Avoid skin trauma including sunburn. Apply medications as directed, rotating application sites when using potent topical steroids. Maintain healthy lifestyle with balanced diet, regular exercise, stress management, and adequate sleep. Consider joining a support group. Return if experiencing joint pain/swelling, widespread redness with fever, pustular lesions, or if depression develops.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
