@@ -497,10 +497,10 @@ const FormsitePage: React.FC = () => {
                     ) : (
                       <div className="flex flex-col items-center justify-center h-60 text-center">
                         <p className="text-gray-400 mb-4">
-                          This submission has not been processed with AI yet
+                          This submission has not been processed with GPT-4o yet
                         </p>
                         <Button
-                          onClick={() => handleProcessSubmission(selectedSubmission.id)}
+                          onClick={() => handleProcessSubmission(selectedSubmission.id, 'gpt')}
                           disabled={processSubmissionMutation.isPending}
                           variant="default"
                           className="bg-blue-600 hover:bg-blue-700"
@@ -511,7 +511,7 @@ const FormsitePage: React.FC = () => {
                             </>
                           ) : (
                             <>
-                              <Zap className="h-4 w-4 mr-2" /> Process with your AI assistant
+                              <Zap className="h-4 w-4 mr-2" /> Process with GPT-4o
                             </>
                           )}
                         </Button>
@@ -535,7 +535,7 @@ const FormsitePage: React.FC = () => {
                           This submission has not been processed with Claude 3.7 Sonnet yet
                         </p>
                         <Button
-                          onClick={() => handleProcessSubmission(selectedSubmission.id)}
+                          onClick={() => handleProcessSubmission(selectedSubmission.id, 'claude')}
                           disabled={processSubmissionMutation.isPending}
                           variant="default"
                           className="bg-blue-600 hover:bg-blue-700"
@@ -546,7 +546,7 @@ const FormsitePage: React.FC = () => {
                             </>
                           ) : (
                             <>
-                              <Zap className="h-4 w-4 mr-2" /> Process with your AI assistant
+                              <Zap className="h-4 w-4 mr-2" /> Process with Claude 3.7
                             </>
                           )}
                         </Button>

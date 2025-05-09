@@ -119,6 +119,7 @@ router.get('/submissions/search', async (req, res) => {
 router.post('/submissions/:id/process', async (req, res) => {
   try {
     const submissionId = req.params.id;
+    const { modelType = 'both' } = req.body; // 'both', 'gpt', or 'claude'
     console.log(`[DEBUG] Processing submission with ID: ${submissionId}`);
     
     // Check if FormSite API key is available
@@ -166,63 +167,86 @@ router.post('/submissions/:id/process', async (req, res) => {
     // Extract form data
     const formData = submission.items || {};
     
-    // Process form submission with Claude 3.7 Sonnet
-    console.log(`[DEBUG PROCESS] Processing form data with Claude 3.7 Sonnet`);
+    // Initialize content variables
+    let claudeContent = '';
+    let openaiContent = '';
     
-    // Use the anthropic utility function to process the form submission
-    const claudeContent = await anthropicUtils.processFormSubmission(formData);
-    console.log(`[DEBUG PROCESS] Successfully processed with Claude`);
+    // Process based on modelType
+    console.log(`[DEBUG PROCESS] Processing form data with modelType: ${modelType}`);
     
-    // Generate HPI Confirmation Summary using OpenAI for backward compatibility
-    const prompt = `
-    <role>system</role>
-    <task>You are a medical transcription AI. Output is in HTML format for History of Present Illness (HPI) confirmation summaries.</task>
-    <format>
-    <h3>HPI Confirmation Summary</h3>
-    <p>Just to confirm what you've told me about your current medical concerns:</p>
-    <ul>
-      <li>Key issues extracted from patient input</li>
-      <li>Include onset, duration, severity, etc.</li>
-      <li>Include any relevant past medical history mentioned</li>
-    </ul>
-    <p>Is this correct? [Yes] [No, there are corrections needed]</p>
-    </format>
+    // Process with Claude if modelType is 'both' or 'claude'
+    if (modelType === 'both' || modelType === 'claude') {
+      console.log(`[DEBUG PROCESS] Processing with Claude 3.7 Sonnet`);
+      try {
+        // Use the anthropic utility function to process the form submission
+        claudeContent = await anthropicUtils.processFormSubmission(formData);
+        console.log(`[DEBUG PROCESS] Successfully processed with Claude`);
+      } catch (claudeError) {
+        console.error('[DEBUG PROCESS] Error processing with Claude:', claudeError);
+        claudeContent = '<p>Error processing with Claude AI</p>';
+      }
+    }
     
-    <example>
-    <patient_input>
-    I've been having chest pain for about 3 days now. It's mostly on the left side and gets worse when I take a deep breath. Started after I was moving some heavy boxes. I have asthma but this feels different. My dad had a heart attack when he was 62, I'm 58 now.
-    </patient_input>
-    <hpi_confirmation>
-    <h3>HPI Confirmation Summary</h3>
-    <p>Just to confirm what you've told me about your current medical concerns:</p>
-    <ul>
-      <li>You've been experiencing chest pain for approximately 3 days</li>
-      <li>The pain is predominantly on the left side</li>
-      <li>Pain worsens with deep breathing</li>
-      <li>Symptoms began after moving heavy boxes</li>
-      <li>You have a history of asthma but feel this is different</li>
-      <li>Family history includes father with heart attack at age 62</li>
-      <li>You are currently 58 years old</li>
-    </ul>
-    <p>Is this correct? [Yes] [No, there are corrections needed]</p>
-    </hpi_confirmation>
-    </example>
+    // Process with GPT-4o if modelType is 'both' or 'gpt'
+    if (modelType === 'both' || modelType === 'gpt') {
+      console.log(`[DEBUG PROCESS] Processing with GPT-4o`);
+      try {
+        // Generate HPI Confirmation Summary using OpenAI
+        const prompt = `
+        <role>system</role>
+        <task>You are a medical transcription AI. Output is in HTML format for History of Present Illness (HPI) confirmation summaries.</task>
+        <format>
+        <h3>HPI Confirmation Summary</h3>
+        <p>Just to confirm what you've told me about your current medical concerns:</p>
+        <ul>
+          <li>Key issues extracted from patient input</li>
+          <li>Include onset, duration, severity, etc.</li>
+          <li>Include any relevant past medical history mentioned</li>
+        </ul>
+        <p>Is this correct? [Yes] [No, there are corrections needed]</p>
+        </format>
+        
+        <example>
+        <patient_input>
+        I've been having chest pain for about 3 days now. It's mostly on the left side and gets worse when I take a deep breath. Started after I was moving some heavy boxes. I have asthma but this feels different. My dad had a heart attack when he was 62, I'm 58 now.
+        </patient_input>
+        <hpi_confirmation>
+        <h3>HPI Confirmation Summary</h3>
+        <p>Just to confirm what you've told me about your current medical concerns:</p>
+        <ul>
+          <li>You've been experiencing chest pain for approximately 3 days</li>
+          <li>The pain is predominantly on the left side</li>
+          <li>Pain worsens with deep breathing</li>
+          <li>Symptoms began after moving heavy boxes</li>
+          <li>You have a history of asthma but feel this is different</li>
+          <li>Family history includes father with heart attack at age 62</li>
+          <li>You are currently 58 years old</li>
+        </ul>
+        <p>Is this correct? [Yes] [No, there are corrections needed]</p>
+        </hpi_confirmation>
+        </example>
+        
+        Now, generate an HPI confirmation summary based on the following patient form submission data:
+        ${JSON.stringify(formData, null, 2)}
+        `;
+        
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [
+            { role: "user", content: prompt }
+          ],
+          max_tokens: 1000
+        });
+        
+        openaiContent = completion.choices[0].message.content || '';
+        console.log(`[DEBUG PROCESS] Successfully processed with GPT-4o`);
+      } catch (openaiError) {
+        console.error('[DEBUG PROCESS] Error processing with GPT-4o:', openaiError);
+        openaiContent = '<p>Error processing with GPT-4o</p>';
+      }
+    }
     
-    Now, generate an HPI confirmation summary based on the following patient form submission data:
-    ${JSON.stringify(formData, null, 2)}
-    `;
-    
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "user", content: prompt }
-      ],
-      max_tokens: 1000
-    });
-    
-    const openaiContent = completion.choices[0].message.content || '';
-    
-    // Return the processed content with both formats
+    // Return the processed content based on what was requested
     res.json({ 
       processed: true, 
       aiContent: openaiContent,
