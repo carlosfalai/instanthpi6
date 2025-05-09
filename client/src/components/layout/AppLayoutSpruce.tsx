@@ -169,6 +169,12 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     { id: 'all-documents', label: 'All Documents', path: '/documents' },
     { id: 'insurance-paperwork', label: 'Insurance Paperwork', path: '/insurance-paperwork' },
   ];
+  
+  // Sub-sections for Claude AI related items
+  const claudeAISubSections = [
+    { id: 'claude-ai-features', label: 'Claude AI Features', path: '/claude-ai' },
+    { id: 'claude-code-assistant', label: 'Code Assistant', path: '/claude-code-assistant' },
+  ];
 
   // Sub-sections for settings-related items
   const settingsSubSections = [
