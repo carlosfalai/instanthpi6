@@ -8,6 +8,44 @@ const anthropic = new Anthropic({
 // The newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
 const DEFAULT_MODEL = 'claude-3-7-sonnet-20250219';
 
+// Example protocol to use as a template
+const PROTOCOL_TEMPLATE = `🩺 Chronic Abdominal Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+
+Investigations and initial evaluation:
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ Lipase and amylase
+☐ Thyroid function tests (TSH, Free T4)
+☐ Celiac disease panel
+☐ Stool studies: occult blood, culture, ova & parasites, C. difficile toxin
+☐ H. pylori testing
+☐ Abdominal ultrasound
+☐ Abdominal/pelvic CT with contrast
+☐ Upper endoscopy (EGD) referral
+☐ Colonoscopy referral if age >45 or concerning symptoms
+
+Pain management (prescriptions for 30 days):
+  ☐ Acetaminophen 500–1000 mg PO QID PRN x 30 days
+  ☐ Dicyclomine 10 mg PO QID PRN for cramping x 30 days
+  ☐ Omeprazole 20 mg PO daily x 30 days
+  ☐ Hyoscyamine 0.125 mg SL QID PRN x 30 days
+
+Treatment options:
+  ☐ Low FODMAP diet trial for 4-6 weeks
+  ☐ Fiber supplementation (psyllium 1 tsp daily)
+  ☐ Probiotics daily
+  ☐ Stress reduction techniques
+
+☐ Referral to gastroenterology
+☐ Referral to pain management if needed
+
+☐ Counseling and hydration: Maintain food diary to identify trigger foods, practice regular meal timing, avoid large meals, maintain adequate hydration with 2-3 liters of water daily, implement stress reduction techniques like meditation or deep breathing exercises.
+
+• Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you`;
+
 /**
  * Generate text based on a prompt using Claude AI
  * @param prompt The prompt to generate text from
@@ -28,8 +66,9 @@ export async function generateText(
     });
 
     // Extract and return the content from the first message part
-    if (response.content[0].type === 'text') {
-      return response.content[0].text;
+    const content = response.content[0];
+    if (content.type === 'text') {
+      return content.text;
     }
     return 'No text content returned from Claude AI.';
   } catch (error: any) {
@@ -59,8 +98,9 @@ export async function summarizeText(
       messages: [{ role: 'user', content: prompt }],
     });
 
-    if (response.content[0].type === 'text') {
-      return response.content[0].text;
+    const content = response.content[0];
+    if (content.type === 'text') {
+      return content.text;
     }
     return 'No text content returned from Claude AI.';
   } catch (error: any) {
@@ -255,5 +295,81 @@ export async function generateTreatmentPlan(
   } catch (error) {
     console.error('Error generating treatment plan with Claude:', error);
     throw new Error(`Failed to generate treatment plan with Claude: ${error.message}`);
+  }
+}
+
+/**
+ * Generate a standard protocol for a specific diagnosis
+ * @param diagnosisName The name of the diagnosis
+ * @param diagnosisCategory The category of the diagnosis (acute, chronic, mental, etc.)
+ * @param existingTreatments Array of existing treatments for this diagnosis
+ * @param model Optional model identifier (defaults to latest Claude model)
+ * @returns The generated standard protocol
+ */
+export async function generateStandardProtocol(
+  diagnosisName: string,
+  diagnosisCategory: string,
+  existingTreatments: Array<{name: string, category: string}> = [],
+  model: string = DEFAULT_MODEL
+): Promise<string> {
+  try {
+    // Create a string with existing treatment options
+    let treatmentsText = '';
+    if (existingTreatments.length > 0) {
+      treatmentsText = 'Existing treatment options for this diagnosis include:\n';
+      
+      // Group treatments by category
+      const treatmentsByCategory: {[key: string]: string[]} = {};
+      
+      existingTreatments.forEach(treatment => {
+        if (!treatmentsByCategory[treatment.category]) {
+          treatmentsByCategory[treatment.category] = [];
+        }
+        treatmentsByCategory[treatment.category].push(treatment.name);
+      });
+      
+      // Add treatments by category
+      for (const [category, treatments] of Object.entries(treatmentsByCategory)) {
+        treatmentsText += `- ${category.charAt(0).toUpperCase() + category.slice(1)}:\n`;
+        treatments.forEach(treatment => {
+          treatmentsText += `  - ${treatment}\n`;
+        });
+      }
+    }
+    
+    const prompt = `I need you to create a detailed standard medical protocol for treating patients with ${diagnosisName}. 
+This is a ${diagnosisCategory} condition.
+
+${treatmentsText}
+
+Use this example template as a reference and follow its format exactly, but adapt the content for ${diagnosisName}:
+
+===TEMPLATE EXAMPLE===
+${PROTOCOL_TEMPLATE}
+===END TEMPLATE===
+
+Please create a comprehensive protocol that starts with:
+🩺 ${diagnosisName}
+
+Include the standard header checklist items, and then create specific sections for:
+1. Investigations and initial evaluation (relevant lab work, imaging, etc. for this condition)
+2. Medication management with specific dosages and durations
+3. Treatment options (procedures, therapies, lifestyle changes)
+4. Potential referrals
+5. Counseling and education points
+6. Follow-up options
+
+Be comprehensive and medically accurate. Include checkbox (☐) symbols before each item as shown in the template.`;
+
+    const response = await anthropic.messages.create({
+      max_tokens: 3000,
+      model: model,
+      messages: [{ role: 'user', content: prompt }],
+    });
+
+    return response.content[0].text;
+  } catch (error: any) {
+    console.error('Error generating standard protocol with Claude:', error);
+    throw new Error(`Failed to generate standard protocol with Claude: ${error.message}`);
   }
 }

@@ -1,0 +1,307 @@
+<!-- Medical Transcription Output Template in HTML (Multilingual, Gmail-Safe) -->
+
+<h2>Table of Contents</h2>
+<ol>
+  <li><a href="#section1">HPI Confirmation Summary</a></li>
+  <li><a href="#section2">Super Spartan SOAP Note</a></li>
+  <li><a href="#section3">Follow-Up Questions</a></li>
+  <li><a href="#section4">Plan – Bullet Points</a>
+    <ol>
+      <li><a href="#section4-1">Medications</a></li>
+      <li><a href="#section4-2">Imaging</a></li>
+      <li><a href="#section4-3">Labs</a></li>
+      <li><a href="#section4-4">Referrals</a></li>
+    </ol>
+  </li>
+  <li><a href="#section5">Spartan Clinical Strategy</a></li>
+  <li><a href="#section6">Work Leave Declaration</a></li>
+  <li><a href="#section7">Work Modification Recommendations</a></li>
+  <li><a href="#section8">Insurance & Short-Term Disability Declaration</a></li>
+</ol>
+
+<h3><a name="section1">1. HPI Confirmation Summary</a></h3>
+<p><strong>English (Physician Language):</strong><br>
+Just to verify this with you beforehand, you are a {{Age}}-year-old {{Gender}} experiencing {{Description}} located in the {{Location}} that began on {{Symptom}}{{Onset}}. The symptom is rated {{Severity}} (0–10) out of 10, worsens with {{Aggravating}}{{Factors}}, and is relieved by {{Relieving}}{{Factors}}. You also report {{Associated}}{{Symptoms}}. No treatments have been tried yet. You have the following chronic conditions: {{Chronic}}{{Conditions}}. No medication allergies reported. Is this correct?</p>
+<p><strong>Patient Language ({{PatientLanguage}}):</strong><br>
+Vamos a confirmar su información médica. Usted tiene {{Age}} años y presenta {{Description}} en {{Location}} desde {{Symptom}}{{Onset}}. El dolor es de {{Severity}} sobre 10, empeora con {{Aggravating}}{{Factors}} y mejora con {{Relieving}}{{Factors}}. También tiene {{Associated}}{{Symptoms}}. Hasta ahora no ha probado tratamientos. Tiene antecedentes de {{Chronic}}{{Conditions}}. No reporta alergias a medicamentos. ¿Es correcta esta información?</p>
+<ul>
+  <li>You are a {{Age}}-year-old {{Gender}}.<br>
+      → Usted tiene {{Age}} años.<br>
+      → <em>{{RomanizedLine1}}</em></li>
+  <li>Experiencing {{Description}} at {{Location}} since {{Symptom}}{{Onset}}.<br>
+      → Tiene {{Description}} en {{Location}} desde {{Symptom}}{{Onset}}.<br>
+      → <em>{{RomanizedLine2}}</em></li>
+  <li>Symptom severity is {{Severity}}/10.<br>
+      → El dolor es de {{Severity}} sobre 10.<br>
+      → <em>{{RomanizedLine3}}</em></li>
+  <li>Worsened by {{Aggravating}}{{Factors}}, relieved by {{Relieving}}{{Factors}}.<br>
+      → Empeora con {{Aggravating}}{{Factors}}, mejora con {{Relieving}}{{Factors}}.<br>
+      → <em>{{RomanizedLine4}}</em></li>
+  <li>Associated symptoms: {{Associated}}{{Symptoms}}.<br>
+      → También tiene {{Associated}}{{Symptoms}}.<br>
+      → <em>{{RomanizedLine5}}</em></li>
+  <li>Chronic conditions: {{Chronic}}{{Conditions}}.<br>
+      → Tiene antecedentes de {{Chronic}}{{Conditions}}.<br>
+      → <em>{{RomanizedLine6}}</em></li>
+  <li>No medication allergies reported.<br>
+      → No reporta alergias a medicamentos.<br>
+      → <em>{{RomanizedLine7}}</em></li>
+  <li>Is this correct?<br>
+      → ¿Es correcta esta información?<br>
+      → <em>{{RomanizedLine8}}</em></li>
+</ul>
+
+<h3><a name="section2">2. Super Spartan SOAP Note</a></h3>
+<p><strong>S:</strong> {{Age}}{{Gender}} with {{Description}} at {{Location}} since {{Symptom}}{{Onset}}; {{Severity}}/10; ↑ {{Aggravating}}{{Factors}}, ↓ {{Relieving}}{{Factors}}; reports {{Associated}}{{Symptoms}}; no prior tx; hx of {{Chronic}}{{Conditions}}; no drug allergies.</p>
+<p><strong>O:</strong> Vital signs: Temp {{Temperature}}, BP {{BloodPressure}}, HR {{HeartRate}}, RR {{RespiratoryRate}}. {{PhysicalExamFindings}}.</p>
+<p><strong>A:</strong> Suspect {{ChiefComplaint}}; ddx includes {{DDX1}}, {{DDX2}}, {{DDX3}}.</p>
+<p><strong>P:</strong> {{TreatmentPlan}}. Reassess with findings.</p>
+
+<h3><a name="section3">3. Follow-Up Questions ({{ChiefComplaint}})</a></h3>
+<div style="margin-left: 20px;">
+  <ol>
+    <li style="margin-bottom: 15px;">
+      <p><strong>{{FollowUpQuestion1}}</strong><br>
+      ({{PatientLanguage}}: {{TranslatedQuestion1}})<br>
+      <em>{{ProperlyFormattedRomanization1}}</em></p>
+    </li>
+    
+    <li style="margin-bottom: 15px;">
+      <p><strong>{{FollowUpQuestion2}}</strong><br>
+      ({{PatientLanguage}}: {{TranslatedQuestion2}})<br>
+      <em>{{ProperlyFormattedRomanization2}}</em></p>
+    </li>
+    
+    <li style="margin-bottom: 15px;">
+      <p><strong>{{FollowUpQuestion3}}</strong><br>
+      ({{PatientLanguage}}: {{TranslatedQuestion3}})<br>
+      <em>{{ProperlyFormattedRomanization3}}</em></p>
+    </li>
+    
+    <li style="margin-bottom: 15px;">
+      <p><strong>{{FollowUpQuestion4}}</strong><br>
+      ({{PatientLanguage}}: {{TranslatedQuestion4}})<br>
+      <em>{{ProperlyFormattedRomanization4}}</em></p>
+    </li>
+    
+    <li style="margin-bottom: 15px;">
+      <p><strong>{{FollowUpQuestion5}}</strong><br>
+      ({{PatientLanguage}}: {{TranslatedQuestion5}})<br>
+      <em>{{ProperlyFormattedRomanization5}}</em></p>
+    </li>
+    
+    <li style="margin-bottom: 15px;">
+      <p><strong>{{FollowUpQuestion6}}</strong><br>
+      ({{PatientLanguage}}: {{TranslatedQuestion6}})<br>
+      <em>{{ProperlyFormattedRomanization6}}</em></p>
+    </li>
+    
+    <li style="margin-bottom: 15px;">
+      <p><strong>{{FollowUpQuestion7}}</strong><br>
+      ({{PatientLanguage}}: {{TranslatedQuestion7}})<br>
+      <em>{{ProperlyFormattedRomanization7}}</em></p>
+    </li>
+    
+    <li style="margin-bottom: 15px;">
+      <p><strong>{{FollowUpQuestion8}}</strong><br>
+      ({{PatientLanguage}}: {{TranslatedQuestion8}})<br>
+      <em>{{ProperlyFormattedRomanization8}}</em></p>
+    </li>
+    
+    <li style="margin-bottom: 15px;">
+      <p><strong>{{FollowUpQuestion9}}</strong><br>
+      ({{PatientLanguage}}: {{TranslatedQuestion9}})<br>
+      <em>{{ProperlyFormattedRomanization9}}</em></p>
+    </li>
+    
+    <li style="margin-bottom: 15px;">
+      <p><strong>{{FollowUpQuestion10}}</strong><br>
+      ({{PatientLanguage}}: {{TranslatedQuestion10}})<br>
+      <em>{{ProperlyFormattedRomanization10}}</em></p>
+    </li>
+  </ol>
+</div>
+
+<h3><a name="section4">4. Plan – Bullet Points</a></h3>
+
+<h4><a name="section4-1">4.1. <strong>Medications</strong></a></h4>
+<div style="margin-left: 20px;">
+  <p><strong>Antibiotics:</strong></p>
+  <p style="margin-left: 20px;">
+    □ Ciprofloxacin 500mg PO BID for 7 days, □ PRN, Ren: Ø (max 1000mg daily)<br>
+    □ Nitrofurantoin 100mg PO QID for 7 days, □ PRN, Ren: Ø (max 400mg daily)<br>
+    □ Sulfamethoxazole-trimethoprim □ 400/80mg PO BID, □ 800/160mg PO BID, □ 1600/320mg PO daily, □ PRN, Ren: Ø (max 1600/320mg daily)<br>
+    □ Doxycycline □ 50mg PO BID, □ 100mg PO BID, □ 100mg PO daily, □ PRN, Ren: Ø (max 200mg daily)<br>
+    □ Cefuroxime □ 250mg PO BID, □ 500mg PO BID, □ 500mg PO TID, □ PRN, Ren: Ø (max 1500mg daily)
+  </p>
+  
+  <p><strong>Pain Management:</strong></p>
+  <p style="margin-left: 20px;">
+    □ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)<br>
+    □ Acetaminophen □ 325mg PO Q4H PRN, □ 500mg PO Q6H PRN, □ 1000mg PO Q6H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)<br>
+    □ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 1500mg daily)<br>
+    □ Phenazopyridine □ 100mg PO TID, □ 200mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 600mg daily)<br>
+    □ Oxybutynin □ 5mg PO BID, □ 5mg PO TID, □ 10mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 30mg daily)
+  </p>
+  
+  <p><strong>Diabetes/Metabolic Medications:</strong></p>
+  <p style="margin-left: 20px;">
+    □ Metformin □ 500mg PO BID, □ 850mg PO BID, □ 1000mg PO BID, □ 500mg PO TID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12 (max 2000mg daily)<br>
+    □ Glimepiride □ 1mg PO daily with breakfast, □ 2mg PO daily with breakfast, □ 4mg PO daily with breakfast, Ren: □ 1, □ 2, □ 3, □ 6, □ 12 (max 8mg daily)<br>
+    □ Empagliflozin □ 10mg PO daily, □ 25mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12 (max 25mg daily)
+  </p>
+  
+  <p><strong>Blood Pressure Medications:</strong></p>
+  <p style="margin-left: 20px;">
+    □ Lisinopril □ 5mg PO daily, □ 10mg PO daily, □ 20mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12 (max 40mg daily)<br>
+    □ Amlodipine □ 2.5mg PO daily, □ 5mg PO daily, □ 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12 (max 10mg daily)<br>
+    □ Hydrochlorothiazide □ 12.5mg PO daily, □ 25mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12 (max 50mg daily)
+  </p>
+  
+  <p><strong>Explanation:</strong></p>
+  <p style="margin-left: 20px;">
+    <span>English (Physician Language):</span> {{MedExplanationEnglish}}<br><br>
+    <span>{{PatientLanguage}} (Patient Language):</span> {{MedExplanationPatient}}<br><br>
+    <span>Romanized for Physician:</span> <em>{{ProperlyFormattedRomanizationMed}}</em>
+  </p>
+</div>
+
+<h4><a name="section4-2">4.2. <strong>Imaging</strong></a></h4>
+<div style="margin-left: 20px;">
+  <ul>
+    <li style="margin-bottom: 20px;"><strong>{{ImagingOption1}}</strong> – {{Age}}{{Gender}} with {{Description}} at {{Location}} since {{Onset}}; {{Severity}}/10; {{AssociatedSymptoms}}; {{ChronicConditions}}; {{ImagingReason1}}
+      <p style="margin-left: 20px;"><em>"{{ImagingRequisitionText1}}"</em></p>
+      
+      <p style="margin-left: 20px;">
+        <span>English (Physician Language):</span> {{ImagingExplanationEnglish1}}<br><br>
+        <span>{{PatientLanguage}} (Patient Language):</span> {{ImagingExplanationPatient1}}<br><br>
+        <span>Romanized for Physician:</span> <em>{{ProperlyFormattedRomanizationImaging1}}</em>
+      </p>
+    </li>
+    
+    <li style="margin-bottom: 20px;"><strong>{{ImagingOption2}}</strong> – {{Age}}{{Gender}} with {{Description}} at {{Location}}; {{Severity}}/10; {{ChronicConditions}}; {{ImagingReason2}}
+      <p style="margin-left: 20px;"><em>"{{ImagingRequisitionText2}}"</em></p>
+      
+      <p style="margin-left: 20px;">
+        <span>English (Physician Language):</span> {{ImagingExplanationEnglish2}}<br><br>
+        <span>{{PatientLanguage}} (Patient Language):</span> {{ImagingExplanationPatient2}}<br><br>
+        <span>Romanized for Physician:</span> <em>{{ProperlyFormattedRomanizationImaging2}}</em>
+      </p>
+    </li>
+  </ul>
+</div>
+
+<h4><a name="section4-3">4.3. <strong>Labs</strong></a></h4>
+<div style="margin-left: 20px;">
+  <ul style="line-height: 1.5;">
+    <li>Urinalysis with Microscopy</li>
+    <li>Urine Culture and Sensitivity</li>
+    <li>Complete Blood Count with Differential</li>
+    <li>Basic Metabolic Panel</li>
+    <li>C-Reactive Protein</li>
+    <li>Sexually Transmitted Infection Panel</li>
+    <li>Prostate-Specific Antigen</li>
+    <li>Blood Cultures</li>
+  </ul>
+  
+  <p><strong>Explanation:</strong></p>
+  <p style="margin-left: 20px;">
+    <span>English (Physician Language):</span> {{LabExplanationEnglish}}<br><br>
+    <span>{{PatientLanguage}} (Patient Language):</span> {{LabExplanationPatient}}<br><br>
+    <span>Romanized for Physician:</span> <em>{{ProperlyFormattedRomanizationLab}}</em>
+  </p>
+</div>
+
+<h4><a name="section4-4">4.4. <strong>Referrals</strong></a></h4>
+<div style="margin-left: 20px;">
+  <ul>
+    <li style="margin-bottom: 20px;"><strong>Urology</strong> – {{Age}}{{Gender}} with {{Description}} at {{Location}} since {{Onset}}; {{Severity}}/10 severity; hx of {{ChronicConditions}}; current treatment with {{CurrentMeds}}; referred for {{ReferralReason1}}
+      <p style="margin-left: 20px;">
+        <span>English (Physician Language):</span> {{ReferralExplanationEnglish1}}<br><br>
+        <span>{{PatientLanguage}} (Patient Language):</span> {{ReferralExplanationPatient1}}<br><br>
+        <span>Romanized for Physician:</span> <em>{{ProperlyFormattedRomanizationReferral1}}</em>
+      </p>
+    </li>
+    
+    <li style="margin-bottom: 20px;"><strong>Infectious Disease</strong> – {{Age}}{{Gender}} with {{Description}} at {{Location}} since {{Onset}}; {{Severity}}/10 severity; hx of {{ChronicConditions}} for {{Duration}}; current treatment with {{CurrentMeds}}; referred for {{ReferralReason2}}
+      <p style="margin-left: 20px;">
+        <span>English (Physician Language):</span> {{ReferralExplanationEnglish2}}<br><br>
+        <span>{{PatientLanguage}} (Patient Language):</span> {{ReferralExplanationPatient2}}<br><br>
+        <span>Romanized for Physician:</span> <em>{{ProperlyFormattedRomanizationReferral2}}</em>
+      </p>
+    </li>
+  </ul>
+</div>
+
+<h3><a name="section5">5. Spartan Clinical Strategy</a></h3>
+<p>{{ChiefComplaint}} → check {{LabStrategy1}}. {{TreatmentStrategy1}}. {{TreatmentStrategy2}} if necessary. Optimize {{TreatmentStrategy3}}, {{TreatmentStrategy4}}, {{TreatmentStrategy5}} aggressively. {{ComplicationStrategy}}: {{ComplicationApproach}} if positive. Stepwise optimization over {{TimeframeStrategy}}.</p>
+
+<h3><a name="section6">6. Work Leave Declaration</a></h3>
+<p><strong>Physician Language:</strong><br>
+This is to confirm that the patient is medically excused from work or school due to {{ChiefComplaint}}, starting from {{today}} through {{today + duration}}, inclusive.</p>
+<p><strong>Patient Language ({{PatientLanguage}}):</strong><br>
+Este documento confirma que usted está justificado médicamente para ausentarse del trabajo o escuela debido a {{ChiefComplaint}}, desde el {{today}} hasta el {{today + duration}}, inclusive.
+</p>
+
+<h3><a name="section7">7. Work Modification Recommendations</a></h3>
+<p><strong>Physician Language:</strong><br>
+The following work modifications are recommended for this patient upon return to work, due to {{ChiefComplaint}}:
+</p>
+<ul style="line-height: 1.5;">
+  <li>No heavy lifting over {{weightLimit}} pounds/kg</li>
+  <li>No prolonged {{restriction1}} for more than {{timeLimit1}} minutes at a time</li>
+  <li>Allow for {{accommodation1}} every {{frequency1}} hours</li>
+  <li>Avoid {{restriction2}} activities</li>
+  <li>These recommendations should remain in effect for {{recommendationDuration}} weeks, after which reassessment is advised</li>
+</ul>
+<p><strong>Patient Language ({{PatientLanguage}}):</strong><br>
+Se recomiendan las siguientes modificaciones laborales para este paciente al regresar al trabajo, debido a {{ChiefComplaint}}:
+</p>
+<ul style="line-height: 1.5;">
+  <li>No levantar objetos pesados de más de {{weightLimit}} libras/kg</li>
+  <li>No {{restriction1}} prolongado por más de {{timeLimit1}} minutos a la vez</li>
+  <li>Permitir {{accommodation1}} cada {{frequency1}} horas</li>
+  <li>Evitar actividades de {{restriction2}}</li>
+  <li>Estas recomendaciones deben permanecer vigentes durante {{recommendationDuration}} semanas, después de lo cual se recomienda una reevaluación</li>
+</ul>
+
+<h3><a name="section8">8. Insurance & Short-Term Disability Declaration</a></h3>
+<p><strong>Physician Language:</strong><br>
+Diagnosis (Primary): {{ChiefComplaint}}<br>
+Diagnosis (Secondary): {{ChronicConditions}}<br>
+Is this work-related? No<br>
+First consult date: {{today}}<br>
+Start of leave: {{today}}<br>
+Hospitalization: {{Hospitalization}}<br>
+Surgery: {{Surgery}}<br>
+Treatment: {{Treatment}}<br>
+Prognosis: {{Prognosis}}<br>
+Previous episodes: {{PreviousEpisodes}}<br>
+Follow-up frequency: {{FollowupFrequency}}<br>
+Symptoms: Severity {{Severity}}/10, worsened by {{Aggravating}}{{Factors}}, improved by {{Relieving}}{{Factors}}, includes {{Associated}}{{Symptoms}}<br>
+Additional exams ordered? Yes<br>
+Referred to specialist? Yes – see referral section<br>
+Restrictions: {{Restrictions}}<br>
+Complications: {{Complications}}<br>
+Adherent to recommendations? Yes<br>
+Independent in self-care? {{SelfCare}}</p>
+<p><strong>Patient Language ({{PatientLanguage}}):</strong><br>
+Diagnóstico (Primario): {{ChiefComplaint}}<br>
+Diagnóstico (Secundario): {{ChronicConditions}}<br>
+¿Está relacionado con el trabajo? No<br>
+Fecha de primera consulta: {{today}}<br>
+Inicio de la licencia: {{today}}<br>
+Hospitalización: {{Hospitalization}}<br>
+Cirugía: {{Surgery}}<br>
+Tratamiento: {{Treatment}}<br>
+Pronóstico: {{Prognosis}}<br>
+Episodios previos: {{PreviousEpisodes}}<br>
+Frecuencia de seguimiento: {{FollowupFrequency}}<br>
+Síntomas: Gravedad {{Severity}}/10, empeorado por {{Aggravating}}{{Factors}}, mejorado por {{Relieving}}{{Factors}}, incluye {{Associated}}{{Symptoms}}<br>
+¿Exámenes adicionales ordenados? Sí<br>
+¿Referido a especialista? Sí – ver sección de referencias<br>
+Restricciones: {{Restrictions}}<br>
+Complicaciones: {{Complications}}<br>
+¿Adherente a las recomendaciones? Sí<br>
+¿Independiente en el autocuidado? {{SelfCare}}
+</p>
