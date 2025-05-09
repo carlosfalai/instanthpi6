@@ -118,8 +118,16 @@ const FormsitePage: React.FC = () => {
   };
 
   // Handle selecting a submission for viewing
-  const handleSelectSubmission = (submission: FormSiteSubmission) => {
-    setSelectedSubmission(submission);
+  const handleSelectSubmission = async (submission: FormSiteSubmission) => {
+    // Fetch the latest details for this submission to ensure we have the most up-to-date data
+    try {
+      const latestSubmission = await formsiteService.getFormSubmission(submission.id);
+      setSelectedSubmission(latestSubmission);
+    } catch (error) {
+      console.error('Error fetching latest submission details:', error);
+      // Fall back to using the submission data from the list if there's an error
+      setSelectedSubmission(submission);
+    }
   };
 
   // Format date string
