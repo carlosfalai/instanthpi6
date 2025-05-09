@@ -63,11 +63,12 @@ const FormsitePage: React.FC = () => {
           ...selectedSubmission,
           processed: true,
           aiProcessedContent: data.aiContent,
+          claudeContent: data.claudeContent,
         });
       }
       toast({
         title: 'Form Processed',
-        description: 'The form submission has been processed successfully.',
+        description: 'The form submission has been processed successfully with both AI models.',
       });
       // Invalidate the submissions query to refresh the list
       queryClient.invalidateQueries({ queryKey: ['/api/formsite/submissions'] });
@@ -420,7 +421,8 @@ const FormsitePage: React.FC = () => {
               <Tabs defaultValue="form-data" className="flex-grow flex flex-col">
                 <TabsList className="w-full bg-[#252525] mb-4">
                   <TabsTrigger value="form-data" className="flex-1">Form Data</TabsTrigger>
-                  <TabsTrigger value="ai-content" className="flex-1">AI Processed Content</TabsTrigger>
+                  <TabsTrigger value="ai-content" className="flex-1">GPT-4o Output</TabsTrigger>
+                  <TabsTrigger value="claude-content" className="flex-1">Claude 3.7 Output</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="form-data" className="flex-grow data-[state=active]:flex flex-col mt-0">
@@ -486,6 +488,41 @@ const FormsitePage: React.FC = () => {
                           ) : (
                             <>
                               <Zap className="h-4 w-4 mr-2" /> Process with your AI assistant
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    )}
+                  </ScrollArea>
+                </TabsContent>
+
+                <TabsContent value="claude-content" className="flex-grow data-[state=active]:flex flex-col mt-0">
+                  <ScrollArea className="flex-grow pr-2">
+                    {selectedSubmission.processed && selectedSubmission.claudeContent ? (
+                      <div 
+                        className="prose prose-invert max-w-none"
+                        dangerouslySetInnerHTML={{ 
+                          __html: selectedSubmission.claudeContent 
+                        }}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-60 text-center">
+                        <p className="text-gray-400 mb-4">
+                          This submission has not been processed with Claude 3.7 Sonnet yet
+                        </p>
+                        <Button
+                          onClick={() => handleProcessSubmission(selectedSubmission.id)}
+                          disabled={processSubmissionMutation.isPending}
+                          variant="default"
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          {processSubmissionMutation.isPending ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Processing...
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="h-4 w-4 mr-2" /> Process with Claude 3.7
                             </>
                           )}
                         </Button>

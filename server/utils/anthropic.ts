@@ -66,9 +66,8 @@ export async function generateText(
     });
 
     // Extract and return the content from the first message part
-    const content = response.content[0];
-    if (content.type === 'text') {
-      return content.text;
+    if (response.content.length > 0 && response.content[0].type === 'text') {
+      return response.content[0].text;
     }
     return 'No text content returned from Claude AI.';
   } catch (error: any) {
@@ -444,9 +443,8 @@ Please fill in all placeholders with information from the form data. Generate al
     });
 
     // Extract and return the content
-    const content = response.content[0];
-    if (content.type === 'text') {
-      return content.text;
+    if (response.content.length > 0 && response.content[0].type === 'text') {
+      return response.content[0].text;
     }
     return 'No text content returned from Claude AI.';
   } catch (error: any) {

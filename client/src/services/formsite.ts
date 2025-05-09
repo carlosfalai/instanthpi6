@@ -9,6 +9,7 @@ export interface FormSiteSubmission {
   results: Record<string, any>;
   processed?: boolean;
   aiProcessedContent?: string;
+  claudeContent?: string;
 }
 
 export interface SearchResults {
@@ -50,7 +51,7 @@ export const formsiteService = {
   /**
    * Process a form submission with AI
    */
-  async processFormSubmission(id: string): Promise<{ processed: boolean, aiContent: string }> {
+  async processFormSubmission(id: string): Promise<{ processed: boolean, aiContent: string, claudeContent: string }> {
     try {
       const response = await apiRequest('POST', `/api/formsite/submissions/${id}/process`, {});
       return await response.json();
