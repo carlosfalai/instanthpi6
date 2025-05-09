@@ -178,8 +178,40 @@ router.post('/submissions/:id/process', async (req, res) => {
     if (modelType === 'both' || modelType === 'claude') {
       console.log(`[DEBUG PROCESS] Processing with Claude 3.7 Sonnet`);
       try {
-        // Use the anthropic utility function to process the form submission
-        claudeContent = await anthropicUtils.processFormSubmission(formData);
+        // Define the prompt with the multilingual medical template format
+        const claudeSystemPrompt = `You are a medical transcription AI that generates structured medical documentation based on patient form data. Format your response using HTML with a multilingual approach.`;
+        
+        const claudePrompt = `
+Create a comprehensive medical report using this exact HTML template format:
+
+<h2>Table of Contents</h2>
+<ol>
+  <li><a href="#section1">HPI Confirmation Summary</a></li>
+  <li><a href="#section2">Super Spartan SAP Note</a></li>
+  <li><a href="#section3">Follow-Up Questions</a></li>
+  <li><a href="#section4">Plan – Bullet Points</a>
+    <ol>
+      <li><a href="#section4-1">Medications</a></li>
+      <li><a href="#section4-2">Imaging</a></li>
+      <li><a href="#section4-3">Labs</a></li>
+      <li><a href="#section4-4">Referrals</a></li>
+    </ol>
+  </li>
+  <li><a href="#section5">Spartan Clinical Strategy</a></li>
+  <li><a href="#section6">Work Leave Declaration</a></li>
+  <li><a href="#section7">Work Modification Recommendations</a></li>
+  <li><a href="#section8">Insurance & Short-Term Disability Declaration</a></li>
+</ol>
+
+Each section should follow the format shown in the template, with both English and the patient's primary language (if identifiable from the data).
+
+Based on this patient data:
+${JSON.stringify(formData, null, 2)}
+
+Generate appropriate content for all sections of the template. For the HPI Confirmation Summary, include both English and translated versions if possible.`;
+        
+        // Process with Claude using the new template format
+        claudeContent = await anthropicUtils.processFormSubmission(formData, claudePrompt);
         console.log(`[DEBUG PROCESS] Successfully processed with Claude`);
       } catch (claudeError) {
         console.error('[DEBUG PROCESS] Error processing with Claude:', claudeError);
@@ -191,43 +223,47 @@ router.post('/submissions/:id/process', async (req, res) => {
     if (modelType === 'both' || modelType === 'gpt') {
       console.log(`[DEBUG PROCESS] Processing with GPT-4o`);
       try {
-        // Generate HPI Confirmation Summary using OpenAI
+        // Generate a complete medical report using the multilingual template
         const prompt = `
-        <role>system</role>
-        <task>You are a medical transcription AI. Output is in HTML format for History of Present Illness (HPI) confirmation summaries.</task>
-        <format>
-        <h3>HPI Confirmation Summary</h3>
-        <p>Just to confirm what you've told me about your current medical concerns:</p>
-        <ul>
-          <li>Key issues extracted from patient input</li>
-          <li>Include onset, duration, severity, etc.</li>
-          <li>Include any relevant past medical history mentioned</li>
-        </ul>
-        <p>Is this correct? [Yes] [No, there are corrections needed]</p>
-        </format>
-        
-        <example>
-        <patient_input>
-        I've been having chest pain for about 3 days now. It's mostly on the left side and gets worse when I take a deep breath. Started after I was moving some heavy boxes. I have asthma but this feels different. My dad had a heart attack when he was 62, I'm 58 now.
-        </patient_input>
-        <hpi_confirmation>
-        <h3>HPI Confirmation Summary</h3>
-        <p>Just to confirm what you've told me about your current medical concerns:</p>
-        <ul>
-          <li>You've been experiencing chest pain for approximately 3 days</li>
-          <li>The pain is predominantly on the left side</li>
-          <li>Pain worsens with deep breathing</li>
-          <li>Symptoms began after moving heavy boxes</li>
-          <li>You have a history of asthma but feel this is different</li>
-          <li>Family history includes father with heart attack at age 62</li>
-          <li>You are currently 58 years old</li>
-        </ul>
-        <p>Is this correct? [Yes] [No, there are corrections needed]</p>
-        </hpi_confirmation>
-        </example>
-        
-        Now, generate an HPI confirmation summary based on the following patient form submission data:
-        ${JSON.stringify(formData, null, 2)}
+You are a medical transcription AI that generates structured medical documentation based on patient form data. Format your response using HTML with a multilingual approach.
+
+Create a comprehensive medical report using this exact HTML template format:
+
+<h2>Table of Contents</h2>
+<ol>
+  <li><a href="#section1">HPI Confirmation Summary</a></li>
+  <li><a href="#section2">Super Spartan SAP Note</a></li>
+  <li><a href="#section3">Follow-Up Questions</a></li>
+  <li><a href="#section4">Plan – Bullet Points</a>
+    <ol>
+      <li><a href="#section4-1">Medications</a></li>
+      <li><a href="#section4-2">Imaging</a></li>
+      <li><a href="#section4-3">Labs</a></li>
+      <li><a href="#section4-4">Referrals</a></li>
+    </ol>
+  </li>
+  <li><a href="#section5">Spartan Clinical Strategy</a></li>
+  <li><a href="#section6">Work Leave Declaration</a></li>
+  <li><a href="#section7">Work Modification Recommendations</a></li>
+  <li><a href="#section8">Insurance & Short-Term Disability Declaration</a></li>
+</ol>
+
+<h3><a name="section1">1. HPI Confirmation Summary</a></h3>
+<p><strong>English (Physician Language):</strong><br>
+Just to verify this with you beforehand, you are a {{Age}}-year-old {{Gender}} experiencing {{Description}} located in the {{Location}} that began on {{Onset}}. The symptom is rated {{Severity}} out of 10, worsens with {{Aggravating Factors}}, and is relieved by {{Relieving Factors}}. You also report {{Associated Symptoms}}. Relevant medical history: {{Chronic Conditions}}. No medication allergies reported.
+</p>
+
+<p><strong>Patient Language (if applicable):</strong><br>
+Translated confirmation of the above.
+</p>
+
+<h3><a name="section2">2. Super Spartan SAP Note</a></h3>
+<p><strong>S:</strong> {{Subjective findings in condensed clinical format}}</p>
+<p><strong>A:</strong> {{Assessment with suspected diagnosis and differentials}}</p>
+<p><strong>P:</strong> {{Plan overview}}</p>
+
+Follow this template exactly to create a comprehensive medical report based on the following patient data:
+${JSON.stringify(formData, null, 2)}
         `;
         
         const completion = await openai.chat.completions.create({

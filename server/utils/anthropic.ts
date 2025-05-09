@@ -392,11 +392,13 @@ Be comprehensive and medically accurate. Include checkbox (☐) symbols before e
 /**
  * Process a FormSite submission with Claude AI
  * @param formData The form data from FormSite submission
+ * @param customPrompt Optional custom prompt to use instead of the default
  * @param model Optional model identifier (defaults to latest Claude model)
  * @returns The processed HTML content
  */
 export async function processFormSubmission(
   formData: Record<string, any>,
+  customPrompt?: string,
   model: string = DEFAULT_MODEL
 ): Promise<string> {
   try {
@@ -439,8 +441,8 @@ Use the patient's submitted information to generate a comprehensive medical docu
 
 The template contains placeholders like {{Age}}, {{Gender}}, etc. Replace these with the appropriate information from the form data. If information is missing, use "not reported" or similar appropriate text. Be thorough and professional.`;
 
-    // Create the user prompt with form data
-    const userPrompt = `Here is a FormSite submission with patient data. Please process this and create a complete medical documentation following the HTML template structure.
+    // Create the user prompt with form data - use customPrompt if provided
+    const userPrompt = customPrompt || `Here is a FormSite submission with patient data. Please process this and create a complete medical documentation following the HTML template structure.
 
 Form Data:
 ${JSON.stringify(formData, null, 2)}
