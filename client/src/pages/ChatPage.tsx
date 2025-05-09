@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Check, ChevronDown, MessageSquare, Send, MoreVertical } from "lucide-react";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 
 // Sample chat messages for the UI example
 const SAMPLE_MESSAGES = [
