@@ -17,26 +17,41 @@ interface Message {
 }
 
 interface SpruceConversationProps {
-  messages: Message[];
-  onSendMessage: (content: string) => void;
-  patientName: string;
+  patientId: number;
+  doctorName: string;
+  messages?: Message[];
+  onSendMessage?: (content: string) => void;
+  patientName?: string;
 }
 
 export default function SpruceConversation({
-  messages,
-  onSendMessage,
-  patientName
+  patientId,
+  doctorName,
+  messages = [],
+  onSendMessage = () => {},
+  patientName = "Patient"
 }: SpruceConversationProps) {
   const [newMessage, setNewMessage] = useState('');
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
+  
+  // Fetch messages from API if not provided
+  const { data: fetchedMessages } = useQuery({
+    queryKey: [`/api/messages/${patientId}`],
+    enabled: (!messages || !Array.isArray(messages) || messages.length === 0) && !!patientId,
+  });
+  
+  // Use provided messages or fetched messages
+  const displayMessages: Message[] = messages && Array.isArray(messages) && messages.length > 0 
+    ? messages 
+    : (Array.isArray(fetchedMessages) ? fetchedMessages : []);
   
   // Scroll to bottom when messages change
   useEffect(() => {
     if (scrollAreaRef.current) {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [displayMessages]);
   
   // Format timestamp for display
   const formatTimestamp = (timestamp: string) => {
@@ -88,12 +103,12 @@ export default function SpruceConversation({
         ref={scrollAreaRef as any}
       >
         <div className="space-y-4">
-          {messages.length === 0 ? (
+          {displayMessages.length === 0 ? (
             <div className="text-center text-gray-500">
               No messages yet. Start the conversation!
             </div>
           ) : (
-            messages.map((message) => (
+            displayMessages.map((message) => (
               <div 
                 key={message.id}
                 className={`flex ${message.isFromPatient ? 'justify-start' : 'justify-end'}`}

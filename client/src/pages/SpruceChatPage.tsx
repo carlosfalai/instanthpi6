@@ -82,7 +82,8 @@ export default function SpruceChatPage() {
   }
   
   // Default to English if language is undefined
-  const patientLanguage = patient?.language === 'french' ? 'french' : 'english';
+  // Comment out for now as it's not being used
+  // const patientLanguage = 'english';
   
   return (
     <AppLayoutSpruce>
