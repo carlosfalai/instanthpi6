@@ -1,13 +1,36 @@
-import { MailService } from '@sendgrid/mail';
+import nodemailer from 'nodemailer';
 import { storage } from '../storage';
 
-// Initialize SendGrid mail service
-const mailService = new MailService();
+// Create a test SMTP transporter object (for development)
+const transporter = nodemailer.createTransport({
+  host: 'smtp.ethereal.email',
+  port: 587,
+  secure: false,
+  auth: {
+    user: 'ethereal.user@ethereal.email', // this will be auto-created for testing
+    pass: 'ethereal.password', // this will be auto-created for testing
+  },
+});
 
-// Set SendGrid API key if available
-if (process.env.SENDGRID_API_KEY) {
-  mailService.setApiKey(process.env.SENDGRID_API_KEY);
-}
+// Create temporary ethereal email account for development
+(async function() {
+  // Only create new account if we don't have credentials yet
+  if (transporter.options.auth.user === 'ethereal.user@ethereal.email') {
+    try {
+      // Generate a Nodemailer test account
+      const testAccount = await nodemailer.createTestAccount();
+      
+      // Update the transporter with the test credentials
+      transporter.options.auth.user = testAccount.user;
+      transporter.options.auth.pass = testAccount.pass;
+      
+      console.log('Created Ethereal test account for email testing');
+      console.log('Preview URL will be shown when emails are sent');
+    } catch (error) {
+      console.error('Failed to create test email account:', error);
+    }
+  }
+})();
 
 interface EmailAttachment {
   content: string; // Base64 encoded content
@@ -26,33 +49,41 @@ interface EmailOptions {
 }
 
 /**
- * Sends an email using SendGrid
+ * Sends an email using Nodemailer
  * 
  * @param options Email options (to, subject, text, html, attachments)
- * @returns Promise<boolean> indicating success or failure
+ * @returns Promise with success status and message
  */
-export async function sendEmail(options: EmailOptions): Promise<{ success: boolean; message: string }> {
-  // Validate SendGrid API key
-  if (!process.env.SENDGRID_API_KEY) {
-    console.error('SENDGRID_API_KEY is not set');
-    return { 
-      success: false, 
-      message: 'Email service is not configured. Please set up SendGrid API key.' 
-    };
-  }
-
+export async function sendEmail(options: EmailOptions): Promise<{ success: boolean; message: string; previewUrl?: string }> {
   // Set default from address if not provided
   const fromAddress = options.from || process.env.EMAIL_FROM || 'noreply@centremedicalfont.com';
 
   try {
-    await mailService.send({
-      to: options.to,
+    // Convert the attachments format to Nodemailer format
+    const attachments = options.attachments?.map(attachment => ({
+      filename: attachment.filename,
+      content: Buffer.from(attachment.content, 'base64'),
+      contentType: attachment.type,
+      contentDisposition: attachment.disposition
+    }));
+
+    // Send mail with defined transport object
+    const info = await transporter.sendMail({
       from: fromAddress,
+      to: options.to,
       subject: options.subject,
-      text: options.text,
-      html: options.html,
-      attachments: options.attachments
+      text: options.text || '',
+      html: options.html || '',
+      attachments: attachments
     });
+
+    console.log('Message sent: %s', info.messageId);
+    
+    // Preview URL for development (only available when using Ethereal)
+    const previewUrl = nodemailer.getTestMessageUrl(info);
+    if (previewUrl) {
+      console.log('Preview URL: %s', previewUrl);
+    }
 
     return { success: true, message: 'Email sent successfully' };
   } catch (error) {
