@@ -17,7 +17,8 @@ import {
   CheckCircle2,
   Beaker,
   CheckCircle,
-  RefreshCw
+  RefreshCw,
+  RotateCcw
 } from 'lucide-react';
 import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -31,7 +32,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { apiRequest, queryClient } from '@/lib/queryClient';
 import { Separator } from '@/components/ui/separator';
-import { Loader2 } from 'lucide-react';
+
 
 interface Treatment {
   id: string;
@@ -991,120 +992,13 @@ export default function KnowledgeBasePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-                <TabsList className="bg-[#262626] mb-6">
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="urgent">Urgent Care</TabsTrigger>
-                  <TabsTrigger value="msk">MSK</TabsTrigger>
-                  <TabsTrigger value="preventative">Preventative</TabsTrigger>
-                  <TabsTrigger value="mental">Mental Health</TabsTrigger>
-                  <TabsTrigger value="std">STD</TabsTrigger>
-                </TabsList>
-              </Tabs>
-              
               <div className="space-y-6 max-h-[700px] overflow-y-auto pr-2">
-                {/* Urgent Care Section */}
+                {/* All Diagnoses in Alphabetical Order */}
                 <div className="space-y-3">
-                  <h3 className="text-md font-medium text-white">Urgent Care</h3>
+                  <h3 className="text-md font-medium text-white">Medical Conditions</h3>
                   <div className="flex flex-wrap gap-2">
                     {filteredDiagnoses
-                      .filter(d => getMedicalGroup(d.category) === 'urgent' || (activeTab === 'all' && d.category === 'acute'))
-                      .map((diagnosis) => (
-                      <Button
-                        key={diagnosis.id}
-                        variant="outline"
-                        className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                        onClick={() => handleDiagnosisClick(diagnosis.id)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="text-sm font-medium">{diagnosis.name}</div>
-                          {diagnosis.standardProtocolEnabled && (
-                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                          )}
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* MSK Section */}
-                <div className="space-y-3">
-                  <h3 className="text-md font-medium text-white">MSK</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {filteredDiagnoses
-                      .filter(d => getMedicalGroup(d.category) === 'msk' || (activeTab === 'all' && d.category === 'common'))
-                      .map((diagnosis) => (
-                      <Button
-                        key={diagnosis.id}
-                        variant="outline"
-                        className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                        onClick={() => handleDiagnosisClick(diagnosis.id)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="text-sm font-medium">{diagnosis.name}</div>
-                          {diagnosis.standardProtocolEnabled && (
-                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                          )}
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Preventative Section */}
-                <div className="space-y-3">
-                  <h3 className="text-md font-medium text-white">Preventative</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {filteredDiagnoses
-                      .filter(d => getMedicalGroup(d.category) === 'preventative' || (activeTab === 'all' && d.category === 'chronic'))
-                      .map((diagnosis) => (
-                      <Button
-                        key={diagnosis.id}
-                        variant="outline"
-                        className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                        onClick={() => handleDiagnosisClick(diagnosis.id)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="text-sm font-medium">{diagnosis.name}</div>
-                          {diagnosis.standardProtocolEnabled && (
-                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                          )}
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* Mental Health Section */}
-                <div className="space-y-3">
-                  <h3 className="text-md font-medium text-white">Mental Health</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {filteredDiagnoses
-                      .filter(d => getMedicalGroup(d.category) === 'mental' || (activeTab === 'all' && d.category === 'mental'))
-                      .map((diagnosis) => (
-                      <Button
-                        key={diagnosis.id}
-                        variant="outline"
-                        className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                        onClick={() => handleDiagnosisClick(diagnosis.id)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="text-sm font-medium">{diagnosis.name}</div>
-                          {diagnosis.standardProtocolEnabled && (
-                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                          )}
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-                
-                {/* STD Section */}
-                <div className="space-y-3">
-                  <h3 className="text-md font-medium text-white">STD</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {filteredDiagnoses
-                      .filter(d => (getMedicalGroup(d.category) === 'other' && activeTab === 'std') || (activeTab === 'all' && d.category === 'other'))
+                      .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
                       .map((diagnosis) => (
                       <Button
                         key={diagnosis.id}
