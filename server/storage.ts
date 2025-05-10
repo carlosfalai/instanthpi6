@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { 
   users, type User, type InsertUser,
   patients, type Patient, type InsertPatient,
@@ -27,6 +28,10 @@ export interface IStorage {
   getAllPatients(): Promise<Patient[]>;
   createPatient(patient: InsertPatient): Promise<Patient>;
   updatePatient(id: number, patient: Partial<InsertPatient>): Promise<Patient | undefined>;
+  
+  // Document operations
+  getDocument(id: string): Promise<any | undefined>;
+  createPatientActivity(activity: { patientId: number, activityType: string, description: string, metadata?: any }): Promise<any>;
   
   // Message operations
   getMessagesByPatientId(patientId: number): Promise<Message[]>;
@@ -111,6 +116,8 @@ export class MemStorage implements IStorage {
   private userEducationProgress: Map<number, UserEducationProgress>;
   private formTemplates: Map<number, FormTemplate>;
   private formResponses: Map<number, FormResponse>;
+  private documents: Map<string, any>;
+  private patientActivities: Map<number, any[]>;
   
   private userId: number;
   private patientId: number;
@@ -136,6 +143,8 @@ export class MemStorage implements IStorage {
     this.userEducationProgress = new Map();
     this.formTemplates = new Map();
     this.formResponses = new Map();
+    this.documents = new Map();
+    this.patientActivities = new Map();
     
     this.userId = 1;
     this.patientId = 1;
@@ -788,6 +797,31 @@ export class MemStorage implements IStorage {
   
   async deleteFormResponse(id: number): Promise<boolean> {
     return this.formResponses.delete(id);
+  }
+
+  // Document operations
+  async getDocument(id: string): Promise<any | undefined> {
+    return this.documents.get(id);
+  }
+
+  async createPatientActivity(activity: { patientId: number, activityType: string, description: string, metadata?: any }): Promise<any> {
+    const { patientId } = activity;
+    if (!this.patientActivities.has(patientId)) {
+      this.patientActivities.set(patientId, []);
+    }
+    
+    const newActivity = {
+      id: uuidv4(),
+      ...activity,
+      timestamp: new Date()
+    };
+    
+    const patientActivities = this.patientActivities.get(patientId);
+    if (patientActivities) {
+      patientActivities.push(newActivity);
+    }
+    
+    return newActivity;
   }
 }
 
