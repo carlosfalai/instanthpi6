@@ -390,7 +390,9 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
       
       {/* Mobile menu button - visible on small screens */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-[#1a1a1a] border-b border-[#333] p-3 flex items-center justify-between">
-        <h1 className="text-lg font-semibold">InstantHPI</h1>
+        <h1 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
+          InstantHPI
+        </h1>
         <Button 
           variant="ghost" 
           size="icon" 
@@ -417,7 +419,11 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
         )}
       >
         <div className="p-4 border-b border-[#333] flex items-center justify-between">
-          <h1 className="text-lg font-semibold">Centre Médical Font</h1>
+          <div className="mr-auto">
+            <h1 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
+              InstantHPI
+            </h1>
+          </div>
           <Button 
             variant="ghost" 
             size="icon" 
