@@ -18,7 +18,7 @@ import {
   Beaker,
   CheckCircle,
   RefreshCw,
-  RotateCcw
+  Loader2
 } from 'lucide-react';
 import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -1054,7 +1054,7 @@ export default function KnowledgeBasePage() {
                         variant="outline"
                         className="border-gray-700"
                       >
-                        <RotateCcw className="mr-2 h-4 w-4" />
+                        <RefreshCw className="mr-2 h-4 w-4" />
                         Reset to Default
                       </Button>
                       <Button 
