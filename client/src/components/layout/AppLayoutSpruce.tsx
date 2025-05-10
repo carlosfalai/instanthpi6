@@ -135,7 +135,14 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
 
   // The main navigation sections for the left sidebar exactly as shown in the screenshot
   const mainNavSections = [
-    { id: 'clinic', label: 'Centre Médical Font', icon: <Stethoscope className="h-5 w-5" />, badge: 0, path: '/clinic' },
+    { 
+      id: 'clinic', 
+      label: 'Centre Médical Font', 
+      icon: <Stethoscope className="h-5 w-5" />, 
+      badge: 0, 
+      path: '/clinic',
+      hasClinicSwitcher: true  // Add this flag to identify this entry
+    },
     { id: 'home', label: 'Home', icon: <Home className="h-5 w-5" />, badge: 0, path: '/' },
     { id: 'patients', label: 'Patients', icon: <Users className="h-5 w-5" />, badge: notificationCounts.patients || 0, path: '/patients', hasSubmenu: true },
     { id: 'documents', label: 'Documents', icon: <FileText className="h-5 w-5" />, badge: notificationCounts.documents || 0, path: '/documents', hasSubmenu: true },
@@ -290,7 +297,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                   <span className="truncate">{section.label}</span>
                 </div>
                 
-                {section.id === 'clinic' && (
+                {section.hasClinicSwitcher && (
                   <Button 
                     size="sm" 
                     variant="ghost" 
@@ -299,7 +306,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                     onClick={(e) => {
                       e.stopPropagation(); // Prevent triggering the parent button click
                       // Add clinic switching logic here
-                      alert('Switch clinics');
+                      alert('Switch to a different clinic');
                     }}
                   >
                     <Plus className="h-4 w-4" />
@@ -565,12 +572,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
         {/* Top Navigation Bar with Branding */}
         <header className="h-14 border-b border-[#333] bg-[#1a1a1a] flex items-center px-4">
           <div className="flex-1 flex items-center">
-            {/* InstantHPI Logo with Purple Gradient */}
-            <div className="mr-4">
-              <h1 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
-                InstantHPI
-              </h1>
-            </div>
+            {/* Left side is kept empty */}
           </div>
           <div className="flex items-center space-x-3">
             <div className="relative hidden md:block">
