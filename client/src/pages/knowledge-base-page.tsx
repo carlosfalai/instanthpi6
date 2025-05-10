@@ -992,34 +992,13 @@ export default function KnowledgeBasePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-                <TabsList className="bg-[#262626] mb-6">
-                  <TabsTrigger value="all">All</TabsTrigger>
-                  <TabsTrigger value="acute">Acute Conditions</TabsTrigger>
-                  <TabsTrigger value="chronic">Chronic Conditions</TabsTrigger>
-                  <TabsTrigger value="mental">Mental Health</TabsTrigger>
-                  <TabsTrigger value="preventative">Preventative Care</TabsTrigger>
-                </TabsList>
-              </Tabs>
-              
               <div className="space-y-6 max-h-[700px] overflow-y-auto pr-2">
                 {(() => {
-                  // Filter diagnoses by selected category
-                  const filteredByCategory = activeTab === 'all' 
-                    ? filteredDiagnoses 
-                    : filteredDiagnoses.filter(d => {
-                        if (activeTab === 'acute') return d.category === 'acute' || d.category === 'common';
-                        if (activeTab === 'chronic') return d.category === 'chronic';
-                        if (activeTab === 'mental') return d.category === 'mental';
-                        if (activeTab === 'preventative') return d.category === 'preventative';
-                        return true;
-                      });
-                  
                   // Create alphabetical groups
                   const groups: Record<string, Diagnosis[]> = {};
                   
                   // Sort and group
-                  filteredByCategory.sort((a, b) => a.name.localeCompare(b.name))
+                  filteredDiagnoses.sort((a, b) => a.name.localeCompare(b.name))
                     .forEach(diagnosis => {
                       const letter = diagnosis.name.charAt(0).toUpperCase();
                       if (!groups[letter]) groups[letter] = [];
@@ -1029,34 +1008,28 @@ export default function KnowledgeBasePage() {
                   // Get letters sorted alphabetically
                   const letters = Object.keys(groups).sort();
                   
-                  return letters.length > 0 ? (
-                    letters.map(letter => (
-                      <div key={letter} className="space-y-3">
-                        <h3 className="text-md font-medium text-white">{letter}</h3>
-                        <div className="flex flex-col space-y-1.5 w-full">
-                          {groups[letter].map(diagnosis => (
-                            <Button
-                              key={diagnosis.id}
-                              variant="outline"
-                              className={`w-full h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                              onClick={() => handleDiagnosisClick(diagnosis.id)}
-                            >
-                              <div className="flex items-center gap-2">
-                                <div className="text-sm font-medium">{diagnosis.name}</div>
-                                {diagnosis.standardProtocolEnabled && (
-                                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                                )}
-                              </div>
-                            </Button>
-                          ))}
-                        </div>
+                  return letters.map(letter => (
+                    <div key={letter} className="space-y-3">
+                      <h3 className="text-md font-medium text-white">{letter}</h3>
+                      <div className="flex flex-col space-y-1.5">
+                        {groups[letter].map(diagnosis => (
+                          <Button
+                            key={diagnosis.id}
+                            variant="outline"
+                            className={`justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
+                            onClick={() => handleDiagnosisClick(diagnosis.id)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm font-medium">{diagnosis.name}</div>
+                              {diagnosis.standardProtocolEnabled && (
+                                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                              )}
+                            </div>
+                          </Button>
+                        ))}
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-center py-8 text-gray-400">
-                      No conditions found in this category.
                     </div>
-                  );
+                  ));
                 })()}
               </div>
               
