@@ -575,7 +575,7 @@ const diagnosisList: Diagnosis[] = [
   { 
     id: '55', 
     name: 'Preventative Care', 
-    category: 'other', 
+    category: 'preventative', 
     standardProtocol: '🩺 Preventative Care\n☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)\n☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating \'Examen: Non réalisé\'. Keep the plan to only essential interventions, ideally in one line.)\n☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.\n\nInvestigations and initial evaluation:\n☐ Complete blood count (CBC)\n☐ Comprehensive metabolic panel (CMP)\n☐ Lipid panel\n☐ Hemoglobin A1C\n☐ Thyroid stimulating hormone (TSH)\n☐ Urinalysis\n☐ Stool occult blood test\n☐ Electrocardiogram (ECG)\n☐ Chest X-ray (if indicated)\n☐ Bone density scan (DEXA) for women >65 and men >70\n☐ Colorectal cancer screening (colonoscopy, FIT, Cologuard)\n☐ Lung cancer screening LDCT (if smoking history)\n☐ Prostate-specific antigen (PSA) for men\n☐ Mammogram for women\n☐ Pap smear for women\n☐ HIV testing\n☐ Hepatitis B and C screening\n☐ Tuberculosis (TB) screening\n\nImmunizations:\n□ Influenza vaccine □ annually, Ren: □ 1\n□ COVID-19 vaccine □ primary series, □ booster, Ren: □ 1\n□ Tetanus-diphtheria-pertussis (Tdap) □ every 10 years, Ren: □ 1\n□ Pneumococcal vaccines □ PCV13, □ PPSV23, Ren: □ 1\n□ Shingles vaccine (Shingrix) □ 2-dose series, Ren: □ 1, □ 2\n□ Human papillomavirus (HPV) □ 2-3 dose series, Ren: □ 1, □ 2, □ 3\n□ Hepatitis A vaccine □ 2-dose series, Ren: □ 1, □ 2\n□ Hepatitis B vaccine □ 3-dose series, Ren: □ 1, □ 2, □ 3\n□ Meningococcal vaccines □ MenACWY, □ MenB, Ren: □ 1, □ 2\n\nPreventive medications:\n□ Aspirin □ 81mg PO daily, □ 162mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (if indicated)\n□ Statin □ Atorvastatin 10mg PO daily, □ Atorvastatin 20mg PO daily, □ Rosuvastatin 5mg PO daily, □ Rosuvastatin 10mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (if indicated)\n□ Multivitamin □ 1 tablet PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24\n□ Vitamin D3 □ 1000IU PO daily, □ 2000IU PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24\n□ Calcium supplement □ 500mg PO daily, □ 1000mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24\n\nHealth maintenance:\n☐ Blood pressure monitoring\n☐ Weight management\n☐ Smoking cessation counseling\n☐ Alcohol use screening and counseling\n☐ Depression screening\n☐ Fall risk assessment\n☐ Diabetes risk assessment\n☐ Cardiovascular risk assessment\n☐ Vision screening\n☐ Hearing evaluation\n☐ Dental examination\n\nReferral options:\n☐ Referral to ophthalmology for eye examination\n☐ Referral to dental care\n☐ Referral to nutritionist/dietitian\n☐ Referral to smoking cessation program\n☐ Referral to exercise physiologist\n☐ Referral to physical therapy for fall prevention\n☐ Referral to sleep medicine\n☐ Referral to dermatology for skin cancer screening\n☐ Referral to behavioral health for mental wellness\n☐ Referral to social work for community resources\n\n☐ Counseling: Preventive care focuses on maintaining health and preventing disease. Maintain a balanced diet with plenty of fruits, vegetables, and whole grains. Engage in at least 150 minutes of moderate exercise weekly. Limit alcohol intake, avoid tobacco products, and get 7-8 hours of sleep nightly. Keep up with recommended screenings and vaccinations. Practice safe sun exposure with SPF 30+ sunscreen. Maintain social connections and engage in stress management techniques. Return for annual physical examinations and as recommended for age-appropriate screenings.\n\nFollow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you', 
     standardProtocolEnabled: false, 
     treatments: [
@@ -848,11 +848,13 @@ export default function KnowledgeBasePage() {
       case 'acute':
         return 'urgent';
       case 'chronic':
-        return 'preventative';
+        return 'chronic';
       case 'common':
         return 'msk';
       case 'mental':
         return 'mental';
+      case 'preventative':
+        return 'preventative';
       default:
         return 'other';
     }
