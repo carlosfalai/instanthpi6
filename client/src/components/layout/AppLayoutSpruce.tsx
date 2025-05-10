@@ -135,6 +135,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
 
   // The main navigation sections for the left sidebar exactly as shown in the screenshot
   const mainNavSections = [
+    { id: 'clinic', label: 'Centre Médical Font', icon: <Stethoscope className="h-5 w-5" />, badge: 0, path: '/clinic' },
     { id: 'home', label: 'Home', icon: <Home className="h-5 w-5" />, badge: 0, path: '/' },
     { id: 'patients', label: 'Patients', icon: <Users className="h-5 w-5" />, badge: notificationCounts.patients || 0, path: '/patients', hasSubmenu: true },
     { id: 'documents', label: 'Documents', icon: <FileText className="h-5 w-5" />, badge: notificationCounts.documents || 0, path: '/documents', hasSubmenu: true },
@@ -251,9 +252,8 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     <div className="flex h-screen bg-[#121212] text-white overflow-hidden">
       {/* Left Sidebar - Main Navigation */}
       <div className="w-64 border-r border-[#333] flex flex-col bg-[#1a1a1a] hidden md:flex">
-        {/* Organization name and clinic switcher button */}
-        <div className="p-4 border-b border-[#333] flex items-center justify-between">
-          <h1 className="text-lg font-semibold">Centre Médical Font</h1>
+        {/* Clinic switcher button */}
+        <div className="p-4 border-b border-[#333] flex items-center justify-end">
           <Button 
             size="sm" 
             variant="ghost" 
@@ -548,10 +548,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
         {/* Top Navigation Bar with Branding */}
         <header className="h-14 border-b border-[#333] bg-[#1a1a1a] flex items-center px-4">
           <div className="flex-1 flex items-center">
-            <h1 className="text-lg font-bold text-blue-500 ml-2">
-              {/* InstantHPI Branding */}
-              InstantHPI
-            </h1>
+            {/* Left side is kept empty */}
           </div>
           <div className="flex items-center space-x-3">
             <div className="relative hidden md:block">
@@ -561,6 +558,12 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                 placeholder="Search..."
                 className="pl-10 py-1 h-9 w-64 bg-[#252525] border-[#444] rounded-md text-sm"
               />
+            </div>
+            {/* InstantHPI Logo with Purple Gradient */}
+            <div className="mr-3">
+              <h1 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
+                InstantHPI
+              </h1>
             </div>
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
