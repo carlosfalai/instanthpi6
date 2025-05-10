@@ -252,16 +252,11 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     <div className="flex h-screen bg-[#121212] text-white overflow-hidden">
       {/* Left Sidebar - Main Navigation */}
       <div className="w-64 border-r border-[#333] flex flex-col bg-[#1a1a1a] hidden md:flex">
-        {/* Clinic switcher button */}
-        <div className="p-4 border-b border-[#333] flex items-center justify-end">
-          <Button 
-            size="sm" 
-            variant="ghost" 
-            className="p-1 h-8 w-8 rounded-full"
-            title="Switch clinics"
-          >
-            <Plus className="h-5 w-5" />
-          </Button>
+        {/* Sidebar header with InstantHPI branding */}
+        <div className="p-4 border-b border-[#333] flex items-center justify-between">
+          <h1 className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-blue-500">
+            InstantHPI
+          </h1>
         </div>
 
         {/* Main navigation sections */}
@@ -294,6 +289,22 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                   </div>
                   <span className="truncate">{section.label}</span>
                 </div>
+                
+                {section.id === 'clinic' && (
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="p-1 h-6 w-6 rounded-full ml-2"
+                    title="Switch clinics"
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering the parent button click
+                      // Add clinic switching logic here
+                      alert('Switch clinics');
+                    }}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                )}
                 
                 {(section.id === 'patients' || section.id === 'documents' || section.id === 'settings') && (
                   <ChevronDown
