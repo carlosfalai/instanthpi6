@@ -1,34 +1,38 @@
 import nodemailer from 'nodemailer';
 import { storage } from '../storage';
 
-// Create a test SMTP transporter object (for development)
-const transporter = nodemailer.createTransport({
-  host: 'smtp.ethereal.email',
-  port: 587,
-  secure: false,
-  auth: {
-    user: 'ethereal.user@ethereal.email', // this will be auto-created for testing
-    pass: 'ethereal.password', // this will be auto-created for testing
-  },
-});
+// Create a test SMTP transporter with Ethereal email 
+let transporter: nodemailer.Transporter;
 
 // Create temporary ethereal email account for development
 (async function() {
-  // Only create new account if we don't have credentials yet
-  if (transporter.options.auth.user === 'ethereal.user@ethereal.email') {
-    try {
-      // Generate a Nodemailer test account
-      const testAccount = await nodemailer.createTestAccount();
-      
-      // Update the transporter with the test credentials
-      transporter.options.auth.user = testAccount.user;
-      transporter.options.auth.pass = testAccount.pass;
-      
-      console.log('Created Ethereal test account for email testing');
-      console.log('Preview URL will be shown when emails are sent');
-    } catch (error) {
-      console.error('Failed to create test email account:', error);
-    }
+  try {
+    // Generate a Nodemailer test account
+    const testAccount = await nodemailer.createTestAccount();
+    
+    // Create a reusable transporter with test credentials
+    transporter = nodemailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+        user: testAccount.user,
+        pass: testAccount.pass,
+      },
+    });
+    
+    console.log('Created Ethereal test account for email testing');
+    console.log('Preview URL will be shown when emails are sent');
+  } catch (error) {
+    console.error('Failed to create test email account:', error);
+    
+    // Create a fallback transporter without auth for development
+    transporter = nodemailer.createTransport({
+      host: 'localhost',
+      port: 1025,
+      secure: false,
+      ignoreTLS: true
+    });
   }
 })();
 
@@ -85,9 +89,13 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
       console.log('Preview URL: %s', previewUrl);
     }
 
-    return { success: true, message: 'Email sent successfully' };
+    return { 
+      success: true, 
+      message: 'Email sent successfully',
+      previewUrl
+    };
   } catch (error) {
-    console.error('SendGrid email error:', error);
+    console.error('Email sending error:', error);
     return { 
       success: false, 
       message: `Failed to send email: ${(error as Error).message}`
