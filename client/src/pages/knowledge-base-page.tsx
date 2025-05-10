@@ -16,7 +16,8 @@ import {
   FileText,
   CheckCircle2,
   Beaker,
-  CheckCircle
+  CheckCircle,
+  RefreshCw
 } from 'lucide-react';
 import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -1153,17 +1154,27 @@ export default function KnowledgeBasePage() {
                         Customize your preferred treatment approach
                       </CardDescription>
                     </div>
-                    <Button 
-                      onClick={handleSaveDiagnosis} 
-                      className="bg-blue-600 hover:bg-blue-700"
-                      disabled={saveDiagnosisMutation.isPending}
-                    >
-                      {saveDiagnosisMutation.isPending && (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      )}
-                      <Save className="mr-2 h-4 w-4" />
-                      Save Preferences
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button 
+                        onClick={handleResetProtocol} 
+                        variant="outline"
+                        className="border-gray-700"
+                      >
+                        <RotateCcw className="mr-2 h-4 w-4" />
+                        Reset to Default
+                      </Button>
+                      <Button 
+                        onClick={handleSaveDiagnosis} 
+                        className="bg-blue-600 hover:bg-blue-700"
+                        disabled={saveDiagnosisMutation.isPending}
+                      >
+                        {saveDiagnosisMutation.isPending && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        <Save className="mr-2 h-4 w-4" />
+                        Save Preferences
+                      </Button>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
