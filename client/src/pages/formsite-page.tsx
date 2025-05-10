@@ -256,20 +256,22 @@ const FormsitePage: React.FC = () => {
             <div
               key={submission.id}
               onClick={() => handleSelectSubmission(submission)}
-              className={`p-3 rounded-md cursor-pointer transition-colors ${
+              className={`p-3 rounded-md cursor-pointer transition-colors overflow-hidden ${
                 selectedSubmission?.id === submission.id 
                   ? 'bg-blue-900/30 border border-blue-700' 
                   : 'bg-[#252525] border border-[#333] hover:border-[#444]'
               }`}
             >
               <div className="flex flex-col">
-                <div className="flex justify-between items-center">
-                  <h3 className="font-medium text-xl text-blue-400">
-                    {address}
-                  </h3>
+                <div className="flex justify-between items-start">
+                  <div className="flex-1 mr-2 overflow-auto max-h-24">
+                    <h3 className="font-medium text-xl text-blue-400 break-words">
+                      {address}
+                    </h3>
+                  </div>
                   
                   {submission.processed && (
-                    <div className="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-xs font-medium">
+                    <div className="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-xs font-medium flex-shrink-0">
                       Processed
                     </div>
                   )}
