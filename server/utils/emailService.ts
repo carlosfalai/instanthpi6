@@ -84,7 +84,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
     console.log('Message sent: %s', info.messageId);
     
     // Preview URL for development (only available when using Ethereal)
-    const previewUrl = nodemailer.getTestMessageUrl(info);
+    const previewUrl = nodemailer.getTestMessageUrl(info) as string | undefined;
     if (previewUrl) {
       console.log('Preview URL: %s', previewUrl);
     }
@@ -92,7 +92,7 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
     return { 
       success: true, 
       message: 'Email sent successfully',
-      previewUrl
+      previewUrl: previewUrl || undefined
     };
   } catch (error) {
     console.error('Email sending error:', error);

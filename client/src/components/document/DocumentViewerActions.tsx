@@ -63,9 +63,14 @@ export default function DocumentViewerActions({
       const result = await response.json();
       
       if (result.success) {
+        // Show preview URL in toast if available (for development purposes)
+        const description = result.previewUrl
+          ? `Document emailed successfully. Preview: ${result.previewUrl}`
+          : 'The document has been emailed to the patient successfully.';
+          
         toast({
           title: 'Document emailed',
-          description: 'The document has been emailed to the patient successfully.',
+          description,
         });
       } else {
         toast({
