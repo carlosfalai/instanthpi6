@@ -42,15 +42,19 @@ interface Treatment {
 interface Diagnosis {
   id: string;
   name: string;
-  category: 'common' | 'chronic' | 'acute' | 'mental' | 'other';
+  category: 'common' | 'chronic' | 'acute' | 'mental' | 'other' | 'preventative';
   description?: string;
   treatments: Treatment[];
   standardProtocol: string;
   standardProtocolEnabled: boolean;
 }
 
-// List of diagnoses with their categories and default treatment options
-const diagnosisList: Diagnosis[] = [
+// Create a deep copy function to help with resetting to defaults
+const deepCopy = <T,>(obj: T): T => JSON.parse(JSON.stringify(obj));
+
+// Original list of diagnoses with their categories and default treatment options
+// This will never be modified, serving as our default values
+const defaultDiagnosisList: Diagnosis[] = [
   { 
     id: '1', 
     name: 'ADHD in Adults (Established Diagnosis)', 
