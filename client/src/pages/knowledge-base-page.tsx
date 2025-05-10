@@ -966,7 +966,7 @@ export default function KnowledgeBasePage() {
                 </TabsList>
               </Tabs>
               
-              <div className="space-y-6 max-h-[350px] overflow-y-auto pr-2">
+              <div className="space-y-6 max-h-[700px] overflow-y-auto pr-2">
                 {/* Urgent Care Section */}
                 <div className="space-y-3">
                   <h3 className="text-md font-medium text-white">Urgent Care</h3>
