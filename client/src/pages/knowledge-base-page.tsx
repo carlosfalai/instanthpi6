@@ -993,29 +993,45 @@ export default function KnowledgeBasePage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6 max-h-[700px] overflow-y-auto pr-2">
-                {/* All Diagnoses in Alphabetical Order */}
-                <div className="space-y-3">
-                  <h3 className="text-md font-medium text-white">Medical Conditions</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {filteredDiagnoses
-                      .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
-                      .map((diagnosis) => (
-                      <Button
-                        key={diagnosis.id}
-                        variant="outline"
-                        className={`h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
-                        onClick={() => handleDiagnosisClick(diagnosis.id)}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="text-sm font-medium">{diagnosis.name}</div>
-                          {diagnosis.standardProtocolEnabled && (
-                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                          )}
-                        </div>
-                      </Button>
-                    ))}
-                  </div>
-                </div>
+                {/* Group diagnoses alphabetically by first letter */}
+                {(() => {
+                  // Create alphabetical groups
+                  const groups: Record<string, Diagnosis[]> = {};
+                  
+                  // Sort and group
+                  filteredDiagnoses.sort((a, b) => a.name.localeCompare(b.name))
+                    .forEach(diagnosis => {
+                      const letter = diagnosis.name.charAt(0).toUpperCase();
+                      if (!groups[letter]) groups[letter] = [];
+                      groups[letter].push(diagnosis);
+                    });
+                    
+                  // Get letters sorted alphabetically
+                  const letters = Object.keys(groups).sort();
+                  
+                  return letters.map(letter => (
+                    <div key={letter} className="space-y-3">
+                      <h3 className="text-md font-medium text-white">{letter}</h3>
+                      <div className="flex flex-col space-y-1.5 w-full">
+                        {groups[letter].map(diagnosis => (
+                          <Button
+                            key={diagnosis.id}
+                            variant="outline"
+                            className={`w-full h-auto justify-start py-2 px-3 text-left border border-gray-700 hover:bg-[#262626] transition-all ${selectedDiagnosis === diagnosis.id ? 'bg-[#262626] ring-1 ring-blue-500' : ''}`}
+                            onClick={() => handleDiagnosisClick(diagnosis.id)}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm font-medium">{diagnosis.name}</div>
+                              {diagnosis.standardProtocolEnabled && (
+                                <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                              )}
+                            </div>
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  ));
+                })()}
               </div>
               
               {filteredDiagnoses.length === 0 && (

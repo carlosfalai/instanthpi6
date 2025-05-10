@@ -1,0 +1,1482 @@
+# Comprehensive Medical Diagnosis Templates
+
+## Table of Contents
+
+### Acute Conditions
+1. [Acute Abdominal Pain](#acute-abdominal-pain)
+2. [Acute Low Back Pain](#acute-low-back-pain)
+3. [Herpes Zoster (Shingles)](#herpes-zoster-shingles)
+4. [Conjunctivitis](#conjunctivitis)
+5. [Shoulder Pain](#shoulder-pain)
+6. [Laryngitis](#laryngitis)
+7. [Oral Herpes](#oral-herpes)
+8. [Paronychia](#paronychia)
+9. [Pharyngitis (Strep throat)](#pharyngitis-strep-throat)
+10. [Upper Respiratory Infection](#upper-respiratory-infection)
+11. [Urinary Tract Infection (UTI)](#urinary-tract-infection-uti)
+12. [Fatigue](#fatigue)
+13. [Headache – Tension Type](#headache--tension-type)
+14. [Insomnia](#insomnia)
+15. [Irregular Periods/Amenorrhea](#irregular-periodsamenorrhea)
+16. [Knee Pain](#knee-pain)
+17. [Urgent Care](#urgent-care)
+18. [Vaginitis/Vaginosis](#vaginitisvaginosis)
+19. [Urethritis](#urethritis)
+20. [Testicular Pain](#testicular-pain)
+21. [Rectal STIs](#rectal-stis)
+22. [Syphilis](#syphilis)
+23. [Dysuria](#dysuria)
+24. [Abnormal Vaginal Discharge](#abnormal-vaginal-discharge)
+25. [Pneumonia](#pneumonia)
+26. [Bronchitis](#bronchitis)
+27. [Influenza](#influenza)
+28. [Otitis Media (Ear Infection)](#otitis-media-ear-infection)
+29. [Otitis Externa (Swimmer's Ear)](#otitis-externa-swimmers-ear)
+30. [Allergic Rhinitis (Hay Fever)](#allergic-rhinitis-hay-fever)
+31. [Cellulitis](#cellulitis)
+32. [Abscess](#abscess)
+33. [Impetigo](#impetigo)
+34. [Scabies](#scabies)
+35. [Rosacea](#rosacea)
+36. [Acne](#acne)
+
+### Chronic Conditions
+37. [Chronic Abdominal Pain](#chronic-abdominal-pain)
+38. [Asthma](#asthma)
+39. [Diabetes Mellitus Type 2](#diabetes-mellitus-type-2)
+40. [Hypertension](#hypertension)
+41. [COPD](#copd-chronic-obstructive-pulmonary-disease)
+42. [Chronic Constipation](#chronic-constipation)
+43. [Chronic Cough](#chronic-cough)
+44. [Chronic Diarrhea](#chronic-diarrhea)
+45. [Chronic Fatigue](#chronic-fatigue)
+46. [Chronic Low Back Pain](#chronic-low-back-pain)
+47. [GERD](#gerd-gastroesophageal-reflux-disease)
+48. [Gout](#gout)
+49. [Headache – Migraine](#headache--migraine)
+50. [Hyperlipidemia](#hyperlipidemia)
+51. [Hypothyroidism](#hypothyroidism)
+52. [Obesity](#obesity)
+53. [Osteoarthritis](#osteoarthritis)
+54. [Eczema (Atopic Dermatitis)](#eczema-atopic-dermatitis)
+55. [Psoriasis](#psoriasis)
+56. [Hepatitis B](#hepatitis-b)
+57. [Hepatitis C](#hepatitis-c)
+58. [HIV](#hiv)
+
+### Mental Health Conditions
+59. [ADHD in Adults (Established Diagnosis)](#adhd-in-adults-established-diagnosis)
+60. [Anxiety](#anxiety)
+61. [Burnout](#burnout)
+62. [Depression](#depression)
+63. [Suspected ADHD in Adults](#suspected-adhd-in-adults-diagnostic-evaluation-phase)
+64. [Adjustment Disorder](#adjustment-disorder)
+65. [Panic Attacks/Panic Disorder](#panic-attackspanic-disorder)
+66. [Bipolar Disorder](#bipolar-disorder)
+67. [Shift Work Sleep Disorder](#shift-work-sleep-disorder)
+
+### Preventative Care
+68. [Preventative Care](#preventative-care)
+69. [Asymptomatic STI Testing](#asymptomatic-sti-testing)
+
+---
+
+## Acute Conditions
+
+### Acute Abdominal Pain
+🩺 Acute Abdominal Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe pain, high fever, peritoneal signs, evidence of bowel obstruction, GI bleeding, recent abdominal trauma)
+
+Investigations and initial evaluation:
+☐ Complete blood count (CBC)
+☐ Comprehensive metabolic panel (CMP)
+☐ Lipase
+☐ Urinalysis
+☐ Pregnancy test for females of reproductive age
+☐ Stool studies (occult blood, culture, ova and parasites)
+☐ Abdominal ultrasound
+☐ CT abdomen/pelvis with contrast
+☐ CT abdomen/pelvis without contrast
+☐ MRI abdomen with and without contrast
+☐ Abdominal X-ray (KUB)
+☐ Pelvic ultrasound for females
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Dicyclomine □ 10mg PO QID PRN, □ 20mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 160mg daily)
+□ Omeprazole □ 20mg PO daily, □ 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ondansetron □ 4mg PO TID PRN, □ 8mg PO TID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 24mg daily)
+□ Pantoprazole □ 20mg PO daily, □ 40mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Metoclopramide □ 5mg PO QID PRN, □ 10mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 40mg daily)
+
+Treatment options:
+☐ Clear liquid diet progressing to full diet as tolerated
+☐ Avoid NSAIDs and alcohol
+☐ Rest and monitor symptoms
+☐ Warm compress to abdomen for comfort
+☐ Maintenance of hydration with 2-3 liters of clear fluids daily
+☐ Avoid heavy lifting until pain resolves
+
+Referral options:
+☐ Referral to gastroenterology
+☐ Referral to general surgery
+☐ Referral to gynecology
+☐ Referral to urology
+☐ Referral to pain management
+☐ Referral to nutritionist
+☐ Referral to emergency department
+
+☐ Counseling: Maintain hydration with 2-3 liters of clear fluids daily, apply warm compress to abdomen for comfort, return if symptoms worsen or fail to improve within 48 hours, avoid heavy lifting until pain resolves.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Acute Low Back Pain
+🩺 Acute Low Back Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+
+Investigations and initial evaluation:
+☐ X-ray lumbar spine
+☐ MRI lumbar spine without contrast
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 1500mg daily)
+□ Cyclobenzaprine □ 5mg PO TID, □ 10mg PO TID, □ 10mg PO QHS, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 30mg daily)
+□ Methocarbamol □ 500mg PO QID, □ 750mg PO QID, □ 750mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+
+Treatment options:
+☐ Heat therapy 20 minutes TID to affected area
+☐ Avoid bed rest, maintain gentle activity as tolerated
+☐ Avoid heavy lifting (>10 lbs) and prolonged sitting/standing
+☐ Physiotherapy referral for core strengthening and mobility exercises
+☐ Massage therapy
+☐ Occupational therapy
+☐ Low-level laser therapy
+☐ Acupuncture for pain management
+☐ Chiropractic referral for spinal manipulation
+
+Referral options:
+☐ Referral to physiotherapy for supervised exercise program
+☐ Referral to pain management
+☐ Referral to neurosurgery
+☐ Referral to rheumatology
+☐ Referral to occupational therapy for activities of daily living modification
+☐ Referral to massage therapy
+☐ Referral to integrative medicine for complementary approaches
+
+☐ Counseling and self-care: Return to normal activities gradually as pain allows, use proper body mechanics when lifting (bend knees not back), return to clinic if experiencing new bowel/bladder dysfunction, leg weakness/numbness, saddle anesthesia, or pain worsening despite 7 days of treatment. Sleep on firm mattress or place board under soft mattress, may use supportive pillow between knees when sleeping on side.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Herpes Zoster (Shingles)
+🩺 Herpes Zoster (Shingles)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare VZV PCR from lesion swab since diagnosis is uncertain
+
+Antiviral therapy (initiate within 72 hours of rash onset):
+☐ Valacyclovir 1000 mg PO TID x 7 days
+☐ Famciclovir 500 mg PO TID x 7 days
+☐ Acyclovir 800 mg PO 5 times daily x 7 days
+
+Pain control options (prescriptions for 14 days):
+☐ Acetaminophen 500–1000 mg PO QID PRN x 14 days
+☐ Ibuprofen 400 mg PO QID PRN x 14 days
+
+☐ Shingrix® vaccine prescription — 2-dose series, first dose now, second dose to be administered between 2 to 6 months after the first dose
+
+☐ Counseling and hydration: Recommend shingles vaccination (Shingrix®) for patients ≥50 years old or immunocompromised ≥18 years old, maintain contact precautions by keeping rash covered until all lesions are crusted over, avoid contact with pregnant women, newborns, and immunocompromised persons, practice strict hand hygiene after touching lesions, if pain or discomfort persists after rash resolution patient should reach back to the clinic, maintain hydration by drinking approximately 2–3 liters of water daily adjusted to thirst and body size.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Conjunctivitis
+🩺 Conjunctivitis
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect other eye pathology requiring slit lamp exam in ED (uveitis, keratitis, acute angle-closure glaucoma, scleritis, iritis - red flags: moderate/severe eye pain, vision changes, photophobia, halos around lights, pupil abnormalities, circumcorneal redness, eye trauma history)
+
+Orders:
+☐ Consider culture if severe, persistent, or non-responsive to treatment
+
+Medications:
+□ Polymyxin B-trimethoprim drops □ 1 drop OU QID, □ 1 drop OU Q3H, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ciprofloxacin 0.3% drops □ 1 drop OU Q2H while awake x2 days then QID x5 days, □ 1 drop OU QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Erythromycin 0.5% ointment □ apply thin ribbon OU QID, □ apply thin ribbon OU BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Olopatadine 0.1% □ 1 drop OU BID, □ 1 drop OU daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Artificial tears □ 1-2 drops OU PRN, □ 1-2 drops OU QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Ketotifen 0.025% □ 1 drop OU BID, □ 1 drop OU TID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Conservative management:
+☐ Cool compresses to affected eye(s) QID for 5-10 minutes
+☐ Strict hand hygiene, avoid touching or rubbing eyes
+☐ Avoid contact lens wear until resolved
+☐ Avoid sharing towels, washcloths, eye makeup
+☐ Referral to emergency department for slit lamp examination if: moderate to severe eye pain, vision changes, photophobia, colored halos around lights, pupil abnormalities, eye redness concentrated around cornea, history of eye injury or foreign body, contact lens wearer with pain
+☐ Counseling: Highly contagious if bacterial/viral; avoid close contact and sharing personal items until discharge resolves. Discard contact lenses used during infection. Discard eye makeup used during infection. May return to work/school 24 hours after starting treatment if bacterial conjunctivitis. Return if symptoms worsen or no improvement after 3 days of treatment.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Shoulder Pain
+🩺 Shoulder Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect rotator cuff tear requiring urgent orthopedic evaluation (red flags: traumatic injury with immediate weakness, significant night pain, inability to raise arm, positive drop arm test, audible pop during injury)
+
+Investigations and initial evaluation:
+☐ Shoulder X-ray AP, lateral, axillary views
+☐ Ultrasound MSK of shoulder for rotator cuff pathology, bursitis, or impingement
+☐ MRI of shoulder without contrast
+☐ MRI of shoulder with contrast (for labral tears)
+☐ MR arthrogram of shoulder
+☐ CT scan of shoulder
+☐ EMG/NCS for suspected nerve involvement
+☐ Complete blood count
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ Rheumatoid factor
+☐ Anti-CCP antibodies
+☐ HLA-B27
+
+Pain management (prescriptions for 14 days):
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 1500mg daily)
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Cyclobenzaprine □ 5mg PO TID, □ 10mg PO TID, □ 10mg PO QHS, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 30mg daily)
+□ Methocarbamol □ 500mg PO QID, □ 750mg PO QID, □ 750mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Diclofenac gel 1% □ apply to affected area QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Lidocaine patch 5% □ apply to affected area daily for 12 hours, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Ice 20 minutes QID for first 48 hours, then heat
+☐ Physical therapy referral for rotator cuff strengthening and shoulder stabilization
+☐ Subacromial corticosteroid injection if persistent bursitis
+☐ Short-term sling use if acute trauma (limit immobilization)
+☐ Gentle pendulum exercises after 3-5 days as tolerated
+
+☐ Referral to orthopedics if rotator cuff tear, labral injury, or refractory symptoms
+
+☐ Counseling: Counsel on gentle mobilization of shoulder to avoid adhesive capsulitis, avoid heavy lifting until reassessment, maintain hydration by drinking approximately 2–3 liters of water daily adjusted to thirst and body size. Gradually return to activities as tolerated. May require 4-6 weeks for significant improvement. Sleep with pillow supporting affected arm if helpful.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Laryngitis
+🩺 Laryngitis
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect epiglottitis or other airway emergency (red flags: stridor, respiratory distress, difficulty swallowing, drooling, sitting in tripod position, rapid onset, high fever)
+
+Investigations and initial evaluation:
+☐ Rapid strep test
+☐ Throat culture
+☐ COVID-19 test
+☐ Influenza testing
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ C-reactive protein
+☐ Viral respiratory panel
+☐ Chest X-ray
+☐ Lateral neck X-ray
+☐ Neck CT with contrast
+☐ Laryngoscopy
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily) 
+□ Dextromethorphan-guaifenesin □ 10-20mg/200-400mg PO Q4H PRN, □ 20-40mg/400-800mg PO Q4H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 120mg/2400mg daily)
+□ Benzocaine lozenges □ 1 lozenge dissolved in mouth Q2H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 10 lozenges daily)
+□ Amoxicillin □ 500mg PO TID, □ 875mg PO BID, for 7-10 days, Ren: □ 1, □ 2, □ 3 (if bacterial infection confirmed)
+
+Treatment options:
+☐ Voice rest - minimize talking for 3-7 days
+☐ Humidifier use, especially at night
+☐ Avoid irritants (smoking, alcohol, spicy foods)
+☐ Warm salt water gargles QID
+☐ Stay well hydrated with warm, non-caffeinated fluids
+
+☐ Referral to ENT if symptoms persist >2 weeks, recurrent episodes, or suspected underlying pathology
+
+☐ Counseling: Complete voice rest is ideal but impractical for most; whisper rather than strain to talk when necessary. Laryngitis typically resolves within 7-10 days. Return if severe throat pain, difficulty breathing, drooling, stridor, or inability to swallow develops.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Oral Herpes
+🩺 Oral Herpes
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect severe infection requiring hospitalization in immunocompromised patient (red flags: extensive lesions, lesions spreading to eyes, severe pain preventing eating/drinking, immunocompromised state, high fever)
+
+Investigations and initial evaluation:
+☐ HSV PCR swab if diagnosis uncertain
+☐ Consider HIV testing if recurrent/severe outbreaks, especially in high-risk individuals
+
+Medications:
+□ Valacyclovir □ 1g PO BID for 7-10 days (initial outbreak), □ 2g PO BID for 1 day (recurrence), □ 500mg PO daily (suppression), Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Acyclovir □ 400mg PO TID for 7-10 days (initial), □ 800mg PO TID for 2 days (recurrence), □ 400mg PO BID (suppression), Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Famciclovir □ 250mg PO TID for 7-10 days (initial), □ 1000mg PO BID for 1 day (recurrence), □ 250mg PO BID (suppression), Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Docosanol 10% cream □ apply 5x daily to lesions until healed, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Benzocaine gel □ apply to lesions QID PRN pain, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Avoid triggers (stress, sun exposure, fatigue, illness)
+☐ Apply cold compress to lesions PRN for comfort
+☐ Maintain adequate hydration
+☐ Soft, non-acidic diet while lesions present
+
+☐ Referral to infectious disease if immunocompromised or severe recurrent outbreaks
+
+☐ Counseling: Highly contagious from prodrome until complete healing; avoid kissing, oral sex, and sharing utensils/towels/lip products during outbreaks. Identify and avoid triggers. Start medication at first sign of prodrome (tingling, burning) for best results. Most outbreaks resolve within 7-14 days. Return if severe pain, eye involvement, or lesions worsening despite treatment.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Paronychia
+🩺 Paronychia
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect severe infection requiring surgical intervention (red flags: extensive cellulitis, ascending lymphangitis, fever, immunocompromised status, significant pain, failed conservative treatment)
+
+Investigations and initial evaluation:
+☐ Consider culture of drainage if severe or refractory to treatment
+☐ Consider X-ray if concern for osteomyelitis
+☐ Consider CBC if suspected systemic infection
+
+Medications:
+□ Cephalexin □ 500mg PO QID, □ 250mg PO QID, for 7-10 days, Ren: □ 1, □ 2, □ 3 (max 4g daily)
+□ Clindamycin □ 300mg PO QID, □ 150mg PO QID, for 7-10 days, Ren: □ 1, □ 2, □ 3 (if penicillin-allergic, max 1.8g daily)
+□ Trimethoprim-sulfamethoxazole □ 1 DS tab PO BID, □ 1 SS tab PO BID, for 7-10 days, Ren: □ 1, □ 2, □ 3 (if MRSA suspected)
+□ Mupirocin 2% ointment □ apply to affected area TID for 7-10 days, Ren: □ 1, □ 2, □ 3
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+
+Treatment options:
+☐ Warm soaks in antibacterial soap solution 3-4 times daily for 15 minutes
+☐ Elevation of affected digit to reduce swelling
+☐ Incision and drainage if fluctuant
+☐ Avoid water exposure except during therapeutic soaks
+☐ Avoid trauma to affected digit
+
+☐ Referral to hand surgery if severe infection, failed outpatient treatment, or suspicion of deep space infection
+
+☐ Counseling: Keep affected area clean and dry between soaks. Avoid nail biting, finger sucking, and manicures until healed. Complete full course of antibiotics even if symptoms improve. Return if redness spreads, increasing pain, purulent drainage, fever, or no improvement after 48 hours of treatment.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Pharyngitis (Strep throat)
+🩺 Pharyngitis (Strep throat)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect peritonsillar abscess or epiglottitis requiring emergency evaluation (red flags: severe unilateral pain, trismus, muffled voice, drooling, respiratory distress, stridor, inability to swallow, neck swelling)
+
+Investigations and initial evaluation:
+☐ Rapid strep test
+☐ Throat culture
+☐ Mononucleosis testing (Monospot or EBV serology)
+☐ Complete blood count
+☐ COVID-19 testing
+☐ Influenza testing
+☐ C-reactive protein (CRP)
+☐ Respiratory viral panel
+☐ Lateral neck X-ray
+☐ Neck CT with contrast
+☐ Throat swab for gonorrhea/chlamydia PCR
+
+Medications:
+□ Amoxicillin □ 500mg PO TID, □ 875mg PO BID, for 10 days, Ren: □ 1, □ 2, □ 3
+□ Penicillin VK □ 250mg PO QID, □ 500mg PO QID, for 10 days, Ren: □ 1, □ 2, □ 3
+□ Azithromycin □ 500mg PO day 1, then 250mg PO daily for 4 days, Ren: □ 1
+□ Clindamycin □ 300mg PO TID, □ 450mg PO TID, for 10 days, Ren: □ 1, □ 2, □ 3
+□ Cephalexin □ 500mg PO BID, □ 500mg PO TID, for 10 days, Ren: □ 1, □ 2, □ 3
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Benzocaine lozenges □ 1 lozenge dissolved in mouth Q2H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 10 lozenges daily)
+□ Phenol throat spray □ 1-2 sprays to throat Q2H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Salt water gargles QID
+☐ Warm liquids (tea with honey, broth)
+☐ Cold foods/beverages for sore throat relief
+☐ Humidifier use, especially at night
+☐ Adequate hydration
+☐ Voice rest as needed
+☐ Avoid irritants (smoking, alcohol)
+☐ Soft diet as tolerated
+
+Referral options:
+☐ Referral to otolaryngology (ENT)
+☐ Referral to infectious disease
+☐ Referral to emergency department
+☐ Referral to pediatrics (for children)
+☐ Referral to allergy/immunology (for recurrent infections)
+☐ Referral to hematology/oncology (for suspicion of malignancy)
+
+☐ Counseling: Complete full course of antibiotics even after symptoms improve. Replace toothbrush after 24-48 hours of antibiotic therapy. Stay home from work/school for 24 hours after starting antibiotics. Return if symptoms worsen, difficulty breathing/swallowing develops, persistent fever, or no improvement after 48-72 hours of treatment. Rest voice as needed and maintain adequate hydration.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Upper Respiratory Infection
+🩺 Upper Respiratory Infection (Cold, Sinusitis)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: moderate to severe eye pain, vision changes, photophobia, colored halos around lights, pupil abnormalities, eye redness concentrated around cornea, history of eye injury or foreign body, contact lens wearer with pain)
+
+Investigations and initial evaluation:
+☐ COVID-19 testing
+☐ Influenza testing
+☐ Rapid strep test
+☐ Respiratory viral panel
+☐ Complete blood count
+☐ Sinus X-ray
+☐ Sinus CT without contrast
+☐ Chest X-ray
+☐ Nasal endoscopy
+☐ Blood cultures
+☐ Nasal culture
+☐ Sputum culture
+
+Medications:
+□ Amoxicillin □ 500mg PO TID, □ 875mg PO BID, for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Amoxicillin-clavulanate □ 875mg/125mg PO BID, □ 500mg/125mg PO TID, for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Azithromycin □ 500mg PO day 1, then 250mg PO daily for 4 days, Ren: □ 1
+□ Doxycycline □ 100mg PO BID for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Levofloxacin □ 500mg PO daily for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Pseudoephedrine □ 30mg PO Q4-6H PRN, □ 60mg PO Q6H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 240mg daily)
+□ Guaifenesin □ 400mg PO Q4H PRN, □ 600mg PO Q6H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Dextromethorphan □ 10-20mg PO Q4H PRN, □ 30mg PO Q6-8H PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 120mg daily)
+□ Fluticasone nasal spray □ 1-2 sprays each nostril daily, □ 1-2 sprays each nostril BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Saline nasal spray □ 1-2 sprays each nostril 3-4 times daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Oxymetazoline nasal spray □ 1-2 sprays each nostril BID for maximum 3 days, Ren: □ 1
+
+Treatment options:
+☐ Nasal saline irrigation BID
+☐ Steam inhalation 10-15 minutes QID
+☐ Humidifier use, especially at night
+☐ Adequate hydration
+☐ Rest
+☐ Warm compress to sinuses TID-QID
+☐ Elevation of head while sleeping
+☐ Avoid allergens and irritants
+
+Referral options:
+☐ Referral to otolaryngology (ENT)
+☐ Referral to allergy/immunology
+☐ Referral to pulmonology
+☐ Referral to infectious disease
+☐ Referral to emergency department
+☐ Referral to neurology (for complicated sinusitis with neurological symptoms)
+
+☐ Counseling: Viral URIs typically resolve within 7-10 days. Acute sinusitis may take 2-3 weeks for complete resolution. Complete full course of antibiotics when prescribed. Avoid antihistamines with viral illnesses as they may thicken secretions. Limit decongestant nasal spray use to 3 days maximum to prevent rebound congestion. Return if symptoms worsen, high fever develops, severe headache, visual changes, facial swelling, or symptoms persist beyond 10-14 days.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Urinary Tract Infection (UTI)
+🩺 Urinary Tract Infection (UTI)
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect pyelonephritis or urosepsis requiring emergency evaluation (red flags: high fever, flank pain, severe nausea/vomiting, altered mental status, hypotension, pregnancy, immunocompromised)
+
+Investigations and initial evaluation:
+☐ Urinalysis with microscopy
+☐ Urine culture and sensitivity
+☐ Complete blood count
+☐ Basic metabolic panel
+☐ Blood cultures
+☐ C-reactive protein (CRP)
+☐ Kidney ultrasound
+☐ CT abdomen/pelvis with contrast
+☐ Pregnancy test for females of reproductive age
+☐ Post-void residual ultrasound
+☐ STI testing
+☐ Prostate-specific antigen (PSA) for males
+
+Medications:
+□ Nitrofurantoin □ 100mg PO BID for 5 days, □ 100mg PO QID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Trimethoprim-sulfamethoxazole □ 1 DS tab PO BID for 3 days, □ 1 DS tab PO BID for 7-14 days, Ren: □ 1, □ 2, □ 3
+□ Fosfomycin □ 3g PO single dose, Ren: □ 1
+□ Ciprofloxacin □ 250mg PO BID for 3 days, □ 500mg PO BID for 7-14 days, Ren: □ 1, □ 2, □ 3
+□ Cephalexin □ 500mg PO QID for 7-14 days, Ren: □ 1, □ 2, □ 3
+□ Amoxicillin-clavulanate □ 500mg/125mg PO TID for 7-14 days, □ 875mg/125mg PO BID for 7-14 days, Ren: □ 1, □ 2, □ 3
+□ Phenazopyridine □ 100mg PO TID for 2 days, □ 200mg PO TID for 2 days, Ren: □ 1
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+
+Treatment options:
+☐ Increased fluid intake (2-3 liters daily)
+☐ Avoid bladder irritants (caffeine, alcohol, spicy foods)
+☐ Void every 2-3 hours during waking hours
+☐ Complete emptying of bladder with each void
+☐ Void before and after sexual activity
+☐ Warm compress to lower abdomen for comfort
+☐ Cranberry supplements (not juice)
+
+Referral options:
+☐ Referral to urology
+☐ Referral to nephrology
+☐ Referral to gynecology (females)
+☐ Referral to infectious disease
+☐ Referral to emergency department
+☐ Referral to pelvic floor physical therapy
+
+☐ Counseling: Complete full course of antibiotics even after symptoms improve. Phenazopyridine will turn urine orange-red; this is normal and not harmful. Increase fluid intake to 2-3 liters daily. Urinate promptly when feeling the urge. For females: wipe front to back, void before and after sexual activity, avoid irritating feminine products. Return if symptoms worsen, fever develops, flank pain occurs, blood in urine, or symptoms persist despite 48-72 hours of antibiotics.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Fatigue
+🩺 Fatigue
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe anemia or other critical cause requiring urgent evaluation (red flags: syncope, chest pain, dyspnea, pallor, hemodynamic instability, significant weight loss, neurological symptoms)
+
+Investigations and initial evaluation:
+☐ Complete blood count with differential
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests (TSH, Free T4)
+☐ Iron studies (Ferritin, TIBC, Iron, % Saturation)
+☐ B12 and Folate levels
+☐ Vitamin D level
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ HbA1c
+☐ Urinalysis
+☐ EKG
+☐ Chest X-ray
+☐ Sleep apnea screening
+☐ Epstein-Barr virus antibodies
+☐ HIV testing
+☐ Hepatitis panel
+☐ ANA and other autoimmune panels
+☐ Cortisol level (AM)
+☐ Testosterone (males)/Estradiol (females)
+
+Medications:
+□ Iron supplement □ Ferrous sulfate 325mg PO daily, □ Ferrous sulfate 325mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Vitamin B12 □ 1000mcg PO daily, □ 1000mcg IM weekly x4 then monthly, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Vitamin D3 □ 1000IU PO daily, □ 2000IU PO daily, □ 5000IU PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Folate □ 1mg PO daily, □ 5mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Caffeine □ 100mg PO BID, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Modafinil □ 100mg PO daily, □ 200mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Multivitamin □ 1 tablet PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Sleep hygiene education
+☐ Graduated exercise program
+☐ Stress reduction techniques
+☐ Cognitive behavioral therapy
+☐ Nutritional counseling
+☐ Regular sleep schedule
+☐ Hydration guidance (2-3 liters daily)
+☐ Energy conservation techniques
+☐ Reduce caffeine and alcohol intake
+☐ Regular meals with balanced nutrition
+
+Referral options:
+☐ Referral to sleep medicine
+☐ Referral to endocrinology
+☐ Referral to hematology
+☐ Referral to psychiatry/psychology
+☐ Referral to neurology
+☐ Referral to rheumatology
+☐ Referral to cardiology
+☐ Referral to integrative medicine
+☐ Referral to infectious disease
+☐ Referral to nutritionist/dietitian
+
+☐ Counseling: Fatigue is a complex symptom with many possible causes. Investigations may take time to identify the underlying cause. Maintain regular sleep schedule, balanced nutrition, and moderate physical activity. Avoid excessive caffeine, alcohol, and processed foods. Practice stress management techniques. Return if symptoms worsen, new symptoms develop, or no improvement after 4 weeks.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Headache – Tension Type
+🩺 Headache – Tension Type
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect secondary headache requiring urgent evaluation (red flags: thunderclap onset, worst headache of life, fever, altered mental status, focal neurological deficits, sudden onset in patient >50, associated with exertion/sexual activity, immunocompromised)
+
+Investigations and initial evaluation:
+☐ Brain MRI without contrast
+☐ Brain MRI with contrast
+☐ CT head without contrast
+☐ Cervical spine X-ray
+☐ Cervical spine MRI
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ Thyroid function tests
+☐ Sleep study
+☐ Sinus CT
+☐ Visual field testing
+☐ Fundoscopic examination
+☐ Temporal artery biopsy (if giant cell arteritis suspected)
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 1500mg daily)
+□ Cyclobenzaprine □ 5mg PO TID, □ 10mg PO TID, □ 10mg PO QHS, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 30mg daily)
+□ Amitriptyline □ 10mg PO QHS, □ 25mg PO QHS, □ 50mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Nortriptyline □ 10mg PO QHS, □ 25mg PO QHS, □ 50mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Propranolol □ 20mg PO BID, □ 40mg PO BID, □ 60mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Topiramate □ 25mg PO QHS, □ 50mg PO BID, □ 100mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Heat or cold therapy to neck/shoulders
+☐ Stress management techniques
+☐ Regular exercise program
+☐ Proper ergonomics
+☐ Sleep hygiene education
+☐ Trigger point therapy
+☐ Massage therapy
+☐ Biofeedback
+☐ Acupuncture
+☐ Relaxation techniques
+☐ Headache diary
+
+Referral options:
+☐ Referral to neurology
+☐ Referral to physical therapy
+☐ Referral to pain management
+☐ Referral to psychiatry/psychology
+☐ Referral to sleep medicine
+☐ Referral to neuro-ophthalmology
+☐ Referral to rheumatology
+☐ Referral to chiropractor
+☐ Referral to acupuncturist
+☐ Referral to massage therapy
+
+☐ Counseling: Tension headaches are often triggered by stress, poor posture, irregular sleep, and eye strain. Maintain regular sleep schedule, practice good posture, take regular breaks from computer work, and manage stress. Use proper lighting when reading. Stay hydrated and avoid skipping meals. Limit caffeine and alcohol intake. Return if headache pattern changes, severe sudden headache occurs, or associated symptoms like fever, vision changes, or neurological symptoms develop.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Insomnia
+🩺 Insomnia
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe depression with suicidal ideation, significant breathing disruption during sleep, violent behaviors during sleep, narcolepsy symptoms, severe medication side effects)
+
+Investigations and initial evaluation:
+☐ Sleep diary (2 weeks)
+☐ Insomnia Severity Index
+☐ Sleep apnea screening
+☐ Home sleep study
+☐ Polysomnography
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests
+☐ Iron studies
+☐ Vitamin D level
+☐ Depression screening (PHQ-9)
+☐ Anxiety screening (GAD-7)
+☐ Substance use screening
+☐ Assessment of medications for sleep-disrupting effects
+☐ Actigraphy monitoring
+
+Medications:
+□ Melatonin □ 1mg PO QHS, □ 3mg PO QHS, □ 5mg PO QHS, □ 10mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Zolpidem □ 5mg PO QHS PRN, □ 10mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (short-term use only)
+□ Eszopiclone □ 1mg PO QHS PRN, □ 2mg PO QHS PRN, □ 3mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (short-term use only)
+□ Trazodone □ 25mg PO QHS PRN, □ 50mg PO QHS PRN, □ 100mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Mirtazapine □ 7.5mg PO QHS, □ 15mg PO QHS, □ 30mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Doxepin □ 3mg PO QHS, □ 6mg PO QHS, □ 10mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Diphenhydramine □ 25mg PO QHS PRN, □ 50mg PO QHS PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (short-term use only)
+□ Magnesium glycinate □ 200mg PO QHS, □ 400mg PO QHS, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Sleep hygiene education
+☐ Cognitive behavioral therapy for insomnia (CBT-I)
+☐ Stimulus control therapy
+☐ Sleep restriction therapy
+☐ Relaxation techniques
+☐ Regular exercise program (not within 3 hours of bedtime)
+☐ Blue light reduction in evenings
+☐ Consistent sleep schedule
+☐ Limit caffeine after noon
+☐ Avoid alcohol near bedtime
+☐ Bedroom environment optimization
+
+Referral options:
+☐ Referral to sleep medicine
+☐ Referral to psychiatry/psychology
+☐ Referral to behavioral therapist for CBT-I
+☐ Referral to endocrinology
+☐ Referral to neurology
+☐ Referral to pain management
+☐ Referral to ENT (if sleep apnea suspected)
+☐ Referral to pulmonology (if sleep apnea suspected)
+☐ Referral to integrative medicine
+☐ Referral to nutritionist
+
+☐ Counseling: Insomnia can have multiple causes including stress, poor sleep habits, medical conditions, and medications. Maintain a regular sleep schedule with consistent bedtime and wake time, even on weekends. Create a relaxing bedtime routine. Avoid electronic screens 1-2 hours before bed. Keep bedroom dark, quiet, and cool. Use bed only for sleep and intimacy. Limit caffeine, alcohol, and large meals before bedtime. Exercise regularly but not close to bedtime. If unable to fall asleep after 20 minutes, get up and do a quiet activity until sleepy. Return if symptoms worsen or depression/anxiety develop.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Irregular Periods/Amenorrhea
+🩺 Irregular Periods/Amenorrhea
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe pelvic pain, heavy bleeding, signs of premature menopause in young patient, suspected pregnancy with bleeding, positive pregnancy test with severe pain)
+
+Investigations and initial evaluation:
+☐ Pregnancy test (urine/serum)
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Thyroid function tests (TSH, Free T4)
+☐ Prolactin level
+☐ Follicle-stimulating hormone (FSH)
+☐ Luteinizing hormone (LH)
+☐ Estradiol
+☐ Progesterone level
+☐ Total and free testosterone
+☐ Sex hormone binding globulin (SHBG)
+☐ Dehydroepiandrosterone sulfate (DHEAS)
+☐ 17-hydroxyprogesterone
+☐ Androstenedione
+☐ Pelvic ultrasound
+☐ Transvaginal ultrasound
+☐ Endometrial biopsy
+☐ HbA1c
+☐ Lipid panel
+☐ Ferritin/iron studies
+
+Medications:
+□ Combined oral contraceptive pill □ Specify: ________________, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Progestin-only pill □ Specify: ________________, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Medroxyprogesterone □ 5mg PO daily x10 days, □ 10mg PO daily x10 days, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Norethindrone acetate □ 5mg PO daily, □ 5mg PO BID, □ 5mg PO TID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Levonorgestrel IUD □ Prescribe for insertion, Ren: □ 1
+□ Spironolactone □ 25mg PO daily, □ 50mg PO daily, □ 100mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Metformin □ 500mg PO daily, □ 500mg PO BID, □ 1000mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Iron supplement □ Ferrous sulfate 325mg PO daily, □ Ferrous sulfate 325mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+
+Treatment options:
+☐ Regular exercise program
+☐ Weight management counseling
+☐ Nutritional counseling
+☐ Stress reduction techniques
+☐ Track menstrual cycles
+☐ Balanced diet with adequate protein and healthy fats
+☐ Avoid excessive exercise
+☐ Maintain healthy BMI
+
+Referral options:
+☐ Referral to gynecology
+☐ Referral to reproductive endocrinology
+☐ Referral to endocrinology
+☐ Referral to nutritionist/dietitian
+☐ Referral to psychiatry/psychology
+☐ Referral to eating disorder specialist
+☐ Referral to fertility specialist
+☐ Referral to integrative medicine
+☐ Referral to genetics
+
+☐ Counseling: Irregular periods can have many causes including hormonal imbalances, stress, weight changes, thyroid disorders, and polycystic ovary syndrome (PCOS). Maintain a menstrual calendar to track cycles. Maintain healthy weight through balanced nutrition and regular exercise. Manage stress through relaxation techniques. Return if severe pain occurs, if heavy bleeding develops, or if no period for more than 3 months after normal cycles.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Knee Pain
+🩺 Knee Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe trauma, inability to bear weight, significant joint effusion, fever, erythema/warmth suggesting infection, locked knee, popliteal mass)
+
+Investigations and initial evaluation:
+☐ Knee X-ray (weight-bearing, AP, lateral, sunrise, tunnel views)
+☐ Knee MRI without contrast
+☐ Knee MRI with contrast
+☐ Knee ultrasound
+☐ Complete blood count
+☐ Erythrocyte sedimentation rate (ESR)
+☐ C-reactive protein (CRP)
+☐ Uric acid level
+☐ Rheumatoid factor
+☐ Anti-CCP antibodies
+☐ ANA panel
+☐ HLA-B27
+☐ Joint aspiration with synovial fluid analysis
+☐ Blood cultures (if sepsis suspected)
+☐ CT scan of knee
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 2400mg daily)
+□ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 1500mg daily)
+□ Meloxicam □ 7.5mg PO daily, □ 15mg PO daily, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Celecoxib □ 100mg PO daily, □ 200mg PO daily, □ 200mg PO BID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Diclofenac gel 1% □ apply to affected area QID, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24
+□ Cyclobenzaprine □ 5mg PO TID, □ 10mg PO TID, □ 10mg PO QHS, □ PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 30mg daily)
+□ Tramadol □ 50mg PO Q6H PRN, □ 50mg PO TID PRN, Ren: □ 1, □ 2, □ 3, □ 6, □ 12, □ 24 (max 400mg daily)
+
+Treatment options:
+☐ RICE protocol (Rest, Ice, Compression, Elevation)
+☐ Physical therapy referral
+☐ Knee brace/support
+☐ Cane or crutches for ambulation
+☐ Weight management strategies
+☐ Low-impact exercise program
+☐ Aquatic therapy
+☐ Intra-articular corticosteroid injection
+☐ Hyaluronic acid injection
+☐ Platelet-rich plasma injection
+☐ Activity modification
+
+Referral options:
+☐ Referral to orthopedic surgery
+☐ Referral to sports medicine
+☐ Referral to physical therapy
+☐ Referral to rheumatology
+☐ Referral to pain management
+☐ Referral to physiatry (PM&R)
+☐ Referral to integrative medicine
+☐ Referral to weight management
+☐ Referral to occupational therapy
+☐ Referral to podiatry (for gait/alignment issues)
+
+☐ Counseling: Knee pain can result from injury, arthritis, or overuse. Apply ice for acute pain (15-20 minutes several times daily) and heat for chronic pain. Avoid activities that worsen pain. Use proper footwear with good support. Lose weight if overweight to reduce stress on knees. Strengthen quadriceps and hamstring muscles through approved exercises. Modify activities to avoid high-impact movements. Return if pain worsens, swelling increases, knee locks or gives way, unable to bear weight, or fever develops.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Urgent Care
+🩺 Urgent Care
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring emergency department evaluation (red flags: altered mental status, respiratory distress, severe pain, unstable vital signs, active bleeding, suspected fracture/dislocation)
+
+Investigations and initial evaluation:
+☐ Vital signs (BP, HR, RR, temperature, O2 saturation)
+☐ Point-of-care glucose testing
+☐ Rapid strep test
+☐ Influenza testing
+☐ COVID-19 testing
+☐ Urinalysis
+☐ Pregnancy test
+☐ ECG
+☐ X-ray as indicated
+☐ Point-of-care troponin
+☐ Complete blood count
+☐ Basic metabolic panel
+☐ Pulse oximetry
+☐ Peak flow measurement
+☐ Visual acuity testing
+
+Medications:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3 (max 2400mg daily)
+□ Prednisone □ 20mg PO daily, □ 40mg PO daily, □ taper over ___ days, Ren: □ 1, □ 2, □ 3
+□ Albuterol HFA □ 2 puffs Q4-6H PRN, Ren: □ 1, □ 2, □ 3
+□ Ondansetron □ 4mg PO/ODT Q8H PRN, □ 8mg PO/ODT Q8H PRN, Ren: □ 1, □ 2, □ 3
+□ Promethazine □ 12.5mg PO/IM Q6H PRN, □ 25mg PO/IM Q6H PRN, Ren: □ 1, □ 2, □ 3
+□ Ketorolac □ 15mg IV/IM once, □ 30mg IV/IM once, Ren: □ 1
+□ Antibiotics - specify: _________________, Ren: □ 1, □ 2, □ 3
+□ IV fluids - specify: _________________, Ren: □ 1
+
+Treatment options:
+☐ O2 supplementation as needed
+☐ Nebulized bronchodilator treatment
+☐ Wound cleaning and dressing
+☐ Splinting/immobilization
+☐ Cryotherapy/ice application
+☐ Heat therapy
+☐ Oral rehydration
+☐ IV rehydration
+☐ Foreign body removal
+☐ Incision and drainage
+
+Referral options:
+☐ Referral to emergency department (specify reason)
+☐ Referral to primary care for follow-up
+☐ Referral to specialist (specify)
+☐ Referral for imaging studies
+☐ Referral for laboratory tests
+☐ Referral to same-day surgery
+☐ Referral to wound care
+☐ Referral to social services
+☐ Referral to mental health services
+☐ Referral for home health services
+
+☐ Counseling: Your condition has been evaluated and treated today in the urgent care setting. Take medications as prescribed. Watch for worsening symptoms including [specific warning signs]. Return to urgent care or go to emergency department if symptoms worsen or if new concerning symptoms develop. Follow up with your primary care provider or specialist as directed. Keep the affected area clean/elevated/protected as instructed.
+
+Follow-up options: ☐ 1 day ☐ 2 days ☐ 3 days ☐ 1 week ☐ 2 weeks ☐ as needed ☐ with PCP ☐ with specialist ☐ via telehealth ☐ if symptoms worsen
+
+### Vaginitis/Vaginosis
+🩺 Vaginitis/Vaginosis
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: fever, severe abdominal pain, pregnancy, immunocompromised state, recurrent symptoms despite treatment)
+
+Investigations and initial evaluation:
+☐ Vaginal pH testing
+☐ Wet mount microscopy
+☐ Whiff test (KOH)
+☐ Vaginal culture
+☐ Nucleic acid amplification test for STIs
+☐ Complete blood count
+☐ Urinalysis
+☐ Pregnancy test
+☐ Glucose testing (if diabetes suspected)
+☐ HIV testing
+☐ Pelvic ultrasound (if PID suspected)
+☐ Cervical screening (if due)
+☐ Comprehensive metabolic panel
+☐ Inflammatory markers (ESR, CRP)
+
+Medications:
+□ Bacterial vaginosis treatment:
+□ Metronidazole 500mg PO BID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Metronidazole gel 0.75% intravaginally QHS for 5 days, Ren: □ 1, □ 2, □ 3
+□ Clindamycin cream 2% intravaginally QHS for 7 days, Ren: □ 1, □ 2, □ 3
+□ Clindamycin 300mg PO BID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Candidiasis (yeast infection) treatment:
+□ Fluconazole 150mg PO once, Ren: □ 1, □ 2, □ 3
+□ Miconazole 2% cream intravaginally QHS for 7 days, Ren: □ 1, □ 2, □ 3
+□ Clotrimazole 1% cream intravaginally QHS for 7 days, Ren: □ 1, □ 2, □ 3
+□ Boric acid 600mg vaginal suppository QHS for 14 days, Ren: □ 1, □ 2, □ 3
+□ Trichomoniasis treatment:
+□ Metronidazole 2g PO once, Ren: □ 1, □ 2, □ 3
+□ Metronidazole 500mg PO BID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Tinidazole 2g PO once, Ren: □ 1, □ 2, □ 3
+
+Treatment options:
+☐ Partner treatment (for trichomoniasis)
+☐ Probiotic supplementation
+☐ Pelvic rest during treatment
+☐ Avoid alcohol during metronidazole/tinidazole treatment
+☐ Delay tampons, sexual activity during treatment
+☐ Wear cotton underwear, avoid tight-fitting clothing
+☐ Avoid douching and scented hygiene products
+☐ Adequate hydration
+☐ Sitz bath for external irritation
+☐ Low sugar diet (if recurrent yeast infections)
+
+Referral options:
+☐ Referral to gynecology
+☐ Referral to infectious disease
+☐ Referral to sexual health clinic
+☐ Referral to primary care
+☐ Referral to endocrinology (if diabetes suspected)
+☐ Referral to immunology (if recurrent infections)
+☐ Referral to vulvar specialty clinic
+☐ Referral to pelvic floor physical therapy
+☐ Referral to psychology (if chronic symptoms affecting quality of life)
+☐ Referral to urology (for partner evaluation)
+
+☐ Counseling: Vaginitis/vaginosis can be caused by bacteria, yeast, or parasites. Complete all medication as prescribed, even if symptoms improve. Avoid alcohol completely during and 24 hours after metronidazole/tinidazole treatment. Partners should be treated if you have trichomoniasis. Wear cotton underwear and avoid tight-fitting clothing. Avoid douches, scented soaps, and feminine hygiene sprays. Return if symptoms persist after completing treatment, if symptoms worsen, or if fever/abdominal pain develops.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Urethritis
+🩺 Urethritis
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: fever, flank pain, testicular pain/swelling, difficulty urinating, blood in urine, urinary retention)
+
+Investigations and initial evaluation:
+☐ Urethral swab for culture
+☐ Nucleic acid amplification test for gonorrhea and chlamydia
+☐ Urinalysis
+☐ Urine culture
+☐ Mycoplasma genitalium testing
+☐ Trichomonas testing
+☐ Urethral discharge Gram stain
+☐ HIV testing
+☐ Syphilis testing
+☐ Hepatitis B and C testing
+☐ Herpes simplex virus testing (if vesicular lesions present)
+☐ Complete blood count
+☐ Renal function tests
+☐ Prostate-specific antigen (in men >50)
+
+Medications:
+□ Gonorrhea treatment:
+□ Ceftriaxone 500mg IM once, Ren: □ 1
+□ Cefixime 800mg PO once, Ren: □ 1
+□ Chlamydia treatment:
+□ Azithromycin 1g PO once, Ren: □ 1
+□ Doxycycline 100mg PO BID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Mycoplasma genitalium treatment:
+□ Doxycycline 100mg PO BID for 7 days followed by Azithromycin 1g PO day 1, then 500mg PO daily for 3 days, Ren: □ 1, □ 2, □ 3
+□ Moxifloxacin 400mg PO daily for 7-14 days, Ren: □ 1, □ 2, □ 3
+□ Non-gonococcal urethritis treatment:
+□ Doxycycline 100mg PO BID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Azithromycin 1g PO once, Ren: □ 1
+□ Phenazopyridine □ 100mg PO TID for 2 days, □ 200mg PO TID for 2 days, Ren: □ 1 (for symptom relief)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3 (max 2400mg daily)
+
+Treatment options:
+☐ Partner notification and treatment
+☐ Abstinence during treatment period
+☐ Increased fluid intake
+☐ Avoid alcohol during treatment
+☐ Avoid caffeine, spicy foods, and other bladder irritants
+☐ Warm sitz baths for comfort
+☐ EPT (expedited partner therapy) if appropriate
+☐ Contact tracing through public health department
+☐ Condom use education
+☐ Sexual health counseling
+
+Referral options:
+☐ Referral to urology
+☐ Referral to infectious disease
+☐ Referral to sexual health clinic
+☐ Referral to primary care
+☐ Referral to HIV counseling and testing
+☐ Referral to psychology (for anxiety related to diagnosis)
+☐ Referral to public health department
+☐ Referral to pain management
+☐ Referral to nephrology (if kidney function concerns)
+☐ Referral to emergency department (for acute complications)
+
+☐ Counseling: Urethritis is an inflammation of the urethra often caused by sexually transmitted infections. Complete all medication as prescribed. Abstain from sexual activity until treatment is complete and symptoms have resolved. Ensure all recent sexual partners are notified and treated to prevent reinfection. Use condoms consistently to prevent future infections. Return if symptoms persist after completing treatment, if symptoms worsen, or if you develop fever, flank pain, or blood in urine.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Testicular Pain
+🩺 Testicular Pain
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: sudden severe pain, scrotal swelling, testicular torsion, trauma, fever, nausea/vomiting)
+
+Investigations and initial evaluation:
+☐ Doppler ultrasound of scrotum/testicles
+☐ Urinalysis
+☐ Urine culture
+☐ Nucleic acid amplification test for gonorrhea and chlamydia
+☐ Complete blood count
+☐ C-reactive protein
+☐ Erythrocyte sedimentation rate
+☐ Comprehensive metabolic panel
+☐ Testicular tumor markers (AFP, beta-hCG, LDH)
+☐ Prehn sign evaluation
+☐ Cremasteric reflex testing
+☐ Transillumination testing
+☐ Digital rectal examination
+☐ Urine pregnancy test (if partner potentially pregnant)
+
+Medications:
+□ Antibiotics for epididymitis/orchitis:
+□ Ceftriaxone 500mg IM once PLUS Doxycycline 100mg PO BID for 10 days, Ren: □ 1, □ 2, □ 3
+□ Levofloxacin 500mg PO daily for 10 days, Ren: □ 1, □ 2, □ 3
+□ Ciprofloxacin 500mg PO BID for 10 days, Ren: □ 1, □ 2, □ 3
+□ Pain management:
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3 (max 2400mg daily)
+□ Naproxen □ 250mg PO BID, □ 375mg PO BID, □ 500mg PO BID, □ PRN, Ren: □ 1, □ 2, □ 3 (max 1500mg daily)
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3 (max 4000mg daily)
+□ Tramadol □ 50mg PO Q6H PRN, □ 50mg PO TID PRN, Ren: □ 1, □ 2, □ 3, □ 6 (max 400mg daily)
+□ Hydrocodone/acetaminophen 5/325mg □ 1-2 tablets PO Q6H PRN, Ren: □ 1 (severe pain only)
+
+Treatment options:
+☐ Scrotal support/elevation
+☐ Ice application (intermittent)
+☐ Bed rest
+☐ Limited physical activity
+☐ Avoidance of sexual activity during treatment
+☐ Partner treatment (if STI confirmed)
+☐ Surgical exploration (if torsion suspected)
+☐ Spermatic cord block
+☐ Gentle testicular massage (for cremasteric spasm)
+☐ Sports supporter for physical activity
+
+Referral options:
+☐ Referral to urology (urgent if torsion suspected)
+☐ Referral to emergency department
+☐ Referral to infectious disease
+☐ Referral to sexual health clinic
+☐ Referral to oncology (if mass/tumor suspected)
+☐ Referral to pain management
+☐ Referral to general surgery
+☐ Referral to radiology for advanced imaging
+☐ Referral to primary care
+☐ Referral to psychology (for chronic pain management)
+
+☐ Counseling: Testicular pain can have various causes including infection, torsion, trauma, or varicocele. Support and elevate the scrotum with snug underwear or athletic supporter. Apply ice wrapped in cloth for 20 minutes several times daily. Take medications as prescribed. Avoid strenuous activity, heavy lifting, and sexual activity until pain resolves. Return immediately if pain suddenly worsens, if scrotal swelling increases, or if fever develops. Testicular torsion is a surgical emergency requiring immediate attention.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Rectal STIs
+🩺 Rectal STIs
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: severe pain, fever, bloody discharge, abdominal pain, weight loss, immunocompromised state)
+
+Investigations and initial evaluation:
+☐ Rectal swab for gonorrhea and chlamydia NAAT
+☐ Rectal swab for culture
+☐ Anal/rectal HSV PCR (if vesicular lesions present)
+☐ HIV testing
+☐ Syphilis testing (RPR/VDRL and treponemal test)
+☐ Hepatitis A, B, and C testing
+☐ Lymphogranuloma venereum (LGV) testing
+☐ Proctoscopy/anoscopy
+☐ Fecal occult blood test
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Throat and urine NAAT for GC/CT
+☐ HPV testing/anal Pap smear
+
+Medications:
+□ Gonorrhea treatment:
+□ Ceftriaxone 500mg IM once, Ren: □ 1
+□ Cefixime 800mg PO once, Ren: □ 1
+□ Chlamydia treatment:
+□ Doxycycline 100mg PO BID for 7 days (21 days for LGV), Ren: □ 1, □ 2, □ 3
+□ Azithromycin 1g PO once, Ren: □ 1
+□ HSV treatment:
+□ Acyclovir 400mg PO TID for 7-10 days, Ren: □ 1, □ 2, □ 3
+□ Valacyclovir 1g PO BID for 7-10 days, Ren: □ 1, □ 2, □ 3
+□ Symptom management:
+□ Lidocaine 2% gel apply to affected area TID-QID PRN, Ren: □ 1, □ 2, □ 3
+□ Hydrocortisone 1% cream apply to external affected area BID PRN, Ren: □ 1, □ 2, □ 3
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3 (max 2400mg daily)
+
+Treatment options:
+☐ Partner notification and treatment
+☐ Abstinence during treatment period
+☐ Condom use education
+☐ PrEP assessment and counseling
+☐ Sitz baths for comfort
+☐ High-fiber diet to reduce discomfort with bowel movements
+☐ Increased fluid intake
+☐ Contact tracing through public health department
+☐ HPV vaccination if eligible
+☐ Regular STI screening schedule
+
+Referral options:
+☐ Referral to infectious disease
+☐ Referral to colorectal surgery
+☐ Referral to gastroenterology
+☐ Referral to HIV specialist
+☐ Referral to sexual health clinic
+☐ Referral to primary care
+☐ Referral to pain management
+☐ Referral to psychology/counseling
+☐ Referral to public health department
+☐ Referral to HPV high-resolution anoscopy clinic
+
+☐ Counseling: Rectal STIs can be asymptomatic but still transmissible. Complete all medication as prescribed. Abstain from sexual activity until treatment is complete and symptoms have resolved. Ensure all recent sexual partners are notified and treated to prevent reinfection. Use condoms or barriers for anal intercourse. Consider regular STI testing every 3-6 months if at ongoing risk. Return if symptoms persist after completing treatment, if symptoms worsen, or if you develop fever, severe pain, or bleeding.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Syphilis
+🩺 Syphilis
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: neurological symptoms, ocular involvement, pregnancy, late latent syphilis, tertiary syphilis, HIV coinfection)
+
+Investigations and initial evaluation:
+☐ RPR (rapid plasma reagin) quantitative test
+☐ VDRL (Venereal Disease Research Laboratory) test
+☐ Treponemal-specific antibody test (TPPA, FTA-ABS, CIA)
+☐ HIV testing
+☐ Hepatitis B and C testing
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Gonorrhea and chlamydia NAAT
+☐ Urinalysis
+☐ Pregnancy test for females of reproductive age
+☐ Lumbar puncture (if neurological symptoms)
+☐ Ophthalmologic examination (if ocular symptoms)
+☐ Neurological examination
+
+Medications:
+□ Primary, secondary, or early latent syphilis (<1 year):
+□ Benzathine penicillin G 2.4 million units IM once, Ren: □ 1
+□ Doxycycline 100mg PO BID for 14 days (penicillin allergy), Ren: □ 1, □ 2, □ 3
+□ Late latent syphilis (>1 year), unknown duration, or tertiary syphilis (without neurosyphilis):
+□ Benzathine penicillin G 2.4 million units IM weekly x 3 weeks, Ren: □ 1, □ 2, □ 3
+□ Doxycycline 100mg PO BID for 28 days (penicillin allergy), Ren: □ 1, □ 2, □ 3, □ 4
+□ Neurosyphilis or ocular syphilis:
+□ Aqueous crystalline penicillin G 3-4 million units IV q4h for 10-14 days, Ren: □ 1, □ 2, □ 3
+□ Jarisch-Herxheimer reaction management:
+□ Acetaminophen 650mg PO Q6H PRN, Ren: □ 1, □ 2, □ 3
+□ Ibuprofen 400mg PO TID PRN, Ren: □ 1, □ 2, □ 3
+□ Prednisone 20mg PO daily for 3 days (severe cases), Ren: □ 1
+
+Treatment options:
+☐ Partner notification and testing
+☐ Abstinence during treatment period
+☐ Skin lesion precautions (if present)
+☐ Condom use education
+☐ Regular serologic testing follow-up
+☐ Contact tracing through public health department
+☐ Penicillin desensitization (if allergy present)
+☐ Observation 30 minutes after injection
+☐ Education about Jarisch-Herxheimer reaction
+☐ HIV PrEP assessment
+
+Referral options:
+☐ Referral to infectious disease
+☐ Referral to neurology (if neurological symptoms)
+☐ Referral to ophthalmology (if ocular involvement)
+☐ Referral to maternal-fetal medicine (if pregnant)
+☐ Referral to HIV specialist (if co-infected)
+☐ Referral to public health department
+☐ Referral to sexual health clinic
+☐ Referral to primary care
+☐ Referral to psychiatry (if cognitive symptoms)
+☐ Referral to cardiology (if cardiovascular syphilis)
+
+☐ Counseling: Syphilis is a bacterial infection that progresses through stages if untreated. Treatment success requires completing all medication as prescribed. You may experience a Jarisch-Herxheimer reaction (fever, headache, muscle aches) within 24 hours after treatment - this is normal and typically resolves within a day. Abstain from sexual activity until treatment is complete and lesions have healed. Ensure all recent sexual partners are notified and tested. Return for follow-up serologic testing at recommended intervals to confirm cure. Return immediately if you develop neurological symptoms, vision changes, or hearing loss.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 3 months ☐ 6 months ☐ 12 months ☐ after results arrive at clinic, we will reach out to you
+
+### Dysuria
+🩺 Dysuria
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: fever, flank pain, hematuria, urinary retention, recurrent UTIs, immunocompromised state, pregnancy)
+
+Investigations and initial evaluation:
+☐ Urinalysis
+☐ Urine culture and sensitivity
+☐ Nucleic acid amplification test for gonorrhea and chlamydia
+☐ Complete blood count
+☐ Comprehensive metabolic panel
+☐ Urine pregnancy test for females of reproductive age
+☐ Postvoid residual measurement
+☐ Renal ultrasound (if recurrent UTIs or complicated infection)
+☐ Blood cultures (if sepsis suspected)
+☐ Pelvic examination for females
+☐ Prostate examination for males
+☐ Trichomonas testing
+☐ Mycoplasma/Ureaplasma testing
+☐ Herpes simplex virus testing (if vesicular lesions present)
+
+Medications:
+□ UTI treatment:
+□ Nitrofurantoin 100mg PO BID for 5 days, Ren: □ 1, □ 2, □ 3
+□ Trimethoprim-sulfamethoxazole DS 1 tablet PO BID for 3 days, Ren: □ 1, □ 2, □ 3
+□ Fosfomycin 3g PO once, Ren: □ 1
+□ Cephalexin 500mg PO QID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Ciprofloxacin 250mg PO BID for 3 days, Ren: □ 1, □ 2, □ 3
+□ STI treatment:
+□ Ceftriaxone 500mg IM once, Ren: □ 1
+□ Azithromycin 1g PO once, Ren: □ 1
+□ Doxycycline 100mg PO BID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Symptom relief:
+□ Phenazopyridine □ 100mg PO TID for 2 days, □ 200mg PO TID for 2 days, Ren: □ 1
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3 (max 2400mg daily)
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, Ren: □ 1, □ 2, □ 3 (max 4000mg daily)
+
+Treatment options:
+☐ Increased fluid intake (2-3 liters daily)
+☐ Void every 2-3 hours while awake
+☐ Complete emptying of bladder with each void
+☐ Void before and after sexual activity
+☐ Front-to-back wiping (females)
+☐ Avoid bladder irritants (caffeine, alcohol, spicy foods)
+☐ Warm sitz baths for external discomfort
+☐ Partner treatment (if STI confirmed)
+☐ Pelvic floor relaxation exercises
+☐ Cotton underwear, avoid tight-fitting clothing
+
+Referral options:
+☐ Referral to urology
+☐ Referral to gynecology
+☐ Referral to infectious disease
+☐ Referral to nephrology
+☐ Referral to sexual health clinic
+☐ Referral to primary care
+☐ Referral to pelvic floor physical therapy
+☐ Referral to pain management
+☐ Referral to emergency department
+☐ Referral to integrative medicine
+
+☐ Counseling: Dysuria (painful urination) can be caused by infection, inflammation, or irritation of the urinary tract. Complete all medication as prescribed. Phenazopyridine will turn urine orange-red; this is normal and not harmful. Increase fluid intake to 2-3 liters daily. For females: wipe front to back, void before and after sexual activity, wear cotton underwear. For recurrent UTIs: avoid bubble baths, douches, and scented hygiene products. Return if symptoms worsen, if fever develops, if flank pain occurs, if blood in urine appears, or if symptoms persist despite 48-72 hours of antibiotics.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Abnormal Vaginal Discharge
+🩺 Abnormal Vaginal Discharge
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: fever, severe pelvic pain, pregnancy, post-procedure, foul-smelling discharge, postmenopausal bleeding)
+
+Investigations and initial evaluation:
+☐ Vaginal pH testing
+☐ Wet mount microscopy
+☐ Whiff test (KOH)
+☐ Vaginal culture
+☐ Nucleic acid amplification test for gonorrhea and chlamydia
+☐ Trichomonas testing
+☐ Bacterial vaginosis testing
+☐ Candida testing
+☐ Complete blood count
+☐ Urinalysis
+☐ Pregnancy test
+☐ Pelvic ultrasound
+☐ Cervical screening/Pap smear
+☐ HPV testing
+☐ HIV testing
+☐ Pelvic examination
+
+Medications:
+□ Bacterial vaginosis treatment:
+□ Metronidazole 500mg PO BID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Metronidazole gel 0.75% intravaginally QHS for 5 days, Ren: □ 1, □ 2, □ 3
+□ Clindamycin cream 2% intravaginally QHS for 7 days, Ren: □ 1, □ 2, □ 3
+□ Candidiasis (yeast infection) treatment:
+□ Fluconazole 150mg PO once, Ren: □ 1, □ 2, □ 3
+□ Miconazole 2% cream intravaginally QHS for 7 days, Ren: □ 1, □ 2, □ 3
+□ Clotrimazole 1% cream intravaginally QHS for 7 days, Ren: □ 1, □ 2, □ 3
+□ Trichomoniasis treatment:
+□ Metronidazole 2g PO once, Ren: □ 1
+□ Metronidazole 500mg PO BID for 7 days, Ren: □ 1, □ 2, □ 3
+□ Tinidazole 2g PO once, Ren: □ 1
+□ Gonorrhea treatment:
+□ Ceftriaxone 500mg IM once, Ren: □ 1
+□ Chlamydia treatment:
+□ Azithromycin 1g PO once, Ren: □ 1
+□ Doxycycline 100mg PO BID for 7 days, Ren: □ 1, □ 2, □ 3
+
+Treatment options:
+☐ Partner treatment (for trichomoniasis, gonorrhea, chlamydia)
+☐ Probiotic supplementation
+☐ Pelvic rest during treatment
+☐ Avoid alcohol during metronidazole/tinidazole treatment
+☐ Delay tampons, sexual activity during treatment
+☐ Wear cotton underwear, avoid tight-fitting clothing
+☐ Avoid douching and scented hygiene products
+☐ Low sugar diet (if recurrent yeast infections)
+☐ Sitz bath for external irritation
+☐ Review of hormonal contraception (if relevant)
+
+Referral options:
+☐ Referral to gynecology
+☐ Referral to infectious disease
+☐ Referral to sexual health clinic
+☐ Referral to primary care
+☐ Referral to endocrinology
+☐ Referral to vulvar specialty clinic
+☐ Referral to urology (for partner evaluation)
+☐ Referral to colposcopy clinic
+☐ Referral to pelvic floor physical therapy
+☐ Referral to psychology (if chronic symptoms affecting quality of life)
+
+☐ Counseling: Abnormal vaginal discharge can be caused by infections, hormonal changes, or irritants. Complete all medication as prescribed. Avoid alcohol completely during and 24 hours after metronidazole/tinidazole treatment. Partners should be treated if you have an STI. Wear cotton underwear and avoid tight-fitting clothing. Avoid douches, scented soaps, and feminine hygiene sprays. Return if symptoms persist after completing treatment, if symptoms worsen, or if fever/abdominal pain develops. Maintain regular gynecological check-ups.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Pneumonia
+🩺 Pneumonia
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: respiratory distress, hypoxemia, hemodynamic instability, altered mental status, immunocompromised state, failed outpatient treatment)
+
+Investigations and initial evaluation:
+☐ Chest X-ray (PA and lateral)
+☐ Complete blood count with differential
+☐ Comprehensive metabolic panel
+☐ Blood cultures
+☐ Sputum Gram stain and culture
+☐ Respiratory viral panel
+☐ COVID-19 testing
+☐ Influenza testing
+☐ Pulse oximetry
+☐ Arterial blood gas (if respiratory distress)
+☐ Procalcitonin
+☐ Legionella/Pneumococcal urinary antigens
+☐ CT chest (if complicated pneumonia)
+☐ HIV testing (if risk factors present)
+☐ Thoracentesis (if significant pleural effusion)
+
+Medications:
+□ Community-acquired pneumonia:
+□ Amoxicillin □ 500mg PO TID, □ 875mg PO BID, for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Amoxicillin-clavulanate □ 875mg/125mg PO BID for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Azithromycin □ 500mg PO day 1, then 250mg PO daily for 4 days, Ren: □ 1
+□ Doxycycline □ 100mg PO BID for 5-7 days, Ren: □ 1, □ 2, □ 3
+□ Levofloxacin □ 750mg PO daily for 5 days, Ren: □ 1, □ 2, □ 3
+□ Symptomatic treatment:
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, □ 1000mg PO QID PRN, Ren: □ 1, □ 2, □ 3 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ 800mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3 (max 2400mg daily)
+□ Guaifenesin □ 400mg PO Q4H PRN, □ 600mg PO Q6H PRN, Ren: □ 1, □ 2, □ 3 (max 2400mg daily)
+□ Benzonatate □ 100mg PO TID, □ 200mg PO TID, Ren: □ 1, □ 2, □ 3 (for cough)
+
+Treatment options:
+☐ Supplemental oxygen as needed
+☐ Incentive spirometry
+☐ Deep breathing exercises
+☐ Adequate hydration (2-3 liters daily)
+☐ Rest and activity as tolerated
+☐ Smoking cessation counseling
+☐ Pneumococcal vaccination
+☐ Influenza vaccination
+☐ Position changes to clear secretions
+☐ Chest physiotherapy
+
+Referral options:
+☐ Referral to emergency department
+☐ Referral to pulmonology
+☐ Referral to infectious disease
+☐ Referral to thoracic surgery (if complicated)
+☐ Referral to respiratory therapy
+☐ Referral to home health services
+☐ Referral to smoking cessation program
+☐ Referral to social work
+☐ Referral to nutrition
+☐ Referral to palliative care (if severe comorbidities)
+
+☐ Counseling: Pneumonia is an infection of the lung tissue. Complete the full course of antibiotics even if feeling better. Rest and stay well-hydrated. Use incentive spirometry or deep breathing exercises 10 times every hour while awake. Avoid smoking and secondhand smoke. Fever, fatigue, and cough may persist for several weeks even as the infection resolves. Return immediately if experiencing worsening shortness of breath, chest pain, confusion, inability to keep fluids down, or high persistent fever. Follow up for repeat chest X-ray in 6-12 weeks to ensure complete resolution.
+
+Follow-up options: ☐ 1 week ☐ 2 weeks ☐ 3 weeks ☐ 1 month ☐ 2 months ☐ 3 months ☐ 6 months ☐ after results arrive at clinic, we will reach out to you
+
+### Bronchitis
+🩺 Bronchitis
+☐ Prepare message to the patient in their language (language considered to be the one used in the SMS-based secure messaging system to communicate with us)
+☐ Prepare Spartan SOAP note (Make a super spartan note, no unnecessary details, no formatting, no fluff. Strict minimum like a real doctor would write. No stating 'Examen: Non réalisé'. Keep the plan to only essential interventions, ideally in one line.)
+☐ This is a complex case: put all the details in the subjective part, so that we can find it in the final SOAP note.
+☐ Prepare message since I suspect serious condition requiring urgent evaluation (red flags: respiratory distress, hypoxemia, high fever, hemoptysis, immunocompromised state)
+
+Investigations and initial evaluation:
+☐ Chest X-ray (if pneumonia suspected)
+☐ Pulse oximetry
+☐ COVID-19 testing
+☐ Influenza testing
+☐ Respiratory viral panel
+☐ Sputum Gram stain and culture (if purulent sputum)
+☐ Complete blood count (if bacterial infection suspected)
+☐ Basic metabolic panel
+☐ Peak flow or spirometry
+☐ Procalcitonin (to distinguish viral vs. bacterial)
+☐ Blood cultures (if sepsis suspected)
+☐ Electrocardiogram (if cardiac involvement suspected)
+☐ Bronchoscopy (if foreign body or malignancy suspected)
+
+Medications:
+□ Symptomatic treatment:
+□ Guaifenesin □ 400mg PO Q4H PRN, □ 600mg PO Q6H PRN, Ren: □ 1, □ 2, □ 3 (max 2400mg daily)
+□ Dextromethorphan □ 10-20mg PO Q4H PRN, □ 30mg PO Q6-8H PRN, Ren: □ 1, □ 2, □ 3 (max 120mg daily)
+□ Benzonatate □ 100mg PO TID, □ 200mg PO TID, Ren: □ 1, □ 2, □ 3 (for cough)
+□ Acetaminophen □ 500mg PO QID PRN, □ 650mg PO QID PRN, Ren: □ 1, □ 2, □ 3 (max 4000mg daily)
+□ Ibuprofen □ 400mg PO TID, □ 600mg PO TID, □ PRN, Ren: □ 1, □ 2, □ 3 (max 2400mg daily)
+□ Azithromycin □ 500mg PO day 1, then 250mg PO daily for days 2-5, Ren: □ 1
+□ Gelomyrtol forte □ 300mg PO QID, Ren: □ 1, □ 2, □ 3
+□ For bronchospasm:
+□ Albuterol HFA □ 2 puffs Q4-6H PRN, Ren: □ 1, □ 2, □ 3
+□ Ipratropium HFA □ 2 puffs QID PRN, Ren: □ 1, □ 2, □
