@@ -264,7 +264,7 @@ const FormsitePage: React.FC = () => {
             >
               <div className="flex flex-col">
                 <div className="flex justify-between items-start">
-                  <div className="flex-1 mr-2 overflow-auto max-h-24">
+                  <div className="flex-1 mr-2 overflow-auto max-h-24 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
                     <h3 className="font-medium text-xl text-blue-400 break-words">
                       {address}
                     </h3>

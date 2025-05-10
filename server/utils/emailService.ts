@@ -8,16 +8,22 @@ let transporter: nodemailer.Transporter;
 (async function() {
   // Check if Gmail password is available
   if (process.env.GMAIL_APP_PASSWORD) {
-    // Set up Gmail transporter
+    // Set up Gmail transporter with direct SMTP settings
     transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true, // Use SSL
       auth: {
         user: 'drcfont@gmail.com', // Your Gmail address
         pass: process.env.GMAIL_APP_PASSWORD, // App password from Gmail
       },
+      tls: {
+        // Do not fail on invalid certs
+        rejectUnauthorized: false
+      }
     });
     
-    console.log('Using Gmail SMTP configuration');
+    console.log('Using Gmail SMTP configuration with direct settings');
   } else {
     // Use Ethereal for testing if no Gmail password
     try {
