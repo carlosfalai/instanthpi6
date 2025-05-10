@@ -1,40 +1,75 @@
 import nodemailer from 'nodemailer';
 import { storage } from '../storage';
 
-// Create a test SMTP transporter with Ethereal email 
+// Set up email transporter - use Ethereal for development or Gmail if credentials available
 let transporter: nodemailer.Transporter;
 
-// Create temporary ethereal email account for development
+// Create reusable transporter with appropriate configuration
 (async function() {
-  try {
-    // Generate a Nodemailer test account
-    const testAccount = await nodemailer.createTestAccount();
-    
-    // Create a reusable transporter with test credentials
+  // Check if Gmail password is available
+  if (process.env.GMAIL_APP_PASSWORD) {
+    // Set up Gmail transporter
     transporter = nodemailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
-      secure: false,
+      service: 'gmail',
       auth: {
-        user: testAccount.user,
-        pass: testAccount.pass,
+        user: 'drcfont@gmail.com', // Your Gmail address
+        pass: process.env.GMAIL_APP_PASSWORD, // App password from Gmail
       },
     });
     
-    console.log('Created Ethereal test account for email testing');
-    console.log('Preview URL will be shown when emails are sent');
-  } catch (error) {
-    console.error('Failed to create test email account:', error);
-    
-    // Create a fallback transporter without auth for development
-    transporter = nodemailer.createTransport({
-      host: 'localhost',
-      port: 1025,
-      secure: false,
-      ignoreTLS: true
-    });
+    console.log('Using Gmail SMTP configuration');
+  } else {
+    // Use Ethereal for testing if no Gmail password
+    try {
+      // Generate Ethereal test account
+      const testAccount = await nodemailer.createTestAccount();
+      
+      // Create test transporter
+      transporter = nodemailer.createTransport({
+        host: 'smtp.ethereal.email',
+        port: 587,
+        secure: false,
+        auth: {
+          user: testAccount.user,
+          pass: testAccount.pass,
+        },
+      });
+      
+      console.log('Created Ethereal test account for email testing');
+      console.log('Preview URL will be shown when emails are sent');
+    } catch (error) {
+      console.error('Failed to create test email account, using mock transporter');
+      
+      // Create a dummy transport that just logs messages
+      transporter = {
+        sendMail: (mailOptions: any) => {
+          console.log('Email would be sent:', mailOptions);
+          return Promise.resolve({ messageId: 'mock-message-id' });
+        },
+        verify: (callback: any) => {
+          callback(null, true);
+          return Promise.resolve(true);
+        }
+      } as any;
+    }
   }
 })();
+
+// Delayed verification after transporter initialization
+setTimeout(() => {
+  if (transporter) {
+    transporter.verify(function(error, success) {
+      if (error) {
+        console.error('Error connecting to SMTP server:', error);
+      } else {
+        console.log('SMTP connection established successfully');
+        console.log('Email service is ready to send messages');
+      }
+    });
+  } else {
+    console.error('Transporter not initialized properly');
+  }
+}, 1000);
 
 interface EmailAttachment {
   content: string; // Base64 encoded content
@@ -83,16 +118,19 @@ export async function sendEmail(options: EmailOptions): Promise<{ success: boole
 
     console.log('Message sent: %s', info.messageId);
     
-    // Preview URL for development (only available when using Ethereal)
-    const previewUrl = nodemailer.getTestMessageUrl(info) as string | undefined;
-    if (previewUrl) {
-      console.log('Preview URL: %s', previewUrl);
+    // If using Ethereal, get the preview URL
+    let previewUrl: string | undefined;
+    if (info && typeof nodemailer.getTestMessageUrl === 'function') {
+      previewUrl = nodemailer.getTestMessageUrl(info) as string | undefined;
+      if (previewUrl) {
+        console.log('Preview URL: %s', previewUrl);
+      }
     }
-
+    
     return { 
       success: true, 
       message: 'Email sent successfully',
-      previewUrl: previewUrl || undefined
+      previewUrl
     };
   } catch (error) {
     console.error('Email sending error:', error);
