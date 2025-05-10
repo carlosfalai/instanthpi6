@@ -14,7 +14,7 @@ let transporter: nodemailer.Transporter;
       port: 465,
       secure: true, // Use SSL
       auth: {
-        user: 'drcfont@gmail.com', // Your Gmail address
+        user: 'noreply@instanthpi.ai', // Your Gmail address
         pass: process.env.GMAIL_APP_PASSWORD, // App password from Gmail
       },
       tls: {
@@ -101,7 +101,7 @@ interface EmailOptions {
  */
 export async function sendEmail(options: EmailOptions): Promise<{ success: boolean; message: string; previewUrl?: string }> {
   // Set default from address if not provided
-  const fromAddress = options.from || process.env.EMAIL_FROM || 'noreply@centremedicalfont.com';
+  const fromAddress = options.from || process.env.EMAIL_FROM || '"InstantHPI" <noreply@instanthpi.ai>';
 
   try {
     // Convert the attachments format to Nodemailer format
