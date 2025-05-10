@@ -54,7 +54,7 @@ const deepCopy = <T,>(obj: T): T => JSON.parse(JSON.stringify(obj));
 
 // Original list of diagnoses with their categories and default treatment options
 // This will never be modified, serving as our default values
-const defaultDiagnosisList: Diagnosis[] = [
+const diagnosisList: Diagnosis[] = [
   { 
     id: '1', 
     name: 'ADHD in Adults (Established Diagnosis)', 
@@ -691,7 +691,7 @@ export default function KnowledgeBasePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<string>('all');
   const [selectedDiagnosis, setSelectedDiagnosis] = useState<string | null>(null);
-  const [editedDiagnoses, setEditedDiagnoses] = useState<Diagnosis[]>(diagnosisList);
+  const [editedDiagnoses, setEditedDiagnoses] = useState<Diagnosis[]>(deepCopy(diagnosisList));
   const [editingProtocol, setEditingProtocol] = useState(false);
   const [tempProtocol, setTempProtocol] = useState('');
   
@@ -819,6 +819,35 @@ export default function KnowledgeBasePage() {
     toast({
       title: 'Protocol Updated',
       description: 'Your standard protocol has been saved successfully.',
+    });
+  };
+  
+  // Reset protocol to default values
+  const handleResetProtocol = () => {
+    if (!selectedDiagnosis) return;
+    
+    // Find the original diagnosis from the diagnoses list
+    const originalDiagnosis = diagnosisList.find(d => d.id === selectedDiagnosis);
+    if (!originalDiagnosis) return;
+    
+    // Update edited diagnoses with the original values
+    setEditedDiagnoses(prevDiagnoses => 
+      prevDiagnoses.map(diagnosis => {
+        if (diagnosis.id === selectedDiagnosis) {
+          return deepCopy(originalDiagnosis);
+        }
+        return diagnosis;
+      })
+    );
+    
+    // Update temp protocol if currently editing
+    if (editingProtocol) {
+      setTempProtocol(originalDiagnosis.standardProtocol);
+    }
+    
+    toast({
+      title: 'Protocol Reset',
+      description: 'Protocol has been reset to default values.',
     });
   };
 
