@@ -270,9 +270,9 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
         <div className="overflow-y-auto flex-grow px-2 py-3">
           {mainNavSections.map((section) => (
             <div key={section.id} className="mb-1">
-              <button
+              <div
                 className={cn(
-                  "flex items-center w-full py-2 px-3 rounded-md text-sm transition-colors",
+                  "flex items-center w-full py-2 px-3 rounded-md text-sm transition-colors cursor-pointer",
                   activeSection === section.id 
                     ? "bg-[#2a2a2a] text-white" 
                     : "text-gray-300 hover:bg-[#252525]",
@@ -298,19 +298,17 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                 </div>
                 
                 {section.hasClinicSwitcher && (
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="p-1 h-6 w-6 rounded-full ml-2"
+                  <div 
+                    className="p-1 h-6 w-6 rounded-full ml-2 bg-transparent hover:bg-[#333] cursor-pointer flex items-center justify-center"
                     title="Switch clinics"
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent triggering the parent button click
+                      e.stopPropagation(); // Prevent triggering the parent click
                       // Add clinic switching logic here
                       alert('Switch to a different clinic');
                     }}
                   >
                     <Plus className="h-4 w-4" />
-                  </Button>
+                  </div>
                 )}
                 
                 {(section.id === 'patients' || section.id === 'documents' || section.id === 'settings') && (
@@ -321,29 +319,29 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                     )}
                   />
                 )}
-              </button>
+              </div>
               
               {/* Patient subsections */}
               {section.id === 'patients' && expandedSections.patients && (
                 <div className="ml-8 mt-1 space-y-1">
                   {patientSubSections.map((subsection) => (
-                    <Link key={subsection.id} href={subsection.path}>
-                      <a
-                        className={cn(
-                          "flex items-center justify-between text-sm py-1 px-3 rounded-md hover:bg-[#252525] cursor-pointer",
-                          location === subsection.path
-                            ? "text-white bg-[#252525]"
-                            : "text-gray-300"
-                        )}
-                      >
-                        <span>{subsection.label}</span>
-                        {subsection.badge && subsection.badge > 0 && (
-                          <Badge variant="destructive" className="text-xs h-5">
-                            {subsection.badge}
-                          </Badge>
-                        )}
-                      </a>
-                    </Link>
+                    <div
+                      key={subsection.id}
+                      className={cn(
+                        "flex items-center justify-between text-sm py-1 px-3 rounded-md hover:bg-[#252525] cursor-pointer",
+                        location === subsection.path
+                          ? "text-white bg-[#252525]"
+                          : "text-gray-300"
+                      )}
+                      onClick={() => setLocation(subsection.path)}
+                    >
+                      <span>{subsection.label}</span>
+                      {subsection.badge && subsection.badge > 0 && (
+                        <Badge variant="destructive" className="text-xs h-5">
+                          {subsection.badge}
+                        </Badge>
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
@@ -456,7 +454,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
         <div className="overflow-y-auto h-full px-2 py-3">
           {mainNavSections.map((section) => (
             <div key={section.id} className="mb-1">
-              <button
+              <div
                 className={cn(
                   "flex items-center w-full py-2 px-3 rounded-md text-sm transition-colors",
                   activeSection === section.id 
@@ -493,7 +491,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                     )}
                   />
                 )}
-              </button>
+              </div>
               
               {/* Subsections - same as desktop */}
               {section.id === 'patients' && expandedSections.patients && (
