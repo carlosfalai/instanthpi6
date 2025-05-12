@@ -476,7 +476,7 @@ const FormsitePage: React.FC = () => {
                           return (
                             <div key={key} className="border-b border-[#333] pb-3 last:border-b-0">
                               <h4 className="font-medium text-gray-300">{fieldLabel}</h4>
-                              <div className="mt-1 text-gray-200 whitespace-pre-wrap font-mono text-sm bg-[#252525] rounded p-2">
+                              <div className="mt-1 text-gray-200 whitespace-pre-wrap font-mono text-sm bg-[#252525] rounded p-2 max-h-60 overflow-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
                                 {formatFieldValue(value)}
                               </div>
                             </div>
