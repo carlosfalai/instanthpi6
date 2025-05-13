@@ -1,106 +1,499 @@
-import { LayoutGrid, Users, UserCog, FileText, Clipboard } from 'lucide-react';
+import { useState } from 'react';
+import { LayoutGrid, Users, UserCog, FileText, Clipboard, ThumbsUp, ThumbsDown, MoreHorizontal, Copy, MessageSquare, Settings, Search, Filter, Plus, SquarePen, Hospital, Stethoscope, Ambulance, Home, HeartPulse } from 'lucide-react';
 import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useToast } from '@/hooks/use-toast';
+
+interface CommunityPost {
+  id: number;
+  title: string;
+  content: string;
+  category: string;
+  practiceType: string;
+  votes: number;
+  comments: number;
+  author: {
+    name: string;
+    avatar: string;
+    specialty: string;
+  };
+  datePosted: string;
+  userVote: 'up' | 'down' | null;
+}
+
+const PRACTICE_TYPES = [
+  { value: 'all', label: 'All Settings' },
+  { value: 'outpatient', label: 'Outpatient', icon: <Stethoscope className="h-4 w-4" /> },
+  { value: 'inpatient', label: 'Inpatient', icon: <Hospital className="h-4 w-4" /> },
+  { value: 'emergency', label: 'Emergency Department', icon: <Ambulance className="h-4 w-4" /> },
+  { value: 'snf', label: 'Skilled Nursing', icon: <Home className="h-4 w-4" /> },
+  { value: 'hospice', label: 'Hospice', icon: <HeartPulse className="h-4 w-4" /> }
+];
+
+// Sample data
+const samplePosts: CommunityPost[] = [
+  {
+    id: 1,
+    title: 'Comprehensive SOAP template for routine follow-ups',
+    content: 'Here\'s a template I\'ve been using for routine follow-ups that has saved me significant time:\n\n**Subjective:**\nPatient reports [symptoms].\nMedication compliance: [Good/Poor].\nSide effects: [None/Specify].\n\n**Objective:**\nVital signs: BP [x/y], HR [z], RR [w], Temp [t], O2 Sat [s]%\nPhysical exam:\n- General: [findings]\n- Cardiac: [findings]\n...',
+    category: 'Templates',
+    practiceType: 'outpatient',
+    votes: 24,
+    comments: 5,
+    author: {
+      name: 'Dr. Sarah Chen',
+      avatar: '',
+      specialty: 'Family Medicine'
+    },
+    datePosted: '2 days ago',
+    userVote: 'up'
+  },
+  {
+    id: 2,
+    title: 'FormSite questionnaire for new chronic pain patients',
+    content: 'This FormSite questionnaire helps me gather comprehensive information before the first visit with chronic pain patients. It includes pain scales, medication history, functional impact assessment, and psychological screening questions. This has improved my first visits significantly.\n\nI\'ve attached the template that you can copy directly to your FormSite account.',
+    category: 'FormSite',
+    practiceType: 'outpatient',
+    votes: 18,
+    comments: 7,
+    author: {
+      name: 'Dr. Michael Rodriguez',
+      avatar: '',
+      specialty: 'Pain Management'
+    },
+    datePosted: '1 week ago',
+    userVote: null
+  },
+  {
+    id: 3,
+    title: 'AI prompt for generating discharge instructions',
+    content: 'I\'ve been using this AI prompt with Claude to generate detailed discharge instructions for common conditions. Just fill in the specifics for your patient:\n\n"Generate discharge instructions for a [age] [gender] diagnosed with [condition]. Include medication dosing for [medication], activity restrictions, follow-up timing, and warning signs that require immediate attention. The patient has [comorbidities] and their health literacy is [basic/moderate/advanced]."',
+    category: 'AI Prompts',
+    practiceType: 'emergency',
+    votes: 32,
+    comments: 12,
+    author: {
+      name: 'Dr. James Wilson',
+      avatar: '',
+      specialty: 'Emergency Medicine'
+    },
+    datePosted: '3 days ago',
+    userVote: 'up'
+  },
+  {
+    id: 4,
+    title: 'Nursing home initial assessment template',
+    content: 'This comprehensive template helps standardize initial assessments for new SNF patients. It includes sections for cognitive assessment, fall risk, skin integrity, nutritional status, and advance directives. Our facility has seen improved documentation quality since implementing this.',
+    category: 'Templates',
+    practiceType: 'snf',
+    votes: 15,
+    comments: 3,
+    author: {
+      name: 'Dr. Patricia Johnson',
+      avatar: '',
+      specialty: 'Geriatrics'
+    },
+    datePosted: '2 weeks ago',
+    userVote: 'down'
+  }
+];
 
 export default function TierAssociationPage() {
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('community');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedPracticeType, setSelectedPracticeType] = useState('all');
+  const [showNewPostDialog, setShowNewPostDialog] = useState(false);
+  const [newPost, setNewPost] = useState({
+    title: '',
+    content: '',
+    category: 'Templates',
+    practiceType: 'outpatient'
+  });
+  const [posts, setPosts] = useState<CommunityPost[]>(samplePosts);
+
+  const handleVote = (postId: number, voteType: 'up' | 'down') => {
+    setPosts(posts.map(post => {
+      if (post.id === postId) {
+        const currentVote = post.userVote;
+        let voteChange = 0;
+        
+        if (currentVote === voteType) {
+          // Cancel vote if clicking the same button
+          voteChange = voteType === 'up' ? -1 : 1;
+          return { ...post, votes: post.votes + voteChange, userVote: null };
+        } else if (currentVote === null) {
+          // New vote
+          voteChange = voteType === 'up' ? 1 : -1;
+          return { ...post, votes: post.votes + voteChange, userVote: voteType };
+        } else {
+          // Change vote (from up to down or vice versa)
+          voteChange = voteType === 'up' ? 2 : -2;
+          return { ...post, votes: post.votes + voteChange, userVote: voteType };
+        }
+      }
+      return post;
+    }));
+  };
+
+  const handleCopyContent = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast({
+      title: "Content copied",
+      description: "The content has been copied to your clipboard."
+    });
+  };
+
+  const handleCreatePost = () => {
+    if (!newPost.title || !newPost.content) {
+      toast({
+        title: "Missing information",
+        description: "Please provide both a title and content for your post.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newPostObject: CommunityPost = {
+      id: Date.now(),
+      title: newPost.title,
+      content: newPost.content,
+      category: newPost.category,
+      practiceType: newPost.practiceType,
+      votes: 0,
+      comments: 0,
+      author: {
+        name: 'Dr. Carlos Font',
+        avatar: '',
+        specialty: 'Family Medicine'
+      },
+      datePosted: 'Just now',
+      userVote: null
+    };
+
+    setPosts([newPostObject, ...posts]);
+    setShowNewPostDialog(false);
+    setNewPost({
+      title: '',
+      content: '',
+      category: 'Templates',
+      practiceType: 'outpatient'
+    });
+
+    toast({
+      title: "Post created",
+      description: "Your contribution has been shared with the community."
+    });
+  };
+
+  // Filter posts based on search, category, and practice type
+  const filteredPosts = posts.filter(post => {
+    const matchesSearch = searchQuery === '' || 
+      post.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      post.content.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = selectedCategory === 'all' || post.category === selectedCategory;
+    const matchesPracticeType = selectedPracticeType === 'all' || post.practiceType === selectedPracticeType;
+    
+    return matchesSearch && matchesCategory && matchesPracticeType;
+  });
+
   return (
     <AppLayoutSpruce>
       <div className="px-6 py-4">
-        <header className="mb-8">
+        <header className="mb-6">
           <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
             Tier 3.5 (The Association)
           </h1>
-          <p className="text-gray-400 max-w-3xl">
-            Advanced automation and AI for healthcare practices working together in a collaborative network.
+          <p className="text-gray-400 max-w-3xl mb-4">
+            A collaborative community platform for healthcare professionals to share resources, templates, and best practices.
           </p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Card className="bg-[#1A1A1A] border-[#333]">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="p-2 rounded-full bg-blue-900/30">
-                  <Users className="h-6 w-6 text-blue-400" />
-                </div>
-              </div>
-              <CardTitle className="mt-4 text-lg">Collaborative Network</CardTitle>
-              <CardDescription>Connect with other healthcare providers.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-300">
-                Share insights, protocols, and resources with other healthcare professionals in your network.
-              </p>
-            </CardContent>
-          </Card>
+        <Tabs defaultValue="community" className="w-full" onValueChange={setActiveTab}>
+          <div className="flex justify-between items-center mb-4">
+            <TabsList>
+              <TabsTrigger value="community">Community Resources</TabsTrigger>
+              <TabsTrigger value="my-resources">My Resources</TabsTrigger>
+              <TabsTrigger value="settings">Community Settings</TabsTrigger>
+            </TabsList>
+            <Button onClick={() => setShowNewPostDialog(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Resource
+            </Button>
+          </div>
 
-          <Card className="bg-[#1A1A1A] border-[#333]">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="p-2 rounded-full bg-purple-900/30">
-                  <UserCog className="h-6 w-6 text-purple-400" />
+          <TabsContent value="community" className="space-y-6">
+            <div className="flex flex-col space-y-4">
+              <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Input 
+                    placeholder="Search resources..." 
+                    className="pl-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <div className="flex space-x-2">
+                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                    <SelectTrigger className="min-w-[120px]">
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Categories</SelectItem>
+                      <SelectItem value="Templates">Templates</SelectItem>
+                      <SelectItem value="FormSite">FormSite</SelectItem>
+                      <SelectItem value="AI Prompts">AI Prompts</SelectItem>
+                      <SelectItem value="Protocols">Clinical Protocols</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={selectedPracticeType} onValueChange={setSelectedPracticeType}>
+                    <SelectTrigger className="min-w-[150px]">
+                      <SelectValue placeholder="Practice Setting" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PRACTICE_TYPES.map(type => (
+                        <SelectItem key={type.value} value={type.value}>
+                          <div className="flex items-center">
+                            {type.icon && <span className="mr-2">{type.icon}</span>}
+                            {type.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              <CardTitle className="mt-4 text-lg">Association Benefits</CardTitle>
-              <CardDescription>Enhanced capabilities for association members.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-300">
-                Access exclusive features, templates, and AI capabilities available only to association members.
-              </p>
-            </CardContent>
-          </Card>
 
-          <Card className="bg-[#1A1A1A] border-[#333]">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="p-2 rounded-full bg-indigo-900/30">
-                  <FileText className="h-6 w-6 text-indigo-400" />
-                </div>
+              <div className="space-y-4">
+                {filteredPosts.length === 0 ? (
+                  <Card className="bg-[#1A1A1A] border-[#333]">
+                    <CardContent className="pt-6 text-center">
+                      <p className="text-gray-400">No resources found matching your criteria.</p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  filteredPosts.map(post => (
+                    <Card key={post.id} className="bg-[#1A1A1A] border-[#333]">
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="flex items-center space-x-2 mb-1">
+                              <Avatar className="h-6 w-6">
+                                <AvatarFallback className="bg-blue-800 text-xs">
+                                  {post.author.name.split(' ').map(n => n[0]).join('')}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span className="text-sm font-medium text-gray-300">{post.author.name}</span>
+                              <span className="text-xs text-gray-500">• {post.datePosted}</span>
+                            </div>
+                            <CardTitle className="text-lg mb-1">{post.title}</CardTitle>
+                          </div>
+                          <div className="flex space-x-1">
+                            <Badge variant="secondary" className="text-xs font-normal bg-blue-900/30 text-blue-400 hover:bg-blue-900/40">
+                              {post.category}
+                            </Badge>
+                            {post.practiceType !== 'all' && (
+                              <Badge variant="outline" className="text-xs font-normal border-gray-700 text-gray-400">
+                                {PRACTICE_TYPES.find(t => t.value === post.practiceType)?.label}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pb-2">
+                        <div className="text-sm text-gray-300 whitespace-pre-line mb-2 line-clamp-6">
+                          {post.content}
+                        </div>
+                        {post.content.length > 300 && (
+                          <Button variant="link" size="sm" className="text-xs p-0 h-auto">
+                            Show more
+                          </Button>
+                        )}
+                      </CardContent>
+                      <CardFooter className="flex justify-between pt-2">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex items-center space-x-1">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={`h-8 w-8 rounded-full ${post.userVote === 'up' ? 'text-green-500' : 'text-gray-400'}`}
+                              onClick={() => handleVote(post.id, 'up')}
+                            >
+                              <ThumbsUp className="h-4 w-4" />
+                            </Button>
+                            <span className={`text-sm ${post.votes > 0 ? 'text-green-500' : post.votes < 0 ? 'text-red-500' : 'text-gray-500'}`}>
+                              {post.votes}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className={`h-8 w-8 rounded-full ${post.userVote === 'down' ? 'text-red-500' : 'text-gray-400'}`}
+                              onClick={() => handleVote(post.id, 'down')}
+                            >
+                              <ThumbsDown className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Button variant="ghost" size="sm" className="h-8 text-gray-400">
+                              <MessageSquare className="h-4 w-4 mr-1" />
+                              <span className="text-xs">{post.comments}</span>
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 text-gray-400"
+                            onClick={() => handleCopyContent(post.content)}
+                          >
+                            <Copy className="h-4 w-4 mr-1" />
+                            <span className="text-xs">Copy</span>
+                          </Button>
+                        </div>
+                      </CardFooter>
+                    </Card>
+                  ))
+                )}
               </div>
-              <CardTitle className="mt-4 text-lg">Resource Sharing</CardTitle>
-              <CardDescription>Collaborative knowledge base.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-300">
-                Share medical protocols, treatment guidelines, and documentation templates with network members.
-              </p>
-            </CardContent>
-          </Card>
+            </div>
+          </TabsContent>
 
-          <Card className="bg-[#1A1A1A] border-[#333]">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="p-2 rounded-full bg-green-900/30">
-                  <Clipboard className="h-6 w-6 text-green-400" />
-                </div>
-              </div>
-              <CardTitle className="mt-4 text-lg">Advanced Reports</CardTitle>
-              <CardDescription>Enhanced analytics and insights.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-300">
-                Generate comprehensive reports and analytics about your practice and compare with anonymized network data.
+          <TabsContent value="my-resources" className="space-y-4">
+            <div className="bg-[#1A1A1A] border border-[#333] rounded-lg p-6 text-center">
+              <SquarePen className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+              <h3 className="text-lg font-medium mb-2">Share Your Knowledge</h3>
+              <p className="text-gray-400 mb-4">
+                Create and share templates, FormSite questionnaires, or AI prompts with the community.
               </p>
-            </CardContent>
-          </Card>
+              <Button onClick={() => setShowNewPostDialog(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                Create New Resource
+              </Button>
+            </div>
+          </TabsContent>
 
-          <Card className="bg-[#1A1A1A] border-[#333]">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div className="p-2 rounded-full bg-red-900/30">
-                  <LayoutGrid className="h-6 w-6 text-red-400" />
+          <TabsContent value="settings" className="space-y-4">
+            <Card className="bg-[#1A1A1A] border-[#333]">
+              <CardHeader>
+                <CardTitle>Community Settings</CardTitle>
+                <CardDescription>Configure your preferences for the community platform</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Notification Preferences</h3>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Email notifications for comments on your posts</span>
+                    <Button variant="outline" size="sm">Enable</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Email digest of top resources (weekly)</span>
+                    <Button variant="outline" size="sm">Enable</Button>
+                  </div>
+                </div>
+                <Separator />
+                <div className="space-y-2">
+                  <h3 className="text-sm font-medium">Privacy Settings</h3>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Show my specialty with posts</span>
+                    <Button variant="outline" size="sm">Enabled</Button>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Allow others to contact me directly</span>
+                    <Button variant="outline" size="sm">Disable</Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* New Post Dialog */}
+        <Dialog open={showNewPostDialog} onOpenChange={setShowNewPostDialog}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Share a Resource with the Community</DialogTitle>
+              <DialogDescription>
+                Templates, FormSite questions, AI prompts and other tools you want to share with other doctors.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Title</label>
+                <Input 
+                  placeholder="Title of your resource" 
+                  value={newPost.title}
+                  onChange={(e) => setNewPost({...newPost, title: e.target.value})}
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Category</label>
+                  <Select 
+                    value={newPost.category} 
+                    onValueChange={(value) => setNewPost({...newPost, category: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Templates">Templates</SelectItem>
+                      <SelectItem value="FormSite">FormSite</SelectItem>
+                      <SelectItem value="AI Prompts">AI Prompts</SelectItem>
+                      <SelectItem value="Protocols">Clinical Protocols</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Practice Setting</label>
+                  <Select 
+                    value={newPost.practiceType} 
+                    onValueChange={(value) => setNewPost({...newPost, practiceType: value})}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select setting" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PRACTICE_TYPES.filter(t => t.value !== 'all').map(type => (
+                        <SelectItem key={type.value} value={type.value}>
+                          <div className="flex items-center">
+                            {type.icon && <span className="mr-2">{type.icon}</span>}
+                            {type.label}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              <CardTitle className="mt-4 text-lg">Association Dashboard</CardTitle>
-              <CardDescription>Unified management interface.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-300">
-                Access all association features and benefits through a centralized dashboard interface.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Content</label>
+                <Textarea 
+                  placeholder="Share your template, FormSite questions, or other resources here..." 
+                  className="min-h-[200px]"
+                  value={newPost.content}
+                  onChange={(e) => setNewPost({...newPost, content: e.target.value})}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowNewPostDialog(false)}>Cancel</Button>
+              <Button onClick={handleCreatePost}>Share with Community</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayoutSpruce>
   );
