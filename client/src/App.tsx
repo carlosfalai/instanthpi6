@@ -28,6 +28,7 @@ import PrioritizedTasksPage from '@/pages/prioritized-tasks-page';
 import MessagesPage from '@/pages/messages-page';
 import ClaudeAIPage from '@/pages/claude-ai-page';
 import ClaudeCodeAssistantPage from '@/pages/claude-code-assistant-page';
+import TierAssociationPage from '@/pages/tier-association-page';
 // New settings pages
 import SettingsPage from '@/pages/settings-page';
 import OrganizationProfilePage from '@/pages/organization-profile-page';
@@ -58,6 +59,7 @@ function Router() {
       <Route path="/ai-billing" component={AiBillingPage} />
       <Route path="/urgent-care" component={UrgentCarePage} />
       <Route path="/subscription" component={SubscriptionPage} />
+      <Route path="/tier-association" component={TierAssociationPage} />
       <Route path="/leadership-association" component={LeadershipAssociationPage} />
       <Route path="/patient/:id/treatment" component={PatientTreatmentPage} />
       <Route path="/priority-tasks" component={PrioritizedTasksPage} />

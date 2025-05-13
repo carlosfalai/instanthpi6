@@ -160,6 +160,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     { id: 'orgSettings', label: 'Organization Settings', icon: <Settings className="h-5 w-5" />, badge: 0, path: '/settings' },
     { id: 'priorityAI', label: 'Priority AI', icon: <BrainCircuit className="h-5 w-5" />, badge: 0, path: '/priority-tasks' },
     { id: 'claudeAI', label: 'Claude AI', icon: <Brain className="h-5 w-5" />, badge: notificationCounts.claudeAI || 0, path: '/claude-ai', hasSubmenu: true },
+    { id: 'tier35', label: 'Tier 3.5 (The Association)', icon: <UserCog className="h-5 w-5" />, badge: 0, path: '/tier-association' },
     { id: 'leadership', label: 'Leadership', icon: <Users className="h-5 w-5" />, badge: 0, path: '/leadership-association' },
   ];
 
