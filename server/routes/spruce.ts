@@ -21,14 +21,14 @@ if (!SPRUCE_API_KEY) {
   console.warn('⚠️ WARNING: No Spruce API key found. Set SPRUCE_API_KEY environment variable for API access.');
 }
 
-// Setup Spruce Health API with proper authentication format
+// Setup Spruce Health API with proper authentication format based on official documentation
 const spruceApi = axios.create({
-  // The s-request-id header suggests a different API structure
+  // According to the documentation, the base URL is https://api.sprucehealth.com
   baseURL: 'https://api.sprucehealth.com',
   headers: {
+    // Documentation specifies authorization format as: "Authorization: Bearer <your-token>"
     'Authorization': `Bearer ${SPRUCE_API_KEY || ''}`,
     'Content-Type': 'application/json',
-    'X-Api-Key': SPRUCE_API_KEY || '', // Standard API key header
     'Accept': 'application/json'
   }
 });
@@ -55,37 +55,14 @@ router.get('/search-patients', async (req, res) => {
     try {
       console.log('Searching patients via Spruce API');
       
-      // Try different API endpoint patterns that may exist in Spruce
-      let response;
-      try {
-        // Try modern API pattern (v1/patients)
-        response = await spruceApi.get('/api/v1/patients', {
-          params: { 
-            search: searchTerm,
-            limit: 100
-          }
-        });
-      } catch (err) {
-        try {
-          // Try legacy pattern (v1/contacts)
-          console.log('First endpoint failed, trying alternate endpoint...');
-          response = await spruceApi.get('/api/v1/contacts', {
-            params: { 
-              search: searchTerm,
-              limit: 100
-            }
-          });
-        } catch (err2) {
-          // Try third pattern
-          console.log('Second endpoint failed, trying third endpoint...');
-          response = await spruceApi.get('/v1/patients', {
-            params: { 
-              query: searchTerm,
-              limit: 100
-            }
-          });
+      // Based on documentation, only try the confirmed endpoint /v1/contacts
+      console.log('Using documented endpoint /v1/contacts');
+      const response = await spruceApi.get('/v1/contacts', {
+        params: { 
+          query: searchTerm, // Use 'query' as parameter per the docs
+          limit: 100
         }
-      }
+      });
       
       // More flexible data extraction from response
       const allPatients = response.data.patients || response.data.data || response.data.contacts || [];
@@ -148,37 +125,15 @@ router.get('/search-patients', async (req, res) => {
 // Fetch contacts from Spruce API - no local database used
 router.post('/sync-patients', async (req, res) => {
   try {
-    // Try different API endpoint patterns that may exist in Spruce
+    // Get patients directly from Spruce API using documented endpoint
     try {
-      let response;
-      
-      try {
-        // Try modern API pattern
-        response = await spruceApi.get('/api/v1/patients', {
-          params: {
-            limit: 200,
-            include_details: 'true'
-          }
-        });
-      } catch (err) {
-        try {
-          // Try legacy pattern
-          console.log('First sync endpoint failed, trying alternate endpoint...');
-          response = await spruceApi.get('/api/v1/contacts', {
-            params: {
-              limit: 200
-            }
-          });
-        } catch (err2) {
-          // Try third pattern
-          console.log('Second sync endpoint failed, trying third endpoint...');
-          response = await spruceApi.get('/v1/patients', {
-            params: {
-              limit: 200
-            }
-          });
+      // Based on documentation, use the confirmed endpoint /v1/contacts
+      console.log('Using documented endpoint /v1/contacts for sync');
+      const response = await spruceApi.get('/v1/contacts', {
+        params: {
+          limit: 200
         }
-      }
+      });
       
       // More flexible data extraction from response
       const sprucePatients = response.data.patients || response.data.data || response.data.contacts || [];
@@ -235,9 +190,6 @@ router.post('/refresh-patients', async (req, res) => {
     
     // Attempt to get fresh patient data from Spruce API
     try {
-      // Try different API endpoint patterns that may exist in Spruce
-      let response;
-      
       // Common headers for cache control
       const cacheHeaders = {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -245,39 +197,15 @@ router.post('/refresh-patients', async (req, res) => {
         'Expires': '0'
       };
       
-      try {
-        // Try modern API pattern
-        response = await spruceApi.get('/api/v1/patients', {
-          params: {
-            _ts: timestamp, // Cache-busting
-            limit: 200,
-            include_details: 'true'
-          },
-          headers: cacheHeaders
-        });
-      } catch (err) {
-        try {
-          // Try legacy pattern
-          console.log('First refresh endpoint failed, trying alternate endpoint...');
-          response = await spruceApi.get('/api/v1/contacts', {
-            params: {
-              _ts: timestamp,
-              limit: 200
-            },
-            headers: cacheHeaders
-          });
-        } catch (err2) {
-          // Try third pattern
-          console.log('Second refresh endpoint failed, trying third endpoint...');
-          response = await spruceApi.get('/v1/patients', {
-            params: {
-              _ts: timestamp,
-              limit: 200
-            },
-            headers: cacheHeaders
-          });
-        }
-      }
+      // Based on documentation, use the confirmed endpoint /v1/contacts
+      console.log('Using documented endpoint /v1/contacts for refresh');
+      const response = await spruceApi.get('/v1/contacts', {
+        params: {
+          _ts: timestamp, // Cache-busting
+          limit: 200
+        },
+        headers: cacheHeaders
+      });
       
       // More flexible data extraction from response
       const sprucePatients = response.data.patients || response.data.data || response.data.contacts || [];
@@ -332,17 +260,21 @@ router.post('/refresh-patients', async (req, res) => {
 // Test endpoint to verify Spruce API connectivity
 router.get('/test-connection', async (req, res) => {
   try {
-    // Try api/v1/users/me endpoint which often exists in APIs for user info
-    const response = await spruceApi.get('/api/v1/users/me');
+    // From the documentation, we see that /v1/contacts is the correct endpoint
+    const response = await spruceApi.get('/v1/contacts', {
+      params: {
+        limit: 1 // Request just one contact to minimize data transfer
+      }
+    });
     res.json({
       success: true,
       message: 'Successfully connected to Spruce API',
       data: response.data
     });
   } catch (error: any) {
-    // Try another common endpoint
+    // Try webhooks endpoint as a fallback
     try {
-      const fallbackResponse = await spruceApi.get('/api/v1/org');
+      const fallbackResponse = await spruceApi.get('/v1/webhooks/endpoints');
       res.json({
         success: true,
         message: 'Successfully connected to Spruce API (fallback endpoint)',
@@ -355,6 +287,16 @@ router.get('/test-connection', async (req, res) => {
         status: error.response?.status,
         headers: error.response?.headers
       });
+      
+      // Check for unauthorized access
+      if (error.response?.status === 403) {
+        return res.status(403).json({
+          success: false,
+          message: 'API key authentication failed. Please check your SPRUCE_API_KEY environment variable.',
+          error: 'Authorization failed',
+          details: error.response?.data
+        });
+      }
       
       // If we received headers from the API, show them for debugging
       const receivedHeaders = error.response?.headers || fallbackError.response?.headers;
@@ -380,8 +322,9 @@ router.post('/messages', async (req, res) => {
     }
     
     try {
-      // Send the message through Spruce API
-      const spruceResponse = await spruceApi.post('/messages', {
+      // Send the message through Spruce API using documented endpoint structure
+      console.log('Sending message to patient through Spruce API');
+      const spruceResponse = await spruceApi.post('/v1/messages', {
         patient_id: patientId,
         content: message,
         message_type: messageType || 'GENERAL',
@@ -413,8 +356,9 @@ router.get('/patients/:patientId/messages', async (req, res) => {
   try {
     const patientId = req.params.patientId;
     
-    // Get messages from Spruce API
-    const response = await spruceApi.get(`/patients/${patientId}/messages`);
+    // Get messages from Spruce API using correct endpoint format
+    console.log(`Retrieving messages for patient ${patientId}`);
+    const response = await spruceApi.get(`/v1/patients/${patientId}/messages`);
     const spruceMessages = response.data.messages || [];
     
     // Convert Spruce messages to our format
