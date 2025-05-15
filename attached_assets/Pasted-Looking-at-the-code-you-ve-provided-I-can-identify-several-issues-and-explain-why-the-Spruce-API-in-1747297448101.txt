@@ -1,0 +1,150 @@
+Looking at the code you've provided, I can identify several issues and explain why the Spruce API integration isn't working properly. Here's my analysis:
+
+## Main Issues Found:
+
+### 1. **API Key and Access ID Format**
+The authorization credentials appear to be Base64 encoded, which is unusual:
+```typescript
+headers: {
+  'Authorization': `Bearer ${process.env.SPRUCE_API_KEY || 'YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0='}`,
+  's-access-id': process.env.SPRUCE_ACCESS_ID || 'aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I='
+}
+```
+These look like Base64 encoded strings. The actual API should probably expect raw API keys or properly formatted credentials.
+
+### 2. **Incorrect API Endpoints**
+The code is using generic endpoint patterns that likely don't match Spruce's actual API:
+```typescript
+// These endpoints might not exist in Spruce API:
+'/contacts'  // Should probably be '/patients' or similar
+'/messages' // Might need a different structure
+```
+
+### 3. **Response Structure Mismatch**
+The code expects responses in a specific format, but Spruce API might return data differently:
+```typescript
+// The code expects:
+response.data.contacts
+
+// But Spruce might return:
+response.data.patients
+// or
+response.data.data
+// or something else entirely
+```
+
+### 4. **Missing Error Details**
+The error handling is swallowing important error details:
+```typescript
+} catch (spruceError) {
+  console.error('Error searching patients in Spruce API:', spruceError);
+  // This doesn't log the actual response or error details
+}
+```
+
+## Code Corrections Needed:
+
+### 1. Fix Authentication Headers
+```typescript
+// Replace with actual Spruce API authentication format
+const spruceApi = axios.create({
+  baseURL: 'https://api.sprucehealth.com/v1',
+  headers: {
+    'Authorization': `Bearer ${process.env.SPRUCE_API_KEY}`,
+    'Content-Type': 'application/json',
+    // Only include if Spruce actually requires this header
+    'X-Spruce-Client-ID': process.env.SPRUCE_CLIENT_ID
+  }
+});
+```
+
+### 2. Update Endpoints to Match Spruce API
+```typescript
+// Update to actual Spruce endpoints
+router.get('/search-patients', async (req, res) => {
+  try {
+    // Replace with correct Spruce endpoint
+    const response = await spruceApi.get('/patients', {
+      params: { 
+        search: searchTerm,
+        // Add any other required parameters
+        limit: 100
+      }
+    });
+    
+    // Update data extraction based on actual response structure
+    const patients = response.data.patients || response.data.data || [];
+```
+
+### 3. Add Detailed Error Logging
+```typescript
+} catch (spruceError: any) {
+  console.error('Spruce API Error:', {
+    message: spruceError.message,
+    response: spruceError.response?.data,
+    status: spruceError.response?.status,
+    headers: spruceError.response?.headers
+  });
+  
+  // Return more specific error information
+  return res.status(spruceError.response?.status || 500).json({
+    error: 'Spruce API Error',
+    message: spruceError.response?.data?.message || spruceError.message,
+    details: spruceError.response?.data
+  });
+}
+```
+
+### 4. Fix Data Mapping
+```typescript
+// Update mapping to match actual Spruce patient object structure
+const mappedPatients = sprucePatients.map((patient: any) => ({
+  id: patient.patient_id || patient.id,
+  name: patient.full_name || patient.name,
+  email: patient.email_address || patient.email,
+  phone: patient.phone_number || patient.phone,
+  dateOfBirth: patient.birth_date || patient.date_of_birth,
+  gender: patient.gender?.toLowerCase() || 'unknown',
+  language: patient.preferred_language || patient.language,
+  spruceId: patient.patient_id || patient.id
+}));
+```
+
+### 5. Add API Documentation Check
+```typescript
+// Add a test endpoint to verify API connectivity
+router.get('/test-connection', async (req, res) => {
+  try {
+    // Try a simple endpoint that should work
+    const response = await spruceApi.get('/');
+    res.json({
+      success: true,
+      data: response.data
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      response: error.response?.data
+    });
+  }
+});
+```
+
+## Why It's Not Working:
+
+1. **Authentication Issues**: The hardcoded Base64 strings suggest the authentication isn't properly set up
+2. **Wrong Endpoints**: The API endpoints don't match Spruce's actual API structure
+3. **Response Format**: The code expects data in a format that Spruce doesn't provide
+4. **Network Issues**: CORS problems or network connectivity issues aren't properly handled
+5. **Missing Configuration**: Required headers or parameters might be missing
+
+## Recommended Steps:
+
+1. **Check Spruce API Documentation**: Verify the correct endpoints, authentication method, and response formats
+2. **Test with Postman/cURL**: Confirm the API works outside your application first
+3. **Add Logging**: Log full request/response details to debug the issue
+4. **Update Environment Variables**: Ensure proper API keys are set in your environment
+5. **Handle Rate Limits**: Add rate limiting and retry logic if needed
+
+Would you like me to provide a complete corrected version once you have the correct Spruce API documentation?

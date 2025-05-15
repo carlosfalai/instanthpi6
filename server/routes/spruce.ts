@@ -15,13 +15,13 @@ interface SprucePatient {
   status?: string;
 }
 
-// Setup Spruce Health API
+// Setup Spruce Health API with proper authentication format
 const spruceApi = axios.create({
   baseURL: 'https://api.sprucehealth.com/v1',
   headers: {
-    'Authorization': `Bearer ${process.env.SPRUCE_API_KEY || 'YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0='}`,
+    'Authorization': `Bearer ${process.env.SPRUCE_API_KEY}`,
     'Content-Type': 'application/json',
-    's-access-id': process.env.SPRUCE_ACCESS_ID || 'aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I='
+    'X-Api-Key': process.env.SPRUCE_API_KEY // Standard API key header
   }
 });
 
@@ -47,93 +47,126 @@ router.get('/search-patients', async (req, res) => {
     try {
       console.log('Searching patients via Spruce API');
       
-      // According to the documentation, we should use the /contacts endpoint
-      const response = await spruceApi.get('/contacts', {
-        params: { query: searchTerm }
+      // Update to use the correct Spruce API endpoint with proper parameters
+      const response = await spruceApi.get('/patients', {
+        params: { 
+          search: searchTerm,
+          limit: 100
+        }
       });
       
-      // Filter patients based on query
-      const allPatients = response.data.contacts || [];
+      // More flexible data extraction from response
+      const allPatients = response.data.patients || response.data.data || response.data.contacts || [];
       console.log(`Received ${allPatients.length} patients from Spruce API`);
       
-      const filteredPatients = allPatients.filter((patient: SprucePatient) => {
+      // Filter patients based on query with more robust checking
+      const filteredPatients = allPatients.filter((patient: any) => {
         return (
-          (patient.name && patient.name.toLowerCase().includes(searchTerm)) ||
-          (patient.email && patient.email.toLowerCase().includes(searchTerm)) ||
-          (patient.phone && patient.phone.includes(searchTerm))
+          (patient.name || patient.full_name || patient.display_name || '').toLowerCase().includes(searchTerm) ||
+          (patient.email || patient.email_address || '').toLowerCase().includes(searchTerm) ||
+          (patient.phone || patient.phone_number || '').includes(searchTerm)
         );
       });
       
       console.log(`Found ${filteredPatients.length} matching patients in Spruce API`);
       
-      // Convert Spruce patients to our format
-      const mappedPatients = filteredPatients.map((sprucePatient: SprucePatient) => ({
-        id: parseInt(sprucePatient.id) || Math.floor(Math.random() * 10000) + 1000, // Convert to number or generate random ID
-        name: sprucePatient.name || 'Unknown Name',
-        email: sprucePatient.email || '',
-        phone: sprucePatient.phone || '',
-        dateOfBirth: sprucePatient.date_of_birth || '',
-        gender: sprucePatient.gender || 'unknown',
-        language: sprucePatient.language || null,
-        spruceId: sprucePatient.id
+      // Convert Spruce patients to our format with better field mapping
+      const mappedPatients = filteredPatients.map((sprucePatient: any) => ({
+        id: parseInt(sprucePatient.id || sprucePatient.patient_id) || Math.floor(Math.random() * 10000) + 1000,
+        name: sprucePatient.full_name || sprucePatient.name || sprucePatient.display_name || 'Unknown Name',
+        email: sprucePatient.email_address || sprucePatient.email || '',
+        phone: sprucePatient.phone_number || sprucePatient.phone || '',
+        dateOfBirth: sprucePatient.birth_date || sprucePatient.date_of_birth || '',
+        gender: (sprucePatient.gender || 'unknown').toLowerCase(),
+        language: sprucePatient.preferred_language || sprucePatient.language || null,
+        spruceId: sprucePatient.patient_id || sprucePatient.id
       }));
       
       res.json({
         patients: mappedPatients,
         source: 'spruce'
       });
-    } catch (spruceError) {
-      console.error('Error searching patients in Spruce API:', spruceError);
-      // Return empty list if Spruce API fails
-      return res.json({
+    } catch (spruceError: any) {
+      // Enhanced error logging with detailed information
+      console.error('Error searching patients in Spruce API:', {
+        message: spruceError.message,
+        response: spruceError.response?.data,
+        status: spruceError.response?.status,
+        headers: spruceError.response?.headers
+      });
+      
+      // Return more specific error information
+      return res.status(spruceError.response?.status || 500).json({
         patients: [],
         source: 'spruce',
-        error: 'Failed to search patients in Spruce API'
+        error: 'Failed to search patients in Spruce API',
+        message: spruceError.response?.data?.message || spruceError.message,
+        details: spruceError.response?.data
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in patient search:', error);
-    res.status(500).json({ message: 'Failed to search patients' });
+    res.status(500).json({ 
+      message: 'Failed to search patients',
+      error: error.message 
+    });
   }
 });
 
 // Fetch contacts from Spruce API - no local database used
 router.post('/sync-patients', async (req, res) => {
   try {
-    // Get patients directly from Spruce API using /contacts endpoint
+    // Get patients directly from Spruce API using correct endpoint
     try {
-      const response = await spruceApi.get('/contacts');
-      const sprucePatients = response.data.contacts || [];
+      const response = await spruceApi.get('/patients', {
+        params: {
+          limit: 200, // Request more patients at once
+          include_details: 'true' // Request additional details if API supports it
+        }
+      });
+      
+      // More flexible data extraction from response
+      const sprucePatients = response.data.patients || response.data.data || response.data.contacts || [];
       
       res.json({ 
         message: `Retrieved ${sprucePatients.length} patients from Spruce API`,
         count: sprucePatients.length,
         source: 'spruce',
-        patients: sprucePatients.map((patient: SprucePatient) => ({
-          id: parseInt(patient.id) || Math.floor(Math.random() * 10000) + 1000,
-          name: patient.name || 'Unknown Name',
-          email: patient.email || '',
-          phone: patient.phone || '',
-          dateOfBirth: patient.date_of_birth || '',
-          gender: patient.gender || 'unknown',
-          language: patient.language || null,
-          spruceId: patient.id
+        patients: sprucePatients.map((patient: any) => ({
+          id: parseInt(patient.id || patient.patient_id) || Math.floor(Math.random() * 10000) + 1000,
+          name: patient.full_name || patient.name || patient.display_name || 'Unknown Name',
+          email: patient.email_address || patient.email || '',
+          phone: patient.phone_number || patient.phone || '',
+          dateOfBirth: patient.birth_date || patient.date_of_birth || '',
+          gender: (patient.gender || 'unknown').toLowerCase(),
+          language: patient.preferred_language || patient.language || null,
+          spruceId: patient.patient_id || patient.id
         }))
       });
-    } catch (spruceError) {
-      console.error('Error connecting to Spruce API:', spruceError);
+    } catch (spruceError: any) {
+      // Enhanced error logging with detailed information
+      console.error('Error connecting to Spruce API:', {
+        message: spruceError.message,
+        response: spruceError.response?.data,
+        status: spruceError.response?.status,
+        headers: spruceError.response?.headers
+      });
       
-      // Return empty list if Spruce API fails
-      return res.json({ 
+      // Return more useful error information
+      return res.status(spruceError.response?.status || 500).json({ 
         message: 'Failed to connect to Spruce API',
+        error: spruceError.response?.data?.message || spruceError.message,
         count: 0,
         source: 'spruce',
         patients: []
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error in sync-patients endpoint:', error);
-    res.status(500).json({ message: 'Failed to sync patients' });
+    res.status(500).json({ 
+      message: 'Failed to sync patients',
+      error: error.message
+    });
   }
 });
 
@@ -147,10 +180,12 @@ router.post('/refresh-patients', async (req, res) => {
     
     // Attempt to get fresh patient data from Spruce API
     try {
-      const response = await spruceApi.get('/contacts', {
+      const response = await spruceApi.get('/patients', {
         params: {
           // Add cache-busting parameter to ensure we get fresh data
-          _ts: timestamp
+          _ts: timestamp,
+          limit: 200,
+          include_details: 'true'
         },
         headers: {
           // Add cache control headers
@@ -160,19 +195,20 @@ router.post('/refresh-patients', async (req, res) => {
         }
       });
       
-      const sprucePatients = response.data.contacts || [];
+      // More flexible data extraction from response
+      const sprucePatients = response.data.patients || response.data.data || response.data.contacts || [];
       console.log(`Successfully refreshed ${sprucePatients.length} patients from Spruce API`);
       
-      // Format and return the patient data
-      const formattedPatients = sprucePatients.map((patient: SprucePatient) => ({
-        id: parseInt(patient.id) || Math.floor(Math.random() * 10000) + 1000,
-        name: patient.name || 'Unknown Name',
-        email: patient.email || '',
-        phone: patient.phone || '',
-        dateOfBirth: patient.date_of_birth || '',
-        gender: patient.gender || 'unknown',
-        language: patient.language || null,
-        spruceId: patient.id
+      // Format and return the patient data with better field mapping
+      const formattedPatients = sprucePatients.map((patient: any) => ({
+        id: parseInt(patient.id || patient.patient_id) || Math.floor(Math.random() * 10000) + 1000,
+        name: patient.full_name || patient.name || patient.display_name || 'Unknown Name',
+        email: patient.email_address || patient.email || '',
+        phone: patient.phone_number || patient.phone || '',
+        dateOfBirth: patient.birth_date || patient.date_of_birth || '',
+        gender: (patient.gender || 'unknown').toLowerCase(),
+        language: patient.preferred_language || patient.language || null,
+        spruceId: patient.patient_id || patient.id
       }));
       
       res.json({
@@ -184,11 +220,19 @@ router.post('/refresh-patients', async (req, res) => {
         patients: formattedPatients
       });
     } catch (spruceError: any) {
-      console.error('Error refreshing data from Spruce API:', spruceError);
-      res.status(500).json({
+      // Enhanced error logging with detailed information
+      console.error('Error refreshing data from Spruce API:', {
+        message: spruceError.message,
+        response: spruceError.response?.data,
+        status: spruceError.response?.status,
+        headers: spruceError.response?.headers
+      });
+      
+      res.status(spruceError.response?.status || 500).json({
         success: false,
         message: 'Failed to refresh patient data from Spruce API',
-        error: spruceError.message || 'Unknown error'
+        error: spruceError.response?.data?.message || spruceError.message,
+        details: spruceError.response?.data
       });
     }
   } catch (error: any) {
@@ -197,6 +241,32 @@ router.post('/refresh-patients', async (req, res) => {
       success: false,
       message: 'Error processing refresh request',
       error: error.message || 'Unknown error'
+    });
+  }
+});
+
+// Test endpoint to verify Spruce API connectivity
+router.get('/test-connection', async (req, res) => {
+  try {
+    // Try a simple endpoint that should work with minimal permissions
+    const response = await spruceApi.get('/');
+    res.json({
+      success: true,
+      message: 'Successfully connected to Spruce API',
+      data: response.data
+    });
+  } catch (error: any) {
+    console.error('Spruce API connection test failed:', {
+      message: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    
+    res.status(error.response?.status || 500).json({
+      success: false,
+      message: 'Failed to connect to Spruce API',
+      error: error.message,
+      details: error.response?.data
     });
   }
 });
