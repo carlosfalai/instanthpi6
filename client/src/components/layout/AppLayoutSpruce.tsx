@@ -334,7 +334,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                           ? "text-white bg-[#252525]"
                           : "text-gray-300"
                       )}
-                      onClick={() => setLocation(subsection.path)}
+                      onClick={() => { window.location.href = subsection.path }}
                     >
                       <span>{subsection.label}</span>
                       {subsection.badge && subsection.badge > 0 && (
