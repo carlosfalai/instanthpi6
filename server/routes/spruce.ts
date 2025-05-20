@@ -72,6 +72,9 @@ router.get('/search-patients', async (req, res) => {
       const allPatients = response.data.patients || response.data.data || response.data.contacts || [];
       console.log(`Received ${allPatients.length} patients from Spruce API`);
       
+      // Log the raw response for debugging
+      console.log('Raw Spruce API response structure:', JSON.stringify(response.data).substring(0, 500) + '...');
+      
       // If no search term is provided, use all patients; otherwise filter
       let filteredPatients;
       
@@ -79,10 +82,33 @@ router.get('/search-patients', async (req, res) => {
       if (query && typeof query === 'string') {
         const searchTerm = query.toLowerCase();
         filteredPatients = allPatients.filter((patient: any) => {
+          // Search across all possible name/contact fields
+          const givenName = (patient.givenName || patient.given_name || '').toLowerCase();
+          const familyName = (patient.familyName || patient.family_name || '').toLowerCase();
+          const displayName = (patient.displayName || patient.display_name || '').toLowerCase();
+          
+          // Check for email in nested objects
+          let emailToSearch = '';
+          if (patient.emailAddresses && Array.isArray(patient.emailAddresses) && patient.emailAddresses.length > 0) {
+            emailToSearch = (patient.emailAddresses[0].value || patient.emailAddresses[0].address || '').toLowerCase();
+          } else {
+            emailToSearch = (patient.email_address || patient.email || '').toLowerCase();
+          }
+          
+          // Check for phone in nested objects
+          let phoneToSearch = '';
+          if (patient.phoneNumbers && Array.isArray(patient.phoneNumbers) && patient.phoneNumbers.length > 0) {
+            phoneToSearch = patient.phoneNumbers[0].value || patient.phoneNumbers[0].displayValue || '';
+          } else {
+            phoneToSearch = patient.phone_number || patient.phone || '';
+          }
+          
           return (
-            (patient.name || patient.full_name || patient.display_name || '').toLowerCase().includes(searchTerm) ||
-            (patient.email || patient.email_address || '').toLowerCase().includes(searchTerm) ||
-            (patient.phone || patient.phone_number || '').includes(searchTerm)
+            givenName.includes(searchTerm) ||
+            familyName.includes(searchTerm) ||
+            displayName.includes(searchTerm) ||
+            emailToSearch.includes(searchTerm) ||
+            phoneToSearch.includes(searchTerm)
           );
         });
       } else {
@@ -93,16 +119,47 @@ router.get('/search-patients', async (req, res) => {
       console.log(`Found ${filteredPatients.length} matching patients in Spruce API`);
       
       // Convert Spruce patients to our format with better field mapping
-      const mappedPatients = filteredPatients.map((sprucePatient: any) => ({
-        id: parseInt(sprucePatient.id || sprucePatient.patient_id) || Math.floor(Math.random() * 10000) + 1000,
-        name: sprucePatient.full_name || sprucePatient.name || sprucePatient.display_name || 'Unknown Name',
-        email: sprucePatient.email_address || sprucePatient.email || '',
-        phone: sprucePatient.phone_number || sprucePatient.phone || '',
-        dateOfBirth: sprucePatient.birth_date || sprucePatient.date_of_birth || '',
-        gender: (sprucePatient.gender || 'unknown').toLowerCase(),
-        language: sprucePatient.preferred_language || sprucePatient.language || null,
-        spruceId: sprucePatient.patient_id || sprucePatient.id
-      }));
+      const mappedPatients = filteredPatients.map((patient: any) => {
+        // Extract name components based on the Spruce API response structure
+        const givenName = patient.givenName || patient.given_name || '';
+        const familyName = patient.familyName || patient.family_name || '';
+        const displayName = patient.displayName || patient.display_name || '';
+        
+        // Compose a proper name using available fields
+        const fullName = displayName || 
+                        (givenName && familyName ? `${givenName} ${familyName}` : 
+                        (givenName || familyName || 'Unknown Name'));
+        
+        // Extract phone from potentially nested objects
+        let phoneNumber = '';
+        if (patient.phoneNumbers && Array.isArray(patient.phoneNumbers) && patient.phoneNumbers.length > 0) {
+          phoneNumber = patient.phoneNumbers[0].value || patient.phoneNumbers[0].displayValue || '';
+        } else {
+          phoneNumber = patient.phone_number || patient.phone || '';
+        }
+        
+        // Extract email from potentially nested objects
+        let emailAddress = '';
+        if (patient.emailAddresses && Array.isArray(patient.emailAddresses) && patient.emailAddresses.length > 0) {
+          emailAddress = patient.emailAddresses[0].value || patient.emailAddresses[0].address || '';
+        } else {
+          emailAddress = patient.email_address || patient.email || '';
+        }
+        
+        // Extract date of birth
+        const dob = patient.dateOfBirth || patient.birth_date || patient.date_of_birth || '';
+        
+        return {
+          id: parseInt(patient.id) || Math.floor(Math.random() * 10000) + 1000,
+          name: fullName,
+          email: emailAddress,
+          phone: phoneNumber,
+          dateOfBirth: dob,
+          gender: (patient.gender || 'unknown').toLowerCase(),
+          language: patient.preferred_language || patient.language || null,
+          spruceId: patient.id
+        };
+      });
       
       res.json({
         patients: mappedPatients,
@@ -148,23 +205,60 @@ router.post('/sync-patients', async (req, res) => {
         }
       });
       
-      // More flexible data extraction from response
-      const sprucePatients = response.data.patients || response.data.data || response.data.contacts || [];
+      // Log the raw response for debugging
+      console.log('Raw Spruce API response structure:', JSON.stringify(response.data).substring(0, 500) + '...');
       
-      res.json({ 
-        message: `Retrieved ${sprucePatients.length} patients from Spruce API`,
-        count: sprucePatients.length,
-        source: 'spruce',
-        patients: sprucePatients.map((patient: any) => ({
-          id: parseInt(patient.id || patient.patient_id) || Math.floor(Math.random() * 10000) + 1000,
-          name: patient.full_name || patient.name || patient.display_name || 'Unknown Name',
-          email: patient.email_address || patient.email || '',
-          phone: patient.phone_number || patient.phone || '',
-          dateOfBirth: patient.birth_date || patient.date_of_birth || '',
+      // More flexible data extraction from response
+      const sprucePatients = response.data.contacts || response.data.patients || response.data.data || [];
+      
+      // Convert Spruce patients to our format with better field mapping
+      const mappedPatients = sprucePatients.map((patient: any) => {
+        // Extract name components based on the Spruce API response structure
+        const givenName = patient.givenName || patient.given_name || '';
+        const familyName = patient.familyName || patient.family_name || '';
+        const displayName = patient.displayName || patient.display_name || '';
+        
+        // Compose a proper name using available fields
+        const fullName = displayName || 
+                        (givenName && familyName ? `${givenName} ${familyName}` : 
+                        (givenName || familyName || 'Unknown Name'));
+        
+        // Extract phone from potentially nested objects
+        let phoneNumber = '';
+        if (patient.phoneNumbers && Array.isArray(patient.phoneNumbers) && patient.phoneNumbers.length > 0) {
+          phoneNumber = patient.phoneNumbers[0].value || patient.phoneNumbers[0].displayValue || '';
+        } else {
+          phoneNumber = patient.phone_number || patient.phone || '';
+        }
+        
+        // Extract email from potentially nested objects
+        let emailAddress = '';
+        if (patient.emailAddresses && Array.isArray(patient.emailAddresses) && patient.emailAddresses.length > 0) {
+          emailAddress = patient.emailAddresses[0].value || patient.emailAddresses[0].address || '';
+        } else {
+          emailAddress = patient.email_address || patient.email || '';
+        }
+        
+        // Extract date of birth
+        const dob = patient.dateOfBirth || patient.birth_date || patient.date_of_birth || '';
+        
+        return {
+          id: parseInt(patient.id) || Math.floor(Math.random() * 10000) + 1000,
+          name: fullName,
+          email: emailAddress,
+          phone: phoneNumber,
+          dateOfBirth: dob,
           gender: (patient.gender || 'unknown').toLowerCase(),
           language: patient.preferred_language || patient.language || null,
-          spruceId: patient.patient_id || patient.id
-        }))
+          spruceId: patient.id
+        };
+      });
+      
+      res.json({ 
+        message: `Retrieved ${mappedPatients.length} patients from Spruce API`,
+        count: mappedPatients.length,
+        source: 'spruce',
+        patients: mappedPatients
       });
     } catch (spruceError: any) {
       // Enhanced error logging with detailed information
@@ -220,21 +314,52 @@ router.post('/refresh-patients', async (req, res) => {
         headers: cacheHeaders
       });
       
+      // Log the raw response for debugging
+      console.log('Raw Spruce API response structure:', JSON.stringify(response.data).substring(0, 500) + '...');
+      
       // More flexible data extraction from response
-      const sprucePatients = response.data.patients || response.data.data || response.data.contacts || [];
+      const sprucePatients = response.data.contacts || response.data.patients || response.data.data || [];
       console.log(`Successfully refreshed ${sprucePatients.length} patients from Spruce API`);
       
-      // Format and return the patient data with better field mapping
-      const formattedPatients = sprucePatients.map((patient: any) => ({
-        id: parseInt(patient.id || patient.patient_id) || Math.floor(Math.random() * 10000) + 1000,
-        name: patient.full_name || patient.name || patient.display_name || 'Unknown Name',
-        email: patient.email_address || patient.email || '',
-        phone: patient.phone_number || patient.phone || '',
-        dateOfBirth: patient.birth_date || patient.date_of_birth || '',
-        gender: (patient.gender || 'unknown').toLowerCase(),
-        language: patient.preferred_language || patient.language || null,
-        spruceId: patient.patient_id || patient.id
-      }));
+      // Format and return the patient data with better field mapping, checking for nested fields
+      const formattedPatients = sprucePatients.map((patient: any) => {
+        // Extract name components based on the Spruce API response structure
+        const givenName = patient.givenName || patient.given_name || '';
+        const familyName = patient.familyName || patient.family_name || '';
+        const displayName = patient.displayName || patient.display_name || '';
+        
+        // Compose a proper name using available fields
+        const fullName = displayName || 
+                         (givenName && familyName ? `${givenName} ${familyName}` : 
+                         (givenName || familyName || 'Unknown Name'));
+        
+        // Extract phone from potentially nested objects
+        let phoneNumber = '';
+        if (patient.phoneNumbers && Array.isArray(patient.phoneNumbers) && patient.phoneNumbers.length > 0) {
+          phoneNumber = patient.phoneNumbers[0].value || patient.phoneNumbers[0].displayValue || '';
+        } else {
+          phoneNumber = patient.phone_number || patient.phone || '';
+        }
+        
+        // Extract email from potentially nested objects
+        let emailAddress = '';
+        if (patient.emailAddresses && Array.isArray(patient.emailAddresses) && patient.emailAddresses.length > 0) {
+          emailAddress = patient.emailAddresses[0].value || patient.emailAddresses[0].address || '';
+        } else {
+          emailAddress = patient.email_address || patient.email || '';
+        }
+        
+        return {
+          id: parseInt(patient.id) || Math.floor(Math.random() * 10000) + 1000,
+          name: fullName,
+          email: emailAddress,
+          phone: phoneNumber,
+          dateOfBirth: patient.birth_date || patient.date_of_birth || '',
+          gender: (patient.gender || 'unknown').toLowerCase(),
+          language: patient.preferred_language || patient.language || null,
+          spruceId: patient.id
+        };
+      });
       
       res.json({
         success: true,
