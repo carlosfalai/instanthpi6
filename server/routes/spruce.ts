@@ -40,42 +40,55 @@ router.get('/search-patients', async (req, res) => {
   try {
     const { query } = req.query;
     
-    if (!query || typeof query !== 'string') {
-      // If no query is provided, return empty list
-      return res.json({
-        patients: [],
-        source: 'spruce'
-      });
-    }
-    
-    const searchTerm = query.toLowerCase();
-    console.log(`Searching for patients with term: "${searchTerm}"`);
-    
-    // Search using Spruce API only
+    // Search using Spruce API
     try {
-      console.log('Searching patients via Spruce API');
+      console.log('Fetching patients via Spruce API');
       
-      // Based on documentation, only try the confirmed endpoint /v1/contacts
-      console.log('Using documented endpoint /v1/contacts');
-      const response = await spruceApi.get('/v1/contacts', {
-        params: { 
-          query: searchTerm, // Use 'query' as parameter per the docs
-          limit: 100
-        }
-      });
+      let response;
+      
+      if (!query || typeof query !== 'string') {
+        // If no query is provided, fetch all patients
+        console.log('No search term provided, fetching all patients');
+        response = await spruceApi.get('/v1/contacts', {
+          params: { 
+            limit: 100
+          }
+        });
+      } else {
+        const searchTerm = query.toLowerCase();
+        console.log(`Searching for patients with term: "${searchTerm}"`);
+        
+        // Based on documentation, use the confirmed endpoint /v1/contacts
+        console.log('Using documented endpoint /v1/contacts with search query');
+        response = await spruceApi.get('/v1/contacts', {
+          params: { 
+            query: searchTerm, // Use 'query' as parameter per the docs
+            limit: 100
+          }
+        });
+      }
       
       // More flexible data extraction from response
       const allPatients = response.data.patients || response.data.data || response.data.contacts || [];
       console.log(`Received ${allPatients.length} patients from Spruce API`);
       
-      // Filter patients based on query with more robust checking
-      const filteredPatients = allPatients.filter((patient: any) => {
-        return (
-          (patient.name || patient.full_name || patient.display_name || '').toLowerCase().includes(searchTerm) ||
-          (patient.email || patient.email_address || '').toLowerCase().includes(searchTerm) ||
-          (patient.phone || patient.phone_number || '').includes(searchTerm)
-        );
-      });
+      // If no search term is provided, use all patients; otherwise filter
+      let filteredPatients;
+      
+      // Only filter if a search term was provided
+      if (query && typeof query === 'string') {
+        const searchTerm = query.toLowerCase();
+        filteredPatients = allPatients.filter((patient: any) => {
+          return (
+            (patient.name || patient.full_name || patient.display_name || '').toLowerCase().includes(searchTerm) ||
+            (patient.email || patient.email_address || '').toLowerCase().includes(searchTerm) ||
+            (patient.phone || patient.phone_number || '').includes(searchTerm)
+          );
+        });
+      } else {
+        // Use all patients when no search term is provided
+        filteredPatients = allPatients;
+      }
       
       console.log(`Found ${filteredPatients.length} matching patients in Spruce API`);
       
