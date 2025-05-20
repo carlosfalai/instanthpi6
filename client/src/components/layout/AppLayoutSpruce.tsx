@@ -66,7 +66,7 @@ interface AppLayoutSpruceProps {
 }
 
 export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
-  const [location, setLocation] = useLocation();
+  const [location] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inbox');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
