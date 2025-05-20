@@ -74,6 +74,11 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     documents: false,
     settings: false
   });
+  
+  // Use this instead of setLocation
+  const navigate = (path: string) => {
+    window.location.href = path;
+  };
 
   // Mock user data - in a real app this would come from context or API
   const currentUser = {
