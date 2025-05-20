@@ -23,7 +23,6 @@ export default function PatientsPage() {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   
   // Refresh patients data mutation
   const refreshPatientsMutation = useMutation({
@@ -97,7 +96,7 @@ export default function PatientsPage() {
   
   // Extract patients array from response
   const filteredPatients = patientsResponse.patients || [];
-  
+
   // Generate initials for patient avatars
   const getInitials = (name: string) => {
     if (!name || name === 'Unknown Name') return '??';
@@ -113,7 +112,7 @@ export default function PatientsPage() {
     const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-red-500'];
     return colors[patientId % colors.length];
   };
-  
+
   // Format date for display
   const formatDate = (date: string | null) => {
     if (!date) return '';
@@ -126,12 +125,7 @@ export default function PatientsPage() {
       return messageDate.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: 'numeric' });
     }
   };
-  
-  // Handle patient selection
-  const handlePatientSelect = (patient: Patient) => {
-    setSelectedPatient(patient);
-  };
-  
+
   return (
     <AppLayoutSpruce>
       <div className="flex h-full bg-[#121212] overflow-hidden">
@@ -141,7 +135,6 @@ export default function PatientsPage() {
           <div className="p-3 border-b border-[#333] flex items-center justify-between">
             <div className="flex items-center">
               <h2 className="font-semibold text-white">All Patients</h2>
-              <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />
             </div>
             <div className="flex items-center">
               <Button 
@@ -188,9 +181,7 @@ export default function PatientsPage() {
                 {filteredPatients.map((patient: Patient) => (
                   <div 
                     key={patient.id}
-                    className={`border-b border-[#333] hover:bg-[#252525] cursor-pointer transition-colors
-                      ${selectedPatient?.id === patient.id ? 'bg-[#2a2a2a]' : ''}`}
-                    onClick={() => handlePatientSelect(patient)}
+                    className="border-b border-[#333] hover:bg-[#252525] cursor-pointer transition-colors"
                   >
                     <div className="p-3 flex items-start">
                       {/* Patient Avatar */}
@@ -229,39 +220,9 @@ export default function PatientsPage() {
           <div className="p-4 border-b border-[#333]">
             <h2 className="text-xl font-bold">Patient Details</h2>
           </div>
-          {selectedPatient ? (
-            <div className="p-4">
-              <div className="mb-6">
-                <h3 className="text-md font-semibold mb-2 text-white">Contact Information</h3>
-                <div className="space-y-2 text-sm text-gray-400">
-                  <p><span className="text-gray-500">Name:</span> {selectedPatient.name}</p>
-                  {selectedPatient.phone && (
-                    <p><span className="text-gray-500">Phone:</span> {selectedPatient.phone}</p>
-                  )}
-                  {selectedPatient.email && (
-                    <p><span className="text-gray-500">Email:</span> {selectedPatient.email}</p>
-                  )}
-                  <p>
-                    <span className="text-gray-500">Gender:</span> {selectedPatient.gender}
-                  </p>
-                  {selectedPatient.language && (
-                    <p><span className="text-gray-500">Language:</span> {selectedPatient.language}</p>
-                  )}
-                </div>
-              </div>
-              
-              <div className="mb-6">
-                <h3 className="text-md font-semibold mb-2 text-white">Recent Communications</h3>
-                <div className="bg-[#252525] rounded-md p-3 text-sm text-gray-400">
-                  <p>No recent communications</p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="p-4">
-              <p className="text-gray-400">Select a patient to view details</p>
-            </div>
-          )}
+          <div className="p-4">
+            <p className="text-gray-400">Select a patient to view details</p>
+          </div>
         </div>
         
         {/* Right column - AI Recommendations */}
