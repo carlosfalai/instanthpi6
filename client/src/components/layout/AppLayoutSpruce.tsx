@@ -66,7 +66,7 @@ interface AppLayoutSpruceProps {
 }
 
 export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('inbox');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -74,9 +74,6 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     documents: false,
     settings: false
   });
-  
-  // Use this instead of direct navigation
-  const [, setLocation] = useLocation();
 
   // Mock user data - in a real app this would come from context or API
   const currentUser = {
@@ -217,32 +214,34 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
 
   // Determine which section is active based on URL
   useEffect(() => {
-    const path = location.split('/')[1] || 'home';
+    // Convert location to string and extract the first path segment
+    const pathString = location.toString();
+    const pathSegment = pathString.split('/')[1] || 'home';
     
     // Handle special cases where subsections should highlight parent section
-    if (path === 'settings' || path === 'organization-profile' || path === 'teammates') {
+    if (pathSegment === 'settings' || pathSegment === 'organization-profile' || pathSegment === 'teammates') {
       setActiveSection('settings');
-    } else if (path === 'patients' || path === 'chronic-conditions' || path === 'medication-refills' || path === 'urgent-care') {
+    } else if (pathSegment === 'patients' || pathSegment === 'chronic-conditions' || pathSegment === 'medication-refills' || pathSegment === 'urgent-care') {
       setActiveSection('patients');
-    } else if (path === 'documents' || path === 'insurance-paperwork') {
+    } else if (pathSegment === 'documents' || pathSegment === 'insurance-paperwork') {
       setActiveSection('documents');
-    } else if (path === 'knowledge-base') {
+    } else if (pathSegment === 'knowledge-base') {
       setActiveSection('knowledge');
-    } else if (path === 'leadership-association') {
+    } else if (pathSegment === 'leadership-association') {
       setActiveSection('leadership');
-    } else if (path === 'ai-billing') {
+    } else if (pathSegment === 'ai-billing') {
       setActiveSection('aiBilling');
-    } else if (path === 'priority-tasks') {
+    } else if (pathSegment === 'priority-tasks') {
       setActiveSection('priorityTasks');
-    } else if (path === 'claude-ai') {
+    } else if (pathSegment === 'claude-ai') {
       setActiveSection('claudeAI');
-    } else if (path === '') {
+    } else if (pathSegment === '') {
       // Handle root path
       setActiveSection('home');
     } else {
       // Find the matching section based on exact path match
       const matchingSection = mainNavSections.find(section => 
-        section.path.substring(1) === path
+        section.path.substring(1) === pathSegment
       );
       if (matchingSection) {
         setActiveSection(matchingSection.id);
@@ -288,7 +287,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                   if (section.id === 'patients' || section.id === 'documents' || section.id === 'settings') {
                     toggleSectionExpanded(section.id);
                   }
-                  setLocation(section.path);
+                  navigate(section.path);
                 }}
               >
                 <div className="flex items-center">
@@ -472,7 +471,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                   if (section.id === 'patients' || section.id === 'documents' || section.id === 'settings') {
                     toggleSectionExpanded(section.id);
                   } else {
-                    setLocation(section.path);
+                    navigate(section.path);
                     setIsMobileMenuOpen(false);
                   }
                 }}
