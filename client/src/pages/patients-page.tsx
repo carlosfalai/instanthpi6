@@ -255,15 +255,44 @@ export default function PatientsPage() {
         
         {/* Middle column - Pending Items and Action Items */}
         <div className="hidden md:block md:w-2/4 border-r border-[#333] bg-[#1a1a1a] flex flex-col">
-          <div className="p-4 border-b border-[#333] flex justify-between items-center">
-            <h2 className="text-xl font-bold">Pending Actions</h2>
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="text-blue-400 border-blue-400 hover:bg-blue-900/20"
-            >
-              Add Item
-            </Button>
+          <div className="p-4 border-b border-[#333] flex flex-col gap-3">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">Pending Actions</h2>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="text-blue-400 border-blue-400 hover:bg-blue-900/20"
+              >
+                Add Item
+              </Button>
+            </div>
+            
+            {/* AI Controls Section */}
+            <div className="bg-[#1e1e1e] border border-[#333] rounded-md p-3">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-sm font-medium text-white">AI Processing Controls</h3>
+                <Badge className="bg-green-600 text-white">Active</Badge>
+              </div>
+              <div className="grid grid-cols-3 gap-2 mb-2">
+                <Button size="sm" variant="outline" className="w-full text-xs font-normal justify-start">
+                  <span className="h-2 w-2 rounded-full bg-blue-500 mr-2"></span>
+                  ChatGPT API
+                </Button>
+                <Button size="sm" variant="outline" className="w-full text-xs font-normal justify-start">
+                  <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                  FormSite Data
+                </Button>
+                <Button size="sm" variant="outline" className="w-full text-xs font-normal justify-start">
+                  <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                  Spruce API
+                </Button>
+              </div>
+              <div className="flex mt-2">
+                <Button size="sm" variant="secondary" className="text-xs w-full">
+                  Manage AI Settings
+                </Button>
+              </div>
+            </div>
           </div>
           
           {selectedPatient ? (
