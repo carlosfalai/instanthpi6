@@ -33,6 +33,17 @@ const spruceApi = axios.create({
   }
 });
 
+// Define interface for Spruce message
+interface SpruceMessage {
+  id: string;
+  sender_id: string;
+  sender_name?: string;
+  content: string;
+  created_at: string;
+  message_type: string;
+  read?: boolean;
+}
+
 export const router = Router();
 
 // Search patients in real-time from Spruce API only
