@@ -264,14 +264,66 @@ export default function PatientsPage() {
           )}
         </div>
         
-        {/* Right column - AI Recommendations */}
-        <div className="hidden md:block md:w-1/3 bg-[#1a1a1a]">
+        {/* Right column - Patient Conversation */}
+        <div className="hidden md:block md:w-1/3 bg-[#1a1a1a] flex flex-col">
           <div className="p-4 border-b border-[#333]">
-            <h2 className="text-xl font-bold">AI Recommendations</h2>
+            <h2 className="text-xl font-bold">Conversation</h2>
           </div>
-          <div className="p-4">
-            <p className="text-gray-400">AI-powered suggestions will appear here</p>
-          </div>
+          
+          {selectedPatient ? (
+            <div className="flex-1 flex flex-col">
+              {/* Conversation History */}
+              <div className="flex-1 overflow-y-auto p-4">
+                <div className="space-y-4">
+                  {/* Sample messages - these would come from an API in a real app */}
+                  <div className="flex items-start">
+                    <div className={`flex-shrink-0 w-8 h-8 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-2`}>
+                      <span className="font-medium text-white text-xs">{getInitials(selectedPatient.name)}</span>
+                    </div>
+                    <div className="bg-[#252525] rounded-lg p-3 text-sm text-white max-w-xs">
+                      <p>Hello doctor, I've been experiencing headaches for the past week.</p>
+                      <p className="text-xs text-gray-400 mt-1">10:30 AM</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start justify-end">
+                    <div className="bg-blue-900 rounded-lg p-3 text-sm text-white max-w-xs">
+                      <p>I'm sorry to hear that. How severe are your headaches on a scale of 1-10?</p>
+                      <p className="text-xs text-gray-400 mt-1">10:35 AM</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className={`flex-shrink-0 w-8 h-8 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-2`}>
+                      <span className="font-medium text-white text-xs">{getInitials(selectedPatient.name)}</span>
+                    </div>
+                    <div className="bg-[#252525] rounded-lg p-3 text-sm text-white max-w-xs">
+                      <p>I would say about a 7. It gets worse in the evening.</p>
+                      <p className="text-xs text-gray-400 mt-1">10:40 AM</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Message Input */}
+              <div className="p-4 border-t border-[#333]">
+                <div className="flex items-center">
+                  <Input 
+                    type="text" 
+                    placeholder="Type a message..." 
+                    className="bg-[#252525] border-[#444] text-white flex-1"
+                  />
+                  <Button className="ml-2 bg-blue-600 hover:bg-blue-700">
+                    Send
+                  </Button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 text-gray-400">
+              <p>Select a patient to view conversation</p>
+            </div>
+          )}
         </div>
       </div>
     </AppLayoutSpruce>
