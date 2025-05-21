@@ -250,47 +250,138 @@ export default function PatientsPage() {
           </div>
         </div>
         
-        {/* Right column - Patient Conversation (moved before Patient Details) */}
+        {/* Middle column - Pending Items and Action Items */}
         <div className="hidden md:block md:w-2/4 border-r border-[#333] bg-[#1a1a1a] flex flex-col">
-          <div className="p-4 border-b border-[#333]">
-            <h2 className="text-xl font-bold">Conversation</h2>
+          <div className="p-4 border-b border-[#333] flex justify-between items-center">
+            <h2 className="text-xl font-bold">Pending Actions</h2>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="text-blue-400 border-blue-400 hover:bg-blue-900/20"
+            >
+              Add Item
+            </Button>
           </div>
           
           {selectedPatient ? (
             <div className="flex-1 flex flex-col">
-              {/* Conversation History */}
+              {/* Pending Items Section */}
               <div className="flex-1 overflow-y-auto p-4">
+                <div className="space-y-4">
+                  <div className="bg-[#222] p-4 rounded-md border border-[#333]">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-medium text-white">Waiting for RAMQ card photo</h3>
+                      <Badge className="bg-yellow-600 text-white">Pending</Badge>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-2">Patient needs to send a photo of their RAMQ health insurance card for verification.</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Requested: May 15, 2025</span>
+                      <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300">Send Reminder</Button>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-[#222] p-4 rounded-md border border-[#333]">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-medium text-white">Prescription approval needed</h3>
+                      <Badge className="bg-red-600 text-white">Urgent</Badge>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-2">Patient requests refill for hypertension medication. Needs your approval.</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Requested: May 20, 2025</span>
+                      <div className="space-x-2">
+                        <Button variant="ghost" size="sm" className="text-green-400 hover:text-green-300">Approve</Button>
+                        <Button variant="ghost" size="sm" className="text-red-400 hover:text-red-300">Deny</Button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-[#222] p-4 rounded-md border border-[#333]">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-medium text-white">Lab results review</h3>
+                      <Badge className="bg-blue-600 text-white">In Progress</Badge>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-2">Blood work results received. Review and communicate findings to patient.</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Received: May 18, 2025</span>
+                      <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300">View Results</Button>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-[#222] p-4 rounded-md border border-[#333]">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-medium text-white">Medical note requested</h3>
+                      <Badge className="bg-purple-600 text-white">To Do</Badge>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-2">Patient needs a doctor's note for work absence due to recent illness.</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Requested: May 19, 2025</span>
+                      <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300">Generate Note</Button>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-[#222] p-4 rounded-md border border-[#333]">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-medium text-white">Treatment follow-up</h3>
+                      <Badge className="bg-green-600 text-white">Scheduled</Badge>
+                    </div>
+                    <p className="text-sm text-gray-400 mb-2">Follow-up scheduled for antibiotic treatment. Check patient progress.</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Due: May 23, 2025</span>
+                      <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300">Reschedule</Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Chat Preview Section */}
+              <div className="border-t border-[#333] p-4">
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-medium text-white">Recent Conversation</h3>
+                  <Button 
+                    variant="link" 
+                    className="text-blue-400 hover:text-blue-300 p-0 h-auto"
+                    onClick={() => {
+                      // Code to switch to full conversation view
+                    }}
+                  >
+                    View Full
+                  </Button>
+                </div>
+                
                 {isLoadingMessages ? (
-                  <div className="flex items-center justify-center h-full">
-                    <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+                  <div className="flex items-center justify-center h-24">
+                    <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
                   </div>
                 ) : patientMessages.length > 0 ? (
-                  <div className="space-y-4">
-                    {patientMessages.map((message) => (
-                      <div key={message.id} className={`flex items-start ${message.isFromPatient ? '' : 'justify-end'}`}>
-                        {message.isFromPatient && (
-                          <div className={`flex-shrink-0 w-8 h-8 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-2`}>
+                  <div className="space-y-3 max-h-48 overflow-y-auto border border-[#333] rounded-md p-3 bg-[#1e1e1e]">
+                    {patientMessages.slice(-3).map((message) => (
+                      <div key={message.id} className="flex items-start">
+                        {message.isFromPatient ? (
+                          <div className={`flex-shrink-0 w-6 h-6 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-2`}>
                             <span className="font-medium text-white text-xs">{getInitials(selectedPatient.name)}</span>
                           </div>
+                        ) : (
+                          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-700 flex items-center justify-center mr-2">
+                            <span className="font-medium text-white text-xs">Dr</span>
+                          </div>
                         )}
-                        <div className={`rounded-lg p-3 text-sm text-white max-w-xs ${message.isFromPatient ? 'bg-[#252525]' : 'bg-blue-900'}`}>
-                          <p>{message.content}</p>
-                          <p className="text-xs text-gray-400 mt-1">
-                            {formatDate(message.timestamp)}
-                          </p>
+                        <div className="flex-1">
+                          <div className="flex justify-between">
+                            <span className="text-xs font-medium text-white">{message.isFromPatient ? selectedPatient.name : 'You'}</span>
+                            <span className="text-xs text-gray-500">{formatDate(message.timestamp)}</span>
+                          </div>
+                          <p className="text-xs text-gray-300">{message.content}</p>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                    <p>No messages available</p>
+                  <div className="flex items-center justify-center h-24 text-gray-500 border border-[#333] rounded-md">
+                    <p>No recent messages</p>
                   </div>
                 )}
-              </div>
-              
-              {/* Message Input */}
-              <div className="p-4 border-t border-[#333]">
+                
+                {/* Quick Reply */}
                 <form onSubmit={async (e) => {
                   e.preventDefault();
                   if (!newMessage.trim() || !selectedPatient) return;
@@ -336,18 +427,19 @@ export default function PatientsPage() {
                     });
                   }
                 }}>
-                  <div className="flex items-center">
+                  <div className="flex items-center mt-3">
                     <Input 
                       type="text" 
-                      placeholder="Type a message..." 
-                      className="bg-[#252525] border-[#444] text-white flex-1"
+                      placeholder="Type a quick message..." 
+                      className="bg-[#252525] border-[#444] text-white flex-1 text-sm h-9"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                     />
                     <Button 
                       type="submit" 
-                      className="ml-2 bg-blue-600 hover:bg-blue-700"
+                      className="ml-2 bg-blue-600 hover:bg-blue-700 h-9"
                       disabled={!newMessage.trim()}
+                      size="sm"
                     >
                       Send
                     </Button>
@@ -357,7 +449,7 @@ export default function PatientsPage() {
             </div>
           ) : (
             <div className="p-4 text-gray-400">
-              <p>Select a patient to view conversation</p>
+              <p>Select a patient to view pending items</p>
             </div>
           )}
         </div>
