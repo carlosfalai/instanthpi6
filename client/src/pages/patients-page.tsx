@@ -164,106 +164,91 @@ export default function PatientsPage() {
   return (
     <AppLayoutSpruce>
       <div className="flex h-full bg-[#121212] overflow-hidden">
-        {/* Left column - Patient List */}
-        <div className="w-full md:w-1/4 border-r border-[#333] flex flex-col bg-[#1a1a1a] overflow-hidden">
-          {/* Patient List Header */}
-          <div className="p-3 border-b border-[#333] flex items-center justify-between">
-            <div className="flex items-center">
-              <h2 className="font-semibold text-white">All Patients</h2>
-              <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />
-            </div>
-            <div className="flex items-center">
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={() => refreshPatientsMutation.mutate()}
-                disabled={refreshPatientsMutation.isPending}
-                className="mr-2"
-              >
-                <RefreshCw className={`h-4 w-4 mr-1 ${refreshPatientsMutation.isPending ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-                size="sm"
-              >
-                Add Patient
-              </Button>
-            </div>
+        {/* Left column - Patient Details (moved from right) */}
+        <div className="hidden md:block md:w-1/4 border-r border-[#333] bg-[#1a1a1a]">
+          <div className="p-4 border-b border-[#333]">
+            <h2 className="text-xl font-bold">Patient Orders & Commands</h2>
           </div>
-          
-          {/* Search Box */}
-          <div className="p-3 border-b border-[#333]">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input 
-                type="text"
-                placeholder="Search patients..." 
-                className="pl-10 bg-[#252525] border-[#444] text-white w-full"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          {/* Patient List - Spruce Style */}
-          <div className="overflow-y-auto flex-grow">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-32">
-                <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+          {selectedPatient ? (
+            <div className="p-4">
+              <div className="mb-6">
+                <h3 className="text-md font-semibold mb-2 text-white">Contact Information</h3>
+                <div className="space-y-2 text-sm text-gray-400">
+                  <p><span className="text-gray-500">Name:</span> {selectedPatient.name}</p>
+                  {selectedPatient.phone && (
+                    <p><span className="text-gray-500">Phone:</span> {selectedPatient.phone}</p>
+                  )}
+                  {selectedPatient.email && (
+                    <p><span className="text-gray-500">Email:</span> {selectedPatient.email}</p>
+                  )}
+                  <p>
+                    <span className="text-gray-500">Gender:</span> {selectedPatient.gender}
+                  </p>
+                  {selectedPatient.language && (
+                    <p><span className="text-gray-500">Language:</span> {selectedPatient.language}</p>
+                  )}
+                </div>
               </div>
-            ) : filteredPatients.length > 0 ? (
-              <div>
-                {filteredPatients.map((patient: Patient) => (
-                  <div 
-                    key={patient.id}
-                    className={`border-b border-[#333] hover:bg-[#252525] cursor-pointer transition-colors
-                      ${selectedPatient?.id === patient.id ? 'bg-[#2a2a2a]' : ''}`}
-                    onClick={() => handlePatientSelect(patient)}
-                  >
-                    <div className="p-3 flex items-start">
-                      {/* Patient Avatar */}
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-full ${getAvatarColor(patient.id)} flex items-center justify-center mr-3`}>
-                        <span className="font-medium text-white">{getInitials(patient.name)}</span>
-                      </div>
-                      
-                      {/* Patient Info */}
-                      <div className="flex-grow min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-medium text-white truncate">{patient.name}</h3>
-                          <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
-                            {formatDate(new Date().toISOString())}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-400 truncate">
-                          {patient.gender === 'male' ? 'Male' : 
-                           patient.gender === 'female' ? 'Female' : 'Unknown gender'}
-                           {patient.phone ? ` • ${patient.phone}` : ''}
-                        </p>
-                      </div>
-                    </div>
+              
+              {/* Command Input Section */}
+              <div className="mb-6">
+                <h3 className="text-md font-semibold mb-2 text-white">AI Commands</h3>
+                <div className="space-y-3">
+                  <Button className="w-full justify-between" variant="outline">
+                    <span>Generate RAMQ Request</span>
+                    <span>→</span>
+                  </Button>
+                  <Button className="w-full justify-between" variant="outline">
+                    <span>Create Prescription</span>
+                    <span>→</span>
+                  </Button>
+                  <Button className="w-full justify-between" variant="outline">
+                    <span>Draft Medical Note</span>
+                    <span>→</span>
+                  </Button>
+                  <Button className="w-full justify-between" variant="outline">
+                    <span>Schedule Follow-up</span>
+                    <span>→</span>
+                  </Button>
+                </div>
+                
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium text-white mb-2">Custom Command</h4>
+                  <div className="flex items-start">
+                    <Input 
+                      placeholder="Type command for AI..." 
+                      className="flex-1 bg-[#252525] border-[#444] text-white" 
+                    />
+                    <Button className="ml-2 bg-blue-600 hover:bg-blue-700">Send</Button>
                   </div>
-                ))}
+                </div>
               </div>
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                No patients found
+              
+              <div className="mb-6">
+                <h3 className="text-md font-semibold mb-2 text-white">Recent Communications</h3>
+                <div className="bg-[#252525] rounded-md p-3 text-sm text-gray-400">
+                  <p>No recent communications</p>
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="p-4">
+              <p className="text-gray-400">Select a patient to view details</p>
+            </div>
+          )}
         </div>
         
-        {/* Middle column - Pending Items and Action Items */}
+        {/* Middle column - AI Processing (renamed from Pending Actions) */}
         <div className="hidden md:block md:w-2/4 border-r border-[#333] bg-[#1a1a1a] flex flex-col">
           <div className="p-4 border-b border-[#333] flex flex-col gap-3">
             <div className="flex justify-between items-center">
-              <h2 className="text-xl font-bold">Pending Actions</h2>
+              <h2 className="text-xl font-bold">AI Processing</h2>
               <Button 
                 variant="outline" 
                 size="sm"
                 className="text-blue-400 border-blue-400 hover:bg-blue-900/20"
               >
-                Add Item
+                Add Task
               </Button>
             </div>
             
@@ -481,49 +466,98 @@ export default function PatientsPage() {
             </div>
           ) : (
             <div className="p-4 text-gray-400">
-              <p>Select a patient to view pending items</p>
+              <p>Select a patient to view AI processing</p>
             </div>
           )}
         </div>
         
-        {/* Middle column - Patient Details (moved to the right) */}
-        <div className="hidden md:block md:w-1/4 bg-[#1a1a1a]">
-          <div className="p-4 border-b border-[#333]">
-            <h2 className="text-xl font-bold">Patient Details</h2>
+        {/* Right column - Patient List (moved from left) */}
+        <div className="w-full md:w-1/4 border-l border-[#333] flex flex-col bg-[#1a1a1a] overflow-hidden">
+          {/* Patient List Header */}
+          <div className="p-3 border-b border-[#333] flex items-center justify-between">
+            <div className="flex items-center">
+              <h2 className="font-semibold text-white">All Patients</h2>
+              <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />
+            </div>
+            <div className="flex items-center">
+              <Button 
+                variant="outline"
+                size="sm"
+                onClick={() => refreshPatientsMutation.mutate()}
+                disabled={refreshPatientsMutation.isPending}
+                className="mr-2"
+              >
+                <RefreshCw className={`h-4 w-4 mr-1 ${refreshPatientsMutation.isPending ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              <Button 
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                size="sm"
+              >
+                Add Patient
+              </Button>
+            </div>
           </div>
-          {selectedPatient ? (
-            <div className="p-4">
-              <div className="mb-6">
-                <h3 className="text-md font-semibold mb-2 text-white">Contact Information</h3>
-                <div className="space-y-2 text-sm text-gray-400">
-                  <p><span className="text-gray-500">Name:</span> {selectedPatient.name}</p>
-                  {selectedPatient.phone && (
-                    <p><span className="text-gray-500">Phone:</span> {selectedPatient.phone}</p>
-                  )}
-                  {selectedPatient.email && (
-                    <p><span className="text-gray-500">Email:</span> {selectedPatient.email}</p>
-                  )}
-                  <p>
-                    <span className="text-gray-500">Gender:</span> {selectedPatient.gender}
-                  </p>
-                  {selectedPatient.language && (
-                    <p><span className="text-gray-500">Language:</span> {selectedPatient.language}</p>
-                  )}
-                </div>
-              </div>
-              
-              <div className="mb-6">
-                <h3 className="text-md font-semibold mb-2 text-white">Recent Communications</h3>
-                <div className="bg-[#252525] rounded-md p-3 text-sm text-gray-400">
-                  <p>No recent communications</p>
-                </div>
-              </div>
+          
+          {/* Search Box */}
+          <div className="p-3 border-b border-[#333]">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              <Input 
+                type="text"
+                placeholder="Search patients..." 
+                className="pl-10 bg-[#252525] border-[#444] text-white w-full"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
             </div>
-          ) : (
-            <div className="p-4">
-              <p className="text-gray-400">Select a patient to view details</p>
-            </div>
-          )}
+          </div>
+          
+          {/* Patient List - Spruce Style */}
+          <div className="overflow-y-auto flex-grow">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-32">
+                <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+              </div>
+            ) : filteredPatients.length > 0 ? (
+              <div>
+                {filteredPatients.map((patient: Patient) => (
+                  <div 
+                    key={patient.id}
+                    className={`border-b border-[#333] hover:bg-[#252525] cursor-pointer transition-colors
+                      ${selectedPatient?.id === patient.id ? 'bg-[#2a2a2a]' : ''}`}
+                    onClick={() => handlePatientSelect(patient)}
+                  >
+                    <div className="p-3 flex items-start">
+                      {/* Patient Avatar */}
+                      <div className={`flex-shrink-0 w-10 h-10 rounded-full ${getAvatarColor(patient.id)} flex items-center justify-center mr-3`}>
+                        <span className="font-medium text-white">{getInitials(patient.name)}</span>
+                      </div>
+                      
+                      {/* Patient Info */}
+                      <div className="flex-grow min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-medium text-white truncate">{patient.name}</h3>
+                          <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
+                            {formatDate(new Date().toISOString())}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-400 truncate">
+                          {patient.gender === 'male' ? 'Male' : 
+                           patient.gender === 'female' ? 'Female' : 'Unknown gender'}
+                           {patient.phone ? ` • ${patient.phone}` : ''}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="p-4 text-center text-gray-500">
+                No patients found
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </AppLayoutSpruce>
