@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2, User, Search, RefreshCw, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { useDebounce } from '@/hooks/use-debounce';
 import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
@@ -138,7 +139,9 @@ export default function PatientsPage() {
     if (patient && patient.id) {
       setIsLoadingMessages(true);
       try {
-        const response = await fetch(`/api/spruce/patients/${patient.id}/messages`);
+        // Use the spruceId if available, otherwise use regular id
+        const patientIdForApi = patient.spruceId || `entity_${patient.id}`;
+        const response = await fetch(`/api/spruce/patients/${patientIdForApi}/messages`);
         if (!response.ok) {
           throw new Error('Failed to fetch patient messages');
         }
