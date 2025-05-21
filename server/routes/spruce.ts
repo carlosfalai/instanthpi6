@@ -509,33 +509,58 @@ router.get('/patients/:patientId/messages', async (req, res) => {
     console.log(`Retrieving messages for patient ${patientId}`);
     
     // Use the documented endpoint from Spruce API
-    const response = await spruceApi.get(`/v1/contacts/${patientId}/conversations`);
+    const conversationsResponse = await spruceApi.get(`/v1/contacts/${patientId}/conversations`);
     console.log('Raw Spruce API messages response structure:', 
-      JSON.stringify(response.data).substring(0, 500) + '...');
+      JSON.stringify(conversationsResponse.data).substring(0, 500) + '...');
     
-    // Extract conversations or messages from response
-    const conversations = response.data.conversations || [];
+    // Extract conversations from response
+    const conversations = conversationsResponse.data.conversations || [];
     let allMessages: any[] = [];
     
-    // Flatten messages from all conversations
-    conversations.forEach((conversation: any) => {
-      const conversationMessages = conversation.messages || [];
-      allMessages = [...allMessages, ...conversationMessages.map((msg: any) => ({
-        id: msg.id || `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        patientId: patientId,
-        content: msg.content || msg.text || '',
-        timestamp: msg.created_at || msg.createdAt || new Date().toISOString(),
-        isFromPatient: msg.sender_type === 'patient' || (msg.sender_id && msg.sender_id !== 'doctor'),
-        sender: msg.sender_name || (msg.sender_type === 'patient' ? 'Patient' : 'Doctor'),
-        attachmentUrl: msg.attachment_url || null
-      }))];
-    });
+    // For each conversation, fetch messages
+    for (const conversation of conversations) {
+      const conversationId = conversation.id;
+      if (!conversationId) continue;
+      
+      try {
+        // Fetch messages for this conversation
+        const messagesResponse = await spruceApi.get(`/v1/conversations/${conversationId}/messages`);
+        const conversationMessages = messagesResponse.data.messages || [];
+        
+        // Add messages to allMessages
+        allMessages = [...allMessages, ...conversationMessages.map((msg: any) => ({
+          id: msg.id || `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          patientId: patientId,
+          conversationId: conversationId,
+          content: msg.content || msg.text || '',
+          timestamp: msg.created_at || msg.createdAt || new Date().toISOString(),
+          isFromPatient: msg.sender && msg.sender.type === 'external',
+          sender: msg.sender ? (msg.sender.type === 'external' ? 'Patient' : 'Doctor') : 'Unknown',
+          attachmentUrl: msg.media && msg.media.url ? msg.media.url : null
+        }))];
+      } catch (err) {
+        console.error(`Error fetching messages for conversation ${conversationId}:`, err);
+      }
+    }
+    
+    // Check if any message contains RAMQ card images
+    const ramqVerification = allMessages.some(msg => 
+      (msg.content && msg.content.toLowerCase().includes('ramq')) || 
+      (msg.attachmentUrl && msg.attachmentUrl.toLowerCase().includes('photo'))
+    );
     
     // Sort messages by timestamp
     allMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
     
     console.log(`Found ${allMessages.length} messages for patient ${patientId}`);
-    res.json(allMessages);
+    
+    // Include RAMQ verification status in the response
+    res.json({
+      messages: allMessages,
+      metadata: {
+        ramqVerified: ramqVerification || false
+      }
+    });
   } catch (error: any) {
     console.error('Error fetching messages from Spruce API:', {
       message: error.message,
@@ -548,7 +573,10 @@ router.get('/patients/:patientId/messages', async (req, res) => {
     res.status(500).json({
       success: false, 
       error: error.message,
-      messages: []
+      messages: [],
+      metadata: {
+        ramqVerified: false
+      }
     });
   }
 });
