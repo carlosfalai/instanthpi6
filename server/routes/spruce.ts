@@ -507,24 +507,100 @@ router.get('/patients/:patientId/messages', async (req, res) => {
     
     // Get messages from Spruce API using correct endpoint format
     console.log(`Retrieving messages for patient ${patientId}`);
-    const response = await spruceApi.get(`/v1/patients/${patientId}/messages`);
-    const spruceMessages = response.data.messages || [];
     
-    // Convert Spruce messages to our format
-    const messages = spruceMessages.map((msg: any) => ({
-      id: msg.id,
-      patientId: parseInt(patientId),
-      content: msg.content,
-      timestamp: new Date(msg.timestamp),
-      isFromPatient: msg.sender_type === 'patient',
-      sender: msg.sender_name || (msg.sender_type === 'patient' ? 'Patient' : 'Doctor'),
-      attachmentUrl: msg.attachment_url || null
-    }));
+    // Use the documented endpoint from Spruce API
+    const response = await spruceApi.get(`/v1/contacts/${patientId}/conversations`);
+    console.log('Raw Spruce API messages response structure:', 
+      JSON.stringify(response.data).substring(0, 500) + '...');
     
-    res.json(messages);
-  } catch (error) {
-    console.error('Error fetching messages from Spruce API:', error);
-    // No fallback to local database - return empty array
-    res.json([]);
+    // Extract conversations or messages from response
+    const conversations = response.data.conversations || [];
+    let allMessages: any[] = [];
+    
+    // Flatten messages from all conversations
+    conversations.forEach((conversation: any) => {
+      const conversationMessages = conversation.messages || [];
+      allMessages = [...allMessages, ...conversationMessages.map((msg: any) => ({
+        id: msg.id || `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        patientId: patientId,
+        content: msg.content || msg.text || '',
+        timestamp: msg.created_at || msg.createdAt || new Date().toISOString(),
+        isFromPatient: msg.sender_type === 'patient' || (msg.sender_id && msg.sender_id !== 'doctor'),
+        sender: msg.sender_name || (msg.sender_type === 'patient' ? 'Patient' : 'Doctor'),
+        attachmentUrl: msg.attachment_url || null
+      }))];
+    });
+    
+    // Sort messages by timestamp
+    allMessages.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    
+    console.log(`Found ${allMessages.length} messages for patient ${patientId}`);
+    res.json(allMessages);
+  } catch (error: any) {
+    console.error('Error fetching messages from Spruce API:', {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data
+    });
+    
+    // Return empty array with error details
+    res.status(500).json({
+      success: false, 
+      error: error.message,
+      messages: []
+    });
+  }
+});
+
+// Send message to patient via Spruce API
+router.post('/patients/:patientId/messages', async (req, res) => {
+  try {
+    const patientId = req.params.patientId;
+    const { content } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({
+        success: false,
+        message: 'Message content is required'
+      });
+    }
+    
+    console.log(`Sending message to patient ${patientId}: ${content.substring(0, 50)}...`);
+    
+    // Use the documented endpoint from Spruce API to send a message
+    const response = await spruceApi.post(`/v1/contacts/${patientId}/messages`, {
+      content: content,
+      type: 'text'
+    });
+    
+    // Extract the created message from response
+    const createdMessage = response.data;
+    
+    res.json({
+      success: true,
+      message: 'Message sent successfully',
+      data: {
+        id: createdMessage.id || `msg-${Date.now()}`,
+        patientId: patientId,
+        content: content,
+        timestamp: new Date().toISOString(),
+        isFromPatient: false,
+        sender: 'Doctor'
+      }
+    });
+  } catch (error: any) {
+    console.error('Error sending message via Spruce API:', {
+      message: error.message,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data
+    });
+    
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send message',
+      error: error.message
+    });
   }
 });

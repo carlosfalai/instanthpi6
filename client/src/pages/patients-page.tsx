@@ -127,16 +127,42 @@ export default function PatientsPage() {
     }
   };
   
-  // Handle patient selection
-  const handlePatientSelect = (patient: Patient) => {
+  // Handle patient selection and fetch their messages
+  const [patientMessages, setPatientMessages] = useState<any[]>([]);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false);
+  const [newMessage, setNewMessage] = useState('');
+  
+  const handlePatientSelect = async (patient: Patient) => {
     setSelectedPatient(patient);
+    
+    if (patient && patient.id) {
+      setIsLoadingMessages(true);
+      try {
+        const response = await fetch(`/api/spruce/patients/${patient.id}/messages`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch patient messages');
+        }
+        const messages = await response.json();
+        setPatientMessages(messages);
+      } catch (error) {
+        console.error('Error fetching patient messages:', error);
+        toast({
+          title: 'Error fetching messages',
+          description: 'Could not load conversation history.',
+          variant: 'destructive'
+        });
+        setPatientMessages([]);
+      } finally {
+        setIsLoadingMessages(false);
+      }
+    }
   };
   
   return (
     <AppLayoutSpruce>
       <div className="flex h-full bg-[#121212] overflow-hidden">
         {/* Left column - Patient List */}
-        <div className="w-full md:w-1/3 border-r border-[#333] flex flex-col bg-[#1a1a1a] overflow-hidden">
+        <div className="w-full md:w-1/4 border-r border-[#333] flex flex-col bg-[#1a1a1a] overflow-hidden">
           {/* Patient List Header */}
           <div className="p-3 border-b border-[#333] flex items-center justify-between">
             <div className="flex items-center">
@@ -224,8 +250,120 @@ export default function PatientsPage() {
           </div>
         </div>
         
-        {/* Middle column - Patient Details */}
-        <div className="hidden md:block md:w-1/3 border-r border-[#333] bg-[#1a1a1a]">
+        {/* Right column - Patient Conversation (moved before Patient Details) */}
+        <div className="hidden md:block md:w-2/4 border-r border-[#333] bg-[#1a1a1a] flex flex-col">
+          <div className="p-4 border-b border-[#333]">
+            <h2 className="text-xl font-bold">Conversation</h2>
+          </div>
+          
+          {selectedPatient ? (
+            <div className="flex-1 flex flex-col">
+              {/* Conversation History */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {isLoadingMessages ? (
+                  <div className="flex items-center justify-center h-full">
+                    <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+                  </div>
+                ) : patientMessages.length > 0 ? (
+                  <div className="space-y-4">
+                    {patientMessages.map((message) => (
+                      <div key={message.id} className={`flex items-start ${message.isFromPatient ? '' : 'justify-end'}`}>
+                        {message.isFromPatient && (
+                          <div className={`flex-shrink-0 w-8 h-8 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-2`}>
+                            <span className="font-medium text-white text-xs">{getInitials(selectedPatient.name)}</span>
+                          </div>
+                        )}
+                        <div className={`rounded-lg p-3 text-sm text-white max-w-xs ${message.isFromPatient ? 'bg-[#252525]' : 'bg-blue-900'}`}>
+                          <p>{message.content}</p>
+                          <p className="text-xs text-gray-400 mt-1">
+                            {formatDate(message.timestamp)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                    <p>No messages available</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Message Input */}
+              <div className="p-4 border-t border-[#333]">
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!newMessage.trim() || !selectedPatient) return;
+                  
+                  try {
+                    const response = await fetch(`/api/spruce/patients/${selectedPatient.id}/messages`, {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({
+                        content: newMessage,
+                        patientId: selectedPatient.id
+                      })
+                    });
+                    
+                    if (!response.ok) {
+                      throw new Error('Failed to send message');
+                    }
+                    
+                    // Add message to UI immediately
+                    const newMessageObj = {
+                      id: `temp-${Date.now()}`,
+                      content: newMessage,
+                      timestamp: new Date().toISOString(),
+                      isFromPatient: false,
+                      sender: 'Doctor',
+                      patientId: selectedPatient.id
+                    };
+                    
+                    setPatientMessages([...patientMessages, newMessageObj]);
+                    setNewMessage('');
+                    
+                    // Fetch updated messages after sending
+                    handlePatientSelect(selectedPatient);
+                    
+                  } catch (error) {
+                    console.error('Error sending message:', error);
+                    toast({
+                      title: 'Error sending message',
+                      description: 'Your message could not be sent.',
+                      variant: 'destructive'
+                    });
+                  }
+                }}>
+                  <div className="flex items-center">
+                    <Input 
+                      type="text" 
+                      placeholder="Type a message..." 
+                      className="bg-[#252525] border-[#444] text-white flex-1"
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                    />
+                    <Button 
+                      type="submit" 
+                      className="ml-2 bg-blue-600 hover:bg-blue-700"
+                      disabled={!newMessage.trim()}
+                    >
+                      Send
+                    </Button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 text-gray-400">
+              <p>Select a patient to view conversation</p>
+            </div>
+          )}
+        </div>
+        
+        {/* Middle column - Patient Details (moved to the right) */}
+        <div className="hidden md:block md:w-1/4 bg-[#1a1a1a]">
           <div className="p-4 border-b border-[#333]">
             <h2 className="text-xl font-bold">Patient Details</h2>
           </div>
@@ -260,68 +398,6 @@ export default function PatientsPage() {
           ) : (
             <div className="p-4">
               <p className="text-gray-400">Select a patient to view details</p>
-            </div>
-          )}
-        </div>
-        
-        {/* Right column - Patient Conversation */}
-        <div className="hidden md:block md:w-1/3 bg-[#1a1a1a] flex flex-col">
-          <div className="p-4 border-b border-[#333]">
-            <h2 className="text-xl font-bold">Conversation</h2>
-          </div>
-          
-          {selectedPatient ? (
-            <div className="flex-1 flex flex-col">
-              {/* Conversation History */}
-              <div className="flex-1 overflow-y-auto p-4">
-                <div className="space-y-4">
-                  {/* Sample messages - these would come from an API in a real app */}
-                  <div className="flex items-start">
-                    <div className={`flex-shrink-0 w-8 h-8 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-2`}>
-                      <span className="font-medium text-white text-xs">{getInitials(selectedPatient.name)}</span>
-                    </div>
-                    <div className="bg-[#252525] rounded-lg p-3 text-sm text-white max-w-xs">
-                      <p>Hello doctor, I've been experiencing headaches for the past week.</p>
-                      <p className="text-xs text-gray-400 mt-1">10:30 AM</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start justify-end">
-                    <div className="bg-blue-900 rounded-lg p-3 text-sm text-white max-w-xs">
-                      <p>I'm sorry to hear that. How severe are your headaches on a scale of 1-10?</p>
-                      <p className="text-xs text-gray-400 mt-1">10:35 AM</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <div className={`flex-shrink-0 w-8 h-8 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-2`}>
-                      <span className="font-medium text-white text-xs">{getInitials(selectedPatient.name)}</span>
-                    </div>
-                    <div className="bg-[#252525] rounded-lg p-3 text-sm text-white max-w-xs">
-                      <p>I would say about a 7. It gets worse in the evening.</p>
-                      <p className="text-xs text-gray-400 mt-1">10:40 AM</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Message Input */}
-              <div className="p-4 border-t border-[#333]">
-                <div className="flex items-center">
-                  <Input 
-                    type="text" 
-                    placeholder="Type a message..." 
-                    className="bg-[#252525] border-[#444] text-white flex-1"
-                  />
-                  <Button className="ml-2 bg-blue-600 hover:bg-blue-700">
-                    Send
-                  </Button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="p-4 text-gray-400">
-              <p>Select a patient to view conversation</p>
             </div>
           )}
         </div>
