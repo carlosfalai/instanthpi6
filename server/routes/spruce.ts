@@ -568,8 +568,29 @@ router.post('/patients/:patientId/messages', async (req, res) => {
     
     console.log(`Sending message to patient ${patientId}: ${content.substring(0, 50)}...`);
     
-    // Use the documented endpoint from Spruce API to send a message
-    const response = await spruceApi.post(`/v1/contacts/${patientId}/messages`, {
+    // Find conversation ID first before sending a message
+    const conversationsResponse = await spruceApi.get(`/v1/contacts/${patientId}/conversations`);
+    if (!conversationsResponse.data || !conversationsResponse.data.conversations || !conversationsResponse.data.conversations.length) {
+      // Create a new conversation if none exists
+      console.log(`No existing conversations found for patient ${patientId}, creating a new one`);
+      const newConversationResponse = await spruceApi.post('/v1/conversations', {
+        contact_ids: [patientId],
+        subject: 'New conversation'
+      });
+      const conversationId = newConversationResponse.data.id;
+      
+      // Now send the message to the newly created conversation
+      const response = await spruceApi.post(`/v1/conversations/${conversationId}/messages`, {
+        content: content,
+        type: 'text'
+      });
+      return response;
+    }
+    
+    // Use the first conversation found to send the message
+    const conversationId = conversationsResponse.data.conversations[0].id;
+    console.log(`Using existing conversation ID: ${conversationId} for patient ${patientId}`);
+    const response = await spruceApi.post(`/v1/conversations/${conversationId}/messages`, {
       content: content,
       type: 'text'
     });
