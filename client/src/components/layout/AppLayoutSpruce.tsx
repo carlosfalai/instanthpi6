@@ -474,7 +474,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                   if (section.id === 'patients' || section.id === 'documents' || section.id === 'settings') {
                     toggleSectionExpanded(section.id);
                   } else {
-                    setLocation(section.path);
+                    navigate(section.path);
                     setIsMobileMenuOpen(false);
                   }
                 }}

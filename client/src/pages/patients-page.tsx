@@ -473,90 +473,206 @@ export default function PatientsPage() {
         
         {/* Right column - Patient List (moved from left) */}
         <div className="w-full md:w-1/4 border-l border-[#333] flex flex-col bg-[#1a1a1a] overflow-hidden">
-          {/* Patient List Header */}
-          <div className="p-3 border-b border-[#333] flex items-center justify-between">
-            <div className="flex items-center">
-              <h2 className="font-semibold text-white">All Patients</h2>
-              <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />
-            </div>
-            <div className="flex items-center">
-              <Button 
-                variant="outline"
-                size="sm"
-                onClick={() => refreshPatientsMutation.mutate()}
-                disabled={refreshPatientsMutation.isPending}
-                className="mr-2"
-              >
-                <RefreshCw className={`h-4 w-4 mr-1 ${refreshPatientsMutation.isPending ? 'animate-spin' : ''}`} />
-                Refresh
-              </Button>
-              <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-                size="sm"
-              >
-                Add Patient
-              </Button>
-            </div>
-          </div>
-          
-          {/* Search Box */}
-          <div className="p-3 border-b border-[#333]">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-              <Input 
-                type="text"
-                placeholder="Search patients..." 
-                className="pl-10 bg-[#252525] border-[#444] text-white w-full"
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          {/* Patient List - Spruce Style */}
-          <div className="overflow-y-auto flex-grow">
-            {isLoading ? (
-              <div className="flex items-center justify-center h-32">
-                <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
-              </div>
-            ) : filteredPatients.length > 0 ? (
-              <div>
-                {filteredPatients.map((patient: Patient) => (
-                  <div 
-                    key={patient.id}
-                    className={`border-b border-[#333] hover:bg-[#252525] cursor-pointer transition-colors
-                      ${selectedPatient?.id === patient.id ? 'bg-[#2a2a2a]' : ''}`}
-                    onClick={() => handlePatientSelect(patient)}
+          <div className="flex flex-col h-full">
+            {/* Top half - Patient list */}
+            <div className="flex flex-col h-1/2 overflow-hidden">
+              {/* Patient List Header */}
+              <div className="p-3 border-b border-[#333] flex items-center justify-between">
+                <div className="flex items-center">
+                  <h2 className="font-semibold text-white">All Patients</h2>
+                  <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />
+                </div>
+                <div className="flex items-center">
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={() => refreshPatientsMutation.mutate()}
+                    disabled={refreshPatientsMutation.isPending}
+                    className="mr-2"
                   >
-                    <div className="p-3 flex items-start">
-                      {/* Patient Avatar */}
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-full ${getAvatarColor(patient.id)} flex items-center justify-center mr-3`}>
-                        <span className="font-medium text-white">{getInitials(patient.name)}</span>
-                      </div>
-                      
-                      {/* Patient Info */}
-                      <div className="flex-grow min-w-0">
-                        <div className="flex items-center justify-between">
-                          <h3 className="font-medium text-white truncate">{patient.name}</h3>
-                          <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
-                            {formatDate(new Date().toISOString())}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-400 truncate">
-                          {patient.gender === 'male' ? 'Male' : 
-                           patient.gender === 'female' ? 'Female' : 'Unknown gender'}
-                           {patient.phone ? ` • ${patient.phone}` : ''}
-                        </p>
-                      </div>
-                    </div>
+                    <RefreshCw className={`h-4 w-4 mr-1 ${refreshPatientsMutation.isPending ? 'animate-spin' : ''}`} />
+                    Refresh
+                  </Button>
+                  <Button 
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    size="sm"
+                  >
+                    Add Patient
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Search Box */}
+              <div className="p-3 border-b border-[#333]">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+                  <Input 
+                    type="text"
+                    placeholder="Search patients..." 
+                    className="pl-10 bg-[#252525] border-[#444] text-white w-full"
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                  />
+                </div>
+              </div>
+              
+              {/* Patient List - Spruce Style */}
+              <div className="overflow-y-auto flex-grow">
+                {isLoading ? (
+                  <div className="flex items-center justify-center h-32">
+                    <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
                   </div>
-                ))}
+                ) : filteredPatients.length > 0 ? (
+                  <div>
+                    {filteredPatients.map((patient: Patient) => (
+                      <div 
+                        key={patient.id}
+                        className={`border-b border-[#333] hover:bg-[#252525] cursor-pointer transition-colors
+                          ${selectedPatient?.id === patient.id ? 'bg-[#2a2a2a]' : ''}`}
+                        onClick={() => handlePatientSelect(patient)}
+                      >
+                        <div className="p-3 flex items-start">
+                          {/* Patient Avatar */}
+                          <div className={`flex-shrink-0 w-10 h-10 rounded-full ${getAvatarColor(patient.id)} flex items-center justify-center mr-3`}>
+                            <span className="font-medium text-white">{getInitials(patient.name)}</span>
+                          </div>
+                          
+                          {/* Patient Info */}
+                          <div className="flex-grow min-w-0">
+                            <div className="flex items-center justify-between">
+                              <h3 className="font-medium text-white truncate">{patient.name}</h3>
+                              <span className="text-xs text-gray-400 whitespace-nowrap ml-2">
+                                {formatDate(new Date().toISOString())}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-400 truncate">
+                              {patient.gender === 'male' ? 'Male' : 
+                              patient.gender === 'female' ? 'Female' : 'Unknown gender'}
+                              {patient.phone ? ` • ${patient.phone}` : ''}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-gray-500">
+                    No patients found
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                No patients found
+            </div>
+            
+            {/* Bottom half - Conversation history */}
+            <div className="h-1/2 border-t border-[#333] flex flex-col overflow-hidden">
+              <div className="p-3 border-b border-[#333] flex items-center justify-between">
+                <h2 className="font-semibold text-white">Conversation History</h2>
               </div>
-            )}
+              <div className="overflow-y-auto flex-grow p-3">
+                {!selectedPatient ? (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    <p>Select a patient to view conversations</p>
+                  </div>
+                ) : isLoadingMessages ? (
+                  <div className="flex items-center justify-center h-full">
+                    <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+                  </div>
+                ) : patientMessages.length > 0 ? (
+                  <div className="space-y-3">
+                    {patientMessages.map((message) => (
+                      <div key={message.id} className="border-b border-[#333] pb-2 mb-2 last:border-b-0 last:mb-0 last:pb-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center">
+                            {message.isFromPatient ? (
+                              <div className={`flex-shrink-0 w-6 h-6 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-2`}>
+                                <span className="font-medium text-white text-xs">{getInitials(selectedPatient.name)}</span>
+                              </div>
+                            ) : (
+                              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-700 flex items-center justify-center mr-2">
+                                <span className="font-medium text-white text-xs">Dr</span>
+                              </div>
+                            )}
+                            <span className="text-sm font-medium text-white">{message.isFromPatient ? selectedPatient.name : 'You'}</span>
+                          </div>
+                          <span className="text-xs text-gray-500">{formatDate(message.timestamp)}</span>
+                        </div>
+                        <p className="text-sm text-gray-300 pl-8">{message.content}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                    <p>No conversation history available</p>
+                  </div>
+                )}
+              </div>
+              
+              {/* Quick message input for the conversation */}
+              {selectedPatient && (
+                <div className="p-3 border-t border-[#333]">
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    if (!newMessage.trim() || !selectedPatient) return;
+                    
+                    try {
+                      const response = await fetch(`/api/spruce/patients/${selectedPatient.id}/messages`, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                          content: newMessage,
+                          patientId: selectedPatient.id
+                        })
+                      });
+                      
+                      if (!response.ok) {
+                        throw new Error('Failed to send message');
+                      }
+                      
+                      // Add message to UI immediately
+                      const newMessageObj = {
+                        id: `temp-${Date.now()}`,
+                        content: newMessage,
+                        timestamp: new Date().toISOString(),
+                        isFromPatient: false,
+                        sender: 'Doctor',
+                        patientId: selectedPatient.id
+                      };
+                      
+                      setPatientMessages([...patientMessages, newMessageObj]);
+                      setNewMessage('');
+                      
+                    } catch (error) {
+                      console.error('Error sending message:', error);
+                      toast({
+                        title: 'Error sending message',
+                        description: 'Your message could not be sent.',
+                        variant: 'destructive'
+                      });
+                    }
+                  }}>
+                    <div className="flex items-center">
+                      <Input 
+                        type="text" 
+                        placeholder="Type a message..." 
+                        className="bg-[#252525] border-[#444] text-white flex-1 text-sm h-8"
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                      />
+                      <Button 
+                        type="submit" 
+                        className="ml-2 bg-blue-600 hover:bg-blue-700 h-8 px-3"
+                        disabled={!newMessage.trim()}
+                        size="sm"
+                      >
+                        Send
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
