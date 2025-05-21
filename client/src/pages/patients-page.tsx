@@ -26,6 +26,8 @@ export default function PatientsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [isTasksExpanded, setIsTasksExpanded] = useState(true);
+  const [isCommunicationsExpanded, setIsCommunicationsExpanded] = useState(true);
   
   // Refresh patients data mutation
   const refreshPatientsMutation = useMutation({
@@ -249,11 +251,52 @@ export default function PatientsPage() {
                 </div>
               </div>
               
-              <div className="mb-6">
-                <h3 className="text-md font-semibold mb-2 text-white">Recent Communications</h3>
-                <div className="bg-[#252525] rounded-md p-3 text-sm text-gray-400">
-                  <p>No recent communications</p>
+              {/* Patient Tasks Section - Collapsible */}
+              <div className="mb-4">
+                <div 
+                  className="flex items-center justify-between cursor-pointer bg-[#252525] p-2 rounded-md mb-2"
+                  onClick={() => setIsTasksExpanded(!isTasksExpanded)}
+                >
+                  <h3 className="text-md font-semibold text-white">Patient Tasks</h3>
+                  <ChevronDown className={`h-5 w-5 transform transition-transform ${isTasksExpanded ? 'rotate-180' : ''}`} />
                 </div>
+                
+                {isTasksExpanded && (
+                  <div className="space-y-3 border border-[#333] rounded-md p-3 bg-[#1e1e1e]">
+                    {/* RAMQ Verification Card */}
+                    <div className="p-3 border border-[#333] rounded-md bg-[#252525]">
+                      <div className="flex justify-between items-center mb-2">
+                        <h4 className="font-medium text-white">Waiting for RAMQ card photo</h4>
+                        <Badge className={selectedPatient?.ramqVerified ? "bg-green-700" : "bg-amber-700"}>
+                          {selectedPatient?.ramqVerified ? "Verified" : "Pending"}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-400 mb-2">Patient needs to send a photo of their RAMQ health insurance card for verification.</p>
+                      <div className="text-right">
+                        <Button size="sm" variant="outline" className="text-blue-400">Send Reminder</Button>
+                      </div>
+                    </div>
+                    
+                    {/* Other pending items can go here */}
+                  </div>
+                )}
+              </div>
+              
+              {/* Recent Communications - Collapsible */}
+              <div className="mb-6">
+                <div 
+                  className="flex items-center justify-between cursor-pointer bg-[#252525] p-2 rounded-md mb-2"
+                  onClick={() => setIsCommunicationsExpanded(!isCommunicationsExpanded)}
+                >
+                  <h3 className="text-md font-semibold text-white">Recent Communications</h3>
+                  <ChevronDown className={`h-5 w-5 transform transition-transform ${isCommunicationsExpanded ? 'rotate-180' : ''}`} />
+                </div>
+                
+                {isCommunicationsExpanded && (
+                  <div className="bg-[#252525] rounded-md p-3 text-sm text-gray-400">
+                    <p>No recent communications</p>
+                  </div>
+                )}
               </div>
             </div>
           ) : (

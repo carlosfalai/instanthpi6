@@ -523,17 +523,20 @@ router.get('/patients/:patientId/messages', async (req, res) => {
       if (!conversationId) continue;
       
       try {
-        // Fetch messages for this conversation
-        const messagesResponse = await spruceApi.get(`/v1/conversations/${conversationId}/messages`);
-        console.log(`Raw message data for conversation ${conversationId}:`, 
-          JSON.stringify(messagesResponse.data).substring(0, 300) + '...');
-        const conversationMessages = messagesResponse.data.messages || [];
+        // Use threads endpoint instead of messages directly
+        const threadsResponse = await spruceApi.get(`/v1/conversations/${conversationId}/threads`);
+        const messages = [];
         
-        if (conversationMessages.length === 0) {
-          console.log(`No messages found in conversation ${conversationId}`);
-        } else {
-          console.log(`Found ${conversationMessages.length} messages in conversation ${conversationId}`);
+        // If the conversation has threads, extract messages from each thread
+        if (threadsResponse.data && threadsResponse.data.threads) {
+          for (const thread of threadsResponse.data.threads) {
+            if (thread.messages && thread.messages.length > 0) {
+              messages.push(...thread.messages);
+            }
+          }
         }
+        
+        const conversationMessages = messages;
         
         // Add messages to allMessages
         allMessages = [...allMessages, ...conversationMessages.map((msg: any) => ({
