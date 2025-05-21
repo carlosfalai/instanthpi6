@@ -290,7 +290,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                   if (section.id === 'patients' || section.id === 'documents' || section.id === 'settings') {
                     toggleSectionExpanded(section.id);
                   }
-                  setLocation(section.path);
+                  navigate(section.path);
                 }}
               >
                 <div className="flex items-center">
