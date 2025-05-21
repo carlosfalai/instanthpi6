@@ -525,7 +525,15 @@ router.get('/patients/:patientId/messages', async (req, res) => {
       try {
         // Fetch messages for this conversation
         const messagesResponse = await spruceApi.get(`/v1/conversations/${conversationId}/messages`);
+        console.log(`Raw message data for conversation ${conversationId}:`, 
+          JSON.stringify(messagesResponse.data).substring(0, 300) + '...');
         const conversationMessages = messagesResponse.data.messages || [];
+        
+        if (conversationMessages.length === 0) {
+          console.log(`No messages found in conversation ${conversationId}`);
+        } else {
+          console.log(`Found ${conversationMessages.length} messages in conversation ${conversationId}`);
+        }
         
         // Add messages to allMessages
         allMessages = [...allMessages, ...conversationMessages.map((msg: any) => ({

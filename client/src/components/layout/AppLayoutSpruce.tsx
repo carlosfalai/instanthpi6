@@ -76,9 +76,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
   });
   
   // Use this instead of direct navigation
-  const navigate = useCallback((path: string) => {
-    window.location.href = path;
-  }, []);
+  const [, setLocation] = useLocation();
 
   // Mock user data - in a real app this would come from context or API
   const currentUser = {
@@ -290,7 +288,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                   if (section.id === 'patients' || section.id === 'documents' || section.id === 'settings') {
                     toggleSectionExpanded(section.id);
                   }
-                  navigate(section.path);
+                  setLocation(section.path);
                 }}
               >
                 <div className="flex items-center">
@@ -474,7 +472,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                   if (section.id === 'patients' || section.id === 'documents' || section.id === 'settings') {
                     toggleSectionExpanded(section.id);
                   } else {
-                    navigate(section.path);
+                    setLocation(section.path);
                     setIsMobileMenuOpen(false);
                   }
                 }}
