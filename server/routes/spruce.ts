@@ -523,28 +523,12 @@ router.get('/patients/:patientId/messages', async (req, res) => {
       if (!conversationId) continue;
       
       try {
-        // For demonstration purposes, create some sample messages
-        // since the actual API is returning a 405 error
-        const conversationMessages = [
-          {
-            id: `msg-${Date.now()}-1`,
-            content: "Hello, I'm having some chest pain and shortness of breath.",
-            sender: { type: 'external', name: 'Patient' },
-            createdAt: new Date(Date.now() - 3600000).toISOString()
-          },
-          {
-            id: `msg-${Date.now()}-2`,
-            content: "I'm sorry to hear that. When did these symptoms start? And do you have any history of heart problems?",
-            sender: { type: 'internal', name: 'Doctor' },
-            createdAt: new Date(Date.now() - 3300000).toISOString()
-          },
-          {
-            id: `msg-${Date.now()}-3`,
-            content: "Started yesterday evening. No history of heart problems, but my father had a heart attack at 60.",
-            sender: { type: 'external', name: 'Patient' },
-            createdAt: new Date(Date.now() - 3000000).toISOString()
-          }
-        ];
+        // Get the conversation details from Spruce API
+        const conversationResponse = await spruceApi.get(`/v1/conversations/${conversationId}`);
+        
+        // Access the actual messages array from the conversation
+        const conversationMessages = conversationResponse.data.messages || [];
+        console.log(`Found ${conversationMessages.length} messages in conversation ${conversationId}`);
         
         // Add messages to allMessages
         allMessages = [...allMessages, ...conversationMessages.map((msg: any) => ({
