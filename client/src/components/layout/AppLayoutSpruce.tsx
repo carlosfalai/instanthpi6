@@ -1,4 +1,4 @@
-import React, { useState, ReactNode, useEffect } from 'react';
+import React, { useState, ReactNode, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'wouter';
 import {
   Users,
@@ -75,10 +75,10 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     settings: false
   });
   
-  // Use this instead of setLocation
-  const navigate = (path: string) => {
+  // Use this instead of direct navigation
+  const navigate = useCallback((path: string) => {
     window.location.href = path;
-  };
+  }, []);
 
   // Mock user data - in a real app this would come from context or API
   const currentUser = {
