@@ -17,6 +17,7 @@ interface Patient {
   gender: string;
   language: 'english' | 'french' | null;
   spruceId?: string | null;
+  ramqVerified?: boolean;
 }
 
 export default function PatientsPage() {
@@ -145,8 +146,22 @@ export default function PatientsPage() {
         if (!response.ok) {
           throw new Error('Failed to fetch patient messages');
         }
-        const messages = await response.json();
-        setPatientMessages(messages);
+        const data = await response.json();
+        // Check if the response has the new format with messages and metadata
+        if (data.messages) {
+          setPatientMessages(data.messages);
+          // Update RAMQ verification status if patient has ramqStatus property
+          if (selectedPatient && data.metadata && data.metadata.ramqVerified !== undefined) {
+            // Need to handle the case where prev might be null
+            setSelectedPatient(prev => prev ? {
+              ...prev,
+              ramqVerified: data.metadata.ramqVerified
+            } : null);
+          }
+        } else {
+          // Fallback for old response format
+          setPatientMessages(data);
+        }
       } catch (error) {
         console.error('Error fetching patient messages:', error);
         toast({
@@ -187,6 +202,16 @@ export default function PatientsPage() {
                   {selectedPatient.language && (
                     <p><span className="text-gray-500">Language:</span> {selectedPatient.language}</p>
                   )}
+                  
+                  {/* RAMQ Verification Status */}
+                  <div className="mt-2 flex items-center">
+                    <span className="text-gray-500 mr-2">RAMQ Status:</span>
+                    {selectedPatient.ramqVerified ? (
+                      <Badge className="bg-green-700 text-white">Verified</Badge>
+                    ) : (
+                      <Badge className="bg-amber-700 text-white">Pending</Badge>
+                    )}
+                  </div>
                 </div>
               </div>
               
@@ -369,9 +394,9 @@ export default function PatientsPage() {
                   <div className="flex items-center justify-center h-24">
                     <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
                   </div>
-                ) : patientMessages.length > 0 ? (
+                ) : patientMessages && patientMessages.length > 0 ? (
                   <div className="space-y-3 max-h-48 overflow-y-auto border border-[#333] rounded-md p-3 bg-[#1e1e1e]">
-                    {patientMessages.slice(-3).map((message) => (
+                    {patientMessages.slice(-5).map((message) => (
                       <div key={message.id} className="flex items-start">
                         {message.isFromPatient ? (
                           <div className={`flex-shrink-0 w-6 h-6 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-2`}>
