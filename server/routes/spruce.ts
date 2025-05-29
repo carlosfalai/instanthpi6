@@ -523,11 +523,11 @@ router.get('/patients/:patientId/messages', async (req, res) => {
       if (!conversationId) continue;
       
       try {
-        // Get the conversation details from Spruce API
-        const conversationResponse = await spruceApi.get(`/v1/conversations/${conversationId}`);
+        // Get the conversation messages using the correct Spruce API endpoint
+        const messagesResponse = await spruceApi.get(`/v1/conversations/${conversationId}/messages`);
         
-        // Access the actual messages array from the conversation
-        const conversationMessages = conversationResponse.data.messages || [];
+        // Access the actual messages array from the response
+        const conversationMessages = messagesResponse.data.messages || messagesResponse.data || [];
         console.log(`Found ${conversationMessages.length} messages in conversation ${conversationId}`);
         
         // Add messages to allMessages

@@ -143,7 +143,7 @@ export default function PatientsPage() {
       setIsLoadingMessages(true);
       try {
         // Use the spruceId if available, otherwise use regular id
-        const patientIdForApi = patient.spruceId || `entity_${patient.id}`;
+        const patientIdForApi = patient.spruceId || patient.id;
         const response = await fetch(`/api/spruce/patients/${patientIdForApi}/messages`);
         if (!response.ok) {
           throw new Error('Failed to fetch patient messages');
@@ -472,14 +472,14 @@ export default function PatientsPage() {
                   if (!newMessage.trim() || !selectedPatient) return;
                   
                   try {
-                    const response = await fetch(`/api/spruce/patients/${selectedPatient.id}/messages`, {
+                    const response = await fetch(`/api/spruce/patients/${selectedPatient.spruceId || selectedPatient.id}/messages`, {
                       method: 'POST',
                       headers: {
                         'Content-Type': 'application/json'
                       },
                       body: JSON.stringify({
                         content: newMessage,
-                        patientId: selectedPatient.id
+                        patientId: selectedPatient.spruceId || selectedPatient.id
                       })
                     });
                     
