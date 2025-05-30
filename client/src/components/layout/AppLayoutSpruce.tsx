@@ -244,12 +244,11 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     }
   }, [location]);
 
+  // Set active section based on current path - simplified to prevent loops
   useEffect(() => {
     const newActiveSection = getActiveSectionFromPath();
-    if (newActiveSection !== activeSection) {
-      setActiveSection(newActiveSection);
-    }
-  }, [getActiveSectionFromPath, activeSection]);
+    setActiveSection(newActiveSection);
+  }, [location]); // Only depend on location, not the function or activeSection
 
   // Generate initials for avatar fallback
   const getInitials = (name: string) => {
