@@ -212,8 +212,8 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     }
   }, [notificationCounts]);
 
-  // Determine which section is active based on URL (simplified to prevent infinite loops)
-  const getActiveSectionFromPath = useCallback(() => {
+  // Determine active section from path without useEffect to prevent infinite loops
+  const determineActiveSection = () => {
     const pathSegment = location.split('/')[1] || 'home';
     
     // Handle special cases where subsections should highlight parent section
@@ -242,13 +242,10 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
       );
       return matchingSection ? matchingSection.id : 'home';
     }
-  }, [location]);
+  };
 
-  // Set active section based on current path - simplified to prevent loops
-  useEffect(() => {
-    const newActiveSection = getActiveSectionFromPath();
-    setActiveSection(newActiveSection);
-  }, [location]); // Only depend on location, not the function or activeSection
+  // Use the determined active section directly
+  const currentActiveSection = determineActiveSection();
 
   // Generate initials for avatar fallback
   const getInitials = (name: string) => {
