@@ -215,39 +215,46 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
   // Determine which section is active based on URL
   useEffect(() => {
     // Convert location to string and extract the first path segment
-    const pathString = location.toString();
+    const pathString = typeof location === 'string' ? location : location.toString();
     const pathSegment = pathString.split('/')[1] || 'home';
+    
+    // Prevent unnecessary re-renders by checking if the section would actually change
+    let newActiveSection = activeSection;
     
     // Handle special cases where subsections should highlight parent section
     if (pathSegment === 'settings' || pathSegment === 'organization-profile' || pathSegment === 'teammates') {
-      setActiveSection('settings');
+      newActiveSection = 'settings';
     } else if (pathSegment === 'patients' || pathSegment === 'chronic-conditions' || pathSegment === 'medication-refills' || pathSegment === 'urgent-care') {
-      setActiveSection('patients');
+      newActiveSection = 'patients';
     } else if (pathSegment === 'documents' || pathSegment === 'insurance-paperwork') {
-      setActiveSection('documents');
+      newActiveSection = 'documents';
     } else if (pathSegment === 'knowledge-base') {
-      setActiveSection('knowledge');
+      newActiveSection = 'knowledgeBase';
     } else if (pathSegment === 'leadership-association') {
-      setActiveSection('leadership');
+      newActiveSection = 'leadership';
     } else if (pathSegment === 'ai-billing') {
-      setActiveSection('aiBilling');
+      newActiveSection = 'aiBilling';
     } else if (pathSegment === 'priority-tasks') {
-      setActiveSection('priorityTasks');
+      newActiveSection = 'priorityAI';
     } else if (pathSegment === 'claude-ai') {
-      setActiveSection('claudeAI');
-    } else if (pathSegment === '') {
-      // Handle root path
-      setActiveSection('home');
+      newActiveSection = 'claudeAI';
+    } else if (pathSegment === '' || pathSegment === 'home') {
+      newActiveSection = 'home';
     } else {
       // Find the matching section based on exact path match
       const matchingSection = mainNavSections.find(section => 
         section.path.substring(1) === pathSegment
       );
       if (matchingSection) {
-        setActiveSection(matchingSection.id);
+        newActiveSection = matchingSection.id;
       }
     }
-  }, [location]);
+    
+    // Only update if the active section actually changed
+    if (newActiveSection !== activeSection) {
+      setActiveSection(newActiveSection);
+    }
+  }, [location, activeSection]);
 
   // Generate initials for avatar fallback
   const getInitials = (name: string) => {

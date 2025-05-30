@@ -1,0 +1,702 @@
+import React, { useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { queryClient } from '@/lib/queryClient';
+import { Loader2, AlertTriangle, Clock, User, Phone, MapPin, Search, Filter, RefreshCw } from 'lucide-react';
+import { format } from 'date-fns';
+
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
+
+// Types
+interface UrgentCarePatient {
+  id: string;
+  name: string;
+  age: number;
+  gender: 'male' | 'female' | 'other';
+  phone: string;
+  address: string;
+  chiefComplaint: string;
+  symptoms: string[];
+  vitalSigns: {
+    temperature?: number;
+    bloodPressure?: string;
+    heartRate?: number;
+    respiratoryRate?: number;
+    oxygenSaturation?: number;
+  };
+  triageLevel: 1 | 2 | 3 | 4 | 5; // 1 = Critical, 5 = Non-urgent
+  arrivalTime: string;
+  status: 'waiting' | 'in_progress' | 'completed' | 'discharged';
+  assignedProvider?: string;
+  estimatedWaitTime?: number;
+  notes?: string;
+}
+
+const UrgentCarePage: React.FC = () => {
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPatient, setSelectedPatient] = useState<UrgentCarePatient | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterTriage, setFilterTriage] = useState<string>('all');
+
+  // Fetch urgent care patients
+  const {
+    data: patients = [],
+    isLoading,
+    error,
+    refetch
+  } = useQuery<UrgentCarePatient[]>({
+    queryKey: ['/api/urgent-care/patients'],
+    queryFn: async () => {
+      // Mock data for now - replace with actual API call
+      return [
+        {
+          id: '1',
+          name: 'Sarah Johnson',
+          age: 34,
+          gender: 'female',
+          phone: '(555) 123-4567',
+          address: '123 Main St, Montreal, QC',
+          chiefComplaint: 'Severe chest pain',
+          symptoms: ['chest pain', 'shortness of breath', 'nausea'],
+          vitalSigns: {
+            temperature: 98.6,
+            bloodPressure: '140/90',
+            heartRate: 95,
+            respiratoryRate: 18,
+            oxygenSaturation: 98
+          },
+          triageLevel: 2,
+          arrivalTime: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+          status: 'waiting',
+          estimatedWaitTime: 15
+        },
+        {
+          id: '2',
+          name: 'Michael Chen',
+          age: 28,
+          gender: 'male',
+          phone: '(555) 987-6543',
+          address: '456 Oak Ave, Montreal, QC',
+          chiefComplaint: 'Ankle injury from fall',
+          symptoms: ['ankle pain', 'swelling', 'difficulty walking'],
+          vitalSigns: {
+            temperature: 98.2,
+            bloodPressure: '120/80',
+            heartRate: 72,
+            respiratoryRate: 16,
+            oxygenSaturation: 99
+          },
+          triageLevel: 4,
+          arrivalTime: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
+          status: 'in_progress',
+          assignedProvider: 'Dr. Smith',
+          estimatedWaitTime: 0
+        },
+        {
+          id: '3',
+          name: 'Emma Rodriguez',
+          age: 7,
+          gender: 'female',
+          phone: '(555) 456-7890',
+          address: '789 Pine St, Montreal, QC',
+          chiefComplaint: 'High fever and cough',
+          symptoms: ['fever', 'cough', 'fatigue', 'loss of appetite'],
+          vitalSigns: {
+            temperature: 102.3,
+            bloodPressure: '90/60',
+            heartRate: 110,
+            respiratoryRate: 22,
+            oxygenSaturation: 96
+          },
+          triageLevel: 3,
+          arrivalTime: new Date(Date.now() - 20 * 60 * 1000).toISOString(),
+          status: 'waiting',
+          estimatedWaitTime: 25
+        }
+      ];
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Update patient status mutation
+  const updatePatientMutation = useMutation({
+    mutationFn: async ({ 
+      patientId, 
+      status, 
+      assignedProvider,
+      notes 
+    }: { 
+      patientId: string; 
+      status: UrgentCarePatient['status']; 
+      assignedProvider?: string;
+      notes?: string;
+    }) => {
+      // Mock API call - replace with actual implementation
+      const response = await fetch(`/api/urgent-care/patients/${patientId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status, assignedProvider, notes }),
+      });
+      
+      if (!response.ok) throw new Error('Failed to update patient');
+      return await response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/urgent-care/patients'] });
+      toast({
+        title: 'Patient updated',
+        description: 'Patient status has been updated successfully.',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Update failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Get triage level badge
+  const getTriageBadge = (level: number) => {
+    switch (level) {
+      case 1:
+        return <Badge variant="destructive" className="bg-red-600">Critical</Badge>;
+      case 2:
+        return <Badge variant="destructive" className="bg-orange-600">Urgent</Badge>;
+      case 3:
+        return <Badge variant="outline" className="bg-yellow-900/20 text-yellow-500 border-yellow-800">Semi-Urgent</Badge>;
+      case 4:
+        return <Badge variant="outline" className="bg-green-900/20 text-green-500 border-green-800">Less Urgent</Badge>;
+      case 5:
+        return <Badge variant="outline" className="bg-blue-900/20 text-blue-500 border-blue-800">Non-Urgent</Badge>;
+      default:
+        return <Badge variant="outline">Unknown</Badge>;
+    }
+  };
+
+  // Get status badge
+  const getStatusBadge = (status: UrgentCarePatient['status']) => {
+    switch (status) {
+      case 'waiting':
+        return <Badge variant="outline" className="bg-yellow-900/20 text-yellow-500 border-yellow-800">Waiting</Badge>;
+      case 'in_progress':
+        return <Badge variant="outline" className="bg-blue-900/20 text-blue-500 border-blue-800">In Progress</Badge>;
+      case 'completed':
+        return <Badge variant="outline" className="bg-green-900/20 text-green-500 border-green-800">Completed</Badge>;
+      case 'discharged':
+        return <Badge variant="outline" className="bg-gray-900/20 text-gray-500 border-gray-800">Discharged</Badge>;
+      default:
+        return <Badge variant="outline">Unknown</Badge>;
+    }
+  };
+
+  // Format time since arrival
+  const getTimeSinceArrival = (arrivalTime: string) => {
+    const arrival = new Date(arrivalTime);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - arrival.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 60) {
+      return `${diffInMinutes}m ago`;
+    } else {
+      const hours = Math.floor(diffInMinutes / 60);
+      const minutes = diffInMinutes % 60;
+      return `${hours}h ${minutes}m ago`;
+    }
+  };
+
+  // Filter patients
+  const filteredPatients = patients.filter(patient => {
+    const matchesSearch = patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         patient.chiefComplaint.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = filterStatus === 'all' || patient.status === filterStatus;
+    const matchesTriage = filterTriage === 'all' || patient.triageLevel.toString() === filterTriage;
+    
+    return matchesSearch && matchesStatus && matchesTriage;
+  });
+
+  // Sort patients by triage level (most urgent first) and arrival time
+  const sortedPatients = [...filteredPatients].sort((a, b) => {
+    if (a.triageLevel !== b.triageLevel) {
+      return a.triageLevel - b.triageLevel;
+    }
+    return new Date(a.arrivalTime).getTime() - new Date(b.arrivalTime).getTime();
+  });
+
+  // Handle patient status update
+  const handleStatusUpdate = (status: UrgentCarePatient['status'], assignedProvider?: string) => {
+    if (!selectedPatient) return;
+    
+    updatePatientMutation.mutate({
+      patientId: selectedPatient.id,
+      status,
+      assignedProvider
+    });
+  };
+
+  return (
+    <AppLayoutSpruce>
+      {/* Header */}
+      <div className="mb-6 flex justify-between items-center">
+        <div className="flex items-center">
+          <AlertTriangle className="h-6 w-6 mr-2 text-red-500" />
+          <div>
+            <h1 className="text-2xl font-bold">Urgent Care Dashboard</h1>
+            <p className="text-gray-400">Real-time patient triage and management</p>
+          </div>
+        </div>
+        <div className="flex space-x-2">
+          <Button
+            onClick={() => refetch()}
+            disabled={isLoading}
+            variant="outline"
+            size="sm"
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+          <Button className="bg-red-600 hover:bg-red-700">
+            <AlertTriangle className="mr-2 h-4 w-4" />
+            Emergency Alert
+          </Button>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <Card className="bg-[#1A1A1A] border-[#333]">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Total Patients</p>
+                <p className="text-2xl font-bold">{patients.length}</p>
+              </div>
+              <User className="h-8 w-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-[#1A1A1A] border-[#333]">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Waiting</p>
+                <p className="text-2xl font-bold text-yellow-500">
+                  {patients.filter(p => p.status === 'waiting').length}
+                </p>
+              </div>
+              <Clock className="h-8 w-8 text-yellow-500" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-[#1A1A1A] border-[#333]">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Critical/Urgent</p>
+                <p className="text-2xl font-bold text-red-500">
+                  {patients.filter(p => p.triageLevel <= 2).length}
+                </p>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-red-500" />
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-[#1A1A1A] border-[#333]">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Avg Wait Time</p>
+                <p className="text-2xl font-bold">
+                  {Math.round(patients.reduce((acc, p) => acc + (p.estimatedWaitTime || 0), 0) / patients.length || 0)}m
+                </p>
+              </div>
+              <Clock className="h-8 w-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Left Column - Patient Queue */}
+        <div className="bg-[#1A1A1A] rounded-lg p-4 border border-[#333] h-[calc(100vh-300px)] flex flex-col">
+          <div className="mb-4">
+            <h2 className="text-lg font-semibold mb-3">Patient Queue</h2>
+            
+            {/* Search and Filters */}
+            <div className="space-y-3">
+              <div className="relative">
+                <Input
+                  placeholder="Search patients..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pr-10 bg-[#252525] border-[#444]"
+                />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
+              </div>
+              
+              <div className="flex gap-2">
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="bg-[#252525] border-[#444]">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="waiting">Waiting</SelectItem>
+                    <SelectItem value="in_progress">In Progress</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="discharged">Discharged</SelectItem>
+                  </SelectContent>
+                </Select>
+                
+                <Select value={filterTriage} onValueChange={setFilterTriage}>
+                  <SelectTrigger className="bg-[#252525] border-[#444]">
+                    <SelectValue placeholder="Filter by triage" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Triage</SelectItem>
+                    <SelectItem value="1">Critical</SelectItem>
+                    <SelectItem value="2">Urgent</SelectItem>
+                    <SelectItem value="3">Semi-Urgent</SelectItem>
+                    <SelectItem value="4">Less Urgent</SelectItem>
+                    <SelectItem value="5">Non-Urgent</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          
+          {/* Patient List */}
+          <ScrollArea className="flex-grow pr-2">
+            {isLoading ? (
+              <div className="flex justify-center items-center h-40">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+              </div>
+            ) : error ? (
+              <div className="py-10 text-center">
+                <p className="text-gray-400 mb-2">Failed to load patients</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => refetch()}
+                >
+                  Try Again
+                </Button>
+              </div>
+            ) : sortedPatients.length === 0 ? (
+              <div className="py-10 text-center">
+                <p className="text-gray-400">No patients found</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {sortedPatients.map((patient) => (
+                  <div
+                    key={patient.id}
+                    onClick={() => setSelectedPatient(patient)}
+                    className={`p-3 rounded-md cursor-pointer transition-colors ${
+                      selectedPatient?.id === patient.id 
+                        ? 'bg-blue-900/30 border border-blue-700' 
+                        : 'bg-[#252525] border border-[#333] hover:border-[#444]'
+                    }`}
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="font-medium text-lg">{patient.name}</h3>
+                        <p className="text-sm text-gray-400">
+                          {patient.age} years old • {patient.gender}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        {getTriageBadge(patient.triageLevel)}
+                        <p className="text-xs text-gray-500 mt-1">
+                          {getTimeSinceArrival(patient.arrivalTime)}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <p className="text-sm text-gray-300 mb-2">
+                      <strong>Chief Complaint:</strong> {patient.chiefComplaint}
+                    </p>
+                    
+                    <div className="flex justify-between items-center">
+                      {getStatusBadge(patient.status)}
+                      {patient.estimatedWaitTime && patient.estimatedWaitTime > 0 && (
+                        <span className="text-xs text-gray-500">
+                          Est. wait: {patient.estimatedWaitTime}m
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </div>
+
+        {/* Right Column - Patient Details */}
+        <div className="bg-[#1A1A1A] rounded-lg p-4 border border-[#333] h-[calc(100vh-300px)] flex flex-col">
+          {!selectedPatient ? (
+            <div className="flex-grow flex flex-col items-center justify-center text-center">
+              <User className="h-16 w-16 mb-4 text-gray-600" />
+              <h3 className="text-xl font-medium mb-2">No patient selected</h3>
+              <p className="text-gray-400 max-w-md">
+                Select a patient from the queue to view details and manage their care
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col h-full">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h2 className="text-xl font-bold">{selectedPatient.name}</h2>
+                  <p className="text-gray-400">
+                    {selectedPatient.age} years old • {selectedPatient.gender}
+                  </p>
+                  <div className="flex items-center space-x-2 mt-1">
+                    {getTriageBadge(selectedPatient.triageLevel)}
+                    {getStatusBadge(selectedPatient.status)}
+                  </div>
+                </div>
+                
+                <div className="text-right">
+                  <p className="text-sm text-gray-500">
+                    Arrived: {getTimeSinceArrival(selectedPatient.arrivalTime)}
+                  </p>
+                  {selectedPatient.estimatedWaitTime && selectedPatient.estimatedWaitTime > 0 && (
+                    <p className="text-sm text-gray-500">
+                      Est. wait: {selectedPatient.estimatedWaitTime}m
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <Tabs defaultValue="overview" className="flex-grow flex flex-col">
+                <TabsList className="w-full bg-[#252525] mb-4 grid grid-cols-3">
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="vitals">Vital Signs</TabsTrigger>
+                  <TabsTrigger value="actions">Actions</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="overview" className="flex-grow data-[state=active]:flex flex-col mt-0">
+                  <ScrollArea className="flex-grow pr-2">
+                    <div className="space-y-4">
+                      <Card className="bg-[#252525] border-[#333]">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">Contact Information</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex items-center">
+                              <Phone className="h-4 w-4 mr-2 text-gray-500" />
+                              <span>{selectedPatient.phone}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <MapPin className="h-4 w-4 mr-2 text-gray-500" />
+                              <span>{selectedPatient.address}</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-[#252525] border-[#333]">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">Chief Complaint</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm">{selectedPatient.chiefComplaint}</p>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-[#252525] border-[#333]">
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-sm">Symptoms</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex flex-wrap gap-2">
+                            {selectedPatient.symptoms.map((symptom, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {symptom}
+                              </Badge>
+                            ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {selectedPatient.assignedProvider && (
+                        <Card className="bg-[#252525] border-[#333]">
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-sm">Assigned Provider</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <p className="text-sm">{selectedPatient.assignedProvider}</p>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                <TabsContent value="vitals" className="flex-grow data-[state=active]:flex flex-col mt-0">
+                  <ScrollArea className="flex-grow pr-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      {selectedPatient.vitalSigns.temperature && (
+                        <Card className="bg-[#252525] border-[#333]">
+                          <CardContent className="p-4">
+                            <div className="text-center">
+                              <p className="text-sm text-gray-400">Temperature</p>
+                              <p className="text-xl font-bold">{selectedPatient.vitalSigns.temperature}°F</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {selectedPatient.vitalSigns.bloodPressure && (
+                        <Card className="bg-[#252525] border-[#333]">
+                          <CardContent className="p-4">
+                            <div className="text-center">
+                              <p className="text-sm text-gray-400">Blood Pressure</p>
+                              <p className="text-xl font-bold">{selectedPatient.vitalSigns.bloodPressure}</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {selectedPatient.vitalSigns.heartRate && (
+                        <Card className="bg-[#252525] border-[#333]">
+                          <CardContent className="p-4">
+                            <div className="text-center">
+                              <p className="text-sm text-gray-400">Heart Rate</p>
+                              <p className="text-xl font-bold">{selectedPatient.vitalSigns.heartRate} bpm</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {selectedPatient.vitalSigns.respiratoryRate && (
+                        <Card className="bg-[#252525] border-[#333]">
+                          <CardContent className="p-4">
+                            <div className="text-center">
+                              <p className="text-sm text-gray-400">Respiratory Rate</p>
+                              <p className="text-xl font-bold">{selectedPatient.vitalSigns.respiratoryRate} /min</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {selectedPatient.vitalSigns.oxygenSaturation && (
+                        <Card className="bg-[#252525] border-[#333]">
+                          <CardContent className="p-4">
+                            <div className="text-center">
+                              <p className="text-sm text-gray-400">O2 Saturation</p>
+                              <p className="text-xl font-bold">{selectedPatient.vitalSigns.oxygenSaturation}%</p>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
+                  </ScrollArea>
+                </TabsContent>
+
+                <TabsContent value="actions" className="flex-grow data-[state=active]:flex flex-col mt-0">
+                  <div className="space-y-3">
+                    {selectedPatient.status === 'waiting' && (
+                      <>
+                        <Button 
+                          onClick={() => handleStatusUpdate('in_progress', 'Dr. Font')}
+                          disabled={updatePatientMutation.isPending}
+                          className="w-full bg-blue-600 hover:bg-blue-700"
+                        >
+                          {updatePatientMutation.isPending ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <User className="mr-2 h-4 w-4" />
+                          )}
+                          Start Consultation
+                        </Button>
+                        
+                        <Button 
+                          onClick={() => handleStatusUpdate('in_progress')}
+                          disabled={updatePatientMutation.isPending}
+                          variant="outline"
+                          className="w-full"
+                        >
+                          Assign to Another Provider
+                        </Button>
+                      </>
+                    )}
+
+                    {selectedPatient.status === 'in_progress' && (
+                      <>
+                        <Button 
+                          onClick={() => handleStatusUpdate('completed')}
+                          disabled={updatePatientMutation.isPending}
+                          className="w-full bg-green-600 hover:bg-green-700"
+                        >
+                          {updatePatientMutation.isPending ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <User className="mr-2 h-4 w-4" />
+                          )}
+                          Complete Consultation
+                        </Button>
+                        
+                        <Button 
+                          onClick={() => handleStatusUpdate('waiting')}
+                          disabled={updatePatientMutation.isPending}
+                          variant="outline"
+                          className="w-full"
+                        >
+                          Return to Queue
+                        </Button>
+                      </>
+                    )}
+
+                    {selectedPatient.status === 'completed' && (
+                      <Button 
+                        onClick={() => handleStatusUpdate('discharged')}
+                        disabled={updatePatientMutation.isPending}
+                        className="w-full bg-gray-600 hover:bg-gray-700"
+                      >
+                        {updatePatientMutation.isPending ? (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        ) : (
+                          <User className="mr-2 h-4 w-4" />
+                        )}
+                        Discharge Patient
+                      </Button>
+                    )}
+
+                    <Button variant="outline" className="w-full">
+                      <Phone className="mr-2 h-4 w-4" />
+                      Call Patient
+                    </Button>
+                    
+                    <Button variant="outline" className="w-full">
+                      <AlertTriangle className="mr-2 h-4 w-4" />
+                      Emergency Protocol
+                    </Button>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+          )}
+        </div>
+      </div>
+    </AppLayoutSpruce>
+  );
+};
+
+export default UrgentCarePage;
