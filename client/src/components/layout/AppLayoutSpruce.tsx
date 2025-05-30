@@ -215,7 +215,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
   // Determine which section is active based on URL
   useEffect(() => {
     // Convert location to string and extract the first path segment
-    const pathString = typeof location === 'string' ? location : location.toString();
+    const pathString = location;
     const pathSegment = pathString.split('/')[1] || 'home';
     
     // Prevent unnecessary re-renders by checking if the section would actually change
