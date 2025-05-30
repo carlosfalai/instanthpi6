@@ -1,10 +1,9 @@
-import { queryClient } from "./queryClient";
-
-// This function loads mock data for demonstration purposes only
-// In production, you should use real data from your API
+// All data now comes exclusively from Spruce Health API
+// This file is kept for compatibility but no longer loads any mock data
 export function loadDemoData() {
-  // Mock conversations
-  const mockConversations = [
+  // All patient data, conversations, and medical information now comes from Spruce API
+  // No mock data is loaded - system exclusively uses authentic Spruce Health data
+}
     {
       patientId: 1,
       patientName: "Lily Raibaud",
