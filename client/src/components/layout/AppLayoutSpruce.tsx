@@ -244,8 +244,10 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
     }
   };
 
-  // Use the determined active section directly
+  // Use the determined active section directly without state
   const currentActiveSection = determineActiveSection();
+  
+  // Remove the problematic activeSection state entirely
 
   // Generate initials for avatar fallback
   const getInitials = (name: string) => {
