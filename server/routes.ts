@@ -21,6 +21,7 @@ import { findSubmissionByPseudonym, generateHPIConfirmationSummary } from "./uti
 import { router as aiRouter } from "./routes/ai";
 import { router as patientsRouter } from "./routes/patients";
 import { router as spruceRouter } from "./routes/spruce";
+import spruceWebhooksRouter from "./routes/spruce-webhooks";
 import { router as educationRouter } from "./routes/education";
 import { router as userRouter } from "./routes/user";
 import { router as anthropicRouter } from "./routes/anthropic";
@@ -61,6 +62,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/anthropic", anthropicRouter);
   app.use("/api/patients", patientsRouter);
   app.use("/api/spruce", spruceRouter);
+  app.use("/api/webhooks/spruce", spruceWebhooksRouter);
   app.use("/api/education", educationRouter);
   app.use("/api/forms", formsRouter);
   app.use("/api/scheduler", schedulerRouter);
