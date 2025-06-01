@@ -548,6 +548,9 @@ router.get('/patients/:patientId/messages', async (req, res) => {
           }
         }
         
+        // Debug: Log the full response to understand the API structure
+        console.log(`API Response for conversation ${conversationId}:`, JSON.stringify(messagesResponse.data, null, 2));
+        
         // Access the actual messages array from the response
         const rawMessages = messagesResponse.data.messages || messagesResponse.data || [];
         const conversationMessages = Array.isArray(rawMessages) ? rawMessages : [];
