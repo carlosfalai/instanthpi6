@@ -508,8 +508,14 @@ router.get('/patients/:patientId/messages', async (req, res) => {
     // Get messages from Spruce API using correct endpoint format
     console.log(`Retrieving messages for patient ${patientId}`);
     
-    // Use the documented endpoint from Spruce API
-    const conversationsResponse = await spruceApi.get(`/v1/contacts/${patientId}/conversations`);
+    // Use the correct endpoint with required parameters
+    const conversationsResponse = await spruceApi.get(`/v1/conversations`, {
+      params: {
+        orderBy: 'lastActivity',
+        limit: 100,
+        contactId: patientId
+      }
+    });
     console.log('Raw Spruce API messages response structure:', 
       JSON.stringify(conversationsResponse.data).substring(0, 500) + '...');
     
@@ -523,8 +529,24 @@ router.get('/patients/:patientId/messages', async (req, res) => {
       if (!conversationId) continue;
       
       try {
-        // Get the conversation messages using the correct Spruce API endpoint
-        const messagesResponse = await spruceApi.get(`/v1/conversations/${conversationId}/messages`);
+        // Try different approaches to get conversation messages
+        let messagesResponse;
+        try {
+          // First try the conversations endpoint with messages parameter
+          messagesResponse = await spruceApi.get(`/v1/conversations/${conversationId}?include=messages`);
+        } catch (firstError) {
+          try {
+            // Try the alternative messages endpoint format
+            messagesResponse = await spruceApi.get(`/v1/conversations/${conversationId}`, {
+              params: { include: 'messages' }
+            });
+          } catch (secondError) {
+            // Try a different endpoint structure
+            messagesResponse = await spruceApi.get(`/v1/messages`, {
+              params: { conversation_id: conversationId }
+            });
+          }
+        }
         
         // Access the actual messages array from the response
         const conversationMessages = messagesResponse.data.messages || messagesResponse.data || [];
