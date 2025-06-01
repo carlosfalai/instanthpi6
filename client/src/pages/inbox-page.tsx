@@ -1,0 +1,254 @@
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Loader2, MessageSquare, Clock, User } from 'lucide-react';
+import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+interface SpruceConversation {
+  id: string;
+  entityId: string;
+  displayName: string;
+  lastActivity: string;
+  unreadCount: number;
+  lastMessage?: {
+    content: string;
+    timestamp: string;
+    isFromPatient: boolean;
+  };
+}
+
+export default function InboxPage() {
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+
+  // Fetch conversations from Spruce API
+  const { data: conversations, isLoading, error } = useQuery({
+    queryKey: ['/api/spruce/conversations'],
+    queryFn: async () => {
+      const response = await fetch('/api/spruce/conversations');
+      if (!response.ok) {
+        throw new Error('Failed to fetch conversations');
+      }
+      return response.json();
+    },
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Fetch messages for selected conversation
+  const { data: messages, isLoading: isLoadingMessages } = useQuery({
+    queryKey: ['/api/spruce/patients', selectedConversation, 'messages'],
+    queryFn: async () => {
+      if (!selectedConversation) return [];
+      const response = await fetch(`/api/spruce/patients/${selectedConversation}/messages`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch messages');
+      }
+      const data = await response.json();
+      return data.messages || [];
+    },
+    enabled: !!selectedConversation,
+  });
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffMinutes = Math.ceil(diffTime / (1000 * 60));
+    
+    if (diffMinutes < 60) {
+      return `${diffMinutes}m ago`;
+    } else if (diffMinutes < 1440) {
+      const hours = Math.floor(diffMinutes / 60);
+      return `${hours}h ago`;
+    } else {
+      return date.toLocaleDateString();
+    }
+  };
+
+  return (
+    <AppLayoutSpruce>
+      <div className="h-screen flex bg-background">
+        {/* Conversation List */}
+        <div className="w-80 border-r border-border flex flex-col">
+          <div className="p-4 border-b border-border">
+            <h1 className="text-xl font-semibold text-foreground">Inbox</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {conversations?.length || 0} conversations
+            </p>
+          </div>
+
+          <ScrollArea className="flex-1">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-32">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              </div>
+            ) : error ? (
+              <div className="p-4 text-center">
+                <p className="text-sm text-destructive">Failed to load conversations</p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="mt-2"
+                  onClick={() => window.location.reload()}
+                >
+                  Retry
+                </Button>
+              </div>
+            ) : conversations?.length === 0 ? (
+              <div className="p-4 text-center">
+                <MessageSquare className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No conversations yet</p>
+              </div>
+            ) : (
+              <div className="p-2">
+                {conversations?.map((conversation: SpruceConversation) => (
+                  <div
+                    key={conversation.id}
+                    className={`p-3 rounded-lg cursor-pointer transition-colors mb-1 ${
+                      selectedConversation === conversation.entityId
+                        ? 'bg-primary/10 border border-primary/20'
+                        : 'hover:bg-muted/50'
+                    }`}
+                    onClick={() => setSelectedConversation(conversation.entityId)}
+                  >
+                    <div className="flex items-start space-x-3">
+                      <Avatar className="h-10 w-10 flex-shrink-0">
+                        <AvatarFallback className="bg-blue-600 text-white">
+                          {getInitials(conversation.displayName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <h3 className="font-medium text-foreground truncate">
+                            {conversation.displayName}
+                          </h3>
+                          {conversation.unreadCount > 0 && (
+                            <Badge variant="destructive" className="ml-2 text-xs">
+                              {conversation.unreadCount}
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        {conversation.lastMessage && (
+                          <p className="text-sm text-muted-foreground truncate mt-1">
+                            {conversation.lastMessage.content}
+                          </p>
+                        )}
+                        
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-xs text-muted-foreground flex items-center">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {formatTimestamp(conversation.lastActivity)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </div>
+
+        {/* Message Detail */}
+        <div className="flex-1 flex flex-col">
+          {!selectedConversation ? (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">
+                  Select a conversation
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  Choose a conversation from the list to view messages
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Message Header */}
+              <div className="p-4 border-b border-border">
+                <div className="flex items-center space-x-3">
+                  <Avatar className="h-10 w-10">
+                    <AvatarFallback className="bg-blue-600 text-white">
+                      {getInitials(
+                        conversations?.find((c: SpruceConversation) => c.entityId === selectedConversation)?.displayName || 'Patient'
+                      )}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h2 className="font-semibold text-foreground">
+                      {conversations?.find((c: SpruceConversation) => c.entityId === selectedConversation)?.displayName || 'Patient'}
+                    </h2>
+                    <p className="text-sm text-muted-foreground">Active conversation</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Messages */}
+              <ScrollArea className="flex-1 p-4">
+                {isLoadingMessages ? (
+                  <div className="flex items-center justify-center h-32">
+                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  </div>
+                ) : messages?.length === 0 ? (
+                  <div className="text-center text-muted-foreground">
+                    <p>No messages in this conversation yet</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {messages?.map((message: any) => (
+                      <div
+                        key={message.id}
+                        className={`flex ${message.isFromPatient ? 'justify-start' : 'justify-end'}`}
+                      >
+                        <div className={`max-w-[70%] ${message.isFromPatient ? 'order-1' : 'order-2'}`}>
+                          <div
+                            className={`p-3 rounded-lg ${
+                              message.isFromPatient
+                                ? 'bg-muted text-foreground'
+                                : 'bg-primary text-primary-foreground'
+                            }`}
+                          >
+                            <p className="text-sm">{message.content}</p>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1 px-1">
+                            {formatTimestamp(message.timestamp)}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+
+              {/* Message Input */}
+              <div className="p-4 border-t border-border">
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    placeholder="Type a message..."
+                    className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background text-foreground"
+                  />
+                  <Button>Send</Button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </AppLayoutSpruce>
+  );
+}

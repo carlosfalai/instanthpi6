@@ -841,6 +841,29 @@ Is this information correct? If not, please let us know what needs to be correct
     }
   });
 
+  // Mount all API routers
+  app.use("/api/ai", aiRouter);
+  app.use("/api/patients", patientsRouter);
+  app.use("/api/spruce", spruceRouter);
+  app.use("/api/webhooks/spruce", spruceWebhooksRouter);
+  app.use("/api/education", educationRouter);
+  app.use("/api/user", userRouter);
+  app.use("/api/anthropic", anthropicRouter);
+  app.use("/api/forms", formsRouter);
+  app.use("/api/scheduler", schedulerRouter);
+  app.use("/api/messaging", messagingRouter);
+  app.use("/api/formsite", formsiteRouter);
+  app.use("/api/formsite-pseudonym", formsitePseudonymRoutes);
+  app.use("/api/medication-refills", medicationRefillsRouter);
+  app.use("/api/insurance-documents", insuranceDocumentsRouter);
+  app.use("/api/fax", faxRouter);
+  app.use("/api/billing", billingRouter);
+  app.use("/api/pseudonym", pseudonymRouter);
+  app.use("/api/urgent-care", urgentCareRouter);
+  app.use("/api/stripe", stripeRouter);
+  app.use("/api/priority-ai", priorityAIRouter);
+  app.use("/api/documents", documentsRouter);
+
   const httpServer = createServer(app);
   return httpServer;
 }

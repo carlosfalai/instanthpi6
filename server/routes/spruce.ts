@@ -549,11 +549,13 @@ router.get('/patients/:patientId/messages', async (req, res) => {
         }
         
         // Access the actual messages array from the response
-        const conversationMessages = messagesResponse.data.messages || messagesResponse.data || [];
+        const rawMessages = messagesResponse.data.messages || messagesResponse.data || [];
+        const conversationMessages = Array.isArray(rawMessages) ? rawMessages : [];
         console.log(`Found ${conversationMessages.length} messages in conversation ${conversationId}`);
         
-        // Add messages to allMessages
-        allMessages = [...allMessages, ...conversationMessages.map((msg: any) => ({
+        // Add messages to allMessages only if we have valid array data
+        if (conversationMessages.length > 0) {
+          allMessages = [...allMessages, ...conversationMessages.map((msg: any) => ({
           id: msg.id || `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           patientId: patientId,
           conversationId: conversationId,
@@ -563,6 +565,7 @@ router.get('/patients/:patientId/messages', async (req, res) => {
           sender: msg.sender ? (msg.sender.type === 'external' ? 'Patient' : 'Doctor') : 'Unknown',
           attachmentUrl: msg.media && msg.media.url ? msg.media.url : null
         }))];
+        }
       } catch (err) {
         console.error(`Error fetching messages for conversation ${conversationId}:`, err);
       }

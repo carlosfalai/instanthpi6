@@ -75,11 +75,10 @@ interface AppLayoutSpruceProps {
 export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
   const [location, navigate] = useLocation();
 
-  // Mock user data - in a real app this would come from context or API
+  // User data without photo - using initials only
   const currentUser = {
     name: 'Dr. Carlos Font',
-    role: 'Family Medicine',
-    avatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&h=100&q=80'
+    role: 'Family Medicine'
   };
 
   // Define main navigation sections
@@ -207,7 +206,6 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
           {/* User Profile */}
           <div className="flex items-center space-x-3 mb-6 p-3 rounded-lg bg-muted/50">
             <Avatar className="h-10 w-10">
-              <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
               <AvatarFallback>{getInitials(currentUser.name)}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
