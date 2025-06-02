@@ -192,11 +192,17 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
       {/* Sidebar */}
       <div className="w-64 bg-card border-r border-border flex-shrink-0">
         <div className="p-6">
-          {/* Header with InstantHPI and Centre Médical Font */}
+          {/* Header with Purple Logo and InstantHPI */}
           <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-2">
-              <span className="text-lg font-semibold text-foreground">InstantHPI</span>
-              <span className="text-sm text-muted-foreground">Centre Médical Font</span>
+            <div className="flex items-center space-x-3">
+              {/* Purple Logo */}
+              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-800 rounded-lg flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-lg">I</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-lg font-semibold text-foreground">InstantHPI</span>
+                <span className="text-xs text-muted-foreground">Centre Médical Font</span>
+              </div>
             </div>
             <Button variant="ghost" size="sm" className="p-1 h-6 w-6">
               <Plus className="h-4 w-4" />
