@@ -88,37 +88,9 @@ router.post('/check-email', async (req, res) => {
     // 4. Use AI to identify insurance documents
     // 5. Create records in the database
 
-    const mockDocuments = [
-      {
-        id: uuidv4(),
-        patientName: 'Michael Brown',
-        dateReceived: new Date().toISOString(),
-        status: 'pending',
-        documentType: 'Insurance Claim Form',
-        pdfUrl: '/uploads/insurance-claim-example.pdf',
-        emailSource: 'claims@insurance-provider.com',
-        aiProcessed: true,
-        aiConfidence: 0.92,
-      },
-      {
-        id: uuidv4(),
-        patientName: 'Sarah Johnson',
-        dateReceived: new Date().toISOString(),
-        status: 'pending',
-        documentType: 'Prior Authorization',
-        pdfUrl: '/uploads/prior-auth-example.pdf',
-        emailSource: 'auth@insurance-provider.com',
-        aiProcessed: true,
-        aiConfidence: 0.88,
-      }
-    ];
-
-    // Insert mock documents into the database
-    for (const doc of mockDocuments) {
-      await db.insert(insuranceDocuments).values(doc);
-    }
-
-    res.json({ count: mockDocuments.length });
+    // Only process authentic documents from actual email sources
+    // No mock data is inserted
+    res.json({ count: 0 });
   } catch (error) {
     console.error('Error checking emails for insurance documents:', error);
     res.status(500).json({ message: 'Failed to check for new insurance documents' });
