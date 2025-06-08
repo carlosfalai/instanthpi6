@@ -189,9 +189,13 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex relative">
+      {/* Background with retro grid */}
+      <div className="absolute top-0 z-0 h-screen w-screen bg-purple-950/10 dark:bg-purple-950/10 bg-[radial-gradient(ellipse_20%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_20%_80%_at_50%_-20%,rgba(120,119,198,0.3),rgba(255,255,255,0))]" />
+      <RetroGrid className="absolute inset-0 z-0" />
+      
       {/* Sidebar */}
-      <div className="w-64 bg-card border-r border-border flex-shrink-0">
+      <div className="w-64 bg-card/50 backdrop-blur border-r border-border flex-shrink-0 relative z-10">
         <div className="p-6">
           {/* Header with InstantHPI in Purple */}
           <div className="flex items-center justify-between mb-8">
@@ -255,7 +259,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col relative z-10">
         {/* Main Content Area */}
         <main className="flex-1 overflow-auto">
           {children}
