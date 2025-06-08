@@ -170,7 +170,15 @@ class SpruceHealthClient {
     participant_id?: string;
   }): Promise<ConversationListResponse> {
     try {
-      const response = await this.client.get('/conversations', { params });
+      const defaultParams = {
+        orderBy: 'lastMessageAt',
+        orderDirection: 'desc',
+        perPage: 20,
+        page: 1,
+        ...params
+      };
+      console.log('Making request with params:', defaultParams);
+      const response = await this.client.get('/conversations', { params: defaultParams });
       return response.data;
     } catch (error) {
       console.error('Error fetching conversations:', error);
