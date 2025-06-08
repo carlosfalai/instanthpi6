@@ -11,11 +11,11 @@ export function GlowingBox({
   className
 }: GlowingBoxProps) {
   return (
-    <div className={cn(
-      "relative bg-gray-800/50 backdrop-blur-sm rounded-lg border border-gray-700/30 hover:bg-gray-700/50 transition-all duration-200",
-      className
-    )}>
-      {children}
+    <div className={cn("relative group", className)}>
+      <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg blur opacity-20 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-tilt"></div>
+      <div className="relative bg-black/20 rounded-lg backdrop-blur-sm border border-purple-500/20">
+        {children}
+      </div>
     </div>
   );
 }
