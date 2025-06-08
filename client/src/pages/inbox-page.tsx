@@ -230,7 +230,7 @@ export default function InboxPage() {
           ) : (
             <>
               {/* Message Header */}
-              <GlowingBox color="blue" className="p-4 border-b border-border/50">
+              <GlowingBox className="p-4 border-b border-border/50">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-blue-600 text-white">
@@ -267,7 +267,6 @@ export default function InboxPage() {
                       >
                         <div className={`max-w-[70%] ${message.isFromPatient ? 'order-1' : 'order-2'}`}>
                           <GlowingBox
-                            color={message.isFromPatient ? "white" : "blue"}
                             className={`p-3 ${
                               message.isFromPatient
                                 ? 'bg-muted/80 text-foreground'
@@ -287,9 +286,9 @@ export default function InboxPage() {
               </ScrollArea>
 
               {/* Message Input */}
-              <GlowingBox color="blue" className="p-4 border-t border-border/50">
+              <GlowingBox className="p-4 border-t border-border/50">
                 <form onSubmit={handleSendMessage} className="flex space-x-2">
-                  <GlowingBox color="white" className="flex-1">
+                  <GlowingBox className="flex-1">
                     <Input
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
@@ -298,7 +297,7 @@ export default function InboxPage() {
                       disabled={sendMessageMutation.isPending}
                     />
                   </GlowingBox>
-                  <GlowingBox color="blue">
+                  <GlowingBox>
                     <Button 
                       type="submit" 
                       disabled={!messageText.trim() || sendMessageMutation.isPending}

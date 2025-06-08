@@ -3,6 +3,7 @@ import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { GlowingBox } from '@/components/ui/glowing-box';
+import { RainbowButton } from '@/components/ui/rainbow-button';
 import { HeroSectionDark } from '@/components/ui/hero-section-dark';
 import { Link } from 'wouter';
 import { 
