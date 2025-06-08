@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { storage } from '../storage';
-import axios from 'axios';
+import { SpruceHealthClient } from '../spruce-health-client';
 
 // Define interface for Spruce patient data
 interface SprucePatient {
@@ -15,7 +15,7 @@ interface SprucePatient {
   status?: string;
 }
 
-// Check for proper Spruce Health credentials
+// Initialize Spruce Health client
 const SPRUCE_BEARER_TOKEN = process.env.SPRUCE_BEARER_TOKEN;
 const SPRUCE_ACCESS_ID = process.env.SPRUCE_ACCESS_ID;
 
@@ -24,45 +24,13 @@ if (!SPRUCE_BEARER_TOKEN) {
 }
 
 console.log('🔑 Spruce Health API Configuration:');
-console.log('📋 Access ID:', SPRUCE_ACCESS_ID || 'Not provided');
+console.log('📋 Access ID:', SPRUCE_ACCESS_ID || 'Not provided'); 
 console.log('🔐 Bearer Token:', SPRUCE_BEARER_TOKEN ? 'Configured' : 'Missing');
 
-// Rate limiting for Spruce API - 60 requests per minute
-let apiCallCount = 0;
-let lastResetTime = Date.now();
-
-const checkRateLimit = () => {
-  const now = Date.now();
-  const timeSinceReset = now - lastResetTime;
-  
-  // Reset counter every minute
-  if (timeSinceReset >= 60000) {
-    apiCallCount = 0;
-    lastResetTime = now;
-  }
-  
-  if (apiCallCount >= 60) {
-    const waitTime = 60000 - timeSinceReset;
-    throw new Error(`Rate limit exceeded. Wait ${Math.ceil(waitTime / 1000)} seconds.`);
-  }
-  
-  apiCallCount++;
-};
-
-// Setup Spruce Health API with proper authentication format
-const spruceApi = axios.create({
-  baseURL: 'https://api.sprucehealth.com',
-  headers: {
-    'Authorization': `Bearer ${SPRUCE_BEARER_TOKEN || ''}`,
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
-
-// Add rate limiting interceptor
-spruceApi.interceptors.request.use((config) => {
-  checkRateLimit();
-  return config;
+const spruceClient = new SpruceHealthClient({
+  bearerToken: SPRUCE_BEARER_TOKEN || '',
+  maxRetries: 3,
+  retryDelay: 1000
 });
 
 // Define interface for Spruce message
@@ -77,6 +45,61 @@ interface SpruceMessage {
 }
 
 export const router = Router();
+
+// Get conversations for inbox
+router.get('/conversations', async (req, res) => {
+  try {
+    const { page, per_page, status } = req.query;
+    
+    const conversations = await spruceClient.getConversations({
+      page: page ? parseInt(page as string) : 1,
+      per_page: per_page ? parseInt(per_page as string) : 20,
+      status: status as string
+    });
+    
+    // Transform conversations for inbox format
+    const transformedConversations = conversations.conversations.map(conv => ({
+      id: conv.id,
+      entityId: conv.id,
+      displayName: conv.participants?.[0]?.name || 'Unknown Patient',
+      lastActivity: conv.updated_at || conv.created_at,
+      unreadCount: conv.unread_count || 0,
+      lastMessage: undefined // Will be populated by separate API call if needed
+    }));
+    
+    res.json(transformedConversations);
+  } catch (error) {
+    console.error('Error fetching conversations:', error);
+    res.status(500).json({ message: 'Failed to fetch conversations' });
+  }
+});
+
+// Get messages for a specific conversation
+router.get('/patients/:patientId/messages', async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const { page, per_page } = req.query;
+    
+    const messages = await spruceClient.getMessages(patientId, {
+      page: page ? parseInt(page as string) : 1,
+      per_page: per_page ? parseInt(per_page as string) : 50
+    });
+    
+    // Transform messages for frontend format
+    const transformedMessages = messages.messages.map(msg => ({
+      id: msg.id,
+      content: msg.content,
+      timestamp: msg.sent_at,
+      isFromPatient: msg.sender_id !== 'doctor',
+      sender: msg.sender_name
+    }));
+    
+    res.json({ messages: transformedMessages });
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ message: 'Failed to fetch messages' });
+  }
+});
 
 // Search patients in real-time from Spruce API only
 router.get('/search-patients', async (req, res) => {
