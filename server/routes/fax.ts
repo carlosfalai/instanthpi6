@@ -51,13 +51,8 @@ const upload = multer({
   }
 });
 
-// Initialize the fax service
-let faxService: FaxService;
-try {
-  faxService = createFaxService();
-} catch (error) {
-  console.error('Failed to initialize fax service:', error);
-}
+// Initialize the fax service (null if no authentic credentials)
+const faxService = createFaxService();
 
 // Send a fax
 router.post('/send', upload.single('file'), async (req: Request, res: Response) => {

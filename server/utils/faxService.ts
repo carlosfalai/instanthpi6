@@ -454,38 +454,10 @@ export class InterFaxService implements FaxService {
   }
 }
 
-// Define a mock fax service for development if no real credentials are available
-class MockFaxService implements FaxService {
-  async sendFax(options: SendFaxOptions): Promise<SendFaxResult> {
-    console.log('Mock Fax Service: Sending fax to', options.to);
-    return {
-      success: true,
-      faxId: `mock-${Date.now()}`,
-      message: 'Fax queued in mock service (no real fax sent)',
-    };
-  }
-
-  async getFaxStatus(faxId: string): Promise<FaxStatus> {
-    console.log('Mock Fax Service: Getting status for', faxId);
-    return 'success';
-  }
-
-  async listFaxes(options: ListFaxOptions = {}): Promise<ListFaxResult> {
-    console.log('Mock Fax Service: Listing faxes with options', options);
-    return {
-      faxes: [],
-      hasMore: false,
-    };
-  }
-
-  async downloadFax(faxId: string, filePath: string): Promise<string> {
-    console.log('Mock Fax Service: Downloading fax', faxId, 'to', filePath);
-    return filePath;
-  }
-}
+// Disabled: Mock fax service removed - only authentic fax services are used
 
 // Factory function to create the appropriate fax service
-export function createFaxService(): FaxService {
+export function createFaxService(): FaxService | null {
   // Check for environment variables to decide which service to use
   const phaxioApiKey = process.env.PHAXIO_API_KEY;
   const phaxioApiSecret = process.env.PHAXIO_API_SECRET;
@@ -505,7 +477,7 @@ export function createFaxService(): FaxService {
     return new InterFaxService(interfaxUsername, interfaxPassword);
   }
   
-  // Use mock service in development mode when no credentials are available
-  console.log('No fax service credentials found, using mock fax service (for development only)');
-  return new MockFaxService();
+  // No authentic fax service credentials found - fax functionality disabled
+  console.log('No authentic fax credentials provided - fax functionality will be disabled');
+  return null;
 }

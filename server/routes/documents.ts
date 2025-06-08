@@ -8,7 +8,7 @@ import { createFaxService } from '../utils/faxService';
 
 const router = Router();
 
-// Initialize fax service
+// Initialize fax service (null if no authentic credentials)
 const faxService = createFaxService();
 
 // Email a document to a patient
