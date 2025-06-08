@@ -167,8 +167,8 @@ export default function InboxPage() {
                     key={conversation.id}
                     className={`p-3 mb-2 cursor-pointer rounded-lg border transition-all duration-200 ${
                       selectedConversation === conversation.entityId
-                        ? 'border-blue-500/50 bg-blue-500/10 shadow-lg'
-                        : 'border-gray-600/50 bg-gray-800/80 hover:bg-gray-700/80 hover:border-gray-500/70'
+                        ? 'border-border/50 bg-muted/20 shadow-lg'
+                        : 'border-border/20 bg-card/20 hover:bg-muted/30 hover:border-border/40'
                     }`}
                     onClick={() => setSelectedConversation(conversation.entityId)}
                   >
@@ -181,7 +181,7 @@ export default function InboxPage() {
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h3 className="font-medium text-white truncate">
+                          <h3 className="font-medium text-foreground truncate">
                             {conversation.displayName}
                           </h3>
                           {conversation.unreadCount > 0 && (
@@ -192,13 +192,13 @@ export default function InboxPage() {
                         </div>
                         
                         {conversation.lastMessage && (
-                          <p className="text-sm text-gray-300 truncate mt-1">
+                          <p className="text-sm text-muted-foreground truncate mt-1">
                             {conversation.lastMessage.content}
                           </p>
                         )}
                         
                         <div className="flex items-center justify-between mt-2">
-                          <span className="text-xs text-gray-400 flex items-center">
+                          <span className="text-xs text-muted-foreground/70 flex items-center">
                             <Clock className="h-3 w-3 mr-1" />
                             {formatTimestamp(conversation.lastActivity)}
                           </span>
