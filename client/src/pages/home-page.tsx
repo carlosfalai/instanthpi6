@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { GlowingBox } from '@/components/ui/glowing-box';
 import { RainbowButton } from '@/components/ui/rainbow-button';
-import { HeroSectionDark } from '@/components/ui/hero-section-dark';
+
 import { Link } from 'wouter';
 import { 
   Users, 
@@ -22,27 +22,7 @@ export default function HomePage() {
   return (
     <AppLayoutSpruce>
       <div className="container mx-auto p-6">
-        {/* Hero Section */}
-        <div className="mb-8">
-          <HeroSectionDark
-            title="InstantHPI"
-            subtitle="AI-Powered Medical Platform"
-            description="Transform your medical practice with intelligent workflow automation, real-time patient communication, and advanced diagnostic support."
-            primaryAction={{
-              label: "Start Consultation",
-              onClick: () => window.location.href = "/inbox"
-            }}
-            secondaryAction={{
-              label: "View Documentation",
-              onClick: () => window.location.href = "/documents"
-            }}
-            features={[
-              { icon: <BrainCircuit className="h-4 w-4" />, label: "AI-Enhanced" },
-              { icon: <Heart className="h-4 w-4" />, label: "Patient-Focused" },
-              { icon: <Users className="h-4 w-4" />, label: "Team Collaboration" }
-            ]}
-          />
-        </div>
+
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <GlowingBox>
