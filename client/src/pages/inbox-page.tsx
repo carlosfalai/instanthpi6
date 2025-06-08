@@ -163,16 +163,16 @@ export default function InboxPage() {
             ) : (
               <div className="p-2">
                 {conversations?.map((conversation: SpruceConversation) => (
-                  <GlowingBox
+                  <div
                     key={conversation.id}
-                    className={`p-3 mb-2 cursor-pointer ${
+                    className={`p-3 mb-2 cursor-pointer rounded-lg border transition-all duration-200 ${
                       selectedConversation === conversation.entityId
-                        ? 'border-primary/40 bg-primary/5'
-                        : ''
+                        ? 'border-blue-500/50 bg-blue-500/10 shadow-lg'
+                        : 'border-gray-600/50 bg-gray-800/80 hover:bg-gray-700/80 hover:border-gray-500/70'
                     }`}
+                    onClick={() => setSelectedConversation(conversation.entityId)}
                   >
-                    <div onClick={() => setSelectedConversation(conversation.entityId)} className="w-full">
-                      <div className="flex items-start space-x-3">
+                    <div className="flex items-start space-x-3">
                       <Avatar className="h-10 w-10 flex-shrink-0">
                         <AvatarFallback className="bg-blue-600 text-white">
                           {getInitials(conversation.displayName)}
@@ -181,7 +181,7 @@ export default function InboxPage() {
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h3 className="font-medium text-foreground truncate">
+                          <h3 className="font-medium text-white truncate">
                             {conversation.displayName}
                           </h3>
                           {conversation.unreadCount > 0 && (
@@ -192,21 +192,20 @@ export default function InboxPage() {
                         </div>
                         
                         {conversation.lastMessage && (
-                          <p className="text-sm text-muted-foreground truncate mt-1">
+                          <p className="text-sm text-gray-300 truncate mt-1">
                             {conversation.lastMessage.content}
                           </p>
                         )}
                         
                         <div className="flex items-center justify-between mt-2">
-                          <span className="text-xs text-muted-foreground flex items-center">
+                          <span className="text-xs text-gray-400 flex items-center">
                             <Clock className="h-3 w-3 mr-1" />
                             {formatTimestamp(conversation.lastActivity)}
                           </span>
                         </div>
                       </div>
-                      </div>
                     </div>
-                  </GlowingBox>
+                  </div>
                 ))}
               </div>
             )}
