@@ -48,11 +48,11 @@ export default function HomePage() {
           <GlowingBox>
             <div className="p-6">
               <div className="flex items-center mb-3">
-                <Users className="h-5 w-5 mr-2 text-blue-400" />
-                <h3 className="text-white font-semibold text-lg">Patients</h3>
+                <Users className="h-5 w-5 mr-2 text-muted-foreground" />
+                <h3 className="text-foreground font-semibold text-lg">Patients</h3>
               </div>
-              <p className="text-white/90 text-base font-medium mb-2">View and manage patients</p>
-              <p className="text-gray-300 mb-4 leading-relaxed">Access patient records, medical history, and documents</p>
+              <p className="text-muted-foreground text-base font-medium mb-2">View and manage patients</p>
+              <p className="text-muted-foreground/80 mb-4 leading-relaxed">Access patient records, medical history, and documents</p>
               <Link href="/patients">
                 <RainbowButton className="w-full">View Patients</RainbowButton>
               </Link>
@@ -62,11 +62,11 @@ export default function HomePage() {
           <GlowingBox>
             <div className="p-6">
               <div className="flex items-center mb-3">
-                <PillIcon className="h-5 w-5 mr-2 text-green-400" />
-                <h3 className="text-white font-semibold text-lg">Medication Refills</h3>
+                <PillIcon className="h-5 w-5 mr-2 text-muted-foreground" />
+                <h3 className="text-foreground font-semibold text-lg">Medication Refills</h3>
               </div>
-              <p className="text-white/90 text-base font-medium mb-2">Handle medication requests</p>
-              <p className="text-gray-300 mb-4 leading-relaxed">Review and process patient medication refill requests</p>
+              <p className="text-muted-foreground text-base font-medium mb-2">Handle medication requests</p>
+              <p className="text-muted-foreground/80 mb-4 leading-relaxed">Review and process patient medication refill requests</p>
               <Link href="/medication-refills">
                 <RainbowButton className="w-full">View Refills</RainbowButton>
               </Link>
@@ -76,11 +76,11 @@ export default function HomePage() {
           <GlowingBox>
             <div className="p-6">
               <div className="flex items-center mb-3">
-                <Heart className="h-5 w-5 mr-2 text-red-400" />
-                <h3 className="text-white font-semibold text-lg">Chronic Conditions</h3>
+                <Heart className="h-5 w-5 mr-2 text-muted-foreground" />
+                <h3 className="text-foreground font-semibold text-lg">Chronic Conditions</h3>
               </div>
-              <p className="text-white/90 text-base font-medium mb-2">Track chronic conditions</p>
-              <p className="text-gray-300 mb-4 leading-relaxed">Monitor and manage patients with chronic health conditions</p>
+              <p className="text-muted-foreground text-base font-medium mb-2">Track chronic conditions</p>
+              <p className="text-muted-foreground/80 mb-4 leading-relaxed">Monitor and manage patients with chronic health conditions</p>
               <Link href="/chronic-conditions">
                 <RainbowButton className="w-full">View Conditions</RainbowButton>
               </Link>
@@ -88,7 +88,7 @@ export default function HomePage() {
           </GlowingBox>
         </div>
         
-        <h2 className="text-2xl font-bold mb-4 text-white">Quick Access</h2>
+        <h2 className="text-2xl font-bold mb-4 text-foreground">Quick Access</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <GlowingBox>

@@ -12,7 +12,7 @@ export function GlowingBox({
 }: GlowingBoxProps) {
   return (
     <div className={cn(
-      "h-full cursor-pointer transition-all duration-300 bg-gradient-to-br from-violet-800/90 via-purple-800/80 to-indigo-800/90 border border-violet-400/70 rounded-lg",
+      "h-full cursor-pointer transition-all duration-300 bg-card/50 backdrop-blur border border-border/30 rounded-lg hover:bg-muted/50",
       className
     )}>
       {children}
