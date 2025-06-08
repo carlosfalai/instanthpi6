@@ -66,17 +66,21 @@ router.get('/patients/:patientId/messages', async (req, res) => {
     const { patientId } = req.params;
     const { page, per_page } = req.query;
     
+    console.log(`Fetching messages for conversation: ${patientId}`);
+    
     const messages = await spruceClient.getMessages(patientId, {
       page: page ? parseInt(page as string) : 1,
       per_page: per_page ? parseInt(per_page as string) : 50
     });
+    
+    console.log(`Found ${messages.messages.length} messages for conversation ${patientId}`);
     
     // Transform messages for frontend format
     const transformedMessages = messages.messages.map(msg => ({
       id: msg.id,
       content: msg.content,
       timestamp: msg.sent_at,
-      isFromPatient: msg.sender_id !== 'doctor',
+      isFromPatient: msg.sender_id !== 'doctor' && msg.sender_id !== 'system',
       sender: msg.sender_name
     }));
     
