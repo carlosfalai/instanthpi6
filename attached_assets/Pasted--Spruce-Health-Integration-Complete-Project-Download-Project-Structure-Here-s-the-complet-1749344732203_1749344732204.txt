@@ -1,0 +1,234 @@
+# Spruce Health Integration - Complete Project Download
+
+## 📁 Project Structure
+
+Here's the complete file structure for your Spruce Health integration application:
+
+```
+spruce-health-integration/
+├── src/
+│   ├── spruce-health-client.ts      # Main API client
+│   └── app.ts                       # Express server
+├── package.json                     # Dependencies & scripts
+├── .env.example                     # Environment configuration
+├── Dockerfile                       # Docker configuration
+├── docker-compose.yml               # Multi-container setup
+├── test-connection.ts               # API connection test
+├── README.md                        # Documentation
+├── tsconfig.json                    # TypeScript config
+├── .gitignore                       # Git ignore rules
+└── frontend/
+    └── dashboard.tsx                # React dashboard component
+```
+
+## 💾 Download Instructions
+
+### Method 1: Individual File Download (Recommended)
+
+Create a new folder called `spruce-health-integration` and save each file below:
+
+#### 1. Create Main Directory
+```bash
+mkdir spruce-health-integration
+cd spruce-health-integration
+```
+
+#### 2. Create Source Directory
+```bash
+mkdir src
+```
+
+#### 3. Save Files (copy content from artifacts above)
+
+**src/spruce-health-client.ts** - Copy from "Spruce Health API Client" artifact
+**src/app.ts** - Copy from "Express.js Application Server" artifact
+**package.json** - Copy from "package.json" artifact
+**.env.example** - Copy from ".env.example" artifact
+**Dockerfile** - Copy from "Dockerfile" artifact
+**docker-compose.yml** - Copy from "docker-compose.yml" artifact
+**test-connection.ts** - Copy from "Test Spruce Health Connection" artifact
+**README.md** - Copy from "README.md" artifact
+
+#### 4. Create Additional Required Files
+
+**tsconfig.json**:
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*", "test-connection.ts"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+**.gitignore**:
+```
+# Dependencies
+node_modules/
+npm-debug.log*
+
+# Production builds
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Logs
+logs/
+*.log
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Docker
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+```
+
+#### 5. Create Frontend Directory (Optional)
+```bash
+mkdir frontend
+```
+
+Save the React dashboard component as **frontend/dashboard.tsx** (copy from "React Frontend Dashboard" artifact)
+
+### Method 2: Quick Setup Script
+
+Create this setup script to download everything quickly:
+
+**setup-project.sh**:
+```bash
+#!/bin/bash
+
+echo "🚀 Setting up Spruce Health Integration Project..."
+
+# Create project structure
+mkdir -p spruce-health-integration/src
+mkdir -p spruce-health-integration/frontend
+cd spruce-health-integration
+
+echo "📁 Created project directories"
+
+# You'll need to manually copy the artifact contents into these files:
+touch src/spruce-health-client.ts
+touch src/app.ts
+touch package.json
+touch .env.example
+touch Dockerfile
+touch docker-compose.yml
+touch test-connection.ts
+touch README.md
+touch tsconfig.json
+touch .gitignore
+touch frontend/dashboard.tsx
+
+echo "📄 Created all project files"
+echo "✅ Project structure ready!"
+echo ""
+echo "Next steps:"
+echo "1. Copy content from each artifact into the corresponding files"
+echo "2. Run: npm install"
+echo "3. Run: npm run test:connection"
+echo "4. Run: npm run dev"
+```
+
+### Method 3: Manual File Creation
+
+If you prefer to create files manually:
+
+1. **Create root folder**: `spruce-health-integration`
+2. **Create subfolders**: `src/` and `frontend/`
+3. **Copy each artifact** into its corresponding file name
+4. **Add the additional files** (tsconfig.json, .gitignore)
+
+## 🛠️ Setup After Download
+
+Once you have all files:
+
+```bash
+# Navigate to project directory
+cd spruce-health-integration
+
+# Install dependencies
+npm install
+
+# Copy environment file
+cp .env.example .env
+
+# Test connection (your credentials are already configured)
+npm run test:connection
+
+# Start development server
+npm run dev
+```
+
+## 📋 File Checklist
+
+Make sure you have all these files:
+
+- [ ] `src/spruce-health-client.ts` (Main API client)
+- [ ] `src/app.ts` (Express server)
+- [ ] `package.json` (Dependencies)
+- [ ] `.env.example` (Environment config with your credentials)
+- [ ] `Dockerfile` (Container config)
+- [ ] `docker-compose.yml` (Multi-container setup)
+- [ ] `test-connection.ts` (Connection test)
+- [ ] `README.md` (Documentation)
+- [ ] `tsconfig.json` (TypeScript config)
+- [ ] `.gitignore` (Git ignore rules)
+- [ ] `frontend/dashboard.tsx` (React UI)
+
+## 🎯 Quick Start Commands
+
+After setting up all files:
+
+```bash
+# Install everything
+npm install
+
+# Test your Spruce connection
+npm run test:connection
+
+# Run development server
+npm run dev
+
+# Or run with Docker
+docker-compose up -d
+```
+
+## 💡 Pro Tip
+
+Your Spruce Health credentials are already configured in the `.env.example` file, so you just need to:
+1. Copy it to `.env`
+2. Run `npm run test:connection` to verify everything works
+3. Start coding!
+
+The application will be available at `http://localhost:3000` with your dashboard at `http://localhost:3000/api/dashboard`.

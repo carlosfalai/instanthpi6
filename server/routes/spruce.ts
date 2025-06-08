@@ -27,6 +27,28 @@ console.log('🔑 Spruce Health API Configuration:');
 console.log('📋 Access ID:', SPRUCE_ACCESS_ID || 'Not provided');
 console.log('🔐 Bearer Token:', SPRUCE_BEARER_TOKEN ? 'Configured' : 'Missing');
 
+// Rate limiting for Spruce API - 60 requests per minute
+let apiCallCount = 0;
+let lastResetTime = Date.now();
+
+const checkRateLimit = () => {
+  const now = Date.now();
+  const timeSinceReset = now - lastResetTime;
+  
+  // Reset counter every minute
+  if (timeSinceReset >= 60000) {
+    apiCallCount = 0;
+    lastResetTime = now;
+  }
+  
+  if (apiCallCount >= 60) {
+    const waitTime = 60000 - timeSinceReset;
+    throw new Error(`Rate limit exceeded. Wait ${Math.ceil(waitTime / 1000)} seconds.`);
+  }
+  
+  apiCallCount++;
+};
+
 // Setup Spruce Health API with proper authentication format
 const spruceApi = axios.create({
   baseURL: 'https://api.sprucehealth.com',
@@ -35,6 +57,12 @@ const spruceApi = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   }
+});
+
+// Add rate limiting interceptor
+spruceApi.interceptors.request.use((config) => {
+  checkRateLimit();
+  return config;
 });
 
 // Define interface for Spruce message
@@ -533,32 +561,21 @@ router.get('/patients/:patientId/messages', async (req, res) => {
       if (!conversationId) continue;
       
       try {
-        // Try different approaches to get conversation messages
-        let messagesResponse;
-        try {
-          // First try the conversations endpoint with messages parameter
-          messagesResponse = await spruceApi.get(`/v1/conversations/${conversationId}?include=messages`);
-        } catch (firstError) {
-          try {
-            // Try the alternative messages endpoint format
-            messagesResponse = await spruceApi.get(`/v1/conversations/${conversationId}`, {
-              params: { include: 'messages' }
-            });
-          } catch (secondError) {
-            // Try a different endpoint structure
-            messagesResponse = await spruceApi.get(`/v1/messages`, {
-              params: { conversation_id: conversationId }
-            });
+        // Try the direct messages endpoint for this conversation
+        const messagesResponse = await spruceApi.get(`/v1/conversations/${conversationId}/messages`, {
+          params: {
+            per_page: 50,
+            sort: 'desc'
           }
-        }
-        
-        // Debug: Log the full response to understand the API structure
-        console.log(`API Response for conversation ${conversationId}:`, JSON.stringify(messagesResponse.data, null, 2));
+        });
         
         // Access the actual messages array from the response
         const rawMessages = messagesResponse.data.messages || messagesResponse.data || [];
         const conversationMessages = Array.isArray(rawMessages) ? rawMessages : [];
-        console.log(`Found ${conversationMessages.length} messages in conversation ${conversationId}`);
+        
+        if (conversationMessages.length > 0) {
+          console.log(`Found ${conversationMessages.length} messages in conversation ${conversationId}`);
+        }
         
         // Add messages to allMessages only if we have valid array data
         if (conversationMessages.length > 0) {
