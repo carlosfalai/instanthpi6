@@ -33,14 +33,25 @@ router.get('/conversations', async (req, res) => {
     });
     
     // Transform conversations for inbox format
-    const transformedConversations = conversations.conversations.map(conv => ({
-      id: conv.id,
-      entityId: conv.id,
-      displayName: conv.participants?.[0]?.name || conv.subject || 'Unknown Patient',
-      lastActivity: conv.updated_at || conv.created_at,
-      unreadCount: conv.unread_count || 0,
-      lastMessage: undefined // Will be populated by separate API call if needed
-    }));
+    const transformedConversations = conversations.conversations.map(conv => {
+      // Extract patient name from title, externalParticipants, or other available fields
+      let displayName = 'Unknown Patient';
+      
+      if (conv.title && conv.title !== 'Centre Médical Font') {
+        displayName = conv.title;
+      } else if (conv.externalParticipants && conv.externalParticipants.length > 0) {
+        displayName = conv.externalParticipants[0].displayName || conv.externalParticipants[0].contact;
+      }
+      
+      return {
+        id: conv.id,
+        entityId: conv.id,
+        displayName: displayName,
+        lastActivity: conv.lastMessageAt || conv.createdAt,
+        unreadCount: conv.unread_count || 0,
+        lastMessage: undefined
+      };
+    });
     
     res.json(transformedConversations);
   } catch (error) {

@@ -10,12 +10,16 @@ interface SpruceHealthConfig {
 
 interface Conversation {
   id: string;
-  subject: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  participants: Participant[];
-  unread_count: number;
+  title: string;
+  type: string;
+  createdAt: string;
+  lastMessageAt: string;
+  externalParticipants?: Array<{
+    contact: string;
+    displayName: string;
+  }>;
+  unread_count?: number;
+  archived?: boolean;
 }
 
 interface Participant {
@@ -177,7 +181,6 @@ class SpruceHealthClient {
         page: 1,
         ...params
       };
-      console.log('Making request with params:', defaultParams);
       const response = await this.client.get('/conversations', { params: defaultParams });
       return response.data;
     } catch (error) {
