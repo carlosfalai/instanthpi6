@@ -31,6 +31,7 @@ import ClaudeCodeAssistantPage from '@/pages/claude-code-assistant-page';
 import TierAssociationPage from '@/pages/tier-association-page';
 import SpruceChatPage from '@/pages/SpruceChatPage';
 import InboxPage from '@/pages/inbox-page';
+import WebhookSetupPage from '@/pages/webhook-setup-page';
 // New settings pages
 import SettingsPage from '@/pages/settings-page';
 import OrganizationProfilePage from '@/pages/organization-profile-page';
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/documents" component={DocumentsPage} />
       <Route path="/messages" component={MessagesPage} />
       <Route path="/inbox" component={InboxPage} />
+      <Route path="/webhooks" component={WebhookSetupPage} />
       <Route path="/education" component={EducationPage} />
       <Route path="/forms" component={FormsPage} />
       <Route path="/forms/new" component={FormBuilderPage} />

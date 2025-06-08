@@ -246,6 +246,48 @@ class SpruceHealthClient {
   }
 
   /**
+   * Create a webhook subscription
+   */
+  async createWebhook(url: string, events: string[] = ['message.created', 'conversation.created', 'conversation.updated']): Promise<any> {
+    try {
+      const response = await this.client.post('/webhooks', {
+        url,
+        events,
+        active: true
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error creating webhook:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * List existing webhooks
+   */
+  async listWebhooks(): Promise<any> {
+    try {
+      const response = await this.client.get('/webhooks');
+      return response.data;
+    } catch (error) {
+      console.error('Error listing webhooks:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete a webhook
+   */
+  async deleteWebhook(webhookId: string): Promise<void> {
+    try {
+      await this.client.delete(`/webhooks/${webhookId}`);
+    } catch (error) {
+      console.error(`Error deleting webhook ${webhookId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
    * Mark messages as read
    */
   async markMessagesAsRead(conversationId: string, messageIds: string[]): Promise<void> {
