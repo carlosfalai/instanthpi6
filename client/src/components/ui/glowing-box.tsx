@@ -12,8 +12,8 @@ export function GlowingBox({
 }: GlowingBoxProps) {
   return (
     <div className={cn("relative group", className)}>
-      <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-gray-600/20 to-gray-400/20 opacity-50 group-hover:opacity-75 transition duration-500 blur-[1px]" />
-      <div className="relative bg-gray-900/90 rounded-lg border border-gray-700/50 backdrop-blur-sm">
+      <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-purple-600/30 to-blue-600/30 opacity-50 group-hover:opacity-75 transition duration-500 blur-[1px]" />
+      <div className="relative bg-gray-900/95 rounded-lg border border-gray-600/70 backdrop-blur-md shadow-2xl">
         {children}
       </div>
     </div>

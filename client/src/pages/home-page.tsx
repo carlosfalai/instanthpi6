@@ -49,10 +49,10 @@ export default function HomePage() {
             <div className="p-6">
               <div className="flex items-center mb-3">
                 <Users className="h-5 w-5 mr-2 text-blue-400" />
-                <h3 className="text-white font-semibold">Patients</h3>
+                <h3 className="text-white font-semibold text-lg">Patients</h3>
               </div>
-              <p className="text-gray-300 text-sm mb-4">View and manage patients</p>
-              <p className="text-gray-400 mb-4">Access patient records, medical history, and documents</p>
+              <p className="text-white/90 text-base font-medium mb-2">View and manage patients</p>
+              <p className="text-gray-300 mb-4 leading-relaxed">Access patient records, medical history, and documents</p>
               <Link href="/patients">
                 <RainbowButton className="w-full">View Patients</RainbowButton>
               </Link>
@@ -63,10 +63,10 @@ export default function HomePage() {
             <div className="p-6">
               <div className="flex items-center mb-3">
                 <PillIcon className="h-5 w-5 mr-2 text-green-400" />
-                <h3 className="text-white font-semibold">Medication Refills</h3>
+                <h3 className="text-white font-semibold text-lg">Medication Refills</h3>
               </div>
-              <p className="text-gray-300 text-sm mb-4">Handle medication requests</p>
-              <p className="text-gray-400 mb-4">Review and process patient medication refill requests</p>
+              <p className="text-white/90 text-base font-medium mb-2">Handle medication requests</p>
+              <p className="text-gray-300 mb-4 leading-relaxed">Review and process patient medication refill requests</p>
               <Link href="/medication-refills">
                 <RainbowButton className="w-full">View Refills</RainbowButton>
               </Link>
@@ -77,10 +77,10 @@ export default function HomePage() {
             <div className="p-6">
               <div className="flex items-center mb-3">
                 <Heart className="h-5 w-5 mr-2 text-red-400" />
-                <h3 className="text-white font-semibold">Chronic Conditions</h3>
+                <h3 className="text-white font-semibold text-lg">Chronic Conditions</h3>
               </div>
-              <p className="text-gray-300 text-sm mb-4">Track chronic conditions</p>
-              <p className="text-gray-400 mb-4">Monitor and manage patients with chronic health conditions</p>
+              <p className="text-white/90 text-base font-medium mb-2">Track chronic conditions</p>
+              <p className="text-gray-300 mb-4 leading-relaxed">Monitor and manage patients with chronic health conditions</p>
               <Link href="/chronic-conditions">
                 <RainbowButton className="w-full">View Conditions</RainbowButton>
               </Link>
@@ -88,14 +88,14 @@ export default function HomePage() {
           </GlowingBox>
         </div>
         
-        <h2 className="text-2xl font-bold mb-4">Quick Access</h2>
+        <h2 className="text-2xl font-bold mb-4 text-white">Quick Access</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <GlowingBox>
             <div className="p-4">
-              <div className="flex items-center mb-2">
+              <div className="flex items-center mb-3">
                 <FileText className="h-4 w-4 mr-2 text-purple-400" />
-                <h4 className="text-white font-medium">Documents</h4>
+                <h4 className="text-white font-semibold">Documents</h4>
               </div>
               <Link href="/documents">
                 <RainbowButton className="w-full h-8 px-3 text-sm">
@@ -107,9 +107,9 @@ export default function HomePage() {
           
           <GlowingBox>
             <div className="p-4">
-              <div className="flex items-center mb-2">
+              <div className="flex items-center mb-3">
                 <AlertTriangle className="h-4 w-4 mr-2 text-yellow-400" />
-                <h4 className="text-white font-medium">Urgent Care</h4>
+                <h4 className="text-white font-semibold">Urgent Care</h4>
               </div>
               <Link href="/urgent-care">
                 <RainbowButton className="w-full h-8 px-3 text-sm">
@@ -121,9 +121,9 @@ export default function HomePage() {
           
           <GlowingBox>
             <div className="p-4">
-              <div className="flex items-center mb-2">
+              <div className="flex items-center mb-3">
                 <GraduationCap className="h-4 w-4 mr-2 text-blue-400" />
-                <h4 className="text-white font-medium">Education</h4>
+                <h4 className="text-white font-semibold">Education</h4>
               </div>
               <Link href="/education">
                 <RainbowButton className="w-full h-8 px-3 text-sm">
@@ -135,9 +135,9 @@ export default function HomePage() {
           
           <GlowingBox>
             <div className="p-4">
-              <div className="flex items-center mb-2">
+              <div className="flex items-center mb-3">
                 <CreditCard className="h-4 w-4 mr-2 text-green-400" />
-                <h4 className="text-white font-medium">Subscription</h4>
+                <h4 className="text-white font-semibold">Subscription</h4>
               </div>
               <Link href="/subscription">
                 <RainbowButton className="w-full h-8 px-3 text-sm">
@@ -152,10 +152,10 @@ export default function HomePage() {
           <div className="p-6">
             <div className="flex items-center mb-3">
               <Settings className="h-5 w-5 mr-2 text-gray-400" />
-              <h3 className="text-white font-semibold">Settings</h3>
+              <h3 className="text-white font-semibold text-lg">Settings</h3>
             </div>
-            <p className="text-gray-300 text-sm mb-4">Configure your practice</p>
-            <p className="text-gray-400 mb-4">
+            <p className="text-white/90 text-base font-medium mb-2">Configure your practice</p>
+            <p className="text-gray-300 mb-4 leading-relaxed">
               Manage organization settings, teammates, and user preferences
             </p>
             <div className="flex flex-wrap gap-3">
