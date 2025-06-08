@@ -30,7 +30,7 @@ import {
   BrainCircuit
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { RetroGrid } from '@/components/ui/retro-grid';
@@ -76,11 +76,7 @@ interface AppLayoutSpruceProps {
 export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
   const [location, navigate] = useLocation();
 
-  // User data without photo - using initials only
-  const currentUser = {
-    name: 'Dr. Carlos Font',
-    role: 'Family Medicine'
-  };
+
 
   // Define main navigation sections
   const mainNavSections: NavSection[] = [
@@ -179,14 +175,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
 
   const currentActiveSection = determineActiveSection();
 
-  // Generate initials for avatar fallback
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase();
-  };
+
 
   return (
     <div className="min-h-screen bg-background flex relative">
@@ -210,20 +199,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
             </Button>
           </div>
 
-          {/* User Profile */}
-          <div className="flex items-center space-x-3 mb-6 p-3 rounded-lg bg-muted/50">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback>{getInitials(currentUser.name)}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-foreground truncate">
-                {currentUser.name}
-              </p>
-              <p className="text-xs text-muted-foreground truncate">
-                {currentUser.role}
-              </p>
-            </div>
-          </div>
+
 
           {/* Navigation */}
           <nav className="space-y-6">
