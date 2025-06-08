@@ -253,13 +253,18 @@ class SpruceHealthClient {
    */
   async sendMessage(conversationId: string, content: string, messageType: 'text' | 'image' | 'file' = 'text'): Promise<Message> {
     try {
-      const response = await this.client.post(`/conversations/${conversationId}/messages`, {
+      const messagePayload = {
         body: content,
         type: messageType
-      });
+      };
+      
+      console.log(`Sending message to conversation ${conversationId}:`, messagePayload);
+      
+      const response = await this.client.post(`/conversations/${conversationId}/messages`, messagePayload);
       return response.data;
     } catch (error) {
       console.error(`Error sending message to conversation ${conversationId}:`, error);
+      console.error('Request payload was:', { body: content, type: messageType });
       throw error;
     }
   }
