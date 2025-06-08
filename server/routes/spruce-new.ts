@@ -110,7 +110,7 @@ router.post('/patients/:patientId/messages', async (req, res) => {
     });
   } catch (error) {
     console.error('Error sending message:', error);
-    res.status(500).json({ message: 'Failed to send message', error: error.message });
+    res.status(500).json({ message: 'Failed to send message', error: (error as Error).message });
   }
 });
 

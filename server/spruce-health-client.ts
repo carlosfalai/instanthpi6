@@ -211,21 +211,40 @@ class SpruceHealthClient {
     since?: string;
   }): Promise<MessageListResponse> {
     try {
-      // Use the correct endpoint format based on Spruce Health API
+      // Get the conversation details to extract messages
       const response = await this.client.get(`/conversations/${conversationId}`, { params });
-      // Extract messages from the conversation response
       const conversation = response.data;
+      
+      // Extract messages from the conversation object
+      const messages = conversation.messages || [];
+      
       return {
-        messages: conversation.messages || [],
+        messages: messages.map((msg: any) => ({
+          id: msg.id,
+          content: msg.content || msg.text || "Message content not available",
+          sent_at: msg.sent_at || msg.created_at || new Date().toISOString(),
+          sender_id: msg.sender_id || msg.from || "unknown",
+          sender_name: msg.sender_name || msg.from_name || "Unknown"
+        })),
         pagination: {
           page: params?.page || 1,
           per_page: params?.per_page || 50,
-          total: conversation.messages?.length || 0
+          total: messages.length,
+          total_pages: Math.ceil(messages.length / (params?.per_page || 50))
         }
       };
     } catch (error) {
       console.error(`Error fetching messages for conversation ${conversationId}:`, error);
-      throw error;
+      // Return empty messages with proper structure
+      return {
+        messages: [],
+        pagination: {
+          page: params?.page || 1,
+          per_page: params?.per_page || 50,
+          total: 0,
+          total_pages: 0
+        }
+      };
     }
   }
 

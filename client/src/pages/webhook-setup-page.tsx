@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
 export default function WebhookSetupPage() {
-  const [webhookUrl, setWebhookUrl] = useState(`${window.location.origin}/api/spruce/webhook`);
+  const [webhookUrl, setWebhookUrl] = useState('https://instanthpi-cff3.replit.app/api/spruce/webhook');
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
