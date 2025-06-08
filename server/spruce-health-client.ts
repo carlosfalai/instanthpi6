@@ -213,31 +213,52 @@ class SpruceHealthClient {
     try {
       console.log(`Fetching messages for conversation ${conversationId} from Spruce API`);
       
-      // Try the standard messages endpoint first
-      let response;
+      // Try different message endpoints based on Spruce API structure
+      let response: any;
+      let finalMessages: any[] = [];
+      
       try {
+        // Try the messages endpoint with proper parameters
         response = await this.client.get(`/conversations/${conversationId}/messages`, {
           params: {
             page: params?.page || 1,
             per_page: params?.per_page || 50,
+            include: 'all'
           }
         });
         console.log(`Messages endpoint response:`, JSON.stringify(response.data, null, 2));
-      } catch (messagesError) {
-        console.log(`Messages endpoint failed, trying conversation endpoint:`, messagesError.message);
-        // Fallback to conversation endpoint
-        response = await this.client.get(`/conversations/${conversationId}`, { params });
-        console.log(`Conversation endpoint response:`, JSON.stringify(response.data, null, 2));
+        finalMessages = response.data.messages || response.data.data || [];
+      } catch (messagesError: any) {
+        console.log(`Direct messages endpoint failed (${messagesError.response?.status}): ${messagesError.message}`);
+        
+        try {
+          // Try alternative messages endpoint
+          response = await this.client.get(`/messages`, {
+            params: {
+              conversation_id: conversationId,
+              page: params?.page || 1,
+              per_page: params?.per_page || 50
+            }
+          });
+          console.log(`Alternative messages endpoint response:`, JSON.stringify(response.data, null, 2));
+          finalMessages = response.data.messages || response.data.data || [];
+        } catch (altError: any) {
+          console.log(`Alternative messages endpoint failed: ${altError.message}`);
+          
+          // Get conversation details for context
+          const convResponse = await this.client.get(`/conversations/${conversationId}`);
+          console.log(`Conversation details:`, JSON.stringify(convResponse.data, null, 2));
+          
+          // Extract any embedded messages
+          const conversation = convResponse.data.conversation || convResponse.data;
+          finalMessages = conversation.messages || conversation.recent_messages || [];
+        }
       }
       
-      // Extract messages from response
-      const data = response.data;
-      const messages = data.messages || data.data || [];
-      
-      console.log(`Found ${messages.length} messages for conversation ${conversationId}`);
+      console.log(`Found ${finalMessages.length} messages for conversation ${conversationId}`);
       
       return {
-        messages: messages.map((msg: any) => ({
+        messages: finalMessages.map((msg: any) => ({
           id: msg.id || `msg_${Date.now()}`,
           conversation_id: conversationId,
           content: msg.content || msg.text || msg.body || "Message content not available",
@@ -250,8 +271,8 @@ class SpruceHealthClient {
         pagination: {
           page: params?.page || 1,
           per_page: params?.per_page || 50,
-          total: messages.length,
-          total_pages: Math.ceil(messages.length / (params?.per_page || 50))
+          total: finalMessages.length,
+          total_pages: Math.ceil(finalMessages.length / (params?.per_page || 50))
         }
       };
     } catch (error) {
@@ -275,38 +296,44 @@ class SpruceHealthClient {
    */
   async sendMessage(conversationId: string, content: string, messageType: 'text' | 'image' | 'file' = 'text'): Promise<Message> {
     try {
-      // According to Spruce Health API docs, the message should be sent with specific format
+      // Try different message sending formats based on Spruce Health API documentation
       const messagePayload = {
         body: content,
-        type: messageType,
-        // Add any required fields based on API documentation
+        type: messageType
       };
       
       console.log(`Sending message to conversation ${conversationId}:`, JSON.stringify(messagePayload));
       
-      const response = await this.client.post(`/conversations/${conversationId}/messages`, messagePayload, {
-        headers: {
-          'Content-Type': 'application/json'
+      // Try direct POST to conversations endpoint
+      let response;
+      try {
+        response = await this.client.post(`/conversations/${conversationId}/messages`, messagePayload);
+        console.log('Message sent successfully via conversations endpoint');
+      } catch (directError: any) {
+        console.log(`Direct conversations endpoint failed (${directError.response?.status}): ${directError.message}`);
+        console.log('Error details:', directError.response?.data);
+        
+        // Try alternative sending format
+        const altPayload = {
+          content: content,
+          message_type: messageType,
+          conversation_id: conversationId
+        };
+        
+        try {
+          response = await this.client.post(`/messages`, altPayload);
+          console.log('Message sent successfully via messages endpoint');
+        } catch (altError: any) {
+          console.log(`Alternative messages endpoint failed: ${altError.message}`);
+          throw altError;
         }
-      });
+      }
       
       return response.data;
     } catch (error: any) {
       console.error(`Error sending message to conversation ${conversationId}:`, error);
-      console.error('Request payload was:', JSON.stringify({ body: content, type: messageType }));
-      console.error('Error response:', error.response?.data);
-      
-      // Return a mock successful response to allow UI to function
-      return {
-        id: `msg_${Date.now()}`,
-        conversation_id: conversationId,
-        content: content,
-        sent_at: new Date().toISOString(),
-        sender_id: 'doctor',
-        sender_name: 'Doctor',
-        message_type: messageType,
-        read: false
-      };
+      console.error('Final error response:', error.response?.data);
+      throw error;
     }
   }
 
