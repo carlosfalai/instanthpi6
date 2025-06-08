@@ -98,7 +98,7 @@ export default function HomePage() {
                 <h4 className="text-white font-medium">Documents</h4>
               </div>
               <Link href="/documents">
-                <RainbowButton className="w-full" size="sm">
+                <RainbowButton className="w-full h-8 px-3 text-sm">
                   Access Documents
                 </RainbowButton>
               </Link>
@@ -112,7 +112,7 @@ export default function HomePage() {
                 <h4 className="text-white font-medium">Urgent Care</h4>
               </div>
               <Link href="/urgent-care">
-                <RainbowButton className="w-full" size="sm">
+                <RainbowButton className="w-full h-8 px-3 text-sm">
                   View Urgent Cases
                 </RainbowButton>
               </Link>
@@ -126,7 +126,7 @@ export default function HomePage() {
                 <h4 className="text-white font-medium">Education</h4>
               </div>
               <Link href="/education">
-                <RainbowButton className="w-full" size="sm">
+                <RainbowButton className="w-full h-8 px-3 text-sm">
                   View Resources
                 </RainbowButton>
               </Link>
@@ -140,7 +140,7 @@ export default function HomePage() {
                 <h4 className="text-white font-medium">Subscription</h4>
               </div>
               <Link href="/subscription">
-                <RainbowButton className="w-full" size="sm">
+                <RainbowButton className="w-full h-8 px-3 text-sm">
                   Manage Plan
                 </RainbowButton>
               </Link>
@@ -160,17 +160,17 @@ export default function HomePage() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/settings/organization-profile">
-                <RainbowButton size="sm">
+                <RainbowButton className="h-8 px-3 text-sm">
                   Organization Profile
                 </RainbowButton>
               </Link>
               <Link href="/settings/teammates">
-                <RainbowButton size="sm">
+                <RainbowButton className="h-8 px-3 text-sm">
                   Teammates
                 </RainbowButton>
               </Link>
               <Link href="/settings">
-                <RainbowButton size="sm">
+                <RainbowButton className="h-8 px-3 text-sm">
                   All Settings
                 </RainbowButton>
               </Link>

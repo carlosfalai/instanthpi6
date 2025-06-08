@@ -33,6 +33,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
+import { RetroGrid } from '@/components/ui/retro-grid';
 
 interface NavItem {
   id: string;
