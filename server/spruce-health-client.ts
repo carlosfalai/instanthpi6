@@ -211,8 +211,18 @@ class SpruceHealthClient {
     since?: string;
   }): Promise<MessageListResponse> {
     try {
-      const response = await this.client.get(`/conversations/${conversationId}/messages`, { params });
-      return response.data;
+      // Use the correct endpoint format based on Spruce Health API
+      const response = await this.client.get(`/conversations/${conversationId}`, { params });
+      // Extract messages from the conversation response
+      const conversation = response.data;
+      return {
+        messages: conversation.messages || [],
+        pagination: {
+          page: params?.page || 1,
+          per_page: params?.per_page || 50,
+          total: conversation.messages?.length || 0
+        }
+      };
     } catch (error) {
       console.error(`Error fetching messages for conversation ${conversationId}:`, error);
       throw error;

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Loader2, MessageSquare, Clock, User } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Loader2, MessageSquare, Clock, User, Send } from 'lucide-react';
 import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 interface SpruceConversation {
   id: string;
@@ -22,6 +24,9 @@ interface SpruceConversation {
 
 export default function InboxPage() {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [messageText, setMessageText] = useState('');
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // Fetch conversations from Spruce API
   const { data: conversations, isLoading, error } = useQuery({
@@ -50,6 +55,50 @@ export default function InboxPage() {
     },
     enabled: !!selectedConversation,
   });
+
+  // Send message mutation
+  const sendMessageMutation = useMutation({
+    mutationFn: async ({ conversationId, message }: { conversationId: string; message: string }) => {
+      const response = await fetch(`/api/spruce/patients/${conversationId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: message }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['/api/spruce/patients', selectedConversation, 'messages'],
+      });
+      setMessageText('');
+      toast({
+        title: "Message sent",
+        description: "Your message has been sent successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to send message",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!messageText.trim() || !selectedConversation) return;
+    
+    sendMessageMutation.mutate({
+      conversationId: selectedConversation,
+      message: messageText.trim(),
+    });
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -236,14 +285,26 @@ export default function InboxPage() {
 
               {/* Message Input */}
               <div className="p-4 border-t border-border">
-                <div className="flex space-x-2">
-                  <input
-                    type="text"
+                <form onSubmit={handleSendMessage} className="flex space-x-2">
+                  <Input
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
                     placeholder="Type a message..."
-                    className="flex-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 bg-background text-foreground"
+                    className="flex-1"
+                    disabled={sendMessageMutation.isPending}
                   />
-                  <Button>Send</Button>
-                </div>
+                  <Button 
+                    type="submit" 
+                    disabled={!messageText.trim() || sendMessageMutation.isPending}
+                    size="icon"
+                  >
+                    {sendMessageMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
+                </form>
               </div>
             </>
           )}
