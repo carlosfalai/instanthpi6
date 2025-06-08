@@ -94,8 +94,8 @@ export default function HomePage() {
           <GlowingBox>
             <div className="p-4">
               <div className="flex items-center mb-3">
-                <FileText className="h-4 w-4 mr-2 text-purple-400" />
-                <h4 className="text-white font-semibold">Documents</h4>
+                <FileText className="h-4 w-4 mr-2 text-muted-foreground" />
+                <h4 className="text-foreground font-semibold">Documents</h4>
               </div>
               <Link href="/documents">
                 <RainbowButton className="w-full h-8 px-3 text-sm">
@@ -108,8 +108,8 @@ export default function HomePage() {
           <GlowingBox>
             <div className="p-4">
               <div className="flex items-center mb-3">
-                <AlertTriangle className="h-4 w-4 mr-2 text-yellow-400" />
-                <h4 className="text-white font-semibold">Urgent Care</h4>
+                <AlertTriangle className="h-4 w-4 mr-2 text-muted-foreground" />
+                <h4 className="text-foreground font-semibold">Urgent Care</h4>
               </div>
               <Link href="/urgent-care">
                 <RainbowButton className="w-full h-8 px-3 text-sm">
@@ -122,8 +122,8 @@ export default function HomePage() {
           <GlowingBox>
             <div className="p-4">
               <div className="flex items-center mb-3">
-                <GraduationCap className="h-4 w-4 mr-2 text-blue-400" />
-                <h4 className="text-white font-semibold">Education</h4>
+                <GraduationCap className="h-4 w-4 mr-2 text-muted-foreground" />
+                <h4 className="text-foreground font-semibold">Education</h4>
               </div>
               <Link href="/education">
                 <RainbowButton className="w-full h-8 px-3 text-sm">
@@ -136,8 +136,8 @@ export default function HomePage() {
           <GlowingBox>
             <div className="p-4">
               <div className="flex items-center mb-3">
-                <CreditCard className="h-4 w-4 mr-2 text-green-400" />
-                <h4 className="text-white font-semibold">Subscription</h4>
+                <CreditCard className="h-4 w-4 mr-2 text-muted-foreground" />
+                <h4 className="text-foreground font-semibold">Subscription</h4>
               </div>
               <Link href="/subscription">
                 <RainbowButton className="w-full h-8 px-3 text-sm">
