@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { GlowingBox, GlowingCard } from '@/components/ui/glowing-box';
 
 interface SpruceConversation {
   id: string;
@@ -162,16 +163,19 @@ export default function InboxPage() {
             ) : (
               <div className="p-2">
                 {conversations?.map((conversation: SpruceConversation) => (
-                  <div
+                  <GlowingBox
                     key={conversation.id}
-                    className={`p-3 rounded-lg cursor-pointer transition-colors mb-1 ${
+                    variant="interactive"
+                    intensity={selectedConversation === conversation.entityId ? "high" : "medium"}
+                    glowColor={selectedConversation === conversation.entityId ? "primary" : "muted"}
+                    className={`p-3 mb-2 cursor-pointer ${
                       selectedConversation === conversation.entityId
-                        ? 'bg-primary/10 border border-primary/20'
-                        : 'hover:bg-muted/50'
+                        ? 'border-primary/40 bg-primary/5'
+                        : ''
                     }`}
-                    onClick={() => setSelectedConversation(conversation.entityId)}
                   >
-                    <div className="flex items-start space-x-3">
+                    <div onClick={() => setSelectedConversation(conversation.entityId)} className="w-full">
+                      <div className="flex items-start space-x-3">
                       <Avatar className="h-10 w-10 flex-shrink-0">
                         <AvatarFallback className="bg-blue-600 text-white">
                           {getInitials(conversation.displayName)}
@@ -204,7 +208,8 @@ export default function InboxPage() {
                         </div>
                       </div>
                     </div>
-                  </div>
+                    </div>
+                  </GlowingBox>
                 ))}
               </div>
             )}
