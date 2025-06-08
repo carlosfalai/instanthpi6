@@ -20,7 +20,7 @@ import { verifyRAMQCard, extractRAMQInfo } from "./utils/imageAnalysis";
 import { findSubmissionByPseudonym, generateHPIConfirmationSummary } from "./utils/formsiteApi";
 import { router as aiRouter } from "./routes/ai";
 import { router as patientsRouter } from "./routes/patients";
-import { router as spruceRouter } from "./routes/spruce";
+import { router as spruceRouter } from "./routes/spruce-new";
 import spruceWebhooksRouter from "./routes/spruce-webhooks";
 import { router as educationRouter } from "./routes/education";
 import { router as userRouter } from "./routes/user";
