@@ -30,6 +30,7 @@ import ClaudeAIPage from '@/pages/claude-ai-page';
 import ClaudeCodeAssistantPage from '@/pages/claude-code-assistant-page';
 import TierAssociationPage from '@/pages/tier-association-page';
 import SpruceChatPage from '@/pages/SpruceChatPage';
+import InboxPage from '@/pages/inbox-page';
 // New settings pages
 import SettingsPage from '@/pages/settings-page';
 import OrganizationProfilePage from '@/pages/organization-profile-page';
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/patients/:patientId" component={SpruceChatPage} />
       <Route path="/documents" component={DocumentsPage} />
       <Route path="/messages" component={MessagesPage} />
+      <Route path="/inbox" component={InboxPage} />
       <Route path="/education" component={EducationPage} />
       <Route path="/forms" component={FormsPage} />
       <Route path="/forms/new" component={FormBuilderPage} />
