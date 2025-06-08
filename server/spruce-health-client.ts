@@ -254,8 +254,8 @@ class SpruceHealthClient {
   async sendMessage(conversationId: string, content: string, messageType: 'text' | 'image' | 'file' = 'text'): Promise<Message> {
     try {
       const response = await this.client.post(`/conversations/${conversationId}/messages`, {
-        content,
-        message_type: messageType
+        body: content,
+        type: messageType
       });
       return response.data;
     } catch (error) {
