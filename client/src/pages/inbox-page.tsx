@@ -165,9 +165,7 @@ export default function InboxPage() {
                 {conversations?.map((conversation: SpruceConversation) => (
                   <GlowingBox
                     key={conversation.id}
-                    variant="interactive"
-                    intensity={selectedConversation === conversation.entityId ? "high" : "medium"}
-                    glowColor={selectedConversation === conversation.entityId ? "primary" : "muted"}
+                    color={selectedConversation === conversation.entityId ? "blue" : "white"}
                     className={`p-3 mb-2 cursor-pointer ${
                       selectedConversation === conversation.entityId
                         ? 'border-primary/40 bg-primary/5'
@@ -233,7 +231,7 @@ export default function InboxPage() {
           ) : (
             <>
               {/* Message Header */}
-              <GlowingBox variant="subtle" className="p-4 border-b border-border/50">
+              <GlowingBox color="blue" className="p-4 border-b border-border/50">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-blue-600 text-white">
@@ -243,10 +241,10 @@ export default function InboxPage() {
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h2 className="font-semibold text-foreground">
+                    <h2 className="font-semibold text-white">
                       {conversations?.find((c: SpruceConversation) => c.entityId === selectedConversation)?.displayName || 'Patient'}
                     </h2>
-                    <p className="text-sm text-muted-foreground">Active conversation</p>
+                    <p className="text-sm text-gray-300">Active conversation</p>
                   </div>
                 </div>
               </GlowingBox>
@@ -270,9 +268,7 @@ export default function InboxPage() {
                       >
                         <div className={`max-w-[70%] ${message.isFromPatient ? 'order-1' : 'order-2'}`}>
                           <GlowingBox
-                            variant={message.isFromPatient ? "subtle" : "prominent"}
-                            intensity="low"
-                            glowColor={message.isFromPatient ? "muted" : "primary"}
+                            color={message.isFromPatient ? "white" : "blue"}
                             className={`p-3 ${
                               message.isFromPatient
                                 ? 'bg-muted/80 text-foreground'
@@ -292,23 +288,23 @@ export default function InboxPage() {
               </ScrollArea>
 
               {/* Message Input */}
-              <GlowingBox variant="prominent" intensity="medium" className="p-4 border-t border-border/50">
+              <GlowingBox color="blue" className="p-4 border-t border-border/50">
                 <form onSubmit={handleSendMessage} className="flex space-x-2">
-                  <GlowingBox variant="subtle" className="flex-1">
+                  <GlowingBox color="white" className="flex-1">
                     <Input
                       value={messageText}
                       onChange={(e) => setMessageText(e.target.value)}
                       placeholder="Type a message..."
-                      className="border-0 bg-transparent focus:ring-0 focus:border-0"
+                      className="border-0 bg-transparent focus:ring-0 focus:border-0 text-white placeholder:text-gray-400"
                       disabled={sendMessageMutation.isPending}
                     />
                   </GlowingBox>
-                  <GlowingBox variant="interactive" intensity="high" glowColor="primary">
+                  <GlowingBox color="blue">
                     <Button 
                       type="submit" 
                       disabled={!messageText.trim() || sendMessageMutation.isPending}
                       size="icon"
-                      className="border-0"
+                      className="border-0 bg-blue-600 hover:bg-blue-700"
                     >
                       {sendMessageMutation.isPending ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
