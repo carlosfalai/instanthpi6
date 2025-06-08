@@ -54,9 +54,7 @@ export default function HomePage() {
               <p className="text-gray-300 text-sm mb-4">View and manage patients</p>
               <p className="text-gray-400 mb-4">Access patient records, medical history, and documents</p>
               <Link href="/patients">
-                <GlowingBox>
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" variant="outline">View Patients</Button>
-                </GlowingBox>
+                <RainbowButton className="w-full">View Patients</RainbowButton>
               </Link>
             </div>
           </GlowingBox>
@@ -70,9 +68,7 @@ export default function HomePage() {
               <p className="text-gray-300 text-sm mb-4">Handle medication requests</p>
               <p className="text-gray-400 mb-4">Review and process patient medication refill requests</p>
               <Link href="/medication-refills">
-                <GlowingBox>
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white" variant="outline">View Refills</Button>
-                </GlowingBox>
+                <RainbowButton className="w-full">View Refills</RainbowButton>
               </Link>
             </div>
           </GlowingBox>
@@ -86,9 +82,7 @@ export default function HomePage() {
               <p className="text-gray-300 text-sm mb-4">Track chronic conditions</p>
               <p className="text-gray-400 mb-4">Monitor and manage patients with chronic health conditions</p>
               <Link href="/chronic-conditions">
-                <GlowingBox>
-                  <Button className="w-full bg-red-600 hover:bg-red-700 text-white" variant="outline">View Conditions</Button>
-                </GlowingBox>
+                <RainbowButton className="w-full">View Conditions</RainbowButton>
               </Link>
             </div>
           </GlowingBox>
