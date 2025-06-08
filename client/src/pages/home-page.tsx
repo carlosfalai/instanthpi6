@@ -98,11 +98,9 @@ export default function HomePage() {
                 <h4 className="text-white font-medium">Documents</h4>
               </div>
               <Link href="/documents">
-                <GlowingBox>
-                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" size="sm">
-                    Access Documents
-                  </Button>
-                </GlowingBox>
+                <RainbowButton className="w-full" size="sm">
+                  Access Documents
+                </RainbowButton>
               </Link>
             </div>
           </GlowingBox>
@@ -114,11 +112,9 @@ export default function HomePage() {
                 <h4 className="text-white font-medium">Urgent Care</h4>
               </div>
               <Link href="/urgent-care">
-                <GlowingBox>
-                  <Button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white" size="sm">
-                    View Urgent Cases
-                  </Button>
-                </GlowingBox>
+                <RainbowButton className="w-full" size="sm">
+                  View Urgent Cases
+                </RainbowButton>
               </Link>
             </div>
           </GlowingBox>
@@ -130,11 +126,9 @@ export default function HomePage() {
                 <h4 className="text-white font-medium">Education</h4>
               </div>
               <Link href="/education">
-                <GlowingBox>
-                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" size="sm">
-                    View Resources
-                  </Button>
-                </GlowingBox>
+                <RainbowButton className="w-full" size="sm">
+                  View Resources
+                </RainbowButton>
               </Link>
             </div>
           </GlowingBox>
@@ -146,11 +140,9 @@ export default function HomePage() {
                 <h4 className="text-white font-medium">Subscription</h4>
               </div>
               <Link href="/subscription">
-                <GlowingBox>
-                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white" size="sm">
-                    Manage Plan
-                  </Button>
-                </GlowingBox>
+                <RainbowButton className="w-full" size="sm">
+                  Manage Plan
+                </RainbowButton>
               </Link>
             </div>
           </GlowingBox>
@@ -168,25 +160,19 @@ export default function HomePage() {
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/settings/organization-profile">
-                <GlowingBox>
-                  <Button variant="outline" size="sm" className="bg-gray-600 hover:bg-gray-700 text-white">
-                    Organization Profile
-                  </Button>
-                </GlowingBox>
+                <RainbowButton size="sm">
+                  Organization Profile
+                </RainbowButton>
               </Link>
               <Link href="/settings/teammates">
-                <GlowingBox>
-                  <Button variant="outline" size="sm" className="bg-gray-600 hover:bg-gray-700 text-white">
-                    Teammates
-                  </Button>
-                </GlowingBox>
+                <RainbowButton size="sm">
+                  Teammates
+                </RainbowButton>
               </Link>
               <Link href="/settings">
-                <GlowingBox>
-                  <Button variant="outline" size="sm" className="bg-gray-600 hover:bg-gray-700 text-white">
-                    All Settings
-                  </Button>
-                </GlowingBox>
+                <RainbowButton size="sm">
+                  All Settings
+                </RainbowButton>
               </Link>
             </div>
           </div>
