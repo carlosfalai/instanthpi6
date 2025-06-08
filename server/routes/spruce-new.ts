@@ -43,13 +43,25 @@ router.get('/conversations', async (req, res) => {
         displayName = conv.externalParticipants[0].displayName || conv.externalParticipants[0].contact;
       }
       
+      // Add debug logging to see what we're getting
+      console.log('Conversation data:', {
+        id: conv.id,
+        title: conv.title,
+        externalParticipants: conv.externalParticipants,
+        finalDisplayName: displayName
+      });
+      
       return {
         id: conv.id,
         entityId: conv.id,
         displayName: displayName,
         lastActivity: conv.lastMessageAt || conv.createdAt,
         unreadCount: conv.unread_count || 0,
-        lastMessage: undefined
+        lastMessage: {
+          content: 'Click to view conversation',
+          timestamp: conv.lastMessageAt || conv.createdAt,
+          isFromPatient: true
+        }
       };
     });
     
