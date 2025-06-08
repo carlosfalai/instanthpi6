@@ -165,7 +165,6 @@ export default function InboxPage() {
                 {conversations?.map((conversation: SpruceConversation) => (
                   <GlowingBox
                     key={conversation.id}
-                    color={selectedConversation === conversation.entityId ? "blue" : "white"}
                     className={`p-3 mb-2 cursor-pointer ${
                       selectedConversation === conversation.entityId
                         ? 'border-primary/40 bg-primary/5'

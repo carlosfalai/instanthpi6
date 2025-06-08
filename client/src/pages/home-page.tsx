@@ -96,125 +96,105 @@ export default function HomePage() {
         <h2 className="text-2xl font-bold mb-4">Quick Access</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <GlowingBox color="purple">
-            <Card className="bg-transparent border-0">
-              <CardHeader className="p-4 pb-2">
-                <div className="flex items-center">
-                  <FileText className="h-4 w-4 mr-2 text-purple-400" />
-                  <CardTitle className="text-base text-white">Documents</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-2">
-                <Link href="/documents">
-                  <GlowingBox color="purple">
-                    <Button className="w-full border-0 bg-purple-600 hover:bg-purple-700 text-white" size="sm" variant="ghost">
-                      Access Documents
-                    </Button>
-                  </GlowingBox>
-                </Link>
-              </CardContent>
-            </Card>
+          <GlowingBox>
+            <div className="p-4">
+              <div className="flex items-center mb-2">
+                <FileText className="h-4 w-4 mr-2 text-purple-400" />
+                <h4 className="text-white font-medium">Documents</h4>
+              </div>
+              <Link href="/documents">
+                <GlowingBox>
+                  <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" size="sm">
+                    Access Documents
+                  </Button>
+                </GlowingBox>
+              </Link>
+            </div>
           </GlowingBox>
           
-          <GlowingBox color="yellow">
-            <Card className="bg-transparent border-0">
-              <CardHeader className="p-4 pb-2">
-                <div className="flex items-center">
-                  <AlertTriangle className="h-4 w-4 mr-2 text-yellow-400" />
-                  <CardTitle className="text-base text-white">Urgent Care</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-2">
-                <Link href="/urgent-care">
-                  <GlowingBox color="yellow">
-                    <Button className="w-full border-0 bg-yellow-600 hover:bg-yellow-700 text-white" size="sm" variant="ghost">
-                      View Urgent Cases
-                    </Button>
-                  </GlowingBox>
-                </Link>
-              </CardContent>
-            </Card>
+          <GlowingBox>
+            <div className="p-4">
+              <div className="flex items-center mb-2">
+                <AlertTriangle className="h-4 w-4 mr-2 text-yellow-400" />
+                <h4 className="text-white font-medium">Urgent Care</h4>
+              </div>
+              <Link href="/urgent-care">
+                <GlowingBox>
+                  <Button className="w-full bg-yellow-600 hover:bg-yellow-700 text-white" size="sm">
+                    View Urgent Cases
+                  </Button>
+                </GlowingBox>
+              </Link>
+            </div>
           </GlowingBox>
           
-          <GlowingBox color="blue">
-            <Card className="bg-transparent border-0">
-              <CardHeader className="p-4 pb-2">
-                <div className="flex items-center">
-                  <GraduationCap className="h-4 w-4 mr-2 text-blue-400" />
-                  <CardTitle className="text-base text-white">Education</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-2">
-                <Link href="/education">
-                  <GlowingBox color="blue">
-                    <Button className="w-full border-0 bg-blue-600 hover:bg-blue-700 text-white" size="sm" variant="ghost">
-                      View Resources
-                    </Button>
-                  </GlowingBox>
-                </Link>
-              </CardContent>
-            </Card>
+          <GlowingBox>
+            <div className="p-4">
+              <div className="flex items-center mb-2">
+                <GraduationCap className="h-4 w-4 mr-2 text-blue-400" />
+                <h4 className="text-white font-medium">Education</h4>
+              </div>
+              <Link href="/education">
+                <GlowingBox>
+                  <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white" size="sm">
+                    View Resources
+                  </Button>
+                </GlowingBox>
+              </Link>
+            </div>
           </GlowingBox>
           
-          <GlowingBox color="green">
-            <Card className="bg-transparent border-0">
-              <CardHeader className="p-4 pb-2">
-                <div className="flex items-center">
-                  <CreditCard className="h-4 w-4 mr-2 text-green-400" />
-                  <CardTitle className="text-base text-white">Subscription</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="p-4 pt-2">
-                <Link href="/subscription">
-                  <GlowingBox color="green">
-                    <Button className="w-full border-0 bg-green-600 hover:bg-green-700 text-white" size="sm" variant="ghost">
-                      Manage Plan
-                    </Button>
-                  </GlowingBox>
-                </Link>
-              </CardContent>
-            </Card>
+          <GlowingBox>
+            <div className="p-4">
+              <div className="flex items-center mb-2">
+                <CreditCard className="h-4 w-4 mr-2 text-green-400" />
+                <h4 className="text-white font-medium">Subscription</h4>
+              </div>
+              <Link href="/subscription">
+                <GlowingBox>
+                  <Button className="w-full bg-green-600 hover:bg-green-700 text-white" size="sm">
+                    Manage Plan
+                  </Button>
+                </GlowingBox>
+              </Link>
+            </div>
           </GlowingBox>
         </div>
         
-        <GlowingBox color="white">
-          <Card className="bg-transparent border-0">
-            <CardHeader className="pb-3">
-              <div className="flex items-center">
-                <Settings className="h-5 w-5 mr-2 text-gray-400" />
-                <CardTitle className="text-white">Settings</CardTitle>
-              </div>
-              <CardDescription className="text-gray-300">Configure your practice</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-400 mb-4">
-                Manage organization settings, teammates, and user preferences
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link href="/settings/organization-profile">
-                  <GlowingBox color="white">
-                    <Button variant="outline" size="sm" className="border-0 bg-gray-600 hover:bg-gray-700 text-white">
-                      Organization Profile
-                    </Button>
-                  </GlowingBox>
-                </Link>
-                <Link href="/settings/teammates">
-                  <GlowingBox color="white">
-                    <Button variant="outline" size="sm" className="border-0 bg-gray-600 hover:bg-gray-700 text-white">
-                      Teammates
-                    </Button>
-                  </GlowingBox>
-                </Link>
-                <Link href="/settings">
-                  <GlowingBox color="white">
-                    <Button variant="outline" size="sm" className="border-0 bg-gray-600 hover:bg-gray-700 text-white">
-                      All Settings
-                    </Button>
-                  </GlowingBox>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+        <GlowingBox>
+          <div className="p-6">
+            <div className="flex items-center mb-3">
+              <Settings className="h-5 w-5 mr-2 text-gray-400" />
+              <h3 className="text-white font-semibold">Settings</h3>
+            </div>
+            <p className="text-gray-300 text-sm mb-4">Configure your practice</p>
+            <p className="text-gray-400 mb-4">
+              Manage organization settings, teammates, and user preferences
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/settings/organization-profile">
+                <GlowingBox>
+                  <Button variant="outline" size="sm" className="bg-gray-600 hover:bg-gray-700 text-white">
+                    Organization Profile
+                  </Button>
+                </GlowingBox>
+              </Link>
+              <Link href="/settings/teammates">
+                <GlowingBox>
+                  <Button variant="outline" size="sm" className="bg-gray-600 hover:bg-gray-700 text-white">
+                    Teammates
+                  </Button>
+                </GlowingBox>
+              </Link>
+              <Link href="/settings">
+                <GlowingBox>
+                  <Button variant="outline" size="sm" className="bg-gray-600 hover:bg-gray-700 text-white">
+                    All Settings
+                  </Button>
+                </GlowingBox>
+              </Link>
+            </div>
+          </div>
         </GlowingBox>
       </div>
     </AppLayoutSpruce>
