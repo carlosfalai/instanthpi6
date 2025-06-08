@@ -15,19 +15,23 @@ interface SprucePatient {
   status?: string;
 }
 
-// Check if we have a valid API key
-const SPRUCE_API_KEY = process.env.SPRUCE_API_KEY;
-if (!SPRUCE_API_KEY) {
-  console.warn('⚠️ WARNING: No Spruce API key found. Set SPRUCE_API_KEY environment variable for API access.');
+// Check for proper Spruce Health credentials
+const SPRUCE_BEARER_TOKEN = process.env.SPRUCE_BEARER_TOKEN;
+const SPRUCE_ACCESS_ID = process.env.SPRUCE_ACCESS_ID;
+
+if (!SPRUCE_BEARER_TOKEN) {
+  console.warn('⚠️ WARNING: No Spruce bearer token found. Set SPRUCE_BEARER_TOKEN environment variable for API access.');
 }
 
-// Setup Spruce Health API with proper authentication format based on official documentation
+console.log('🔑 Spruce Health API Configuration:');
+console.log('📋 Access ID:', SPRUCE_ACCESS_ID || 'Not provided');
+console.log('🔐 Bearer Token:', SPRUCE_BEARER_TOKEN ? 'Configured' : 'Missing');
+
+// Setup Spruce Health API with proper authentication format
 const spruceApi = axios.create({
-  // According to the documentation, the base URL is https://api.sprucehealth.com
   baseURL: 'https://api.sprucehealth.com',
   headers: {
-    // Documentation specifies authorization format as: "Authorization: Bearer <your-token>"
-    'Authorization': `Bearer ${SPRUCE_API_KEY || ''}`,
+    'Authorization': `Bearer ${SPRUCE_BEARER_TOKEN || ''}`,
     'Content-Type': 'application/json',
     'Accept': 'application/json'
   }

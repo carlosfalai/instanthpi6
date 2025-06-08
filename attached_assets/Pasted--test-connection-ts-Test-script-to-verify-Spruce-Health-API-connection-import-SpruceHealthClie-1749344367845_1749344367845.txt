@@ -1,0 +1,113 @@
+// test-connection.ts - Test script to verify Spruce Health API connection
+import { SpruceHealthClient } from './src/spruce-health-client';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+async function testSpruceConnection() {
+  console.log('🔧 Testing Spruce Health API Connection...\n');
+  
+  // Check if credentials are provided
+  const bearerToken = process.env.SPRUCE_BEARER_TOKEN;
+  const accessId = process.env.SPRUCE_ACCESS_ID;
+  
+  if (!bearerToken) {
+    console.error('❌ SPRUCE_BEARER_TOKEN not found in environment variables');
+    process.exit(1);
+  }
+  
+  console.log('✅ Bearer Token:', bearerToken.substring(0, 20) + '...');
+  console.log('✅ Access ID:', accessId || 'Not provided');
+  console.log('');
+  
+  // Initialize client
+  const client = new SpruceHealthClient({
+    bearerToken: bearerToken
+  });
+  
+  try {
+    console.log('🔍 Testing API connection...');
+    
+    // Test 1: Get conversations
+    console.log('\n📋 Test 1: Fetching conversations...');
+    const conversations = await client.getConversations({ per_page: 5 });
+    console.log(`✅ Success! Found ${conversations.conversations.length} conversations`);
+    console.log(`📊 Total conversations: ${conversations.pagination.total}`);
+    
+    if (conversations.conversations.length > 0) {
+      const firstConv = conversations.conversations[0];
+      console.log(`📝 First conversation: "${firstConv.subject}" (${firstConv.status})`);
+      console.log(`👥 Participants: ${firstConv.participants.map(p => p.name).join(', ')}`);
+      
+      // Test 2: Get messages from first conversation
+      console.log('\n💬 Test 2: Fetching messages from first conversation...');
+      try {
+        const messages = await client.getMessages(firstConv.id, { per_page: 3 });
+        console.log(`✅ Success! Found ${messages.messages.length} messages`);
+        
+        if (messages.messages.length > 0) {
+          const firstMessage = messages.messages[0];
+          console.log(`📝 Latest message from: ${firstMessage.sender_name}`);
+          console.log(`📅 Sent at: ${firstMessage.sent_at}`);
+          console.log(`💭 Content preview: ${firstMessage.content.substring(0, 50)}...`);
+        }
+      } catch (msgError) {
+        console.log(`⚠️  Could not fetch messages: ${msgError}`);
+      }
+    }
+    
+    // Test 3: Check rate limit status
+    console.log('\n⏱️  Test 3: Checking rate limit status...');
+    const rateLimitStatus = client.getRateLimitStatus();
+    console.log(`✅ Rate limit remaining: ${rateLimitStatus.remaining}/60`);
+    console.log(`🔄 Reset time: ${rateLimitStatus.resetTime.toISOString()}`);
+    
+    // Test 4: Search functionality
+    console.log('\n🔍 Test 4: Testing search functionality...');
+    try {
+      const searchResults = await client.searchConversations('patient');
+      console.log(`✅ Search completed! Found ${searchResults.length} results`);
+    } catch (searchError) {
+      console.log(`⚠️  Search test failed: ${searchError}`);
+    }
+    
+    console.log('\n🎉 All tests completed successfully!');
+    console.log('🚀 Your Spruce Health integration is ready to use!');
+    
+  } catch (error) {
+    console.error('\n❌ API connection failed:');
+    console.error('Error:', error);
+    
+    if (error.message.includes('401')) {
+      console.error('\n🔑 Authentication Issue:');
+      console.error('- Check that your bearer token is correct');
+      console.error('- Verify your Spruce Health account has API access');
+      console.error('- Contact Spruce Health support if the token should be valid');
+    } else if (error.message.includes('403')) {
+      console.error('\n🚫 Permission Issue:');
+      console.error('- Your account may not have API access enabled');
+      console.error('- Contact Spruce Health to request API access');
+    } else if (error.message.includes('404')) {
+      console.error('\n🔍 Endpoint Issue:');
+      console.error('- The API endpoint may have changed');
+      console.error('- Check Spruce Health API documentation for updates');
+    } else if (error.message.includes('429')) {
+      console.error('\n⏰ Rate Limit Issue:');
+      console.error('- You have exceeded the API rate limit');
+      console.error('- Wait a few minutes and try again');
+    } else {
+      console.error('\n🌐 Network Issue:');
+      console.error('- Check your internet connection');
+      console.error('- Verify Spruce Health API is accessible');
+    }
+    
+    process.exit(1);
+  }
+}
+
+// Run the test
+if (require.main === module) {
+  testSpruceConnection().catch(console.error);
+}
+
+export default testSpruceConnection;

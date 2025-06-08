@@ -1,0 +1,257 @@
+# Spruce Health API Integration
+
+A complete, production-ready application for integrating with Spruce Health's patient conversation API. This application provides a secure, HIPAA-compliant interface for managing patient conversations and messages.
+
+## 🚀 Features
+
+- **Complete Spruce Health API Integration**: Full support for conversations and messages
+- **Real-time Dashboard**: React-based UI for managing conversations
+- **Rate Limiting**: Automatic handling of API rate limits with retry logic
+- **Security**: HIPAA-compliant data handling and encryption
+- **Production Ready**: Docker support, health checks, monitoring
+- **TypeScript**: Full type safety throughout the application
+
+## 📋 Prerequisites
+
+Before you begin, ensure you have:
+
+- Node.js 18+ installed
+- Docker and Docker Compose (for containerized deployment)
+- Spruce Health account with API access
+- Spruce Health bearer token
+
+## 🛠️ Quick Start
+
+### 1. Clone and Setup
+
+```bash
+git clone <your-repo-url>
+cd spruce-health-integration
+npm install
+```
+
+### 2. Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your Spruce Health credentials:
+
+```bash
+SPRUCE_BEARER_TOKEN=YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0=
+SPRUCE_ACCESS_ID=aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I=
+```
+
+### 3. Test Connection
+
+```bash
+npm run test:connection
+```
+
+This will verify your API credentials and test the connection to Spruce Health.
+
+### 3. Run Development Server
+
+```bash
+npm run dev
+```
+
+The application will be available at:
+- API: http://localhost:3000
+- Dashboard: http://localhost:3000/api/dashboard
+
+### 4. Docker Deployment
+
+```bash
+# Build and run with Docker Compose
+docker-compose up -d
+
+# Check logs
+docker-compose logs -f spruce-health-app
+```
+
+## 📡 API Endpoints
+
+### Health & Status
+- `GET /health` - Health check and rate limit status
+- `GET /api/rate-limit` - Current rate limit status
+
+### Conversations
+- `GET /api/conversations` - List all conversations
+- `GET /api/conversations/with-messages` - Conversations with latest messages
+- `GET /api/conversations/search?q=query` - Search conversations
+- `GET /api/conversations/:id` - Get specific conversation
+- `GET /api/conversations/:id/messages` - Get conversation messages
+- `POST /api/conversations/:id/messages` - Send message
+- `PATCH /api/conversations/:id/messages/read` - Mark messages as read
+
+### Dashboard
+- `GET /api/dashboard` - Complete dashboard data
+
+## 🏗️ Architecture
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   React UI      │────│   Express API    │────│  Spruce Health  │
+│   Dashboard     │    │   Server         │    │  API            │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │                   │
+             ┌──────▼──────┐    ┌──────▼──────┐
+             │   Redis     │    │ PostgreSQL  │
+             │   Cache     │    │ Database    │
+             └─────────────┘    └─────────────┘
+```
+
+## 🔒 Security Features
+
+- **Bearer Token Authentication**: Secure API access
+- **Rate Limiting**: Prevents API abuse
+- **CORS Protection**: Configurable cross-origin policies
+- **Helmet.js**: Security headers
+- **Input Validation**: All API inputs validated
+- **Error Handling**: Secure error responses
+
+## 📊 Monitoring
+
+The application includes built-in monitoring:
+
+- Health checks at `/health`
+- Rate limit monitoring
+- Error tracking and logging
+- Optional Prometheus/Grafana integration
+
+## 🧪 Testing
+
+```bash
+# Run tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run linting
+npm run lint
+```
+
+## 🏥 HIPAA Compliance
+
+This application is designed with HIPAA compliance in mind:
+
+- Secure credential storage
+- Encrypted data transmission
+- Audit logging capabilities
+- Access controls
+- Data retention policies
+
+**Important**: Ensure your deployment environment meets HIPAA requirements and you have proper Business Associate Agreements in place.
+
+## 📦 Deployment Options
+
+### Option 1: Docker Compose (Recommended)
+
+```bash
+docker-compose up -d
+```
+
+### Option 2: Manual Deployment
+
+```bash
+npm run build
+npm start
+```
+
+### Option 3: Cloud Deployment
+
+The application is ready for deployment to:
+- AWS (with ECS/Fargate)
+- Google Cloud Platform
+- Azure Container Instances
+- DigitalOcean App Platform
+
+## 🔧 Configuration
+
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `SPRUCE_BEARER_TOKEN` | Spruce Health API token | Required |
+| `PORT` | Server port | 3000 |
+| `NODE_ENV` | Environment | development |
+| `ALLOWED_ORIGINS` | CORS origins | localhost:3000 |
+
+### Rate Limiting
+
+The application automatically handles Spruce Health's rate limits:
+- 60 requests per minute
+- Automatic retry with exponential backoff
+- Queue management for burst requests
+
+## 🚨 Error Handling
+
+The application includes comprehensive error handling:
+
+- API errors are properly formatted
+- Rate limit exceeded: automatic retry
+- Network errors: exponential backoff
+- Invalid tokens: clear error messages
+
+## 📈 Performance
+
+- **Caching**: Redis for conversation caching
+- **Connection Pooling**: Efficient API connections
+- **Pagination**: Handles large datasets
+- **Lazy Loading**: UI loads data on demand
+
+## 🛟 Support
+
+### Common Issues
+
+1. **Authentication Errors**
+   - Verify your bearer token is correct
+   - Check token permissions in Spruce Health
+
+2. **Rate Limit Issues**
+   - Monitor `/api/rate-limit` endpoint
+   - Consider implementing request queuing
+
+3. **Connection Issues**
+   - Check network connectivity
+   - Verify Spruce Health API status
+
+### Getting Help
+
+1. Check the health endpoint: `/health`
+2. Review application logs
+3. Verify environment configuration
+4. Contact Spruce Health support for API issues
+
+## 📄 License
+
+MIT License - see LICENSE file for details
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+## 🔄 Updates
+
+To update the application:
+
+```bash
+git pull origin main
+npm install
+npm run build
+docker-compose down
+docker-compose up -d --build
+```
+
+---
+
+**Note**: This application requires a valid Spruce Health account and API access. Contact Spruce Health support to request API access for your organization.
