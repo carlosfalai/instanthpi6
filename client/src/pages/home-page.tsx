@@ -44,60 +44,60 @@ export default function HomePage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <GlowingBox variant="prominent" intensity="medium" glowColor="blue">
-            <Card className="bg-[#1e1e1e]/80 border-[#333]/50 border-0">
+          <GlowingBox color="blue">
+            <Card className="bg-transparent border-0">
               <CardHeader className="pb-3">
                 <div className="flex items-center">
                   <Users className="h-5 w-5 mr-2 text-blue-400" />
-                  <CardTitle>Patients</CardTitle>
+                  <CardTitle className="text-white">Patients</CardTitle>
                 </div>
-                <CardDescription>View and manage patients</CardDescription>
+                <CardDescription className="text-gray-300">View and manage patients</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-400 mb-4">Access patient records, medical history, and documents</p>
                 <Link href="/patients">
-                  <GlowingBox variant="interactive" intensity="high">
-                    <Button className="w-full border-0" variant="outline">View Patients</Button>
+                  <GlowingBox color="blue">
+                    <Button className="w-full border-0 bg-blue-600 hover:bg-blue-700 text-white" variant="outline">View Patients</Button>
                   </GlowingBox>
                 </Link>
               </CardContent>
             </Card>
           </GlowingBox>
           
-          <GlowingBox variant="prominent" intensity="medium" glowColor="green">
-            <Card className="bg-[#1e1e1e]/80 border-[#333]/50 border-0">
+          <GlowingBox color="green">
+            <Card className="bg-transparent border-0">
               <CardHeader className="pb-3">
                 <div className="flex items-center">
                   <PillIcon className="h-5 w-5 mr-2 text-green-400" />
-                  <CardTitle>Medication Refills</CardTitle>
+                  <CardTitle className="text-white">Medication Refills</CardTitle>
                 </div>
-                <CardDescription>Handle medication requests</CardDescription>
+                <CardDescription className="text-gray-300">Handle medication requests</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-400 mb-4">Review and process patient medication refill requests</p>
                 <Link href="/medication-refills">
-                  <GlowingBox variant="interactive" intensity="high">
-                    <Button className="w-full border-0" variant="outline">View Refills</Button>
+                  <GlowingBox color="green">
+                    <Button className="w-full border-0 bg-green-600 hover:bg-green-700 text-white" variant="outline">View Refills</Button>
                   </GlowingBox>
                 </Link>
               </CardContent>
             </Card>
           </GlowingBox>
           
-          <GlowingBox variant="prominent" intensity="medium" glowColor="red">
-            <Card className="bg-[#1e1e1e]/80 border-[#333]/50 border-0">
+          <GlowingBox color="red">
+            <Card className="bg-transparent border-0">
               <CardHeader className="pb-3">
                 <div className="flex items-center">
                   <Heart className="h-5 w-5 mr-2 text-red-400" />
-                  <CardTitle>Chronic Conditions</CardTitle>
+                  <CardTitle className="text-white">Chronic Conditions</CardTitle>
                 </div>
-                <CardDescription>Track chronic conditions</CardDescription>
+                <CardDescription className="text-gray-300">Track chronic conditions</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-400 mb-4">Monitor and manage patients with chronic health conditions</p>
                 <Link href="/chronic-conditions">
-                  <GlowingBox variant="interactive" intensity="high">
-                    <Button className="w-full border-0" variant="outline">View Conditions</Button>
+                  <GlowingBox color="red">
+                    <Button className="w-full border-0 bg-red-600 hover:bg-red-700 text-white" variant="outline">View Conditions</Button>
                   </GlowingBox>
                 </Link>
               </CardContent>
@@ -108,18 +108,18 @@ export default function HomePage() {
         <h2 className="text-2xl font-bold mb-4">Quick Access</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <GlowingBox variant="subtle" intensity="low" glowColor="purple">
-            <Card className="bg-[#1e1e1e]/80 border-0">
+          <GlowingBox color="purple">
+            <Card className="bg-transparent border-0">
               <CardHeader className="p-4 pb-2">
                 <div className="flex items-center">
                   <FileText className="h-4 w-4 mr-2 text-purple-400" />
-                  <CardTitle className="text-base">Documents</CardTitle>
+                  <CardTitle className="text-base text-white">Documents</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-4 pt-2">
                 <Link href="/documents">
-                  <GlowingBox variant="interactive" intensity="medium">
-                    <Button className="w-full border-0" size="sm" variant="ghost">
+                  <GlowingBox color="purple">
+                    <Button className="w-full border-0 bg-purple-600 hover:bg-purple-700 text-white" size="sm" variant="ghost">
                       Access Documents
                     </Button>
                   </GlowingBox>
@@ -128,18 +128,18 @@ export default function HomePage() {
             </Card>
           </GlowingBox>
           
-          <GlowingBox variant="subtle" intensity="low" glowColor="yellow">
-            <Card className="bg-[#1e1e1e]/80 border-0">
+          <GlowingBox color="yellow">
+            <Card className="bg-transparent border-0">
               <CardHeader className="p-4 pb-2">
                 <div className="flex items-center">
                   <AlertTriangle className="h-4 w-4 mr-2 text-yellow-400" />
-                  <CardTitle className="text-base">Urgent Care</CardTitle>
+                  <CardTitle className="text-base text-white">Urgent Care</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="p-4 pt-2">
                 <Link href="/urgent-care">
-                  <GlowingBox variant="interactive" intensity="medium">
-                    <Button className="w-full border-0" size="sm" variant="ghost">
+                  <GlowingBox color="yellow">
+                    <Button className="w-full border-0 bg-yellow-600 hover:bg-yellow-700 text-white" size="sm" variant="ghost">
                       View Urgent Cases
                     </Button>
                   </GlowingBox>
