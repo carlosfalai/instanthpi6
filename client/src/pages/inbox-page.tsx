@@ -207,7 +207,7 @@ export default function InboxPage() {
                           </span>
                         </div>
                       </div>
-                    </div>
+                      </div>
                     </div>
                   </GlowingBox>
                 ))}
@@ -233,7 +233,7 @@ export default function InboxPage() {
           ) : (
             <>
               {/* Message Header */}
-              <div className="p-4 border-b border-border">
+              <GlowingBox variant="subtle" className="p-4 border-b border-border/50">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-blue-600 text-white">
@@ -249,7 +249,7 @@ export default function InboxPage() {
                     <p className="text-sm text-muted-foreground">Active conversation</p>
                   </div>
                 </div>
-              </div>
+              </GlowingBox>
 
               {/* Messages */}
               <ScrollArea className="flex-1 p-4">
@@ -269,15 +269,18 @@ export default function InboxPage() {
                         className={`flex ${message.isFromPatient ? 'justify-start' : 'justify-end'}`}
                       >
                         <div className={`max-w-[70%] ${message.isFromPatient ? 'order-1' : 'order-2'}`}>
-                          <div
-                            className={`p-3 rounded-lg ${
+                          <GlowingBox
+                            variant={message.isFromPatient ? "subtle" : "prominent"}
+                            intensity="low"
+                            glowColor={message.isFromPatient ? "muted" : "primary"}
+                            className={`p-3 ${
                               message.isFromPatient
-                                ? 'bg-muted text-foreground'
+                                ? 'bg-muted/80 text-foreground'
                                 : 'bg-primary text-primary-foreground'
                             }`}
                           >
                             <p className="text-sm">{message.content}</p>
-                          </div>
+                          </GlowingBox>
                           <p className="text-xs text-muted-foreground mt-1 px-1">
                             {formatTimestamp(message.timestamp)}
                           </p>
@@ -289,28 +292,33 @@ export default function InboxPage() {
               </ScrollArea>
 
               {/* Message Input */}
-              <div className="p-4 border-t border-border">
+              <GlowingBox variant="prominent" intensity="medium" className="p-4 border-t border-border/50">
                 <form onSubmit={handleSendMessage} className="flex space-x-2">
-                  <Input
-                    value={messageText}
-                    onChange={(e) => setMessageText(e.target.value)}
-                    placeholder="Type a message..."
-                    className="flex-1"
-                    disabled={sendMessageMutation.isPending}
-                  />
-                  <Button 
-                    type="submit" 
-                    disabled={!messageText.trim() || sendMessageMutation.isPending}
-                    size="icon"
-                  >
-                    {sendMessageMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="h-4 w-4" />
-                    )}
-                  </Button>
+                  <GlowingBox variant="subtle" className="flex-1">
+                    <Input
+                      value={messageText}
+                      onChange={(e) => setMessageText(e.target.value)}
+                      placeholder="Type a message..."
+                      className="border-0 bg-transparent focus:ring-0 focus:border-0"
+                      disabled={sendMessageMutation.isPending}
+                    />
+                  </GlowingBox>
+                  <GlowingBox variant="interactive" intensity="high" glowColor="primary">
+                    <Button 
+                      type="submit" 
+                      disabled={!messageText.trim() || sendMessageMutation.isPending}
+                      size="icon"
+                      className="border-0"
+                    >
+                      {sendMessageMutation.isPending ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </GlowingBox>
                 </form>
-              </div>
+              </GlowingBox>
             </>
           )}
         </div>
