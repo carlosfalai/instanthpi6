@@ -1,7 +1,7 @@
 {
   "metadata": {
     "name": "InstantHPI - Complete Application Source Code Backup",
-    "version": "1.0.0", 
+    "version": "1.0.0",
     "description": "Complete source code for InstantHPI telemedicine platform",
     "generated": "2025-07-21",
     "completion_percentage": "95%",
@@ -21,7 +21,7 @@
   "implementation_status": {
     "completed": [
       "✅ Complete React frontend with 40+ pages",
-      "✅ Express backend with 25+ API routes", 
+      "✅ Express backend with 25+ API routes",
       "✅ Spruce Health API integration",
       "✅ AI integrations (Anthropic, OpenAI, xAI)",
       "✅ Database schema with 15+ tables",
@@ -53,7 +53,7 @@
     "architecture": "Full-stack React + Express + PostgreSQL",
     "styling": "Tailwind CSS with shadcn/ui components",
     "state_management": "React Query for server state",
-    "routing": "Wouter for client-side routing", 
+    "routing": "Wouter for client-side routing",
     "database": "PostgreSQL with Drizzle ORM",
     "ai_providers": "Anthropic Claude, OpenAI GPT-4o, xAI Grok",
     "external_apis": "Spruce Health, Formsite, Stripe, SendGrid"
