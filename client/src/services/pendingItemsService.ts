@@ -3,11 +3,11 @@ import { SpruceMessage } from "./spruceApi";
 
 export interface PendingItem {
   id: string;
-  type: 'test' | 'imaging' | 'bloodwork' | 'referral' | 'other';
+  type: "test" | "imaging" | "bloodwork" | "referral" | "other";
   description: string;
   requestedDate?: string;
-  priority: 'high' | 'medium' | 'low';
-  status: 'pending' | 'completed';
+  priority: "high" | "medium" | "low";
+  status: "pending" | "completed";
   patientId: number;
 }
 
@@ -20,12 +20,11 @@ export const pendingItemsService = {
    */
   async analyzePendingItems(patientId: number, messages: SpruceMessage[]): Promise<PendingItem[]> {
     try {
-      const response = await apiRequest(
-        "POST",
-        "/api/pending-items/analyze",
-        { patientId, messages }
-      );
-      
+      const response = await apiRequest("POST", "/api/pending-items/analyze", {
+        patientId,
+        messages,
+      });
+
       return await response.json();
     } catch (error) {
       console.error("Error analyzing pending items:", error);
@@ -51,12 +50,10 @@ export const pendingItemsService = {
    */
   async markItemCompleted(itemId: string): Promise<PendingItem> {
     try {
-      const response = await apiRequest(
-        "PATCH",
-        `/api/pending-items/${itemId}`,
-        { status: "completed" }
-      );
-      
+      const response = await apiRequest("PATCH", `/api/pending-items/${itemId}`, {
+        status: "completed",
+      });
+
       return await response.json();
     } catch (error) {
       console.error("Error marking item completed:", error);
@@ -69,14 +66,10 @@ export const pendingItemsService = {
    */
   async followUpOnItem(patientId: number, itemId: string): Promise<void> {
     try {
-      await apiRequest(
-        "POST",
-        "/api/pending-items/follow-up",
-        { patientId, itemId }
-      );
+      await apiRequest("POST", "/api/pending-items/follow-up", { patientId, itemId });
     } catch (error) {
       console.error("Error following up on item:", error);
       throw error;
     }
-  }
+  },
 };

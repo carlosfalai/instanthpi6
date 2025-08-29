@@ -1,14 +1,14 @@
-import { useState } from 'react';
-import { RefreshCcw, Check, Pill, ListChecks, Clock, AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Label } from '@/components/ui/label';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import TreatmentSelector from './TreatmentSelector';
+import { useState } from "react";
+import { RefreshCcw, Check, Pill, ListChecks, Clock, AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TreatmentSelector from "./TreatmentSelector";
 
 interface MiddlePanelProps {
   patient: any;
@@ -24,10 +24,10 @@ interface MiddlePanelProps {
 }
 
 interface PendingItem {
-  type: 'test' | 'imaging' | 'bloodwork' | 'referral' | 'other';
+  type: "test" | "imaging" | "bloodwork" | "referral" | "other";
   description: string;
   requestedDate?: string;
-  priority: 'high' | 'medium' | 'low';
+  priority: "high" | "medium" | "low";
 }
 
 export default function MiddlePanel({
@@ -40,41 +40,41 @@ export default function MiddlePanel({
   onSendApprovedItems,
   onSendMessage,
   isUpdating,
-  isSending
+  isSending,
 }: MiddlePanelProps) {
   const [approved, setApproved] = useState({
     hpi: false,
     soap: false,
     prescription: false,
-    followUpQuestions: false
+    followUpQuestions: false,
   });
-  
+
   const handleApproval = (section: keyof typeof approved, value: boolean) => {
-    setApproved(prev => ({ ...prev, [section]: value }));
+    setApproved((prev) => ({ ...prev, [section]: value }));
   };
-  
-  const hasApprovedItems = Object.values(approved).some(val => val);
+
+  const hasApprovedItems = Object.values(approved).some((val) => val);
 
   // Sample pending items - in a real implementation, these would be identified by AI analyzing the message history
   const pendingItems: PendingItem[] = [
     {
-      type: 'test',
-      description: 'Strep throat PCR results',
-      requestedDate: '2025-04-15',
-      priority: 'high'
+      type: "test",
+      description: "Strep throat PCR results",
+      requestedDate: "2025-04-15",
+      priority: "high",
     },
     {
-      type: 'imaging',
-      description: 'X-ray of left foot',
-      requestedDate: '2025-04-12', 
-      priority: 'medium'
+      type: "imaging",
+      description: "X-ray of left foot",
+      requestedDate: "2025-04-12",
+      priority: "medium",
     },
     {
-      type: 'bloodwork',
-      description: 'STI panel results',
-      requestedDate: '2025-04-10',
-      priority: 'high'
-    }
+      type: "bloodwork",
+      description: "STI panel results",
+      requestedDate: "2025-04-10",
+      priority: "high",
+    },
   ];
 
   return (
@@ -88,7 +88,7 @@ export default function MiddlePanel({
           </Badge>
         </div>
       </div>
-      
+
       {/* Patient Info Summary - always visible */}
       <div className="bg-gray-50 mx-4 mt-4 rounded-md p-3">
         <div className="flex justify-between items-start">
@@ -109,7 +109,7 @@ export default function MiddlePanel({
           </div>
         </div>
       </div>
-      
+
       {/* Tabs for AI Suggestions, Treatment Selection, and Pending Items */}
       <Tabs defaultValue="ai-suggestions" className="flex-1 flex flex-col">
         <div className="px-4 pt-2">
@@ -128,7 +128,7 @@ export default function MiddlePanel({
             </TabsTrigger>
           </TabsList>
         </div>
-        
+
         {/* AI Suggestions Tab */}
         <TabsContent value="ai-suggestions" className="flex-1 flex flex-col overflow-auto">
           <ScrollArea className="flex-1 p-4 overflow-y-auto">
@@ -160,10 +160,10 @@ export default function MiddlePanel({
                           History of Present Illness
                         </h3>
                         <div className="flex items-center">
-                          <Checkbox 
-                            id="hpi-approve" 
+                          <Checkbox
+                            id="hpi-approve"
                             checked={approved.hpi}
-                            onCheckedChange={(checked) => handleApproval('hpi', checked as boolean)}
+                            onCheckedChange={(checked) => handleApproval("hpi", checked as boolean)}
                           />
                           <Label htmlFor="hpi-approve" className="ml-2 text-xs text-gray-700">
                             Approve
@@ -174,7 +174,7 @@ export default function MiddlePanel({
                         <p>{documentation.hpi}</p>
                       </div>
                     </div>
-                    
+
                     {/* SOAP Notes Section */}
                     <div className="mb-6">
                       <div className="flex justify-between items-center mb-2">
@@ -182,17 +182,19 @@ export default function MiddlePanel({
                           SOAP Notes
                         </h3>
                         <div className="flex items-center">
-                          <Checkbox 
-                            id="soap-approve" 
+                          <Checkbox
+                            id="soap-approve"
                             checked={approved.soap}
-                            onCheckedChange={(checked) => handleApproval('soap', checked as boolean)}
+                            onCheckedChange={(checked) =>
+                              handleApproval("soap", checked as boolean)
+                            }
                           />
                           <Label htmlFor="soap-approve" className="ml-2 text-xs text-gray-700">
                             Approve
                           </Label>
                         </div>
                       </div>
-                      
+
                       {/* Subjective */}
                       <div className="mb-3">
                         <h4 className="text-xs font-medium text-gray-700 mb-1">Subjective</h4>
@@ -200,7 +202,7 @@ export default function MiddlePanel({
                           <p>{documentation.subjective}</p>
                         </div>
                       </div>
-                      
+
                       {/* Objective */}
                       <div className="mb-3">
                         <h4 className="text-xs font-medium text-gray-700 mb-1">Objective</h4>
@@ -208,7 +210,7 @@ export default function MiddlePanel({
                           <p>{documentation.objective}</p>
                         </div>
                       </div>
-                      
+
                       {/* Assessment */}
                       <div className="mb-3">
                         <h4 className="text-xs font-medium text-gray-700 mb-1">Assessment</h4>
@@ -216,7 +218,7 @@ export default function MiddlePanel({
                           <p>{documentation.assessment}</p>
                         </div>
                       </div>
-                      
+
                       {/* Plan */}
                       <div>
                         <h4 className="text-xs font-medium text-gray-700 mb-1">Plan</h4>
@@ -225,7 +227,7 @@ export default function MiddlePanel({
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Prescription Section */}
                     {documentation.prescription && (
                       <div className="mb-6">
@@ -234,10 +236,12 @@ export default function MiddlePanel({
                             Prescription
                           </h3>
                           <div className="flex items-center">
-                            <Checkbox 
-                              id="rx-approve" 
+                            <Checkbox
+                              id="rx-approve"
                               checked={approved.prescription}
-                              onCheckedChange={(checked) => handleApproval('prescription', checked as boolean)}
+                              onCheckedChange={(checked) =>
+                                handleApproval("prescription", checked as boolean)
+                              }
                             />
                             <Label htmlFor="rx-approve" className="ml-2 text-xs text-gray-700">
                               Approve
@@ -250,8 +254,12 @@ export default function MiddlePanel({
                             <span className="font-medium">Dosage</span>
                           </div>
                           <div className="py-2 border-b border-gray-100 flex justify-between">
-                            <span className="text-gray-700">{documentation.prescription.medication}</span>
-                            <span className="text-gray-700">{documentation.prescription.dosage}</span>
+                            <span className="text-gray-700">
+                              {documentation.prescription.medication}
+                            </span>
+                            <span className="text-gray-700">
+                              {documentation.prescription.dosage}
+                            </span>
                           </div>
                           <div className="py-2 border-b border-gray-100">
                             <span className="text-gray-700 block">
@@ -275,69 +283,81 @@ export default function MiddlePanel({
                         </div>
                       </div>
                     )}
-                    
+
                     {/* Follow-up Questions */}
-                    {documentation.followUpQuestions && documentation.followUpQuestions.length > 0 && (
-                      <div>
-                        <div className="flex justify-between items-center mb-2">
-                          <h3 className="text-sm font-medium text-gray-900 uppercase tracking-wider">
-                            Suggested Follow-up Questions
-                          </h3>
-                          <div className="flex items-center">
-                            <Checkbox 
-                              id="questions-approve" 
-                              checked={approved.followUpQuestions}
-                              onCheckedChange={(checked) => handleApproval('followUpQuestions', checked as boolean)}
-                            />
-                            <Label htmlFor="questions-approve" className="ml-2 text-xs text-gray-700">
-                              Approve
-                            </Label>
+                    {documentation.followUpQuestions &&
+                      documentation.followUpQuestions.length > 0 && (
+                        <div>
+                          <div className="flex justify-between items-center mb-2">
+                            <h3 className="text-sm font-medium text-gray-900 uppercase tracking-wider">
+                              Suggested Follow-up Questions
+                            </h3>
+                            <div className="flex items-center">
+                              <Checkbox
+                                id="questions-approve"
+                                checked={approved.followUpQuestions}
+                                onCheckedChange={(checked) =>
+                                  handleApproval("followUpQuestions", checked as boolean)
+                                }
+                              />
+                              <Label
+                                htmlFor="questions-approve"
+                                className="ml-2 text-xs text-gray-700"
+                              >
+                                Approve
+                              </Label>
+                            </div>
+                          </div>
+                          <div className="bg-white border border-gray-200 rounded-md p-3 text-sm">
+                            <ul className="space-y-2">
+                              {documentation.followUpQuestions.map(
+                                (question: string, index: number) => (
+                                  <li key={index} className="flex items-start">
+                                    <svg
+                                      className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                      />
+                                    </svg>
+                                    <span className="text-gray-700">{question}</span>
+                                  </li>
+                                )
+                              )}
+                            </ul>
+                            <div className="mt-3 flex justify-end">
+                              <Button size="sm" className="text-xs">
+                                Send All
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                        <div className="bg-white border border-gray-200 rounded-md p-3 text-sm">
-                          <ul className="space-y-2">
-                            {documentation.followUpQuestions.map((question: string, index: number) => (
-                              <li key={index} className="flex items-start">
-                                <svg className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span className="text-gray-700">{question}</span>
-                              </li>
-                            ))}
-                          </ul>
-                          <div className="mt-3 flex justify-end">
-                            <Button size="sm" className="text-xs">
-                              Send All
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                      )}
                   </>
                 ) : (
                   <div className="flex flex-col items-center justify-center h-64">
                     <p className="text-gray-500 mb-4">No AI documentation generated yet.</p>
-                    <Button onClick={onRegenerateDocumentation}>
-                      Generate Documentation
-                    </Button>
+                    <Button onClick={onRegenerateDocumentation}>Generate Documentation</Button>
                   </div>
                 )}
               </>
             )}
           </ScrollArea>
-          
+
           {/* Action buttons for the AI suggestions */}
           <div className="p-4 border-t border-gray-200 bg-gray-50">
             <div className="flex justify-between items-center">
-              <Button 
-                variant="outline" 
-                onClick={onRegenerateDocumentation}
-                disabled={isLoading}
-              >
+              <Button variant="outline" onClick={onRegenerateDocumentation} disabled={isLoading}>
                 <RefreshCcw className="h-5 w-5 mr-2 text-gray-400" />
                 Regenerate
               </Button>
-              
+
               <Button
                 onClick={onSendApprovedItems}
                 disabled={!hasApprovedItems || isUpdating || isSending}
@@ -347,23 +367,23 @@ export default function MiddlePanel({
                 )}
               >
                 <Check className="h-5 w-5 mr-2" />
-                {isUpdating || isSending ? 'Sending...' : 'Send Approved Items'}
+                {isUpdating || isSending ? "Sending..." : "Send Approved Items"}
               </Button>
             </div>
           </div>
         </TabsContent>
-        
+
         {/* Treatment Selection Tab */}
         <TabsContent value="treatment-selection" className="flex-1 flex flex-col overflow-auto">
           <div className="flex-1 p-4 overflow-y-auto">
-            <TreatmentSelector 
-              patientId={patient?.id} 
-              onSendMessage={onSendMessage} 
-              isSending={isSending} 
+            <TreatmentSelector
+              patientId={patient?.id}
+              onSendMessage={onSendMessage}
+              isSending={isSending}
             />
           </div>
         </TabsContent>
-        
+
         {/* Pending Items Tab */}
         <TabsContent value="pending-items" className="flex-1 flex flex-col overflow-auto">
           <ScrollArea className="flex-1 p-4 overflow-y-auto">
@@ -374,34 +394,38 @@ export default function MiddlePanel({
                   <h3 className="text-sm font-medium">Pending Medical Items</h3>
                 </div>
                 <p className="text-xs text-amber-700">
-                  These items have been identified by AI as pending from previous patient conversations.
+                  These items have been identified by AI as pending from previous patient
+                  conversations.
                 </p>
               </div>
-              
+
               {pendingItems.length > 0 ? (
                 <div className="space-y-3">
                   {pendingItems.map((item, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className={cn(
                         "border rounded-md p-3 flex justify-between items-start",
-                        item.priority === 'high' 
-                          ? "border-red-200 bg-red-50" 
-                          : item.priority === 'medium'
+                        item.priority === "high"
+                          ? "border-red-200 bg-red-50"
+                          : item.priority === "medium"
                             ? "border-amber-200 bg-amber-50"
                             : "border-blue-200 bg-blue-50"
                       )}
                     >
                       <div>
                         <div className="flex items-center mb-1">
-                          <Badge variant="outline" className={cn(
-                            "mr-2",
-                            item.priority === 'high' 
-                              ? "bg-red-100 text-red-800 border-red-200" 
-                              : item.priority === 'medium'
-                                ? "bg-amber-100 text-amber-800 border-amber-200"
-                                : "bg-blue-100 text-blue-800 border-blue-200"
-                          )}>
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "mr-2",
+                              item.priority === "high"
+                                ? "bg-red-100 text-red-800 border-red-200"
+                                : item.priority === "medium"
+                                  ? "bg-amber-100 text-amber-800 border-amber-200"
+                                  : "bg-blue-100 text-blue-800 border-blue-200"
+                            )}
+                          >
                             {item.type.toUpperCase()}
                           </Badge>
                           <h4 className="text-sm font-medium text-gray-900">{item.description}</h4>

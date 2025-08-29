@@ -1,20 +1,27 @@
-import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useQuery } from '@tanstack/react-query';
-import { Loader2, AlertCircle } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
+import React from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2, AlertCircle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChronicCondition {
   id: string;
   patientId: number;
   condition: string;
   diagnosisDate: string;
-  status: 'active' | 'remission' | 'resolved';
+  status: "active" | "remission" | "resolved";
   provider: string;
   notes: string;
   lastUpdated: string;
@@ -22,27 +29,32 @@ interface ChronicCondition {
 
 export default function ChronicConditionsPage() {
   const { toast } = useToast();
-  
+
   // Fetch chronic conditions from the API
-  const { data: conditions, isLoading, error, refetch } = useQuery<ChronicCondition[]>({
-    queryKey: ['/api/conditions'],
+  const {
+    data: conditions,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<ChronicCondition[]>({
+    queryKey: ["/api/conditions"],
     queryFn: async () => {
       // For now, return mock data since we don't have this API endpoint yet
       // This will be replaced with real API call once the endpoint is ready
       return [];
-    }
+    },
   });
 
   // Calculate statistics for the dashboard
-  const activeConditions = conditions?.filter(c => c.status === 'active').length || 0;
-  const inRemission = conditions?.filter(c => c.status === 'remission').length || 0;
-  const resolved = conditions?.filter(c => c.status === 'resolved').length || 0;
-  
+  const activeConditions = conditions?.filter((c) => c.status === "active").length || 0;
+  const inRemission = conditions?.filter((c) => c.status === "remission").length || 0;
+  const resolved = conditions?.filter((c) => c.status === "resolved").length || 0;
+
   return (
     <AppLayoutSpruce>
       <div className="container mx-auto py-6">
         <h1 className="text-3xl font-bold mb-6">Chronic Conditions</h1>
-        
+
         {isLoading ? (
           <div className="flex justify-center items-center h-64">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -53,12 +65,7 @@ export default function ChronicConditionsPage() {
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>
               Failed to load chronic conditions. Please try again.
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="ml-2" 
-                onClick={() => refetch()}
-              >
+              <Button variant="outline" size="sm" className="ml-2" onClick={() => refetch()}>
                 Retry
               </Button>
             </AlertDescription>
@@ -76,7 +83,7 @@ export default function ChronicConditionsPage() {
                   <div className="text-3xl font-bold text-blue-600">{activeConditions}</div>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg font-medium">In Remission</CardTitle>
@@ -86,7 +93,7 @@ export default function ChronicConditionsPage() {
                   <div className="text-3xl font-bold text-amber-500">{inRemission}</div>
                 </CardContent>
               </Card>
-              
+
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg font-medium">Resolved</CardTitle>
@@ -97,7 +104,7 @@ export default function ChronicConditionsPage() {
                 </CardContent>
               </Card>
             </div>
-            
+
             {/* Tabs for different condition views */}
             <Tabs defaultValue="all">
               <TabsList className="mb-6">
@@ -106,43 +113,45 @@ export default function ChronicConditionsPage() {
                 <TabsTrigger value="remission">In Remission</TabsTrigger>
                 <TabsTrigger value="resolved">Resolved</TabsTrigger>
               </TabsList>
-              
+
               <TabsContent value="all" className="mt-0">
                 <ConditionsTable conditions={conditions || []} />
               </TabsContent>
-              
+
               <TabsContent value="active" className="mt-0">
-                <ConditionsTable 
-                  conditions={(conditions || []).filter(c => c.status === 'active')} 
+                <ConditionsTable
+                  conditions={(conditions || []).filter((c) => c.status === "active")}
                 />
               </TabsContent>
-              
+
               <TabsContent value="remission" className="mt-0">
-                <ConditionsTable 
-                  conditions={(conditions || []).filter(c => c.status === 'remission')} 
+                <ConditionsTable
+                  conditions={(conditions || []).filter((c) => c.status === "remission")}
                 />
               </TabsContent>
-              
+
               <TabsContent value="resolved" className="mt-0">
-                <ConditionsTable 
-                  conditions={(conditions || []).filter(c => c.status === 'resolved')} 
+                <ConditionsTable
+                  conditions={(conditions || []).filter((c) => c.status === "resolved")}
                 />
               </TabsContent>
             </Tabs>
-            
+
             {conditions?.length === 0 && (
               <Card className="mt-6">
                 <CardContent className="pt-6">
                   <div className="text-center py-12">
                     <h3 className="text-lg font-medium mb-2">No chronic conditions found</h3>
                     <p className="text-gray-500 mb-4">
-                      This page will be populated with chronic condition data as patients are added to the system.
+                      This page will be populated with chronic condition data as patients are added
+                      to the system.
                     </p>
-                    <Button 
+                    <Button
                       onClick={() => {
                         toast({
                           title: "Feature Coming Soon",
-                          description: "The ability to manually add chronic conditions will be available in a future update."
+                          description:
+                            "The ability to manually add chronic conditions will be available in a future update.",
                         });
                       }}
                     >
@@ -163,7 +172,7 @@ function ConditionsTable({ conditions }: { conditions: ChronicCondition[] }) {
   if (conditions.length === 0) {
     return null;
   }
-  
+
   return (
     <Card>
       <CardContent className="p-0">
@@ -191,7 +200,9 @@ function ConditionsTable({ conditions }: { conditions: ChronicCondition[] }) {
                 <TableCell>{condition.provider}</TableCell>
                 <TableCell>{new Date(condition.lastUpdated).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="sm">View</Button>
+                  <Button variant="ghost" size="sm">
+                    View
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
@@ -202,22 +213,24 @@ function ConditionsTable({ conditions }: { conditions: ChronicCondition[] }) {
   );
 }
 
-function StatusBadge({ status }: { status: 'active' | 'remission' | 'resolved' }) {
+function StatusBadge({ status }: { status: "active" | "remission" | "resolved" }) {
   const getStatusStyles = () => {
     switch (status) {
-      case 'active':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'remission':
-        return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'resolved':
-        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case "active":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "remission":
+        return "bg-amber-100 text-amber-800 border-amber-200";
+      case "resolved":
+        return "bg-emerald-100 text-emerald-800 border-emerald-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
-  
+
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusStyles()}`}>
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusStyles()}`}
+    >
       {status.charAt(0).toUpperCase() + status.slice(1)}
     </span>
   );

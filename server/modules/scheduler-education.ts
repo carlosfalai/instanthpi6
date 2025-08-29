@@ -58,10 +58,11 @@ To begin using the AI Scheduler:
 
 export const schedulerModuleMetadata = {
   title: "AI Scheduler for Preventative Care",
-  description: "Learn how to configure and use the automated scheduling system for preventative care management.",
+  description:
+    "Learn how to configure and use the automated scheduling system for preventative care management.",
   type: "article",
   featuresUnlocked: ["Scheduler"],
   prerequisiteModules: [1], // Requires the base AI module
   order: 6, // Place after the existing modules
-  estimatedMinutes: 20
+  estimatedMinutes: 20,
 };

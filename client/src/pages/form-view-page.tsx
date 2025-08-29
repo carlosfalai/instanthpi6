@@ -1,7 +1,14 @@
-import React, { useState } from 'react';
-import { useRoute } from 'wouter';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import React, { useState } from "react";
+import { useRoute } from "wouter";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,7 +20,13 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { CalendarIcon, ArrowLeft, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -21,14 +34,18 @@ import { cn } from "@/lib/utils";
 import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 
 export default function FormViewPage() {
-  const [, params] = useRoute('/forms/:id');
+  const [, params] = useRoute("/forms/:id");
   const formId = params?.id ? parseInt(params.id) : undefined;
   const { toast } = useToast();
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [patientId, setPatientId] = useState<number | null>(null);
-  
+
   // Fetch the form template
-  const { data: formTemplate, isLoading: isLoadingTemplate, error } = useQuery({
+  const {
+    data: formTemplate,
+    isLoading: isLoadingTemplate,
+    error,
+  } = useQuery({
     queryKey: [`/api/forms/templates/${formId}`],
     queryFn: async () => {
       if (!formId) throw new Error("Form ID is required");
@@ -38,7 +55,7 @@ export default function FormViewPage() {
     },
     enabled: !!formId,
   });
-  
+
   // Fetch patients for the patient selector
   const { data: patients = [] } = useQuery({
     queryKey: ["/api/patients"],
@@ -48,7 +65,7 @@ export default function FormViewPage() {
       return res.json();
     },
   });
-  
+
   // Submit form response mutation
   const submitFormMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -71,14 +88,14 @@ export default function FormViewPage() {
       });
     },
   });
-  
+
   const handleInputChange = (questionId: string, value: any) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
-      [questionId]: value
+      [questionId]: value,
     }));
   };
-  
+
   const handleSubmit = () => {
     if (!formId) {
       toast({
@@ -88,7 +105,7 @@ export default function FormViewPage() {
       });
       return;
     }
-    
+
     if (!patientId) {
       toast({
         title: "Error",
@@ -97,14 +114,17 @@ export default function FormViewPage() {
       });
       return;
     }
-    
+
     // Check if required questions are answered
     const unansweredRequired = formTemplate.questions
       .filter((q: any) => q.required)
-      .filter((q: any) => !answers[q.id] || 
-        (Array.isArray(answers[q.id]) && answers[q.id].length === 0) || 
-        answers[q.id] === "");
-    
+      .filter(
+        (q: any) =>
+          !answers[q.id] ||
+          (Array.isArray(answers[q.id]) && answers[q.id].length === 0) ||
+          answers[q.id] === ""
+      );
+
     if (unansweredRequired.length > 0) {
       toast({
         title: "Error",
@@ -113,16 +133,16 @@ export default function FormViewPage() {
       });
       return;
     }
-    
+
     submitFormMutation.mutate({
       formTemplateId: formId,
       patientId,
       answers,
       status: "completed",
-      completedAt: new Date()
+      completedAt: new Date(),
     });
   };
-  
+
   if (isLoadingTemplate) {
     return (
       <AppLayoutSpruce>
@@ -132,7 +152,7 @@ export default function FormViewPage() {
       </AppLayoutSpruce>
     );
   }
-  
+
   if (error || !formTemplate) {
     return (
       <AppLayoutSpruce>
@@ -145,10 +165,12 @@ export default function FormViewPage() {
               </Button>
             </Link>
           </div>
-          
+
           <div className="p-8 text-center">
             <h2 className="text-2xl font-bold mb-4">Form Not Found</h2>
-            <p className="text-gray-500 mb-6">The form you're looking for doesn't exist or you don't have permission to view it.</p>
+            <p className="text-gray-500 mb-6">
+              The form you're looking for doesn't exist or you don't have permission to view it.
+            </p>
             <Button asChild>
               <Link href="/forms">View All Forms</Link>
             </Button>
@@ -157,7 +179,7 @@ export default function FormViewPage() {
       </AppLayoutSpruce>
     );
   }
-  
+
   return (
     <AppLayoutSpruce>
       <div className="container mx-auto py-6">
@@ -169,7 +191,7 @@ export default function FormViewPage() {
             </Button>
           </Link>
         </div>
-      
+
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-2xl">{formTemplate.name}</CardTitle>
@@ -178,7 +200,10 @@ export default function FormViewPage() {
           <CardContent>
             <div className="mb-6">
               <Label htmlFor="patient">Select Patient</Label>
-              <Select value={patientId?.toString() || ""} onValueChange={(value) => setPatientId(parseInt(value))}>
+              <Select
+                value={patientId?.toString() || ""}
+                onValueChange={(value) => setPatientId(parseInt(value))}
+              >
                 <SelectTrigger className="w-full md:w-80">
                   <SelectValue placeholder="Select a patient" />
                 </SelectTrigger>
@@ -191,9 +216,9 @@ export default function FormViewPage() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <Separator className="my-6" />
-            
+
             <div className="space-y-8">
               {formTemplate.questions.map((question: any) => (
                 <div key={question.id} className="space-y-2">
@@ -204,7 +229,7 @@ export default function FormViewPage() {
                   {question.description && (
                     <p className="text-sm text-gray-500">{question.description}</p>
                   )}
-                  
+
                   {/* Render different input types based on question type */}
                   {question.type === "text" && (
                     <Input
@@ -213,7 +238,7 @@ export default function FormViewPage() {
                       onChange={(e) => handleInputChange(question.id, e.target.value)}
                     />
                   )}
-                  
+
                   {question.type === "textarea" && (
                     <Textarea
                       placeholder={question.placeholder}
@@ -222,10 +247,10 @@ export default function FormViewPage() {
                       rows={4}
                     />
                   )}
-                  
+
                   {question.type === "select" && (
-                    <Select 
-                      value={answers[question.id] || ""} 
+                    <Select
+                      value={answers[question.id] || ""}
                       onValueChange={(value) => handleInputChange(question.id, value)}
                     >
                       <SelectTrigger>
@@ -233,14 +258,17 @@ export default function FormViewPage() {
                       </SelectTrigger>
                       <SelectContent>
                         {question.options?.map((option: any, optionIndex: number) => (
-                          <SelectItem key={option.value || optionIndex} value={option.value || `option_${optionIndex + 1}`}>
+                          <SelectItem
+                            key={option.value || optionIndex}
+                            value={option.value || `option_${optionIndex + 1}`}
+                          >
                             {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   )}
-                  
+
                   {question.type === "radio" && (
                     <RadioGroup
                       value={answers[question.id] || ""}
@@ -248,17 +276,22 @@ export default function FormViewPage() {
                       className="space-y-2"
                     >
                       {question.options?.map((option: any, optionIndex: number) => (
-                        <div key={option.value || optionIndex} className="flex items-center space-x-2">
-                          <RadioGroupItem 
-                            id={`${question.id}-${option.value || optionIndex}`} 
-                            value={option.value || `option_${optionIndex + 1}`} 
+                        <div
+                          key={option.value || optionIndex}
+                          className="flex items-center space-x-2"
+                        >
+                          <RadioGroupItem
+                            id={`${question.id}-${option.value || optionIndex}`}
+                            value={option.value || `option_${optionIndex + 1}`}
                           />
-                          <Label htmlFor={`${question.id}-${option.value || optionIndex}`}>{option.label}</Label>
+                          <Label htmlFor={`${question.id}-${option.value || optionIndex}`}>
+                            {option.label}
+                          </Label>
                         </div>
                       ))}
                     </RadioGroup>
                   )}
-                  
+
                   {question.type === "checkbox" && (
                     <div className="space-y-2">
                       {question.options?.map((option: any, optionIndex: number) => {
@@ -286,7 +319,7 @@ export default function FormViewPage() {
                       })}
                     </div>
                   )}
-                  
+
                   {question.type === "date" && (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -308,14 +341,16 @@ export default function FormViewPage() {
                       <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                           mode="single"
-                          selected={answers[question.id] ? new Date(answers[question.id]) : undefined}
+                          selected={
+                            answers[question.id] ? new Date(answers[question.id]) : undefined
+                          }
                           onSelect={(date) => handleInputChange(question.id, date)}
                           initialFocus
                         />
                       </PopoverContent>
                     </Popover>
                   )}
-                  
+
                   {question.type === "number" && (
                     <Input
                       type="number"
@@ -329,13 +364,8 @@ export default function FormViewPage() {
             </div>
           </CardContent>
           <CardFooter className="flex justify-end">
-            <Button 
-              onClick={handleSubmit}
-              disabled={submitFormMutation.isPending || !patientId}
-            >
-              {submitFormMutation.isPending && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
+            <Button onClick={handleSubmit} disabled={submitFormMutation.isPending || !patientId}>
+              {submitFormMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Submit Form
             </Button>
           </CardFooter>

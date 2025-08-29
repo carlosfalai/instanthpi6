@@ -1,7 +1,7 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
-import { PendingItem, pendingItemsService } from '@/services/pendingItemsService';
-import { useToast } from '@/hooks/use-toast';
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { PendingItem, pendingItemsService } from "@/services/pendingItemsService";
+import { useToast } from "@/hooks/use-toast";
 
 export const usePendingItems = (patientId: number) => {
   const { toast } = useToast();
@@ -45,7 +45,7 @@ export const usePendingItems = (patientId: number) => {
         title: "Follow-up Sent",
         description: "A follow-up message has been sent to the patient.",
       });
-      
+
       // Refresh the messages list
       queryClient.invalidateQueries({ queryKey: [`/api/patients/${patientId}/messages`] });
     },

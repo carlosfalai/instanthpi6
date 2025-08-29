@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
-import { 
+import React, { useState, useEffect } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -9,40 +9,40 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { 
+} from "@/components/ui/dialog";
+import {
   Form,
   FormControl,
   FormDescription,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage 
-} from '@/components/ui/form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Plus, Loader2, Link2 } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { PseudonymLink, pseudonymMappingService } from '@/services/pseudonymMapping';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { 
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Plus, Loader2, Link2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { PseudonymLink, pseudonymMappingService } from "@/services/pseudonymMapping";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
-} from '@/components/ui/select';
+  SelectValue,
+} from "@/components/ui/select";
 
 // Form schema for creating a new pseudonym link
 const formSchema = z.object({
   pseudonym: z.string().min(3, { message: "Pseudonym must be at least 3 characters" }),
-  patientId: z.number({ 
+  patientId: z.number({
     required_error: "You must select a patient",
-    invalid_type_error: "Patient ID must be a number"
+    invalid_type_error: "Patient ID must be a number",
   }),
-  messageId: z.number().optional()
+  messageId: z.number().optional(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -64,59 +64,59 @@ export function CreatePseudonymLink({ onSuccess, pseudonym }: CreatePseudonymLin
 
   // Load patients for the dropdown
   const { data: patients = [] } = useQuery<Patient[]>({
-    queryKey: ['/api/patients'],
+    queryKey: ["/api/patients"],
     queryFn: async () => {
-      const response = await fetch('/api/patients');
-      if (!response.ok) throw new Error('Failed to fetch patients');
+      const response = await fetch("/api/patients");
+      if (!response.ok) throw new Error("Failed to fetch patients");
       return response.json();
-    }
+    },
   });
 
   // Form setup
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      pseudonym: pseudonym || '',
+      pseudonym: pseudonym || "",
       patientId: undefined,
-      messageId: undefined
-    }
+      messageId: undefined,
+    },
   });
 
   // Create pseudonym link mutation
   const createLinkMutation = useMutation({
     mutationFn: async (values: FormValues) => {
-      const patient = patients.find(p => p.id === values.patientId);
-      if (!patient) throw new Error('Selected patient not found');
-      
+      const patient = patients.find((p) => p.id === values.patientId);
+      if (!patient) throw new Error("Selected patient not found");
+
       return await pseudonymMappingService.createPseudonymLink({
         pseudonym: values.pseudonym,
         patientId: values.patientId,
         patientName: patient.name,
-        messageId: values.messageId
+        messageId: values.messageId,
       });
     },
     onSuccess: (link) => {
       toast({
-        title: 'Link Created',
+        title: "Link Created",
         description: `Successfully linked ${link.pseudonym} to ${link.patientName}`,
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/pseudonym-links'] });
-      
+      queryClient.invalidateQueries({ queryKey: ["/api/pseudonym-links"] });
+
       if (onSuccess) {
         onSuccess(link);
       }
-      
+
       // Close dialog and reset form
       setOpen(false);
       form.reset();
     },
     onError: (error: Error) => {
       toast({
-        title: 'Creation Failed',
+        title: "Creation Failed",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
-    }
+    },
   });
 
   // Handle form submission
@@ -127,14 +127,14 @@ export function CreatePseudonymLink({ onSuccess, pseudonym }: CreatePseudonymLin
   // Update form values when pseudonym prop changes
   useEffect(() => {
     if (pseudonym) {
-      form.setValue('pseudonym', pseudonym);
+      form.setValue("pseudonym", pseudonym);
     }
   }, [pseudonym, form]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button 
+        <Button
           variant="default"
           className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 border-0"
         >
@@ -163,9 +163,9 @@ export function CreatePseudonymLink({ onSuccess, pseudonym }: CreatePseudonymLin
                 <FormItem>
                   <FormLabel>Pseudonym</FormLabel>
                   <FormControl>
-                    <Input 
-                      placeholder="e.g., 847 Ancient Meadows" 
-                      {...field} 
+                    <Input
+                      placeholder="e.g., 847 Ancient Meadows"
+                      {...field}
                       className="bg-[#252525] border-[#444] text-white"
                     />
                   </FormControl>
@@ -195,8 +195,8 @@ export function CreatePseudonymLink({ onSuccess, pseudonym }: CreatePseudonymLin
                     </FormControl>
                     <SelectContent className="bg-[#1E1E1E] border-[#444] text-white">
                       {patients.map((patient) => (
-                        <SelectItem 
-                          key={patient.id} 
+                        <SelectItem
+                          key={patient.id}
                           value={patient.id.toString()}
                           className="hover:bg-[#333] focus:bg-[#333] cursor-pointer"
                         >
@@ -221,13 +221,13 @@ export function CreatePseudonymLink({ onSuccess, pseudonym }: CreatePseudonymLin
                 <FormItem>
                   <FormLabel>Message ID (Optional)</FormLabel>
                   <FormControl>
-                    <Input 
+                    <Input
                       type="number"
-                      placeholder="e.g., 12345" 
+                      placeholder="e.g., 12345"
                       {...field}
-                      value={field.value || ''}
+                      value={field.value || ""}
                       onChange={(e) => {
-                        const value = e.target.value === '' ? undefined : parseInt(e.target.value);
+                        const value = e.target.value === "" ? undefined : parseInt(e.target.value);
                         field.onChange(value);
                       }}
                       className="bg-[#252525] border-[#444] text-white"
@@ -242,15 +242,15 @@ export function CreatePseudonymLink({ onSuccess, pseudonym }: CreatePseudonymLin
             />
 
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setOpen(false)}
                 className="border-[#444] hover:bg-[#333] text-gray-300"
               >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 type="submit"
                 disabled={createLinkMutation.isPending}
                 className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 border-0"

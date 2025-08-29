@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
-import { Link, useLocation } from 'wouter';
+import React, { ReactNode } from "react";
+import { Link, useLocation } from "wouter";
 import {
   Users,
   FileText,
@@ -27,13 +27,12 @@ import {
   Menu,
   UserCog,
   ChevronDown,
-  BrainCircuit
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
+  BrainCircuit,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-import { Badge } from '@/components/ui/badge';
-import { useQuery } from '@tanstack/react-query';
-import { RetroGrid } from '@/components/ui/retro-grid';
+import { Badge } from "@/components/ui/badge";
+import { useQuery } from "@tanstack/react-query";
 
 interface NavItem {
   id: string;
@@ -53,18 +52,18 @@ interface NavSection {
 const notificationCounts = {
   inbox: 7,
   priorityAI: 4,
-  patients: 12
+  patients: 12,
 };
 
 const NotificationBadge: React.FC<{ count: number }> = ({ count }) => {
   if (count === 0) return null;
-  
+
   return (
-    <Badge 
-      variant="destructive" 
+    <Badge
+      variant="destructive"
       className="ml-auto text-xs min-w-[1.5rem] h-5 flex items-center justify-center rounded-full"
     >
-      {count > 99 ? '99+' : count}
+      {count > 99 ? "99+" : count}
     </Badge>
   );
 };
@@ -76,117 +75,164 @@ interface AppLayoutSpruceProps {
 export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
   const [location, navigate] = useLocation();
 
-
-
   // Define main navigation sections
   const mainNavSections: NavSection[] = [
     {
-      id: 'main',
-      title: 'Main',
+      id: "main",
+      title: "Main",
       items: [
-        { id: 'home', label: 'Home', path: '/', icon: Home },
-        { id: 'inbox', label: 'Inbox', path: '/inbox', icon: MessageSquare, notificationCount: notificationCounts.inbox },
-        { id: 'priorityAI', label: 'Priority AI', path: '/priority-tasks', icon: BrainCircuit, notificationCount: notificationCounts.priorityAI },
-      ]
+        { id: "home", label: "Home", path: "/", icon: Home },
+        {
+          id: "inbox",
+          label: "Inbox",
+          path: "/inbox",
+          icon: MessageSquare,
+          notificationCount: notificationCounts.inbox,
+        },
+        {
+          id: "priorityAI",
+          label: "Priority AI",
+          path: "/priority-tasks",
+          icon: BrainCircuit,
+          notificationCount: notificationCounts.priorityAI,
+        },
+      ],
     },
     {
-      id: 'patients',
-      title: 'Patients',
+      id: "patients",
+      title: "Patients",
       items: [
-        { id: 'patients', label: 'Patients', path: '/patients', icon: Users, notificationCount: notificationCounts.patients },
-        { id: 'chronicConditions', label: 'Chronic Conditions', path: '/chronic-conditions', icon: Heart },
-        { id: 'medicationRefills', label: 'Medication Refills', path: '/medication-refills', icon: PillIcon },
-        { id: 'urgentCare', label: 'Urgent Care', path: '/urgent-care', icon: AlertCircle },
-      ]
+        {
+          id: "patients",
+          label: "Patients",
+          path: "/patients",
+          icon: Users,
+          notificationCount: notificationCounts.patients,
+        },
+        {
+          id: "chronicConditions",
+          label: "Chronic Conditions",
+          path: "/chronic-conditions",
+          icon: Heart,
+        },
+        {
+          id: "medicationRefills",
+          label: "Medication Refills",
+          path: "/medication-refills",
+          icon: PillIcon,
+        },
+        { id: "urgentCare", label: "Urgent Care", path: "/urgent-care", icon: AlertCircle },
+      ],
     },
     {
-      id: 'documents',
-      title: 'Documents',
+      id: "documents",
+      title: "Documents",
       items: [
-        { id: 'documents', label: 'Documents', path: '/documents', icon: FileText },
-        { id: 'insurancePaperwork', label: 'Insurance Paperwork', path: '/insurance-paperwork', icon: FileCheck },
-      ]
+        { id: "documents", label: "Documents", path: "/documents", icon: FileText },
+        {
+          id: "insurancePaperwork",
+          label: "Insurance Paperwork",
+          path: "/insurance-paperwork",
+          icon: FileCheck,
+        },
+      ],
     },
     {
-      id: 'tools',
-      title: 'Tools & AI',
+      id: "tools",
+      title: "Tools & AI",
       items: [
-        { id: 'knowledgeBase', label: 'Knowledge Base', path: '/knowledge-base', icon: GraduationCap },
-        { id: 'aiBilling', label: 'AI Billing', path: '/ai-billing', icon: DollarSign },
-        { id: 'claudeAI', label: 'Claude AI', path: '/claude-ai', icon: Brain },
-      ]
+        {
+          id: "knowledgeBase",
+          label: "Knowledge Base",
+          path: "/knowledge-base",
+          icon: GraduationCap,
+        },
+        { id: "aiBilling", label: "AI Billing", path: "/ai-billing", icon: DollarSign },
+        { id: "claudeAI", label: "Claude AI", path: "/claude-ai", icon: Brain },
+      ],
     },
     {
-      id: 'tier35',
-      title: 'Tier 3.5 (The Association)',
+      id: "tier35",
+      title: "Tier 3.5 (The Association)",
       items: [
-        { id: 'association', label: 'Association', path: '/tier-association', icon: UserCog },
-      ]
+        { id: "association", label: "Association", path: "/tier-association", icon: UserCog },
+      ],
     },
     {
-      id: 'leadership',
-      title: 'Leadership',
+      id: "leadership",
+      title: "Leadership",
       items: [
-        { id: 'leadership', label: 'Leadership', path: '/leadership-association', icon: UserCog },
-      ]
+        { id: "leadership", label: "Leadership", path: "/leadership-association", icon: UserCog },
+      ],
     },
     {
-      id: 'settings',
-      title: 'Settings',
+      id: "settings",
+      title: "Settings",
       items: [
-        { id: 'settings', label: 'Settings', path: '/settings', icon: Settings },
-        { id: 'organizationProfile', label: 'Organization Profile', path: '/organization-profile', icon: User },
-        { id: 'teammates', label: 'Teammates', path: '/teammates', icon: Users },
-      ]
-    }
+        { id: "settings", label: "Settings", path: "/settings", icon: Settings },
+        {
+          id: "organizationProfile",
+          label: "Organization Profile",
+          path: "/organization-profile",
+          icon: User,
+        },
+        { id: "teammates", label: "Teammates", path: "/teammates", icon: Users },
+      ],
+    },
   ];
 
   // Determine active section from path
   const determineActiveSection = () => {
-    const pathSegment = location.split('/')[1] || 'home';
-    
-    if (pathSegment === 'settings' || pathSegment === 'organization-profile' || pathSegment === 'teammates') {
-      return 'settings';
-    } else if (pathSegment === 'patients' || pathSegment === 'chronic-conditions' || pathSegment === 'medication-refills' || pathSegment === 'urgent-care') {
-      return 'patients';
-    } else if (pathSegment === 'documents' || pathSegment === 'insurance-paperwork') {
-      return 'documents';
-    } else if (pathSegment === 'knowledge-base') {
-      return 'knowledgeBase';
-    } else if (pathSegment === 'leadership-association') {
-      return 'leadership';
-    } else if (pathSegment === 'ai-billing') {
-      return 'aiBilling';
-    } else if (pathSegment === 'priority-tasks') {
-      return 'priorityAI';
-    } else if (pathSegment === 'claude-ai') {
-      return 'claudeAI';
-    } else if (pathSegment === 'tier-association') {
-      return 'association';
-    } else if (pathSegment === '' || pathSegment === 'home') {
-      return 'home';
+    const pathSegment = location.split("/")[1] || "home";
+
+    if (
+      pathSegment === "settings" ||
+      pathSegment === "organization-profile" ||
+      pathSegment === "teammates"
+    ) {
+      return "settings";
+    } else if (
+      pathSegment === "patients" ||
+      pathSegment === "chronic-conditions" ||
+      pathSegment === "medication-refills" ||
+      pathSegment === "urgent-care"
+    ) {
+      return "patients";
+    } else if (pathSegment === "documents" || pathSegment === "insurance-paperwork") {
+      return "documents";
+    } else if (pathSegment === "knowledge-base") {
+      return "knowledgeBase";
+    } else if (pathSegment === "leadership-association") {
+      return "leadership";
+    } else if (pathSegment === "ai-billing") {
+      return "aiBilling";
+    } else if (pathSegment === "priority-tasks") {
+      return "priorityAI";
+    } else if (pathSegment === "claude-ai") {
+      return "claudeAI";
+    } else if (pathSegment === "tier-association") {
+      return "association";
+    } else if (pathSegment === "" || pathSegment === "home") {
+      return "home";
     } else {
-      const matchingSection = mainNavSections.find(section => 
-        section.items.some(item => item.path.substring(1) === pathSegment)
+      const matchingSection = mainNavSections.find((section) =>
+        section.items.some((item) => item.path.substring(1) === pathSegment)
       );
-      return matchingSection?.items.find(item => item.path.substring(1) === pathSegment)?.id || 'home';
+      return (
+        matchingSection?.items.find((item) => item.path.substring(1) === pathSegment)?.id || "home"
+      );
     }
   };
 
   const currentActiveSection = determineActiveSection();
 
-
-
   return (
-    <div className="min-h-screen bg-background flex relative">
-      {/* Background with retro grid */}
-      <div className="absolute top-0 z-0 h-screen w-screen bg-gray-950/95 bg-[radial-gradient(ellipse_20%_80%_at_50%_-20%,rgba(120,119,198,0.1),rgba(255,255,255,0))] dark:bg-[radial-gradient(ellipse_20%_80%_at_50%_-20%,rgba(120,119,198,0.2),rgba(255,255,255,0))]" />
-      <RetroGrid className="absolute inset-0 z-0" opacity={0.1} />
-      {/* Dark overlay for better text readability */}
-      <div className="absolute inset-0 bg-black/20 z-[1]" />
-      
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex relative">
+      {/* Background with subtle gradient */}
+      <div className="absolute top-0 z-0 h-screen w-screen bg-gradient-to-br from-blue-50/20 to-purple-50/20 dark:from-gray-900 dark:to-gray-800" />
+
       {/* Sidebar */}
-      <div className="w-64 bg-card/50 backdrop-blur border-r border-border flex-shrink-0 relative z-10">
+      <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0 relative z-10">
         <div className="p-6">
           {/* Header with InstantHPI in Purple */}
           <div className="flex items-center justify-between mb-8">
@@ -199,8 +245,6 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
             </Button>
           </div>
 
-
-
           {/* Navigation */}
           <nav className="space-y-6">
             {mainNavSections.map((section) => (
@@ -212,14 +256,14 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                   {section.items.map((item) => {
                     const isActive = currentActiveSection === item.id;
                     const Icon = item.icon;
-                    
+
                     return (
                       <Link key={item.id} href={item.path}>
                         <div
                           className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                             isActive
-                              ? 'bg-primary text-primary-foreground'
-                              : 'text-foreground hover:bg-muted'
+                              ? "bg-blue-600 text-white"
+                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                           }`}
                         >
                           <Icon className="h-4 w-4" />
@@ -239,9 +283,7 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
       {/* Main Content */}
       <div className="flex-1 flex flex-col relative z-10">
         {/* Main Content Area */}
-        <main className="flex-1 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto">{children}</main>
       </div>
     </div>
   );

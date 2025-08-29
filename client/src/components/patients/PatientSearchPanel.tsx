@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Loader2, Check } from 'lucide-react';
-import { useDebounce } from '@/hooks/use-debounce';
-import { useToast } from '@/hooks/use-toast';
+import React, { useState, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Search, Loader2, Check } from "lucide-react";
+import { useDebounce } from "@/hooks/use-debounce";
+import { useToast } from "@/hooks/use-toast";
 
 interface Patient {
   id: number;
@@ -13,7 +13,7 @@ interface Patient {
   phone: string;
   dateOfBirth: string;
   gender: string;
-  language: 'english' | 'french' | null;
+  language: "english" | "french" | null;
   spruceId: string | null;
 }
 
@@ -22,50 +22,50 @@ interface PatientSearchPanelProps {
   selectedPatientId: number | null;
 }
 
-export default function PatientSearchPanel({ 
+export default function PatientSearchPanel({
   onSelectPatient,
-  selectedPatientId
+  selectedPatientId,
 }: PatientSearchPanelProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Query to get patients exclusively from Spruce API
-  const { 
-    data: patientsResponse = { patients: [], source: 'spruce' }, 
+  const {
+    data: patientsResponse = { patients: [], source: "spruce" },
     isLoading,
-    error
+    error,
   } = useQuery({
-    queryKey: ['/api/spruce/search-patients', debouncedSearchTerm],
+    queryKey: ["/api/spruce/search-patients", debouncedSearchTerm],
     queryFn: async () => {
-      let url = '/api/spruce/search-patients';
-      
+      let url = "/api/spruce/search-patients";
+
       // Add query parameter if available
       if (debouncedSearchTerm) {
         url += `?query=${encodeURIComponent(debouncedSearchTerm)}`;
       }
-      
+
       const res = await fetch(url);
-      
+
       if (!res.ok) {
-        throw new Error('Failed to fetch patients');
+        throw new Error("Failed to fetch patients");
       }
-      
+
       return res.json();
-    }
+    },
   });
-  
+
   // Extract patients array from response
   const patients = patientsResponse.patients || [];
-  
+
   // Show error toast if patient fetching fails
   useEffect(() => {
     if (error) {
       toast({
         title: "Error loading patients",
         description: "Please try again later",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   }, [error, toast]);
@@ -73,15 +73,15 @@ export default function PatientSearchPanel({
   // Refresh data every 30 seconds to ensure it's current
   useEffect(() => {
     const intervalId = setInterval(() => {
-      queryClient.invalidateQueries({ queryKey: ['/api/spruce/search-patients'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/spruce/search-patients"] });
     }, 30000);
 
     return () => clearInterval(intervalId);
   }, [queryClient]);
-  
+
   const filteredPatients = patients.filter((patient: Patient) => {
     if (!debouncedSearchTerm) return true;
-    
+
     const searchLower = debouncedSearchTerm.toLowerCase();
     return (
       patient.name?.toLowerCase().includes(searchLower) ||
@@ -89,13 +89,13 @@ export default function PatientSearchPanel({
       patient.phone?.toLowerCase().includes(searchLower)
     );
   });
-  
+
   return (
     <div className="flex flex-col h-full bg-[#121212] text-white">
       <div className="p-4 bg-[#1e1e1e] border-b border-gray-800">
         <h2 className="font-semibold">Patients</h2>
       </div>
-      
+
       <div className="p-3">
         <div className="relative">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
@@ -108,7 +108,7 @@ export default function PatientSearchPanel({
           />
         </div>
       </div>
-      
+
       <ScrollArea className="flex-1">
         {isLoading ? (
           <div className="flex justify-center items-center h-32">
@@ -117,31 +117,29 @@ export default function PatientSearchPanel({
         ) : filteredPatients.length > 0 ? (
           <div className="divide-y divide-gray-800">
             {filteredPatients.map((patient: Patient) => (
-              <div 
+              <div
                 key={patient.id}
-                className={`p-3 cursor-pointer hover:bg-[#1e1e1e] ${selectedPatientId === patient.id ? 'bg-[#1e1e1e]' : ''}`}
+                className={`p-3 cursor-pointer hover:bg-[#1e1e1e] ${selectedPatientId === patient.id ? "bg-[#1e1e1e]" : ""}`}
                 onClick={() => onSelectPatient(patient)}
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="font-medium">{patient.name}</div>
                     <div className="text-sm text-gray-400">
-                      {patient.email || patient.phone || ''}
+                      {patient.email || patient.phone || ""}
                     </div>
                   </div>
-                  
-                  {selectedPatientId === patient.id && (
-                    <Check className="h-4 w-4 text-blue-500" />
-                  )}
+
+                  {selectedPatientId === patient.id && <Check className="h-4 w-4 text-blue-500" />}
                 </div>
-                
+
                 <div className="flex items-center mt-1 text-xs space-x-2">
                   {patient.language && (
                     <span className="px-1.5 py-0.5 rounded bg-[#262626] text-gray-300">
                       {patient.language.charAt(0).toUpperCase() + patient.language.slice(1)}
                     </span>
                   )}
-                  
+
                   {patient.gender && (
                     <span className="px-1.5 py-0.5 rounded bg-[#262626] text-gray-300">
                       {patient.gender.charAt(0).toUpperCase() + patient.gender.slice(1)}
@@ -153,7 +151,7 @@ export default function PatientSearchPanel({
           </div>
         ) : (
           <div className="text-gray-500 text-center p-4">
-            {debouncedSearchTerm ? 'No patients matching your search' : 'No patients available'}
+            {debouncedSearchTerm ? "No patients matching your search" : "No patients available"}
           </div>
         )}
       </ScrollArea>

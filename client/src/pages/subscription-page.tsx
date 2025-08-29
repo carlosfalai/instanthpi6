@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { apiRequest, queryClient } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
-import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 
 // Components
 import {
@@ -14,8 +14,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -24,10 +24,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,15 +38,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { Loader2, CheckCircle2, AlertCircle, CreditCard } from 'lucide-react';
+} from "@/components/ui/alert-dialog";
+import { Loader2, CheckCircle2, AlertCircle, CreditCard } from "lucide-react";
 
 // Initialize Stripe
-if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-  throw new Error('Missing Stripe public key');
-}
-
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY || "pk_test_placeholder";
+const stripePromise = loadStripe(stripeKey);
 
 // Plan selection component
 const PlanSelection = ({ onPlanSelect, selectedPlan, plans, isLoading }: any) => {
@@ -73,10 +70,10 @@ const PlanSelection = ({ onPlanSelect, selectedPlan, plans, isLoading }: any) =>
   return (
     <div className="grid gap-4 md:grid-cols-3">
       {plans.map((plan: any) => (
-        <Card 
-          key={plan.id} 
+        <Card
+          key={plan.id}
           className={`relative overflow-hidden transition-all hover:shadow-md ${
-            selectedPlan?.id === plan.id ? 'border-primary ring-2 ring-primary' : ''
+            selectedPlan?.id === plan.id ? "border-primary ring-2 ring-primary" : ""
           }`}
         >
           {selectedPlan?.id === plan.id && (
@@ -101,9 +98,9 @@ const PlanSelection = ({ onPlanSelect, selectedPlan, plans, isLoading }: any) =>
               </li>
               <li className="flex items-center">
                 <CheckCircle2 className="mr-2 h-4 w-4 text-primary" />
-                {plan.interval === 'month' 
-                  ? 'Monthly updates and features' 
-                  : 'Annual updates and premium features'}
+                {plan.interval === "month"
+                  ? "Monthly updates and features"
+                  : "Annual updates and premium features"}
               </li>
               <li className="flex items-center">
                 <CheckCircle2 className="mr-2 h-4 w-4 text-primary" />
@@ -112,12 +109,12 @@ const PlanSelection = ({ onPlanSelect, selectedPlan, plans, isLoading }: any) =>
             </ul>
           </CardContent>
           <CardFooter>
-            <Button 
-              onClick={() => onPlanSelect(plan)} 
+            <Button
+              onClick={() => onPlanSelect(plan)}
               variant={selectedPlan?.id === plan.id ? "default" : "outline"}
               className="w-full"
             >
-              {selectedPlan?.id === plan.id ? 'Selected' : 'Select Plan'}
+              {selectedPlan?.id === plan.id ? "Selected" : "Select Plan"}
             </Button>
           </CardFooter>
         </Card>
@@ -148,17 +145,17 @@ const PaymentForm = ({ clientSecret, onSuccess, onCancel }: any) => {
       const { error: submitError } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: window.location.origin + '/subscription?success=true',
+          return_url: window.location.origin + "/subscription?success=true",
         },
-        redirect: 'if_required',
+        redirect: "if_required",
       });
 
       if (submitError) {
-        setError(submitError.message || 'An error occurred with the payment');
+        setError(submitError.message || "An error occurred with the payment");
         toast({
           variant: "destructive",
           title: "Payment failed",
-          description: submitError.message || 'Payment processing failed',
+          description: submitError.message || "Payment processing failed",
         });
       } else {
         toast({
@@ -168,11 +165,11 @@ const PaymentForm = ({ clientSecret, onSuccess, onCancel }: any) => {
         onSuccess();
       }
     } catch (err: any) {
-      setError(err.message || 'An unexpected error occurred');
+      setError(err.message || "An unexpected error occurred");
       toast({
         variant: "destructive",
         title: "Payment error",
-        description: err.message || 'An unexpected error occurred',
+        description: err.message || "An unexpected error occurred",
       });
     } finally {
       setIsSubmitting(false);
@@ -183,26 +180,16 @@ const PaymentForm = ({ clientSecret, onSuccess, onCancel }: any) => {
     <form onSubmit={handleSubmit}>
       <div className="space-y-4">
         <PaymentElement />
-        
+
         {error && (
-          <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
-            {error}
-          </div>
+          <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">{error}</div>
         )}
-        
+
         <div className="flex justify-end space-x-2 mt-6">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={onCancel}
-            disabled={isSubmitting}
-          >
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isSubmitting}>
             Cancel
           </Button>
-          <Button 
-            type="submit" 
-            disabled={!stripe || !elements || isSubmitting}
-          >
+          <Button type="submit" disabled={!stripe || !elements || isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -239,15 +226,15 @@ export default function SubscriptionPage() {
 
   // Fetch current user subscription status
   const { data: user, isLoading: isLoadingUser } = useQuery<User>({
-    queryKey: ['/api/user'],
+    queryKey: ["/api/user"],
     retry: false,
   });
 
   // Fetch available subscription plans
   const { data: plansData, isLoading: isLoadingPlans } = useQuery({
-    queryKey: ['/api/stripe/plans'],
+    queryKey: ["/api/stripe/plans"],
     queryFn: async () => {
-      const res = await apiRequest('GET', '/api/stripe/plans');
+      const res = await apiRequest("GET", "/api/stripe/plans");
       const data = await res.json();
       return data.plans;
     },
@@ -257,9 +244,9 @@ export default function SubscriptionPage() {
   // Create subscription mutation
   const createSubscriptionMutation = useMutation({
     mutationFn: async (priceId: string) => {
-      const res = await apiRequest('POST', '/api/stripe/get-or-create-subscription', { 
+      const res = await apiRequest("POST", "/api/stripe/get-or-create-subscription", {
         priceId,
-        email: user?.email
+        email: user?.email,
       });
       return res.json();
     },
@@ -272,7 +259,7 @@ export default function SubscriptionPage() {
           title: "Subscription active",
           description: "Your subscription is already active",
         });
-        queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+        queryClient.invalidateQueries({ queryKey: ["/api/user"] });
       }
     },
     onError: (error: any) => {
@@ -281,7 +268,7 @@ export default function SubscriptionPage() {
         title: "Subscription error",
         description: error.message || "Failed to create subscription",
       });
-    }
+    },
   });
 
   const handlePlanSelect = (plan: any) => {
@@ -303,7 +290,7 @@ export default function SubscriptionPage() {
 
   const handlePaymentSuccess = () => {
     setPaymentModalOpen(false);
-    queryClient.invalidateQueries({ queryKey: ['/api/user'] });
+    queryClient.invalidateQueries({ queryKey: ["/api/user"] });
   };
 
   const handlePaymentCancel = () => {
@@ -312,7 +299,7 @@ export default function SubscriptionPage() {
 
   // Format date to readable format
   const formatDate = (dateString: string | null | undefined) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return "N/A";
     return new Date(dateString).toLocaleDateString();
   };
 
@@ -332,9 +319,7 @@ export default function SubscriptionPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Current Subscription</CardTitle>
-                <CardDescription>
-                  View and manage your current subscription details
-                </CardDescription>
+                <CardDescription>View and manage your current subscription details</CardDescription>
               </CardHeader>
               <CardContent>
                 {isLoadingUser ? (
@@ -349,7 +334,7 @@ export default function SubscriptionPage() {
                       <CheckCircle2 className="text-primary mr-2 h-5 w-5" />
                       <h3 className="font-semibold">Active Subscription</h3>
                     </div>
-                    
+
                     <div className="grid gap-1">
                       <div className="grid grid-cols-2 gap-2">
                         <div className="text-muted-foreground">Status:</div>
@@ -359,12 +344,12 @@ export default function SubscriptionPage() {
                           </Badge>
                         </div>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-2">
                         <div className="text-muted-foreground">Renewal Date:</div>
                         <div>{formatDate(user?.premiumUntil)}</div>
                       </div>
-                      
+
                       {user?.stripeSubscriptionId && (
                         <div className="grid grid-cols-2 gap-2">
                           <div className="text-muted-foreground">Subscription ID:</div>
@@ -383,8 +368,9 @@ export default function SubscriptionPage() {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            This will cancel your subscription at the end of the current billing period. 
-                            You'll continue to have access until {formatDate(user?.premiumUntil)}.
+                            This will cancel your subscription at the end of the current billing
+                            period. You'll continue to have access until{" "}
+                            {formatDate(user?.premiumUntil)}.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
@@ -403,9 +389,10 @@ export default function SubscriptionPage() {
                       <h3 className="font-semibold">No Active Subscription</h3>
                     </div>
                     <p className="text-muted-foreground">
-                      You don't have an active subscription. Subscribe to get full access to all features.
+                      You don't have an active subscription. Subscribe to get full access to all
+                      features.
                     </p>
-                    <Button onClick={() => document.getElementById('plans-tab')?.click()}>
+                    <Button onClick={() => document.getElementById("plans-tab")?.click()}>
                       View Subscription Plans
                     </Button>
                   </div>
@@ -419,24 +406,22 @@ export default function SubscriptionPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Subscription Plans</CardTitle>
-                  <CardDescription>
-                    Choose a plan that works for you
-                  </CardDescription>
+                  <CardDescription>Choose a plan that works for you</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <PlanSelection 
-                    plans={plansData} 
+                  <PlanSelection
+                    plans={plansData}
                     isLoading={isLoadingPlans}
                     selectedPlan={selectedPlan}
                     onPlanSelect={handlePlanSelect}
                   />
                 </CardContent>
                 <CardFooter className="flex justify-end">
-                  <Button 
-                    onClick={handleSubscribe} 
+                  <Button
+                    onClick={handleSubscribe}
                     disabled={
-                      !selectedPlan || 
-                      createSubscriptionMutation.isPending || 
+                      !selectedPlan ||
+                      createSubscriptionMutation.isPending ||
                       (user?.isPremium && user?.stripeSubscriptionId)
                     }
                   >
@@ -446,7 +431,7 @@ export default function SubscriptionPage() {
                         Processing...
                       </>
                     ) : (
-                      'Subscribe'
+                      "Subscribe"
                     )}
                   </Button>
                 </CardFooter>
@@ -456,16 +441,15 @@ export default function SubscriptionPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Subscription Benefits</CardTitle>
-                  <CardDescription>
-                    What you get with an InstantHPI subscription
-                  </CardDescription>
+                  <CardDescription>What you get with an InstantHPI subscription</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid gap-4 md:grid-cols-3">
                     <div className="space-y-2">
                       <h3 className="font-semibold">Enhanced AI Processing</h3>
                       <p className="text-sm text-muted-foreground">
-                        Access to advanced AI models for faster and more accurate medical documentation
+                        Access to advanced AI models for faster and more accurate medical
+                        documentation
                       </p>
                     </div>
                     <div className="space-y-2">
@@ -477,7 +461,8 @@ export default function SubscriptionPage() {
                     <div className="space-y-2">
                       <h3 className="font-semibold">Premium Features</h3>
                       <p className="text-sm text-muted-foreground">
-                        Unlock premium features like comprehensive billing optimization and advanced analytics
+                        Unlock premium features like comprehensive billing optimization and advanced
+                        analytics
                       </p>
                     </div>
                   </div>
@@ -496,10 +481,10 @@ export default function SubscriptionPage() {
                 Enter your payment details to start your subscription
               </DialogDescription>
             </DialogHeader>
-            
+
             {clientSecret && (
               <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <PaymentForm 
+                <PaymentForm
                   clientSecret={clientSecret}
                   onSuccess={handlePaymentSuccess}
                   onCancel={handlePaymentCancel}

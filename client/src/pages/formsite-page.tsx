@@ -1,22 +1,22 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
-import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2, Search, FileText, RefreshCw, Zap, FormInput, UserRound } from 'lucide-react';
-import { format } from 'date-fns';
-import formsiteService, { FormSiteSubmission } from '@/services/formsite';
-import { getFieldLabel, formatFieldValue } from '@/services/formsiteFieldMapping';
-import CreatePseudonymLink from '@/components/pseudonym/CreatePseudonymLink';
-import PseudonymLinks from '@/components/pseudonym/PseudonymLinks';
+import React, { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, Search, FileText, RefreshCw, Zap, FormInput, UserRound } from "lucide-react";
+import { format } from "date-fns";
+import formsiteService, { FormSiteSubmission } from "@/services/formsite";
+import { getFieldLabel, formatFieldValue } from "@/services/formsiteFieldMapping";
+import CreatePseudonymLink from "@/components/pseudonym/CreatePseudonymLink";
+import PseudonymLinks from "@/components/pseudonym/PseudonymLinks";
 
 const FormsitePage: React.FC = () => {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubmission, setSelectedSubmission] = useState<FormSiteSubmission | null>(null);
 
   // Fetch all form submissions
@@ -26,12 +26,12 @@ const FormsitePage: React.FC = () => {
     error: submissionsError,
     refetch: refetchSubmissions,
   } = useQuery({
-    queryKey: ['/api/formsite/submissions'],
+    queryKey: ["/api/formsite/submissions"],
     queryFn: async () => {
       try {
         return await formsiteService.getFormSubmissions();
       } catch (error) {
-        console.error('Error fetching FormSite submissions:', error);
+        console.error("Error fetching FormSite submissions:", error);
         throw error;
       }
     },
@@ -43,7 +43,7 @@ const FormsitePage: React.FC = () => {
     isLoading: isLoadingDetails,
     error: detailsError,
   } = useQuery({
-    queryKey: ['/api/formsite/submissions', selectedSubmission?.id],
+    queryKey: ["/api/formsite/submissions", selectedSubmission?.id],
     queryFn: async () => {
       if (!selectedSubmission?.id) return null;
       return await formsiteService.getFormSubmission(selectedSubmission.id);
@@ -53,7 +53,7 @@ const FormsitePage: React.FC = () => {
 
   // Process submission with AI mutation
   const processSubmissionMutation = useMutation({
-    mutationFn: async (params: { submissionId: string, modelType: 'both' | 'gpt' | 'claude' }) => {
+    mutationFn: async (params: { submissionId: string; modelType: "both" | "gpt" | "claude" }) => {
       return await formsiteService.processFormSubmission(params);
     },
     onSuccess: (data) => {
@@ -66,36 +66,36 @@ const FormsitePage: React.FC = () => {
           claudeContent: data.claudeContent || selectedSubmission.claudeContent,
         });
       }
-      
+
       // Show different toast messages based on what was processed
       const hasGpt = !!data.aiContent;
       const hasClaude = !!data.claudeContent;
-      
+
       if (hasGpt && hasClaude) {
         toast({
-          title: 'Form Processed',
-          description: 'The form submission has been processed successfully with both AI models.',
+          title: "Form Processed",
+          description: "The form submission has been processed successfully with both AI models.",
         });
       } else if (hasGpt) {
         toast({
-          title: 'GPT-4o Processing Complete',
-          description: 'The form submission has been processed with GPT-4o.',
+          title: "GPT-4o Processing Complete",
+          description: "The form submission has been processed with GPT-4o.",
         });
       } else if (hasClaude) {
         toast({
-          title: 'Claude 3.7 Processing Complete',
-          description: 'The form submission has been processed with Claude 3.7 Sonnet.',
+          title: "Claude 3.7 Processing Complete",
+          description: "The form submission has been processed with Claude 3.7 Sonnet.",
         });
       }
-      
+
       // Invalidate the submissions query to refresh the list
-      queryClient.invalidateQueries({ queryKey: ['/api/formsite/submissions'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/formsite/submissions"] });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Processing Failed',
+        title: "Processing Failed",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
@@ -110,28 +110,31 @@ const FormsitePage: React.FC = () => {
 
     try {
       const results = await formsiteService.searchFormSubmissions(searchQuery);
-      
+
       // Ensure results is an array before updating the state
-      const formattedResults = Array.isArray(results) 
-        ? results 
-        : 'results' in results && Array.isArray(results.results)
+      const formattedResults = Array.isArray(results)
+        ? results
+        : "results" in results && Array.isArray(results.results)
           ? results.results
           : [];
-      
+
       // Temporarily update the submissions data with search results
-      queryClient.setQueryData(['/api/formsite/submissions'], formattedResults);
+      queryClient.setQueryData(["/api/formsite/submissions"], formattedResults);
     } catch (error) {
-      console.error('Error searching submissions:', error);
+      console.error("Error searching submissions:", error);
       toast({
-        title: 'Search Failed',
-        description: 'Failed to search form submissions',
-        variant: 'destructive',
+        title: "Search Failed",
+        description: "Failed to search form submissions",
+        variant: "destructive",
       });
     }
   };
 
   // Handle processing a submission with AI
-  const handleProcessSubmission = (submissionId: string, modelType: 'both' | 'gpt' | 'claude' = 'both') => {
+  const handleProcessSubmission = (
+    submissionId: string,
+    modelType: "both" | "gpt" | "claude" = "both"
+  ) => {
     processSubmissionMutation.mutate({ submissionId, modelType });
   };
 
@@ -142,7 +145,7 @@ const FormsitePage: React.FC = () => {
       const latestSubmission = await formsiteService.getFormSubmission(submission.id);
       setSelectedSubmission(latestSubmission);
     } catch (error) {
-      console.error('Error fetching latest submission details:', error);
+      console.error("Error fetching latest submission details:", error);
       // Fall back to using the submission data from the list if there's an error
       setSelectedSubmission(submission);
     }
@@ -151,7 +154,7 @@ const FormsitePage: React.FC = () => {
   // Format date string
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'MMM d, yyyy');
+      return format(new Date(dateString), "MMM d, yyyy");
     } catch (error) {
       return dateString;
     }
@@ -160,33 +163,33 @@ const FormsitePage: React.FC = () => {
   // Get an address preview from form content (Field 1)
   const getAddressPreview = (results: Record<string, any>) => {
     const entries = Object.entries(results);
-    if (entries.length === 0) return 'No address available';
+    if (entries.length === 0) return "No address available";
 
     // Find the address field (field 1)
     for (const [key, value] of entries) {
       // Extract the field ID
       let fieldId = key;
-      if (typeof key === 'string') {
+      if (typeof key === "string") {
         // Handle keys in various formats like "items[0][id]:2" or just "2"
-        fieldId = key.includes('[id]') 
-          ? key.split('[id]')[1].replace(/[^\d]/g, '') 
-          : key.includes(':')
-            ? key.split(':')[1]
+        fieldId = key.includes("[id]")
+          ? key.split("[id]")[1].replace(/[^\d]/g, "")
+          : key.includes(":")
+            ? key.split(":")[1]
             : key;
       }
-      
+
       // If this is field 1 (Address), return its value
-      if (fieldId === '1') {
+      if (fieldId === "1") {
         // Format the value for display
         let displayValue = value;
-        if (typeof value === 'object') {
+        if (typeof value === "object") {
           if (value.value !== undefined) {
             displayValue = value.value;
           } else {
             displayValue = JSON.stringify(value);
           }
         }
-        
+
         return String(displayValue);
       }
     }
@@ -194,29 +197,29 @@ const FormsitePage: React.FC = () => {
     // As a backup, try to find field 0 which might contain the email address
     for (const [key, value] of entries) {
       let fieldId = key;
-      if (typeof key === 'string') {
-        fieldId = key.includes('[id]') 
-          ? key.split('[id]')[1].replace(/[^\d]/g, '') 
-          : key.includes(':')
-            ? key.split(':')[1]
+      if (typeof key === "string") {
+        fieldId = key.includes("[id]")
+          ? key.split("[id]")[1].replace(/[^\d]/g, "")
+          : key.includes(":")
+            ? key.split(":")[1]
             : key;
       }
-      
-      if (fieldId === '0') {
+
+      if (fieldId === "0") {
         let displayValue = value;
-        if (typeof value === 'object') {
+        if (typeof value === "object") {
           if (value.value !== undefined) {
             displayValue = value.value;
           } else {
             displayValue = JSON.stringify(value);
           }
         }
-        
+
         return String(displayValue);
       }
     }
 
-    return 'Address not found';
+    return "Address not found";
   };
 
   // Render the submissions list (with error handling for non-array data)
@@ -226,12 +229,7 @@ const FormsitePage: React.FC = () => {
       return (
         <div className="py-10 text-center">
           <p className="text-gray-400">Invalid data format received</p>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => refetchSubmissions()}
-            className="mt-2"
-          >
+          <Button variant="outline" size="sm" onClick={() => refetchSubmissions()} className="mt-2">
             Refresh Data
           </Button>
         </div>
@@ -251,25 +249,23 @@ const FormsitePage: React.FC = () => {
         {submissions.map((submission) => {
           // Get the address (Field 1) instead of showing dates
           const address = getAddressPreview(submission.results);
-          
+
           return (
             <div
               key={submission.id}
               onClick={() => handleSelectSubmission(submission)}
               className={`p-3 rounded-md cursor-pointer transition-colors overflow-hidden ${
-                selectedSubmission?.id === submission.id 
-                  ? 'bg-blue-900/30 border border-blue-700' 
-                  : 'bg-[#252525] border border-[#333] hover:border-[#444]'
+                selectedSubmission?.id === submission.id
+                  ? "bg-blue-900/30 border border-blue-700"
+                  : "bg-[#252525] border border-[#333] hover:border-[#444]"
               }`}
             >
               <div className="flex flex-col">
                 <div className="flex justify-between items-start">
                   <div className="flex-1 mr-2 overflow-auto max-h-24 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
-                    <h3 className="font-medium text-xl text-blue-400 break-words">
-                      {address}
-                    </h3>
+                    <h3 className="font-medium text-xl text-blue-400 break-words">{address}</h3>
                   </div>
-                  
+
                   {submission.processed && (
                     <div className="bg-blue-900/50 text-blue-400 px-2 py-0.5 rounded text-xs font-medium flex-shrink-0">
                       Processed
@@ -294,14 +290,14 @@ const FormsitePage: React.FC = () => {
         </div>
         <div className="flex space-x-2">
           {/* Refresh Button */}
-          <Button 
+          <Button
             onClick={() => refetchSubmissions()}
             disabled={isLoadingSubmissions}
             variant="outline"
             size="sm"
             className="border border-gray-700 hover:bg-gray-800 transition-all duration-200"
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingSubmissions ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingSubmissions ? "animate-spin" : ""}`} />
             Refresh
           </Button>
         </div>
@@ -322,26 +318,31 @@ const FormsitePage: React.FC = () => {
                 Pseudonym Lookup
               </TabsTrigger>
             </TabsList>
-            
+
             {/* Submissions Tab */}
-            <TabsContent value="submissions" className="flex-grow data-[state=active]:flex flex-col mt-0">
+            <TabsContent
+              value="submissions"
+              className="flex-grow data-[state=active]:flex flex-col mt-0"
+            >
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-3">
                   <p className="text-sm text-gray-400">
                     View and process patient information by their generated ID
                   </p>
-                  <Button 
+                  <Button
                     onClick={() => refetchSubmissions()}
                     disabled={isLoadingSubmissions}
                     variant="outline"
                     size="sm"
                     className="border border-gray-700 hover:bg-gray-800 transition-all duration-200 ml-2"
                   >
-                    <RefreshCw className={`h-4 w-4 mr-2 ${isLoadingSubmissions ? 'animate-spin' : ''}`} />
+                    <RefreshCw
+                      className={`h-4 w-4 mr-2 ${isLoadingSubmissions ? "animate-spin" : ""}`}
+                    />
                     Refresh
                   </Button>
                 </div>
-                
+
                 {/* Search Input */}
                 <div className="flex gap-2">
                   <div className="relative flex-1">
@@ -350,10 +351,10 @@ const FormsitePage: React.FC = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       className="pr-10 bg-[#252525] border-[#444] w-full"
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="icon"
                       className="absolute right-0 top-0 h-full"
                       onClick={handleSearch}
@@ -363,7 +364,7 @@ const FormsitePage: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Submissions List */}
               <ScrollArea className="flex-grow pr-2">
                 {isLoadingSubmissions ? (
@@ -373,31 +374,28 @@ const FormsitePage: React.FC = () => {
                 ) : submissionsError ? (
                   <div className="py-10 text-center">
                     <p className="text-gray-400 mb-2">Failed to load form submissions</p>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      onClick={() => refetchSubmissions()}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => refetchSubmissions()}>
                       Try Again
                     </Button>
                   </div>
-                ) : renderSubmissionsList()}
+                ) : (
+                  renderSubmissionsList()
+                )}
               </ScrollArea>
             </TabsContent>
-            
+
             {/* Pseudonym Lookup Tab */}
-            <TabsContent value="pseudonym" className="flex-grow data-[state=active]:flex flex-col mt-0">
+            <TabsContent
+              value="pseudonym"
+              className="flex-grow data-[state=active]:flex flex-col mt-0"
+            >
               <div className="flex flex-col gap-4">
                 <div className="flex justify-between items-center">
                   <h2 className="text-lg font-medium">Pseudonym Management</h2>
-                  <CreatePseudonymLink 
-                    pseudonym={selectedSubmission?.results?.['1'] || ''}
-                  />
+                  <CreatePseudonymLink pseudonym={selectedSubmission?.results?.["1"] || ""} />
                 </div>
                 <div className="mt-2">
-                  <PseudonymLinks 
-                    pseudonym={selectedSubmission?.results?.['1'] || ''}
-                  />
+                  <PseudonymLinks pseudonym={selectedSubmission?.results?.["1"] || ""} />
                 </div>
               </div>
             </TabsContent>
@@ -426,7 +424,7 @@ const FormsitePage: React.FC = () => {
                   </p>
                 </div>
                 <Button
-                  onClick={() => handleProcessSubmission(selectedSubmission.id, 'both')}
+                  onClick={() => handleProcessSubmission(selectedSubmission.id, "both")}
                   disabled={processSubmissionMutation.isPending}
                   variant="default"
                   className="bg-blue-600 hover:bg-blue-700"
@@ -443,15 +441,24 @@ const FormsitePage: React.FC = () => {
                   )}
                 </Button>
               </div>
-              
+
               <Tabs defaultValue="form-data" className="flex-grow flex flex-col">
                 <TabsList className="w-full bg-[#252525] mb-4 grid grid-cols-3">
-                  <TabsTrigger value="form-data" className="flex items-center justify-center">Form Data</TabsTrigger>
-                  <TabsTrigger value="claude-content" className="flex items-center justify-center">Claude 3.7 Output</TabsTrigger>
-                  <TabsTrigger value="ai-content" className="flex items-center justify-center">GPT-4o Output</TabsTrigger>
+                  <TabsTrigger value="form-data" className="flex items-center justify-center">
+                    Form Data
+                  </TabsTrigger>
+                  <TabsTrigger value="claude-content" className="flex items-center justify-center">
+                    Claude 3.7 Output
+                  </TabsTrigger>
+                  <TabsTrigger value="ai-content" className="flex items-center justify-center">
+                    GPT-4o Output
+                  </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="form-data" className="flex-grow data-[state=active]:flex flex-col mt-0">
+                <TabsContent
+                  value="form-data"
+                  className="flex-grow data-[state=active]:flex flex-col mt-0"
+                >
                   <ScrollArea className="flex-grow pr-2">
                     {isLoadingDetails ? (
                       <div className="flex justify-center items-center h-40">
@@ -461,7 +468,8 @@ const FormsitePage: React.FC = () => {
                       <div className="py-10 text-center">
                         <p className="text-gray-400">Failed to load submission details</p>
                       </div>
-                    ) : !selectedSubmission.results || Object.keys(selectedSubmission.results).length === 0 ? (
+                    ) : !selectedSubmission.results ||
+                      Object.keys(selectedSubmission.results).length === 0 ? (
                       <div className="py-10 text-center">
                         <p className="text-gray-400">No form data available</p>
                       </div>
@@ -469,10 +477,10 @@ const FormsitePage: React.FC = () => {
                       <div className="space-y-4">
                         {Object.entries(selectedSubmission.results).map(([key, value]) => {
                           // Extract the field ID
-                          const fieldId = key.includes(':') ? key.split(':')[0] : key;
+                          const fieldId = key.includes(":") ? key.split(":")[0] : key;
                           // Get human-readable label for the field
                           const fieldLabel = getFieldLabel(fieldId);
-                          
+
                           return (
                             <div key={key} className="border-b border-[#333] pb-3 last:border-b-0">
                               <h4 className="font-medium text-gray-300">{fieldLabel}</h4>
@@ -487,13 +495,16 @@ const FormsitePage: React.FC = () => {
                   </ScrollArea>
                 </TabsContent>
 
-                <TabsContent value="ai-content" className="flex-grow data-[state=active]:flex flex-col mt-0">
+                <TabsContent
+                  value="ai-content"
+                  className="flex-grow data-[state=active]:flex flex-col mt-0"
+                >
                   <ScrollArea className="flex-grow pr-2">
                     {selectedSubmission.processed && selectedSubmission.aiProcessedContent ? (
-                      <div 
+                      <div
                         className="prose prose-invert max-w-none"
-                        dangerouslySetInnerHTML={{ 
-                          __html: selectedSubmission.aiProcessedContent 
+                        dangerouslySetInnerHTML={{
+                          __html: selectedSubmission.aiProcessedContent,
                         }}
                       />
                     ) : (
@@ -502,7 +513,7 @@ const FormsitePage: React.FC = () => {
                           This submission has not been processed with GPT-4o yet
                         </p>
                         <Button
-                          onClick={() => handleProcessSubmission(selectedSubmission.id, 'gpt')}
+                          onClick={() => handleProcessSubmission(selectedSubmission.id, "gpt")}
                           disabled={processSubmissionMutation.isPending}
                           variant="default"
                           className="bg-blue-600 hover:bg-blue-700"
@@ -522,13 +533,16 @@ const FormsitePage: React.FC = () => {
                   </ScrollArea>
                 </TabsContent>
 
-                <TabsContent value="claude-content" className="flex-grow data-[state=active]:flex flex-col mt-0">
+                <TabsContent
+                  value="claude-content"
+                  className="flex-grow data-[state=active]:flex flex-col mt-0"
+                >
                   <ScrollArea className="flex-grow pr-2">
                     {selectedSubmission.processed && selectedSubmission.claudeContent ? (
-                      <div 
+                      <div
                         className="prose prose-invert max-w-none"
-                        dangerouslySetInnerHTML={{ 
-                          __html: selectedSubmission.claudeContent 
+                        dangerouslySetInnerHTML={{
+                          __html: selectedSubmission.claudeContent,
                         }}
                       />
                     ) : (
@@ -537,7 +551,7 @@ const FormsitePage: React.FC = () => {
                           This submission has not been processed with Claude 3.7 Sonnet yet
                         </p>
                         <Button
-                          onClick={() => handleProcessSubmission(selectedSubmission.id, 'claude')}
+                          onClick={() => handleProcessSubmission(selectedSubmission.id, "claude")}
                           disabled={processSubmissionMutation.isPending}
                           variant="default"
                           className="bg-blue-600 hover:bg-blue-700"

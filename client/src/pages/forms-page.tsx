@@ -1,24 +1,37 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Edit, FileText, Save, X, ChevronDown, ChevronUp } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
-import { 
-  Dialog, 
-  DialogTrigger, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -68,7 +81,7 @@ function FormBuilder() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [editingTemplate, setEditingTemplate] = useState<number | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  
+
   // Predefined form categories
   const formCategories = [
     "General",
@@ -78,22 +91,23 @@ function FormBuilder() {
     "Assessment",
     "Follow-up",
     "Consent",
-    "Vaccination"
+    "Vaccination",
   ];
-  
+
   // Fetch form templates
   const { data: formTemplates = [], isLoading: isLoadingTemplates } = useQuery({
     queryKey: ["/api/forms/templates", selectedCategory],
     queryFn: async () => {
-      const url = selectedCategory && selectedCategory !== "all" 
-        ? `/api/forms/templates?category=${selectedCategory}`
-        : "/api/forms/templates";
+      const url =
+        selectedCategory && selectedCategory !== "all"
+          ? `/api/forms/templates?category=${selectedCategory}`
+          : "/api/forms/templates";
       const res = await fetch(url);
       if (!res.ok) throw new Error("Failed to fetch templates");
       return res.json();
     },
   });
-  
+
   // Create form template mutation
   const createTemplateMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -117,7 +131,7 @@ function FormBuilder() {
       });
     },
   });
-  
+
   // Update form template mutation
   const updateTemplateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: any }) => {
@@ -141,7 +155,7 @@ function FormBuilder() {
       });
     },
   });
-  
+
   // Delete form template mutation
   const deleteTemplateMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -162,7 +176,7 @@ function FormBuilder() {
       });
     },
   });
-  
+
   // Reset form state
   const resetFormState = () => {
     setFormName("");
@@ -172,7 +186,7 @@ function FormBuilder() {
     setQuestions([]);
     setEditingTemplate(null);
   };
-  
+
   // Add a question to the form
   const addQuestion = (type: QuestionType) => {
     const newQuestion: Question = {
@@ -181,29 +195,27 @@ function FormBuilder() {
       label: `New ${type} question`,
       required: false,
     };
-    
+
     if (type === "select" || type === "radio" || type === "checkbox") {
       newQuestion.options = [
         { value: "option1", label: "Option 1" },
         { value: "option2", label: "Option 2" },
       ];
     }
-    
+
     setQuestions([...questions, newQuestion]);
   };
-  
+
   // Update a question's properties
   const updateQuestion = (id: string, updates: Partial<Question>) => {
-    setQuestions(
-      questions.map((q) => (q.id === id ? { ...q, ...updates } : q))
-    );
+    setQuestions(questions.map((q) => (q.id === id ? { ...q, ...updates } : q)));
   };
-  
+
   // Remove a question
   const removeQuestion = (id: string) => {
     setQuestions(questions.filter((q) => q.id !== id));
   };
-  
+
   // Move question up in the order
   const moveQuestionUp = (index: number) => {
     if (index === 0) return;
@@ -211,7 +223,7 @@ function FormBuilder() {
     [newQuestions[index], newQuestions[index - 1]] = [newQuestions[index - 1], newQuestions[index]];
     setQuestions(newQuestions);
   };
-  
+
   // Move question down in the order
   const moveQuestionDown = (index: number) => {
     if (index === questions.length - 1) return;
@@ -219,7 +231,7 @@ function FormBuilder() {
     [newQuestions[index], newQuestions[index + 1]] = [newQuestions[index + 1], newQuestions[index]];
     setQuestions(newQuestions);
   };
-  
+
   // Handle form submission
   const handleSubmit = () => {
     if (!formName) {
@@ -230,7 +242,7 @@ function FormBuilder() {
       });
       return;
     }
-    
+
     if (questions.length === 0) {
       toast({
         title: "Error",
@@ -239,7 +251,7 @@ function FormBuilder() {
       });
       return;
     }
-    
+
     const templateData = {
       name: formName,
       description: formDescription,
@@ -247,7 +259,7 @@ function FormBuilder() {
       isPublic,
       questions,
     };
-    
+
     if (editingTemplate) {
       updateTemplateMutation.mutate({
         id: editingTemplate,
@@ -257,7 +269,7 @@ function FormBuilder() {
       createTemplateMutation.mutate(templateData);
     }
   };
-  
+
   // Edit an existing template
   const handleEditTemplate = (template: FormTemplate) => {
     setFormName(template.name);
@@ -273,7 +285,8 @@ function FormBuilder() {
     <div className="container mx-auto py-6">
       <h1 className="text-3xl font-bold mb-6">Form Builder</h1>
       <p className="text-gray-500 mb-6">
-        Create custom forms for your patients instead of using external Formsite forms. These forms can be sent to patients and the responses will be saved directly in your system.
+        Create custom forms for your patients instead of using external Formsite forms. These forms
+        can be sent to patients and the responses will be saved directly in your system.
       </p>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -287,22 +300,29 @@ function FormBuilder() {
         <TabsContent value="template-list" className="space-y-6">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-4">
-              <Select value={selectedCategory || ""} onValueChange={(value) => setSelectedCategory(value || null)}>
+              <Select
+                value={selectedCategory || ""}
+                onValueChange={(value) => setSelectedCategory(value || null)}
+              >
                 <SelectTrigger className="w-[200px]">
                   <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
                   {formCategories.map((category) => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={() => {
-              resetFormState();
-              setActiveTab("create-template");
-            }}>
+            <Button
+              onClick={() => {
+                resetFormState();
+                setActiveTab("create-template");
+              }}
+            >
               <Plus className="mr-2 h-4 w-4" /> Create New Form
             </Button>
           </div>
@@ -331,12 +351,21 @@ function FormBuilder() {
                   </CardHeader>
                   <CardContent className="pb-3">
                     <div className="text-sm text-gray-500">
-                      <p>{template.questions.length} question{template.questions.length !== 1 ? "s" : ""}</p>
-                      <p className="text-xs mt-1">Created: {new Date(template.createdAt).toLocaleDateString()}</p>
+                      <p>
+                        {template.questions.length} question
+                        {template.questions.length !== 1 ? "s" : ""}
+                      </p>
+                      <p className="text-xs mt-1">
+                        Created: {new Date(template.createdAt).toLocaleDateString()}
+                      </p>
                     </div>
                   </CardContent>
                   <CardFooter className="flex justify-between pt-0">
-                    <Button variant="outline" size="sm" onClick={() => handleEditTemplate(template)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleEditTemplate(template)}
+                    >
                       <Edit className="h-4 w-4 mr-1" /> Edit
                     </Button>
                     <Dialog>
@@ -349,15 +378,16 @@ function FormBuilder() {
                         <DialogHeader>
                           <DialogTitle>Delete Form Template</DialogTitle>
                           <DialogDescription>
-                            Are you sure you want to delete "{template.name}"? This action cannot be undone.
+                            Are you sure you want to delete "{template.name}"? This action cannot be
+                            undone.
                           </DialogDescription>
                         </DialogHeader>
                         <DialogFooter>
                           <DialogClose asChild>
                             <Button variant="outline">Cancel</Button>
                           </DialogClose>
-                          <Button 
-                            variant="destructive" 
+                          <Button
+                            variant="destructive"
                             onClick={() => deleteTemplateMutation.mutate(template.id)}
                             disabled={deleteTemplateMutation.isPending}
                           >
@@ -376,7 +406,9 @@ function FormBuilder() {
         <TabsContent value="create-template">
           <Card>
             <CardHeader>
-              <CardTitle>{editingTemplate ? "Edit Form Template" : "Create Form Template"}</CardTitle>
+              <CardTitle>
+                {editingTemplate ? "Edit Form Template" : "Create Form Template"}
+              </CardTitle>
               <CardDescription>
                 Design your custom form with various question types.
               </CardDescription>
@@ -415,18 +447,16 @@ function FormBuilder() {
                       </SelectTrigger>
                       <SelectContent>
                         {formCategories.map((category) => (
-                          <SelectItem key={category} value={category}>{category}</SelectItem>
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="flex items-end">
                     <div className="flex items-center space-x-2 mt-6">
-                      <Switch
-                        id="isPublic"
-                        checked={isPublic}
-                        onCheckedChange={setIsPublic}
-                      />
+                      <Switch id="isPublic" checked={isPublic} onCheckedChange={setIsPublic} />
                       <Label htmlFor="isPublic">Make this template available to all users</Label>
                     </div>
                   </div>
@@ -437,7 +467,7 @@ function FormBuilder() {
 
               <div>
                 <h3 className="text-lg font-medium mb-4">Questions</h3>
-                
+
                 <div className="space-y-6">
                   {questions.map((question, index) => (
                     <Card key={question.id} className="relative">
@@ -448,17 +478,17 @@ function FormBuilder() {
                             {question.required && <Badge>Required</Badge>}
                           </div>
                           <div className="flex gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               onClick={() => moveQuestionUp(index)}
                               disabled={index === 0}
                             >
                               <ChevronUp className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               onClick={() => moveQuestionDown(index)}
                               disabled={index === questions.length - 1}
                             >
@@ -480,14 +510,14 @@ function FormBuilder() {
                           <Label>Question Text</Label>
                           <Input
                             value={question.label}
-                            onChange={(e) =>
-                              updateQuestion(question.id, { label: e.target.value })
-                            }
+                            onChange={(e) => updateQuestion(question.id, { label: e.target.value })}
                             className="mt-1"
                           />
                         </div>
 
-                        {(question.type === "text" || question.type === "textarea" || question.type === "number") && (
+                        {(question.type === "text" ||
+                          question.type === "textarea" ||
+                          question.type === "number") && (
                           <div>
                             <Label>Placeholder (optional)</Label>
                             <Input
@@ -500,7 +530,9 @@ function FormBuilder() {
                           </div>
                         )}
 
-                        {(question.type === "select" || question.type === "radio" || question.type === "checkbox") && (
+                        {(question.type === "select" ||
+                          question.type === "radio" ||
+                          question.type === "checkbox") && (
                           <div>
                             <Label className="flex justify-between">
                               <span>Options</span>
@@ -598,13 +630,19 @@ function FormBuilder() {
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={() => {
-                resetFormState();
-                setActiveTab("template-list");
-              }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resetFormState();
+                  setActiveTab("template-list");
+                }}
+              >
                 Cancel
               </Button>
-              <Button onClick={handleSubmit} disabled={createTemplateMutation.isPending || updateTemplateMutation.isPending}>
+              <Button
+                onClick={handleSubmit}
+                disabled={createTemplateMutation.isPending || updateTemplateMutation.isPending}
+              >
                 <Save className="h-4 w-4 mr-2" />
                 {editingTemplate ? "Update Form" : "Save Form"}
               </Button>
@@ -620,7 +658,7 @@ function FormBuilder() {
 function FormAccessibility() {
   const { toast } = useToast();
   const [selectedForms, setSelectedForms] = useState<Record<number, boolean>>({});
-  
+
   // Fetch all form templates
   const { data: formTemplates = [], isLoading } = useQuery({
     queryKey: ["/api/forms/templates/all"],
@@ -630,7 +668,7 @@ function FormAccessibility() {
       return res.json();
     },
   });
-  
+
   // Initialize selected forms when data is loaded
   useEffect(() => {
     const initialSelectedForms: Record<number, boolean> = {};
@@ -639,7 +677,7 @@ function FormAccessibility() {
     });
     setSelectedForms(initialSelectedForms);
   }, [formTemplates]);
-  
+
   // Update form accessibility mutation
   const updateFormAccessibilityMutation = useMutation({
     mutationFn: async ({ id, isPublic }: { id: number; isPublic: boolean }) => {
@@ -661,29 +699,30 @@ function FormAccessibility() {
       });
     },
   });
-  
+
   // Handle form toggle
   const handleFormToggle = (id: number, isPublic: boolean) => {
-    setSelectedForms(prev => ({ ...prev, [id]: isPublic }));
+    setSelectedForms((prev) => ({ ...prev, [id]: isPublic }));
     updateFormAccessibilityMutation.mutate({ id, isPublic });
   };
-  
+
   // Generate sharable URL for a form
   const getFormUrl = (formId: number) => {
     const baseUrl = window.location.origin;
     return `${baseUrl}/form/${formId}`;
   };
-  
+
   // State for the currently viewed form
   const [viewingForm, setViewingForm] = useState<FormTemplate | null>(null);
-  
+
   return (
     <div className="container mx-auto py-6">
       <h1 className="text-3xl font-bold mb-6">Form Accessibility</h1>
       <p className="text-gray-500 mb-6">
-        Manage which forms are accessible to patients and view their URLs. Toggle forms on to make them available to patients.
+        Manage which forms are accessible to patients and view their URLs. Toggle forms on to make
+        them available to patients.
       </p>
-      
+
       {isLoading ? (
         <div className="text-center py-8">Loading forms...</div>
       ) : formTemplates.length === 0 ? (
@@ -702,18 +741,25 @@ function FormAccessibility() {
             <CardContent>
               <div className="space-y-4">
                 {formTemplates.map((template: FormTemplate) => (
-                  <div key={template.id} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                  <div
+                    key={template.id}
+                    className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                  >
                     <div className="flex justify-between items-start">
                       <div className="space-y-2">
                         <div className="flex items-center space-x-2">
-                          <h3 className="font-medium cursor-pointer hover:text-blue-600" onClick={() => setViewingForm(template)}>
+                          <h3
+                            className="font-medium cursor-pointer hover:text-blue-600"
+                            onClick={() => setViewingForm(template)}
+                          >
                             {template.name}
                           </h3>
                           <Badge variant="outline">{template.category}</Badge>
                         </div>
                         <p className="text-sm text-gray-500">{template.description}</p>
                         <div className="text-xs text-gray-400">
-                          {template.questions.length} question{template.questions.length !== 1 ? "s" : ""}
+                          {template.questions.length} question
+                          {template.questions.length !== 1 ? "s" : ""}
                         </div>
                         <div className="pt-2">
                           <div className="flex items-center space-x-2">
@@ -763,16 +809,14 @@ function FormAccessibility() {
               </div>
             </CardContent>
           </Card>
-          
+
           {/* Form viewer dialog */}
           {viewingForm && (
             <Dialog open={!!viewingForm} onOpenChange={(open) => !open && setViewingForm(null)}>
               <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>{viewingForm.name}</DialogTitle>
-                  <DialogDescription>
-                    {viewingForm.description}
-                  </DialogDescription>
+                  <DialogDescription>{viewingForm.description}</DialogDescription>
                 </DialogHeader>
                 <div className="space-y-6 py-4">
                   <div className="flex items-center justify-between">
@@ -789,17 +833,13 @@ function FormAccessibility() {
                       </Label>
                     </div>
                   </div>
-                  
+
                   <Separator />
-                  
+
                   <div>
                     <h3 className="text-lg font-medium mb-4">Form URL</h3>
                     <div className="flex items-center space-x-2">
-                      <Input
-                        value={getFormUrl(viewingForm.id)}
-                        readOnly
-                        className="flex-1"
-                      />
+                      <Input value={getFormUrl(viewingForm.id)} readOnly className="flex-1" />
                       <Button
                         onClick={() => {
                           navigator.clipboard.writeText(getFormUrl(viewingForm.id));
@@ -813,9 +853,9 @@ function FormAccessibility() {
                       </Button>
                     </div>
                   </div>
-                  
+
                   <Separator />
-                  
+
                   <div>
                     <h3 className="text-lg font-medium mb-4">Questions Preview</h3>
                     <div className="space-y-4">
@@ -824,60 +864,80 @@ function FormAccessibility() {
                           <CardHeader className="pb-2">
                             <div className="flex justify-between">
                               <CardTitle className="text-base">
-                                {index + 1}. {question.label} {question.required && <span className="text-red-500">*</span>}
+                                {index + 1}. {question.label}{" "}
+                                {question.required && <span className="text-red-500">*</span>}
                               </CardTitle>
                               <Badge>{question.type}</Badge>
                             </div>
                           </CardHeader>
                           <CardContent>
                             {/* Preview of question content based on type */}
-                            {(question.type === 'text' || question.type === 'textarea') && (
-                              <Input disabled placeholder={question.placeholder || `Enter ${question.type === 'text' ? 'text' : 'long text'} here...`} />
+                            {(question.type === "text" || question.type === "textarea") && (
+                              <Input
+                                disabled
+                                placeholder={
+                                  question.placeholder ||
+                                  `Enter ${question.type === "text" ? "text" : "long text"} here...`
+                                }
+                              />
                             )}
-                            
-                            {question.type === 'select' && question.options && (
+
+                            {question.type === "select" && question.options && (
                               <Select disabled>
                                 <SelectTrigger>
                                   <SelectValue placeholder="Select an option" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                  {question.options.map(option => (
-                                    <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                                  {question.options.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
                                   ))}
                                 </SelectContent>
                               </Select>
                             )}
-                            
-                            {question.type === 'radio' && question.options && (
+
+                            {question.type === "radio" && question.options && (
                               <div className="space-y-2">
-                                {question.options.map(option => (
+                                {question.options.map((option) => (
                                   <div key={option.value} className="flex items-center space-x-2">
-                                    <input type="radio" id={`${question.id}-${option.value}`} name={question.id} disabled />
-                                    <Label htmlFor={`${question.id}-${option.value}`}>{option.label}</Label>
+                                    <input
+                                      type="radio"
+                                      id={`${question.id}-${option.value}`}
+                                      name={question.id}
+                                      disabled
+                                    />
+                                    <Label htmlFor={`${question.id}-${option.value}`}>
+                                      {option.label}
+                                    </Label>
                                   </div>
                                 ))}
                               </div>
                             )}
-                            
-                            {question.type === 'checkbox' && question.options && (
+
+                            {question.type === "checkbox" && question.options && (
                               <div className="space-y-2">
-                                {question.options.map(option => (
+                                {question.options.map((option) => (
                                   <div key={option.value} className="flex items-center space-x-2">
-                                    <input type="checkbox" id={`${question.id}-${option.value}`} disabled />
-                                    <Label htmlFor={`${question.id}-${option.value}`}>{option.label}</Label>
+                                    <input
+                                      type="checkbox"
+                                      id={`${question.id}-${option.value}`}
+                                      disabled
+                                    />
+                                    <Label htmlFor={`${question.id}-${option.value}`}>
+                                      {option.label}
+                                    </Label>
                                   </div>
                                 ))}
                               </div>
                             )}
-                            
-                            {question.type === 'date' && (
-                              <Input type="date" disabled />
-                            )}
-                            
-                            {question.type === 'number' && (
+
+                            {question.type === "date" && <Input type="date" disabled />}
+
+                            {question.type === "number" && (
                               <Input type="number" disabled placeholder="Enter a number..." />
                             )}
-                            
+
                             {question.description && (
                               <p className="text-xs text-gray-500 mt-2">{question.description}</p>
                             )}
@@ -901,7 +961,7 @@ function FormAccessibility() {
 
 export default function FormsPage() {
   const [activeTab, setActiveTab] = useState("builder");
-  
+
   return (
     <AppLayoutSpruce>
       <div className="container mx-auto py-6">
@@ -910,11 +970,11 @@ export default function FormsPage() {
             <TabsTrigger value="builder">Form Builder</TabsTrigger>
             <TabsTrigger value="accessibility">Form Accessibility</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="builder">
             <FormBuilder />
           </TabsContent>
-          
+
           <TabsContent value="accessibility">
             <FormAccessibility />
           </TabsContent>

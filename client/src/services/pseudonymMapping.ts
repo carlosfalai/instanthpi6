@@ -1,4 +1,4 @@
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest } from "@/lib/queryClient";
 
 /**
  * Service for managing mappings between patient pseudonyms and their chat conversations
@@ -18,10 +18,10 @@ export const pseudonymMappingService = {
    */
   async getPseudonymLinks(): Promise<PseudonymLink[]> {
     try {
-      const response = await apiRequest('GET', '/api/pseudonym-links');
+      const response = await apiRequest("GET", "/api/pseudonym-links");
       return await response.json();
     } catch (error) {
-      console.error('Error fetching pseudonym links:', error);
+      console.error("Error fetching pseudonym links:", error);
       return [];
     }
   },
@@ -31,7 +31,10 @@ export const pseudonymMappingService = {
    */
   async findLinksByPseudonym(pseudonym: string): Promise<PseudonymLink[]> {
     try {
-      const response = await apiRequest('GET', `/api/pseudonym-links/by-pseudonym/${encodeURIComponent(pseudonym)}`);
+      const response = await apiRequest(
+        "GET",
+        `/api/pseudonym-links/by-pseudonym/${encodeURIComponent(pseudonym)}`
+      );
       return await response.json();
     } catch (error) {
       console.error(`Error finding links for pseudonym ${pseudonym}:`, error);
@@ -44,7 +47,7 @@ export const pseudonymMappingService = {
    */
   async findLinksByPatientId(patientId: number): Promise<PseudonymLink[]> {
     try {
-      const response = await apiRequest('GET', `/api/pseudonym-links/by-patient/${patientId}`);
+      const response = await apiRequest("GET", `/api/pseudonym-links/by-patient/${patientId}`);
       return await response.json();
     } catch (error) {
       console.error(`Error finding links for patient ${patientId}:`, error);
@@ -55,22 +58,24 @@ export const pseudonymMappingService = {
   /**
    * Creates a new pseudonym-patient link
    */
-  async createPseudonymLink(link: Omit<PseudonymLink, 'timestamp' | 'id'> & { id?: number }): Promise<PseudonymLink> {
+  async createPseudonymLink(
+    link: Omit<PseudonymLink, "timestamp" | "id"> & { id?: number }
+  ): Promise<PseudonymLink> {
     try {
-      const response = await apiRequest('POST', '/api/pseudonym-links', link);
+      const response = await apiRequest("POST", "/api/pseudonym-links", link);
       return await response.json();
     } catch (error) {
-      console.error('Error creating pseudonym link:', error);
+      console.error("Error creating pseudonym link:", error);
       throw error;
     }
   },
-  
+
   /**
    * Deletes a pseudonym-patient link
    */
   async deletePseudonymLink(id: number): Promise<void> {
     try {
-      await apiRequest('DELETE', `/api/pseudonym-links/${id}`);
+      await apiRequest("DELETE", `/api/pseudonym-links/${id}`);
     } catch (error) {
       console.error(`Error deleting pseudonym link with ID ${id}:`, error);
       throw error;
@@ -87,7 +92,7 @@ export const pseudonymMappingService = {
     const patterns = [
       // Pattern: 3 digits followed by words (e.g., "847 Ancient Meadows")
       /\b(\d{2,4}\s+[A-Z][a-z]+\s+[A-Z][a-z]+)\b/g,
-      
+
       // Pattern: Number + adjective + noun
       /\b(\d+\s+[A-Z][a-z]+\s+[A-Z][a-z]+s?)\b/g,
     ];
@@ -101,7 +106,7 @@ export const pseudonymMappingService = {
     }
 
     return null;
-  }
+  },
 };
 
 export default pseudonymMappingService;

@@ -1,5 +1,5 @@
 // server/spruce-health-client.ts
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 interface SpruceHealthConfig {
   bearerToken: string;
@@ -36,7 +36,7 @@ interface Message {
   sender_id: string;
   sender_name: string;
   content: string;
-  message_type: 'text' | 'image' | 'file';
+  message_type: "text" | "image" | "file";
   sent_at: string;
   read: boolean;
 }
@@ -69,20 +69,20 @@ class SpruceHealthClient {
 
   constructor(config: SpruceHealthConfig) {
     this.config = {
-      baseUrl: 'https://api.sprucehealth.com/v1',
+      baseUrl: "https://api.sprucehealth.com/v1",
       maxRetries: 3,
       retryDelay: 1000,
-      ...config
+      ...config,
     };
 
     this.client = axios.create({
       baseURL: this.config.baseUrl,
       headers: {
-        'Authorization': `Bearer ${this.config.bearerToken}`,
-        'Content-Type': 'application/json',
-        'User-Agent': 'SpruceHealthClient/1.0'
+        Authorization: `Bearer ${this.config.bearerToken}`,
+        "Content-Type": "application/json",
+        "User-Agent": "SpruceHealthClient/1.0",
       },
-      timeout: 30000
+      timeout: 30000,
     });
 
     this.setupInterceptors();
@@ -106,16 +106,16 @@ class SpruceHealthClient {
       },
       async (error) => {
         if (error.response?.status === 429) {
-          const retryAfter = parseInt(error.response.headers['retry-after'] || '60');
+          const retryAfter = parseInt(error.response.headers["retry-after"] || "60");
           console.warn(`Rate limit exceeded. Retrying after ${retryAfter} seconds.`);
           await this.sleep(retryAfter * 1000);
           return this.client.request(error.config);
         }
-        
+
         if (error.response?.status >= 500 && this.shouldRetry(error.config)) {
           return this.retryRequest(error.config);
         }
-        
+
         return Promise.reject(this.formatError(error));
       }
     );
@@ -130,9 +130,9 @@ class SpruceHealthClient {
   }
 
   private updateRateLimitInfo(response: AxiosResponse): void {
-    const remaining = response.headers['x-ratelimit-remaining'];
-    const reset = response.headers['x-ratelimit-reset'];
-    
+    const remaining = response.headers["x-ratelimit-remaining"];
+    const reset = response.headers["x-ratelimit-reset"];
+
     if (remaining) this.rateLimitRemaining = parseInt(remaining);
     if (reset) this.rateLimitReset = new Date(parseInt(reset) * 1000);
   }
@@ -142,22 +142,26 @@ class SpruceHealthClient {
     return retryCount < (this.config.maxRetries || 3);
   }
 
-  private async retryRequest(config: AxiosRequestConfig & { __retryCount?: number }): Promise<AxiosResponse> {
+  private async retryRequest(
+    config: AxiosRequestConfig & { __retryCount?: number }
+  ): Promise<AxiosResponse> {
     config.__retryCount = (config.__retryCount || 0) + 1;
     const delay = this.config.retryDelay! * Math.pow(2, config.__retryCount - 1);
-    
+
     await this.sleep(delay);
     return this.client.request(config);
   }
 
   private sleep(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private formatError(error: any): Error {
     if (error.response) {
       const { status, data } = error.response;
-      return new Error(`Spruce API Error (${status}): ${data?.message || data?.error || 'Unknown error'}`);
+      return new Error(
+        `Spruce API Error (${status}): ${data?.message || data?.error || "Unknown error"}`
+      );
     }
     return new Error(`Network Error: ${error.message}`);
   }
@@ -175,16 +179,16 @@ class SpruceHealthClient {
   }): Promise<ConversationListResponse> {
     try {
       const defaultParams = {
-        orderBy: 'lastMessageAt',
-        orderDirection: 'desc',
+        orderBy: "lastMessageAt",
+        orderDirection: "desc",
         perPage: 20,
         page: 1,
-        ...params
+        ...params,
       };
-      const response = await this.client.get('/conversations', { params: defaultParams });
+      const response = await this.client.get("/conversations", { params: defaultParams });
       return response.data;
     } catch (error) {
-      console.error('Error fetching conversations:', error);
+      console.error("Error fetching conversations:", error);
       throw error;
     }
   }
@@ -205,58 +209,66 @@ class SpruceHealthClient {
   /**
    * Get messages from a specific conversation
    */
-  async getMessages(conversationId: string, params?: {
-    page?: number;
-    per_page?: number;
-    since?: string;
-  }): Promise<MessageListResponse> {
+  async getMessages(
+    conversationId: string,
+    params?: {
+      page?: number;
+      per_page?: number;
+      since?: string;
+    }
+  ): Promise<MessageListResponse> {
     try {
       console.log(`Fetching messages for conversation ${conversationId} from Spruce API`);
-      
+
       // Try different message endpoints based on Spruce API structure
       let response: any;
       let finalMessages: any[] = [];
-      
+
       try {
         // Try the messages endpoint with proper parameters
         response = await this.client.get(`/conversations/${conversationId}/messages`, {
           params: {
             page: params?.page || 1,
             per_page: params?.per_page || 50,
-            include: 'all'
-          }
+            include: "all",
+          },
         });
         console.log(`Messages endpoint response:`, JSON.stringify(response.data, null, 2));
         finalMessages = response.data.messages || response.data.data || [];
       } catch (messagesError: any) {
-        console.log(`Direct messages endpoint failed (${messagesError.response?.status}): ${messagesError.message}`);
-        
+        console.log(
+          `Direct messages endpoint failed (${messagesError.response?.status}): ${messagesError.message}`
+        );
+
         try {
           // Try alternative messages endpoint
           response = await this.client.get(`/messages`, {
             params: {
               conversation_id: conversationId,
               page: params?.page || 1,
-              per_page: params?.per_page || 50
-            }
+              per_page: params?.per_page || 50,
+            },
           });
-          console.log(`Alternative messages endpoint response:`, JSON.stringify(response.data, null, 2));
+          console.log(
+            `Alternative messages endpoint response:`,
+            JSON.stringify(response.data, null, 2)
+          );
           finalMessages = response.data.messages || response.data.data || [];
         } catch (altError: any) {
           console.log(`Alternative messages endpoint failed: ${altError.message}`);
-          
+
           // Get conversation details for context
           const convResponse = await this.client.get(`/conversations/${conversationId}`);
           console.log(`Conversation details:`, JSON.stringify(convResponse.data, null, 2));
-          
+
           // Extract any embedded messages
           const conversation = convResponse.data.conversation || convResponse.data;
           finalMessages = conversation.messages || conversation.recent_messages || [];
         }
       }
-      
+
       console.log(`Found ${finalMessages.length} messages for conversation ${conversationId}`);
-      
+
       return {
         messages: finalMessages.map((msg: any) => ({
           id: msg.id || `msg_${Date.now()}`,
@@ -265,28 +277,28 @@ class SpruceHealthClient {
           sent_at: msg.sent_at || msg.created_at || msg.timestamp || new Date().toISOString(),
           sender_id: msg.sender_id || msg.from || msg.sender || "unknown",
           sender_name: msg.sender_name || msg.from_name || msg.display_name || "Unknown",
-          message_type: msg.message_type || msg.type || 'text',
-          read: msg.read !== undefined ? msg.read : true
+          message_type: msg.message_type || msg.type || "text",
+          read: msg.read !== undefined ? msg.read : true,
         })),
         pagination: {
           page: params?.page || 1,
           per_page: params?.per_page || 50,
           total: finalMessages.length,
-          total_pages: Math.ceil(finalMessages.length / (params?.per_page || 50))
-        }
+          total_pages: Math.ceil(finalMessages.length / (params?.per_page || 50)),
+        },
       };
     } catch (error) {
       console.error(`Error fetching messages for conversation ${conversationId}:`, error);
-      console.error('Error response:', error.response?.data);
-      
+      console.error("Error response:", error.response?.data);
+
       return {
         messages: [],
         pagination: {
           page: params?.page || 1,
           per_page: params?.per_page || 50,
           total: 0,
-          total_pages: 0
-        }
+          total_pages: 0,
+        },
       };
     }
   }
@@ -294,45 +306,57 @@ class SpruceHealthClient {
   /**
    * Send a message to a conversation
    */
-  async sendMessage(conversationId: string, content: string, messageType: 'text' | 'image' | 'file' = 'text'): Promise<Message> {
+  async sendMessage(
+    conversationId: string,
+    content: string,
+    messageType: "text" | "image" | "file" = "text"
+  ): Promise<Message> {
     try {
       // Try different message sending formats based on Spruce Health API documentation
       const messagePayload = {
         body: content,
-        type: messageType
+        type: messageType,
       };
-      
-      console.log(`Sending message to conversation ${conversationId}:`, JSON.stringify(messagePayload));
-      
+
+      console.log(
+        `Sending message to conversation ${conversationId}:`,
+        JSON.stringify(messagePayload)
+      );
+
       // Try direct POST to conversations endpoint
       let response;
       try {
-        response = await this.client.post(`/conversations/${conversationId}/messages`, messagePayload);
-        console.log('Message sent successfully via conversations endpoint');
+        response = await this.client.post(
+          `/conversations/${conversationId}/messages`,
+          messagePayload
+        );
+        console.log("Message sent successfully via conversations endpoint");
       } catch (directError: any) {
-        console.log(`Direct conversations endpoint failed (${directError.response?.status}): ${directError.message}`);
-        console.log('Error details:', directError.response?.data);
-        
+        console.log(
+          `Direct conversations endpoint failed (${directError.response?.status}): ${directError.message}`
+        );
+        console.log("Error details:", directError.response?.data);
+
         // Try alternative sending format
         const altPayload = {
           content: content,
           message_type: messageType,
-          conversation_id: conversationId
+          conversation_id: conversationId,
         };
-        
+
         try {
           response = await this.client.post(`/messages`, altPayload);
-          console.log('Message sent successfully via messages endpoint');
+          console.log("Message sent successfully via messages endpoint");
         } catch (altError: any) {
           console.log(`Alternative messages endpoint failed: ${altError.message}`);
           throw altError;
         }
       }
-      
+
       return response.data;
     } catch (error: any) {
       console.error(`Error sending message to conversation ${conversationId}:`, error);
-      console.error('Final error response:', error.response?.data);
+      console.error("Final error response:", error.response?.data);
       throw error;
     }
   }
@@ -340,16 +364,19 @@ class SpruceHealthClient {
   /**
    * Create a webhook subscription
    */
-  async createWebhook(url: string, events: string[] = ['message.created', 'conversation.created', 'conversation.updated']): Promise<any> {
+  async createWebhook(
+    url: string,
+    events: string[] = ["message.created", "conversation.created", "conversation.updated"]
+  ): Promise<any> {
     try {
-      const response = await this.client.post('/webhooks', {
+      const response = await this.client.post("/webhooks", {
         url,
         events,
-        active: true
+        active: true,
       });
       return response.data;
     } catch (error) {
-      console.error('Error creating webhook:', error);
+      console.error("Error creating webhook:", error);
       throw error;
     }
   }
@@ -359,10 +386,10 @@ class SpruceHealthClient {
    */
   async listWebhooks(): Promise<any> {
     try {
-      const response = await this.client.get('/webhooks');
+      const response = await this.client.get("/webhooks");
       return response.data;
     } catch (error) {
-      console.error('Error listing webhooks:', error);
+      console.error("Error listing webhooks:", error);
       throw error;
     }
   }
@@ -385,7 +412,7 @@ class SpruceHealthClient {
   async markMessagesAsRead(conversationId: string, messageIds: string[]): Promise<void> {
     try {
       await this.client.patch(`/conversations/${conversationId}/messages/read`, {
-        message_ids: messageIds
+        message_ids: messageIds,
       });
     } catch (error) {
       console.error(`Error marking messages as read in conversation ${conversationId}:`, error);
@@ -396,7 +423,9 @@ class SpruceHealthClient {
   /**
    * Get all conversations with their latest messages (convenience method)
    */
-  async getConversationsWithLatestMessages(): Promise<(Conversation & { latest_message?: Message })[]> {
+  async getConversationsWithLatestMessages(): Promise<
+    (Conversation & { latest_message?: Message })[]
+  > {
     try {
       const conversationsResponse = await this.getConversations();
       const conversationsWithMessages = await Promise.all(
@@ -405,7 +434,7 @@ class SpruceHealthClient {
             const messagesResponse = await this.getMessages(conversation.id, { per_page: 1 });
             return {
               ...conversation,
-              latest_message: messagesResponse.messages[0] || undefined
+              latest_message: messagesResponse.messages[0] || undefined,
             };
           } catch (error) {
             console.warn(`Could not fetch messages for conversation ${conversation.id}:`, error);
@@ -413,10 +442,10 @@ class SpruceHealthClient {
           }
         })
       );
-      
+
       return conversationsWithMessages;
     } catch (error) {
-      console.error('Error fetching conversations with latest messages:', error);
+      console.error("Error fetching conversations with latest messages:", error);
       throw error;
     }
   }
@@ -427,14 +456,15 @@ class SpruceHealthClient {
   async searchConversations(query: string): Promise<Conversation[]> {
     try {
       const allConversations = await this.getConversations();
-      return allConversations.conversations.filter(conversation =>
-        conversation.participants.some(participant =>
-          participant.name.toLowerCase().includes(query.toLowerCase()) ||
-          participant.email?.toLowerCase().includes(query.toLowerCase())
+      return allConversations.conversations.filter((conversation) =>
+        conversation.participants.some(
+          (participant) =>
+            participant.name.toLowerCase().includes(query.toLowerCase()) ||
+            participant.email?.toLowerCase().includes(query.toLowerCase())
         )
       );
     } catch (error) {
-      console.error('Error searching conversations:', error);
+      console.error("Error searching conversations:", error);
       throw error;
     }
   }
@@ -445,7 +475,7 @@ class SpruceHealthClient {
   getRateLimitStatus(): { remaining: number; resetTime: Date } {
     return {
       remaining: this.rateLimitRemaining,
-      resetTime: this.rateLimitReset
+      resetTime: this.rateLimitReset,
     };
   }
 }
@@ -457,5 +487,5 @@ export {
   Message,
   Participant,
   ConversationListResponse,
-  MessageListResponse
+  MessageListResponse,
 };

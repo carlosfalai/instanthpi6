@@ -1,23 +1,36 @@
-import React, { useState, useRef } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { SendHorizontal, Loader2, Sparkles, X, MessageSquare, FileText, Clipboard, ClipboardList, Mail, Languages, Copy, Wallet } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { apiRequest, queryClient } from '@/lib/queryClient';
-import { Badge } from '@/components/ui/badge';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import ConversationStatusBar from './ConversationStatusBar';
-import { useConversationStatus } from '@/hooks/use-conversation-status';
+import React, { useState, useRef } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import {
+  SendHorizontal,
+  Loader2,
+  Sparkles,
+  X,
+  MessageSquare,
+  FileText,
+  Clipboard,
+  ClipboardList,
+  Mail,
+  Languages,
+  Copy,
+  Wallet,
+} from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
+import { apiRequest, queryClient } from "@/lib/queryClient";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import ConversationStatusBar from "./ConversationStatusBar";
+import { useConversationStatus } from "@/hooks/use-conversation-status";
 
 interface AiAssistantPanelProps {
   patientId: number;
-  language: 'english' | 'french';
+  language: "english" | "french";
   onSendMessage: (content: string) => void;
 }
 
@@ -31,133 +44,176 @@ interface SuggestionItem {
 interface TreatmentItem {
   id: string;
   text: string;
-  category: 'medication' | 'imaging' | 'labs' | 'referral' | 'followup';
+  category: "medication" | "imaging" | "labs" | "referral" | "followup";
   isSelected: boolean;
 }
 
 interface ActionItem {
   id: string;
   text: string;
-  type: 'message_patient' | 'soap_note' | 'french_note';
+  type: "message_patient" | "soap_note" | "french_note";
   isSelected: boolean;
 }
 
-export default function AiAssistantPanel({ 
-  patientId, 
-  language, 
-  onSendMessage 
+export default function AiAssistantPanel({
+  patientId,
+  language,
+  onSendMessage,
 }: AiAssistantPanelProps) {
   const { toast } = useToast();
-  const [customPrompt, setCustomPrompt] = useState('');
+  const [customPrompt, setCustomPrompt] = useState("");
   const [selectedSuggestions, setSelectedSuggestions] = useState<Record<string, boolean>>({});
-  const [activeTab, setActiveTab] = useState<'suggestions' | 'plan' | 'custom'>('plan');
-  const [previewContent, setPreviewContent] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<"suggestions" | "plan" | "custom">("plan");
+  const [previewContent, setPreviewContent] = useState<string>("");
   const [selectedBillingCodes, setSelectedBillingCodes] = useState<Record<string, boolean>>({
     telemed: false,
-    translation: false
+    translation: false,
   });
-  const [customBillingCode, setCustomBillingCode] = useState<string>('');
-  
+  const [customBillingCode, setCustomBillingCode] = useState<string>("");
+
   // Query for patient data
-  const { 
-    data: patient
-  } = useQuery<any>({
+  const { data: patient } = useQuery<any>({
     queryKey: [`/api/patients/${patientId}`],
     enabled: !!patientId,
   });
-  
+
   // Query for patient messages
-  const {
-    data: messages = [],
-  } = useQuery<any[]>({
+  const { data: messages = [] } = useQuery<any[]>({
     queryKey: [`/api/patients/${patientId}/messages`],
     enabled: !!patientId,
   });
-  
+
   // Analyze conversation status
   const { status, statusDetail } = useConversationStatus(messages, patient);
-  
+
   // Treatment plan items with checkboxes
   const [treatmentItems, setTreatmentItems] = useState<TreatmentItem[]>([
-    { id: 'med1', text: 'Trial NSAID (e.g., ibuprofen) ± acetaminophen', category: 'medication', isSelected: false },
-    { id: 'med2', text: 'Consider muscle relaxant if spasms present', category: 'medication', isSelected: false },
-    { id: 'med3', text: 'Topical analgesic cream/patch to affected area', category: 'medication', isSelected: false },
-    { id: 'img1', text: 'Lumbar MRI with and without IV contrast', category: 'imaging', isSelected: false },
-    { id: 'img2', text: 'X-ray of affected area to rule out structural issues', category: 'imaging', isSelected: false },
-    { id: 'lab1', text: 'CBC, ESR, CRP to evaluate for infection/inflammation', category: 'labs', isSelected: false },
-    { id: 'lab2', text: 'Basic metabolic panel', category: 'labs', isSelected: false },
-    { id: 'ref1', text: 'Physical therapy referral', category: 'referral', isSelected: false },
-    { id: 'ref2', text: 'Pain management specialist consultation', category: 'referral', isSelected: false },
-    { id: 'fup1', text: 'Follow up in 2 weeks to reassess symptoms', category: 'followup', isSelected: false },
+    {
+      id: "med1",
+      text: "Trial NSAID (e.g., ibuprofen) ± acetaminophen",
+      category: "medication",
+      isSelected: false,
+    },
+    {
+      id: "med2",
+      text: "Consider muscle relaxant if spasms present",
+      category: "medication",
+      isSelected: false,
+    },
+    {
+      id: "med3",
+      text: "Topical analgesic cream/patch to affected area",
+      category: "medication",
+      isSelected: false,
+    },
+    {
+      id: "img1",
+      text: "Lumbar MRI with and without IV contrast",
+      category: "imaging",
+      isSelected: false,
+    },
+    {
+      id: "img2",
+      text: "X-ray of affected area to rule out structural issues",
+      category: "imaging",
+      isSelected: false,
+    },
+    {
+      id: "lab1",
+      text: "CBC, ESR, CRP to evaluate for infection/inflammation",
+      category: "labs",
+      isSelected: false,
+    },
+    { id: "lab2", text: "Basic metabolic panel", category: "labs", isSelected: false },
+    { id: "ref1", text: "Physical therapy referral", category: "referral", isSelected: false },
+    {
+      id: "ref2",
+      text: "Pain management specialist consultation",
+      category: "referral",
+      isSelected: false,
+    },
+    {
+      id: "fup1",
+      text: "Follow up in 2 weeks to reassess symptoms",
+      category: "followup",
+      isSelected: false,
+    },
   ]);
-  
+
   // Action items with checkboxes
   const [actionItems, setActionItems] = useState<ActionItem[]>([
-    { id: 'action1', text: 'Prepare message for patient', type: 'message_patient', isSelected: false },
-    { id: 'action2', text: 'Prepare SOAP note', type: 'soap_note', isSelected: false },
-    { id: 'action3', text: 'Prepare super spartan note in French', type: 'french_note', isSelected: false },
+    {
+      id: "action1",
+      text: "Prepare message for patient",
+      type: "message_patient",
+      isSelected: false,
+    },
+    { id: "action2", text: "Prepare SOAP note", type: "soap_note", isSelected: false },
+    {
+      id: "action3",
+      text: "Prepare super spartan note in French",
+      type: "french_note",
+      isSelected: false,
+    },
   ]);
-  
+
   // Query for AI suggestions
-  const { 
-    data: suggestions = [], 
-    isLoading: suggestionsLoading 
-  } = useQuery<SuggestionItem[]>({
-    queryKey: ['/api/ai/suggestions', patientId, language],
+  const { data: suggestions = [], isLoading: suggestionsLoading } = useQuery<SuggestionItem[]>({
+    queryKey: ["/api/ai/suggestions", patientId, language],
     enabled: !!patientId,
   });
-  
+
   // Group suggestions by type
-  const followUpSuggestions = suggestions.filter(s => s.type === 'followup');
-  const responseSuggestions = suggestions.filter(s => s.type === 'response');
-  const planSuggestions = suggestions.filter(s => s.type === 'plan');
-  
+  const followUpSuggestions = suggestions.filter((s) => s.type === "followup");
+  const responseSuggestions = suggestions.filter((s) => s.type === "response");
+  const planSuggestions = suggestions.filter((s) => s.type === "plan");
+
   // Generate custom prompt mutation
   const generateMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest('POST', '/api/ai/generate', {
+      const res = await apiRequest("POST", "/api/ai/generate", {
         prompt: customPrompt,
         patientId,
         patientLanguage: language,
-        maxLength: 5
+        maxLength: 5,
       });
       return await res.json();
     },
     onSuccess: (data) => {
       if (data?.text) {
         onSendMessage(data.text);
-        setCustomPrompt('');
+        setCustomPrompt("");
       }
     },
   });
-  
+
   // Send selected suggestions
   const sendSelectedSuggestions = () => {
-    const selectedItems = suggestions.filter(s => selectedSuggestions[s.id]);
+    const selectedItems = suggestions.filter((s) => selectedSuggestions[s.id]);
     if (selectedItems.length === 0) return;
-    
+
     // Combine selected items into a single message
-    let message = '';
-    
-    const planItems = selectedItems.filter(s => s.type === 'plan');
+    let message = "";
+
+    const planItems = selectedItems.filter((s) => s.type === "plan");
     if (planItems.length > 0) {
-      const planHeader = language === 'french' ? 'Plan:' : 'Plan:';
+      const planHeader = language === "french" ? "Plan:" : "Plan:";
       message += `${planHeader}\n`;
-      planItems.forEach(item => {
+      planItems.forEach((item) => {
         message += `• ${item.text}\n`;
       });
-      message += '\n';
+      message += "\n";
     }
-    
-    const followUpItems = selectedItems.filter(s => s.type === 'followup');
+
+    const followUpItems = selectedItems.filter((s) => s.type === "followup");
     if (followUpItems.length > 0) {
-      const followUpHeader = language === 'french' ? 'Questions de suivi:' : 'Follow-up questions:';
+      const followUpHeader = language === "french" ? "Questions de suivi:" : "Follow-up questions:";
       message += `${followUpHeader}\n`;
-      followUpItems.forEach(item => {
+      followUpItems.forEach((item) => {
         message += `• ${item.text}\n`;
       });
     }
-    
+
     // Send the combined message
     if (message) {
       onSendMessage(message.trim());
@@ -165,25 +221,29 @@ export default function AiAssistantPanel({
       setSelectedSuggestions({});
     }
   };
-  
+
   // Toggle suggestion selection
   const toggleSuggestion = (id: string) => {
-    setSelectedSuggestions(prev => ({
+    setSelectedSuggestions((prev) => ({
       ...prev,
-      [id]: !prev[id]
+      [id]: !prev[id],
     }));
   };
-  
+
   return (
     <div className="flex flex-col h-full bg-[#121212] text-white">
       {/* Conversation Status Bar - Fixed at the top, always visible */}
-      <ConversationStatusBar 
-        status={status} 
-        statusDetail={statusDetail} 
-        patientName={patient?.name || 'Patient'}
+      <ConversationStatusBar
+        status={status}
+        statusDetail={statusDetail}
+        patientName={patient?.name || "Patient"}
       />
-      
-      <Tabs defaultValue="suggestions" className="h-full flex flex-col" onValueChange={(value) => setActiveTab(value as any)}>
+
+      <Tabs
+        defaultValue="suggestions"
+        className="h-full flex flex-col"
+        onValueChange={(value) => setActiveTab(value as any)}
+      >
         <div className="p-3 bg-[#1e1e1e] border-b border-gray-800">
           <h2 className="font-semibold mb-3">AI Assistant</h2>
           <TabsList className="w-full bg-[#262626]">
@@ -201,7 +261,7 @@ export default function AiAssistantPanel({
             </TabsTrigger>
           </TabsList>
         </div>
-        
+
         <TabsContent value="suggestions" className="flex-1 flex flex-col p-0 m-0 overflow-hidden">
           <ScrollArea className="flex-1 p-4 overflow-auto">
             {suggestionsLoading ? (
@@ -213,11 +273,11 @@ export default function AiAssistantPanel({
                 {followUpSuggestions.length > 0 && (
                   <div className="mb-6">
                     <h3 className="text-sm font-medium text-gray-400 mb-2">
-                      {language === 'french' ? 'Questions de suivi' : 'Follow-up Questions'}
+                      {language === "french" ? "Questions de suivi" : "Follow-up Questions"}
                     </h3>
                     <div className="space-y-2">
                       {followUpSuggestions.map((suggestion) => (
-                        <div 
+                        <div
                           key={suggestion.id}
                           className="flex items-start p-2 rounded bg-[#1e1e1e] hover:bg-[#262626]"
                         >
@@ -232,15 +292,15 @@ export default function AiAssistantPanel({
                     </div>
                   </div>
                 )}
-                
+
                 {planSuggestions.length > 0 && (
                   <div className="mb-6">
                     <h3 className="text-sm font-medium text-gray-400 mb-2">
-                      {language === 'french' ? 'Plan' : 'Plan'}
+                      {language === "french" ? "Plan" : "Plan"}
                     </h3>
                     <div className="space-y-2">
                       {planSuggestions.map((suggestion) => (
-                        <div 
+                        <div
                           key={suggestion.id}
                           className="flex items-start p-2 rounded bg-[#1e1e1e] hover:bg-[#262626]"
                         >
@@ -255,15 +315,15 @@ export default function AiAssistantPanel({
                     </div>
                   </div>
                 )}
-                
+
                 {responseSuggestions.length > 0 && (
                   <div>
                     <h3 className="text-sm font-medium text-gray-400 mb-2">
-                      {language === 'french' ? 'Réponses proposées' : 'Suggested Responses'}
+                      {language === "french" ? "Réponses proposées" : "Suggested Responses"}
                     </h3>
                     <div className="space-y-2">
                       {responseSuggestions.map((suggestion) => (
-                        <div 
+                        <div
                           key={suggestion.id}
                           className="p-2 rounded bg-[#1e1e1e] hover:bg-[#262626]"
                         >
@@ -279,7 +339,7 @@ export default function AiAssistantPanel({
                     </div>
                   </div>
                 )}
-                
+
                 {suggestions.length === 0 && (
                   <div className="text-gray-500 text-center">
                     No suggestions available for this patient yet
@@ -288,9 +348,9 @@ export default function AiAssistantPanel({
               </>
             )}
           </ScrollArea>
-          
+
           {/* Send button for selected suggestions */}
-          {Object.values(selectedSuggestions).some(v => v) && (
+          {Object.values(selectedSuggestions).some((v) => v) && (
             <div className="p-3 bg-[#1e1e1e] border-t border-gray-800 flex justify-between items-center">
               <Button
                 variant="outline"
@@ -300,18 +360,14 @@ export default function AiAssistantPanel({
               >
                 <X className="h-3 w-3 mr-1" /> Clear Selection
               </Button>
-              
-              <Button
-                onClick={sendSelectedSuggestions}
-                size="sm"
-                className="text-xs"
-              >
+
+              <Button onClick={sendSelectedSuggestions} size="sm" className="text-xs">
                 <SendHorizontal className="h-3 w-3 mr-1" /> Send Selected
               </Button>
             </div>
           )}
         </TabsContent>
-        
+
         <TabsContent value="plan" className="flex-1 flex flex-col p-0 m-0 overflow-hidden">
           <ScrollArea className="flex-1 p-4 overflow-auto">
             {/* Current Complaint Box */}
@@ -325,16 +381,22 @@ export default function AiAssistantPanel({
                 </CardHeader>
                 <CardContent className="pt-3">
                   <div className="text-sm text-white">
-                    <p>{'Just to verify this with you beforehand, you are a [Age]-year-old [Gender] experiencing [Description] located in the [Location] that began on [Symptom] [Onset].'}</p>
-                    <Button 
-                      variant="ghost" 
+                    <p>
+                      {
+                        "Just to verify this with you beforehand, you are a [Age]-year-old [Gender] experiencing [Description] located in the [Location] that began on [Symptom] [Onset]."
+                      }
+                    </p>
+                    <Button
+                      variant="ghost"
                       className="text-xs text-blue-400 p-1 h-auto mt-2"
                       onClick={() => {
-                        const confirmationText = "Here's a summary of what we discussed for confirmation: [HPI Confirmation]";
+                        const confirmationText =
+                          "Here's a summary of what we discussed for confirmation: [HPI Confirmation]";
                         onSendMessage(confirmationText);
-                        setPreviewContent(prevContent => prevContent + 
-                          (prevContent ? '\n\n' : '') + 
-                          '📋 HPI Confirmation Added');
+                        setPreviewContent(
+                          (prevContent) =>
+                            prevContent + (prevContent ? "\n\n" : "") + "📋 HPI Confirmation Added"
+                        );
                       }}
                     >
                       <Clipboard className="h-3 w-3 mr-1" />
@@ -360,28 +422,32 @@ export default function AiAssistantPanel({
                       <h4 className="font-medium text-gray-400 mb-1">Medications</h4>
                       <div className="space-y-1.5">
                         {treatmentItems
-                          .filter(item => item.category === 'medication')
+                          .filter((item) => item.category === "medication")
                           .map((item) => (
                             <div key={item.id} className="flex items-center">
-                              <Checkbox 
+                              <Checkbox
                                 id={item.id}
                                 checked={item.isSelected}
                                 onCheckedChange={(checked) => {
-                                  setTreatmentItems(prev => 
-                                    prev.map(i => i.id === item.id ? {...i, isSelected: !!checked} : i)
+                                  setTreatmentItems((prev) =>
+                                    prev.map((i) =>
+                                      i.id === item.id ? { ...i, isSelected: !!checked } : i
+                                    )
                                   );
                                 }}
                                 className="mr-2"
                               />
-                              <Label htmlFor={item.id} className="text-sm font-normal cursor-pointer">
+                              <Label
+                                htmlFor={item.id}
+                                className="text-sm font-normal cursor-pointer"
+                              >
                                 {item.text}
                               </Label>
                             </div>
-                          ))
-                        }
+                          ))}
                       </div>
                     </div>
-                    
+
                     {/* Billing Section */}
                     <div className="mb-3 p-2 border border-blue-800/50 rounded-md bg-blue-900/20">
                       <h4 className="font-medium text-blue-400 mb-1 flex items-center">
@@ -390,37 +456,50 @@ export default function AiAssistantPanel({
                       </h4>
                       <div className="space-y-1.5">
                         <div className="flex items-center">
-                          <Checkbox 
+                          <Checkbox
                             id="billing-telemed"
                             checked={selectedBillingCodes.telemed}
-                            onCheckedChange={(checked) => setSelectedBillingCodes(prev => ({
-                              ...prev,
-                              telemed: !!checked
-                            }))}
+                            onCheckedChange={(checked) =>
+                              setSelectedBillingCodes((prev) => ({
+                                ...prev,
+                                telemed: !!checked,
+                              }))
+                            }
                             className="mr-2"
                           />
-                          <Label htmlFor="billing-telemed" className="text-sm font-normal cursor-pointer flex-1">
+                          <Label
+                            htmlFor="billing-telemed"
+                            className="text-sm font-normal cursor-pointer flex-1"
+                          >
                             Telemedicine consultation (15773#tt)
                           </Label>
                         </div>
-                        
+
                         <div className="flex items-center">
-                          <Checkbox 
+                          <Checkbox
                             id="billing-translation"
                             checked={selectedBillingCodes.translation}
-                            onCheckedChange={(checked) => setSelectedBillingCodes(prev => ({
-                              ...prev,
-                              translation: !!checked
-                            }))}
+                            onCheckedChange={(checked) =>
+                              setSelectedBillingCodes((prev) => ({
+                                ...prev,
+                                translation: !!checked,
+                              }))
+                            }
                             className="mr-2"
                           />
-                          <Label htmlFor="billing-translation" className="text-sm font-normal cursor-pointer flex-1">
+                          <Label
+                            htmlFor="billing-translation"
+                            className="text-sm font-normal cursor-pointer flex-1"
+                          >
                             Translation service for non-French/English speaking patient
                           </Label>
                         </div>
-                        
+
                         <div className="mt-2">
-                          <Label htmlFor="custom-billing-code" className="text-xs text-gray-400 mb-1 block">
+                          <Label
+                            htmlFor="custom-billing-code"
+                            className="text-xs text-gray-400 mb-1 block"
+                          >
                             Add custom billing code:
                           </Label>
                           <div className="flex gap-2">
@@ -435,104 +514,129 @@ export default function AiAssistantPanel({
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="mb-3">
                       <h4 className="font-medium text-gray-400 mb-1">Imaging</h4>
                       <div className="space-y-1.5">
                         {treatmentItems
-                          .filter(item => item.category === 'imaging')
+                          .filter((item) => item.category === "imaging")
                           .map((item) => (
                             <div key={item.id} className="flex items-center">
-                              <Checkbox 
+                              <Checkbox
                                 id={item.id}
                                 checked={item.isSelected}
                                 onCheckedChange={(checked) => {
-                                  setTreatmentItems(prev => 
-                                    prev.map(i => i.id === item.id ? {...i, isSelected: !!checked} : i)
+                                  setTreatmentItems((prev) =>
+                                    prev.map((i) =>
+                                      i.id === item.id ? { ...i, isSelected: !!checked } : i
+                                    )
                                   );
                                 }}
                                 className="mr-2"
                               />
-                              <Label htmlFor={item.id} className="text-sm font-normal cursor-pointer">
+                              <Label
+                                htmlFor={item.id}
+                                className="text-sm font-normal cursor-pointer"
+                              >
                                 {item.text}
                               </Label>
                             </div>
-                          ))
-                        }
+                          ))}
                       </div>
                     </div>
-                    
+
                     <div className="mb-3">
                       <h4 className="font-medium text-gray-400 mb-1">Labs</h4>
                       <div className="space-y-1.5">
                         {treatmentItems
-                          .filter(item => item.category === 'labs')
+                          .filter((item) => item.category === "labs")
                           .map((item) => (
                             <div key={item.id} className="flex items-center">
-                              <Checkbox 
+                              <Checkbox
                                 id={item.id}
                                 checked={item.isSelected}
                                 onCheckedChange={(checked) => {
-                                  setTreatmentItems(prev => 
-                                    prev.map(i => i.id === item.id ? {...i, isSelected: !!checked} : i)
+                                  setTreatmentItems((prev) =>
+                                    prev.map((i) =>
+                                      i.id === item.id ? { ...i, isSelected: !!checked } : i
+                                    )
                                   );
                                 }}
                                 className="mr-2"
                               />
-                              <Label htmlFor={item.id} className="text-sm font-normal cursor-pointer">
+                              <Label
+                                htmlFor={item.id}
+                                className="text-sm font-normal cursor-pointer"
+                              >
                                 {item.text}
                               </Label>
                             </div>
-                          ))
-                        }
+                          ))}
                       </div>
                     </div>
-                    
+
                     <div className="mb-3">
                       <h4 className="font-medium text-gray-400 mb-1">Referrals & Follow-up</h4>
                       <div className="space-y-1.5">
                         {treatmentItems
-                          .filter(item => item.category === 'referral' || item.category === 'followup')
+                          .filter(
+                            (item) => item.category === "referral" || item.category === "followup"
+                          )
                           .map((item) => (
                             <div key={item.id} className="flex items-center">
-                              <Checkbox 
+                              <Checkbox
                                 id={item.id}
                                 checked={item.isSelected}
                                 onCheckedChange={(checked) => {
-                                  setTreatmentItems(prev => 
-                                    prev.map(i => i.id === item.id ? {...i, isSelected: !!checked} : i)
+                                  setTreatmentItems((prev) =>
+                                    prev.map((i) =>
+                                      i.id === item.id ? { ...i, isSelected: !!checked } : i
+                                    )
                                   );
                                 }}
                                 className="mr-2"
                               />
-                              <Label htmlFor={item.id} className="text-sm font-normal cursor-pointer">
+                              <Label
+                                htmlFor={item.id}
+                                className="text-sm font-normal cursor-pointer"
+                              >
                                 {item.text}
                               </Label>
                             </div>
-                          ))
-                        }
+                          ))}
                       </div>
                     </div>
-                    
+
                     <div className="mt-4 pt-3 border-t border-gray-800">
                       <h4 className="font-medium text-gray-400 mb-2">Actions</h4>
                       <div className="space-y-2">
                         {actionItems.map((item) => (
                           <div key={item.id} className="flex items-center">
-                            <Checkbox 
+                            <Checkbox
                               id={item.id}
                               checked={item.isSelected}
                               onCheckedChange={(checked) => {
-                                setActionItems(prev => 
-                                  prev.map(i => i.id === item.id ? {...i, isSelected: !!checked} : i)
+                                setActionItems((prev) =>
+                                  prev.map((i) =>
+                                    i.id === item.id ? { ...i, isSelected: !!checked } : i
+                                  )
                                 );
                               }}
                               className="mr-2"
                             />
-                            <Label htmlFor={item.id} className="text-sm font-normal cursor-pointer flex items-center">
-                              {item.type === 'message_patient' && <Mail className="h-3.5 w-3.5 mr-1.5 text-blue-400" />}
-                              {item.type === 'soap_note' && <FileText className="h-3.5 w-3.5 mr-1.5 text-green-400" />}
-                              {item.type === 'french_note' && <Languages className="h-3.5 w-3.5 mr-1.5 text-purple-400" />}
+                            <Label
+                              htmlFor={item.id}
+                              className="text-sm font-normal cursor-pointer flex items-center"
+                            >
+                              {item.type === "message_patient" && (
+                                <Mail className="h-3.5 w-3.5 mr-1.5 text-blue-400" />
+                              )}
+                              {item.type === "soap_note" && (
+                                <FileText className="h-3.5 w-3.5 mr-1.5 text-green-400" />
+                              )}
+                              {item.type === "french_note" && (
+                                <Languages className="h-3.5 w-3.5 mr-1.5 text-purple-400" />
+                              )}
                               {item.text}
                             </Label>
                           </div>
@@ -546,9 +650,13 @@ export default function AiAssistantPanel({
                     variant="outline"
                     size="sm"
                     onClick={() => {
-                      setTreatmentItems(prev => prev.map(item => ({...item, isSelected: false})));
-                      setActionItems(prev => prev.map(item => ({...item, isSelected: false})));
-                      setPreviewContent('');
+                      setTreatmentItems((prev) =>
+                        prev.map((item) => ({ ...item, isSelected: false }))
+                      );
+                      setActionItems((prev) =>
+                        prev.map((item) => ({ ...item, isSelected: false }))
+                      );
+                      setPreviewContent("");
                     }}
                     className="text-xs"
                   >
@@ -559,115 +667,133 @@ export default function AiAssistantPanel({
                     className="text-xs"
                     onClick={() => {
                       // Create treatment plan from selected items
-                      const selectedTreatments = treatmentItems.filter(item => item.isSelected);
-                      
+                      const selectedTreatments = treatmentItems.filter((item) => item.isSelected);
+
                       if (selectedTreatments.length === 0) {
                         toast({
                           title: "No treatments selected",
                           description: "Please select at least one treatment item",
-                          variant: "destructive"
+                          variant: "destructive",
                         });
                         return;
                       }
-                      
+
                       // Categorize selected treatments
-                      const medItems = selectedTreatments.filter(item => item.category === 'medication');
-                      const imgItems = selectedTreatments.filter(item => item.category === 'imaging');
-                      const labItems = selectedTreatments.filter(item => item.category === 'labs');
-                      const refItems = selectedTreatments.filter(item => item.category === 'referral');
-                      const fupItems = selectedTreatments.filter(item => item.category === 'followup');
-                      
+                      const medItems = selectedTreatments.filter(
+                        (item) => item.category === "medication"
+                      );
+                      const imgItems = selectedTreatments.filter(
+                        (item) => item.category === "imaging"
+                      );
+                      const labItems = selectedTreatments.filter(
+                        (item) => item.category === "labs"
+                      );
+                      const refItems = selectedTreatments.filter(
+                        (item) => item.category === "referral"
+                      );
+                      const fupItems = selectedTreatments.filter(
+                        (item) => item.category === "followup"
+                      );
+
                       // Generate preview content
                       let preview = "🩺 Treatment Plan:\n";
-                      
+
                       if (medItems.length > 0) {
                         preview += "\nMedications:\n";
-                        medItems.forEach(item => preview += `- ${item.text}\n`);
+                        medItems.forEach((item) => (preview += `- ${item.text}\n`));
                       }
-                      
+
                       if (imgItems.length > 0) {
                         preview += "\nImaging:\n";
-                        imgItems.forEach(item => preview += `- ${item.text}\n`);
+                        imgItems.forEach((item) => (preview += `- ${item.text}\n`));
                       }
-                      
+
                       if (labItems.length > 0) {
                         preview += "\nLabs:\n";
-                        labItems.forEach(item => preview += `- ${item.text}\n`);
+                        labItems.forEach((item) => (preview += `- ${item.text}\n`));
                       }
-                      
+
                       if (refItems.length > 0) {
                         preview += "\nReferrals:\n";
-                        refItems.forEach(item => preview += `- ${item.text}\n`);
+                        refItems.forEach((item) => (preview += `- ${item.text}\n`));
                       }
-                      
+
                       if (fupItems.length > 0) {
                         preview += "\nFollow-up:\n";
-                        fupItems.forEach(item => preview += `- ${item.text}\n`);
+                        fupItems.forEach((item) => (preview += `- ${item.text}\n`));
                       }
-                      
+
                       // Add billing codes if selected
-                      const hasBillingCodes = selectedBillingCodes.telemed || 
-                                            selectedBillingCodes.translation || 
-                                            customBillingCode.trim().length > 0;
-                      
+                      const hasBillingCodes =
+                        selectedBillingCodes.telemed ||
+                        selectedBillingCodes.translation ||
+                        customBillingCode.trim().length > 0;
+
                       if (hasBillingCodes) {
                         preview += "\n💼 Billing:\n";
                         if (selectedBillingCodes.telemed) {
                           preview += "- Telemedicine consultation (15773#tt)\n";
                         }
                         if (selectedBillingCodes.translation) {
-                          preview += "- Translation services for non-French/English speaking patient\n";
+                          preview +=
+                            "- Translation services for non-French/English speaking patient\n";
                         }
                         if (customBillingCode.trim().length > 0) {
                           preview += `- ${customBillingCode.trim()}\n`;
                         }
-                        
+
                         // Record the timestamp for billing purposes
                         const timestamp = new Date().toLocaleTimeString();
                         preview += `- Service time: ${timestamp}\n`;
-                        
+
                         // Send billing information to billing system
                         if (patient) {
                           try {
                             const billingCodes = [];
                             if (selectedBillingCodes.telemed) billingCodes.push("15773#tt");
                             if (selectedBillingCodes.translation) billingCodes.push("translation");
-                            if (customBillingCode.trim()) billingCodes.push(customBillingCode.trim());
-                            
+                            if (customBillingCode.trim())
+                              billingCodes.push(customBillingCode.trim());
+
                             // Make API call to create billing entry
-                            apiRequest('POST', '/api/billing/entries', {
+                            apiRequest("POST", "/api/billing/entries", {
                               patientId: patient.id,
                               patientName: patient.name,
                               patientDOB: patient.dob,
-                              encounterType: 'message',
-                              description: 'Telemedicine consultation',
+                              encounterType: "message",
+                              description: "Telemedicine consultation",
                               suggestedCodes: billingCodes,
                               serviceTime: timestamp,
                               date: new Date().toISOString(),
-                              status: 'pending'
-                            }).then(() => {
-                              toast({
-                                title: "Billing entry created",
-                                description: "A new billing entry has been added to the AI Billing Assistant"
+                              status: "pending",
+                            })
+                              .then(() => {
+                                toast({
+                                  title: "Billing entry created",
+                                  description:
+                                    "A new billing entry has been added to the AI Billing Assistant",
+                                });
+                                // Invalidate the billing entries query
+                                queryClient.invalidateQueries({
+                                  queryKey: ["/api/billing/entries"],
+                                });
+                              })
+                              .catch((error) => {
+                                console.error("Failed to create billing entry:", error);
                               });
-                              // Invalidate the billing entries query
-                              queryClient.invalidateQueries({ queryKey: ['/api/billing/entries'] });
-                            }).catch(error => {
-                              console.error("Failed to create billing entry:", error);
-                            });
                           } catch (error) {
                             console.error("Failed to create billing entry:", error);
                           }
                         }
                       }
-                      
+
                       // Add action items
-                      const selectedActions = actionItems.filter(item => item.isSelected);
+                      const selectedActions = actionItems.filter((item) => item.isSelected);
                       if (selectedActions.length > 0) {
                         preview += "\n📋 Selected Actions:\n";
-                        selectedActions.forEach(item => preview += `- ${item.text}\n`);
+                        selectedActions.forEach((item) => (preview += `- ${item.text}\n`));
                       }
-                      
+
                       setPreviewContent(preview);
                     }}
                   >
@@ -688,9 +814,7 @@ export default function AiAssistantPanel({
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-3">
-                    <div className="text-sm text-white whitespace-pre-wrap">
-                      {previewContent}
-                    </div>
+                    <div className="text-sm text-white whitespace-pre-wrap">{previewContent}</div>
                   </CardContent>
                   <CardFooter className="flex justify-between bg-[#181818] border-t border-gray-800 pt-3 pb-3">
                     <Button
@@ -713,10 +837,12 @@ export default function AiAssistantPanel({
                       className="text-xs"
                       onClick={() => {
                         // Send to patient
-                        const messageText = actionItems.find(item => item.type === 'message_patient' && item.isSelected)
+                        const messageText = actionItems.find(
+                          (item) => item.type === "message_patient" && item.isSelected
+                        )
                           ? previewContent
                           : "Treatment plan: " + previewContent;
-                        
+
                         onSendMessage(messageText);
                         toast({
                           title: "Message sent",
@@ -742,19 +868,31 @@ export default function AiAssistantPanel({
                 </CardHeader>
                 <CardContent className="pt-3">
                   <div className="text-sm text-white">
-                    <p><strong>S:</strong> {'[Age] [Gender] with [Description] at [Location] since [Symptom] [Onset]; [Severity] [0-10]/10'}</p>
-                    <p><strong>A:</strong> {'Suspect [Chief] [Complaint]; ddx includes musculoskeletal cause...'}</p>
-                    <p><strong>P:</strong> {'In-person eval, imaging if needed, NSAIDs if tolerated...'}</p>
+                    <p>
+                      <strong>S:</strong>{" "}
+                      {
+                        "[Age] [Gender] with [Description] at [Location] since [Symptom] [Onset]; [Severity] [0-10]/10"
+                      }
+                    </p>
+                    <p>
+                      <strong>A:</strong>{" "}
+                      {"Suspect [Chief] [Complaint]; ddx includes musculoskeletal cause..."}
+                    </p>
+                    <p>
+                      <strong>P:</strong>{" "}
+                      {"In-person eval, imaging if needed, NSAIDs if tolerated..."}
+                    </p>
                     <div className="flex justify-between mt-2">
-                      <Button 
+                      <Button
                         variant="outline"
                         size="sm"
                         className="text-xs"
                         onClick={() => {
-                          const soapContent = "S: [Age] [Gender] with [Description] at [Location] since [Symptom] [Onset]; [Severity] [0-10]/10\n" +
+                          const soapContent =
+                            "S: [Age] [Gender] with [Description] at [Location] since [Symptom] [Onset]; [Severity] [0-10]/10\n" +
                             "A: Suspect [Chief] [Complaint]; ddx includes musculoskeletal cause...\n" +
                             "P: In-person eval, imaging if needed, NSAIDs if tolerated...";
-                          
+
                           navigator.clipboard.writeText(soapContent);
                           toast({
                             title: "SOAP note copied",
@@ -765,15 +903,16 @@ export default function AiAssistantPanel({
                         <Copy className="h-3 w-3 mr-1" />
                         Copy
                       </Button>
-                      <Button 
-                        variant="ghost" 
+                      <Button
+                        variant="ghost"
                         className="text-xs text-blue-400"
                         onClick={() => {
                           const noteText = "Here's my SOAP note assessment: [SOAP Note]";
                           onSendMessage(noteText);
-                          setPreviewContent(prevContent => prevContent + 
-                            (prevContent ? '\n\n' : '') + 
-                            '📋 SOAP Note Added');
+                          setPreviewContent(
+                            (prevContent) =>
+                              prevContent + (prevContent ? "\n\n" : "") + "📋 SOAP Note Added"
+                          );
                         }}
                       >
                         <Clipboard className="h-3 w-3 mr-1" />
@@ -801,15 +940,19 @@ export default function AiAssistantPanel({
                       <li>Have you noticed numbness, tingling, or weakness in either leg?</li>
                       <li>Do coughing, sneezing, or straining worsen the pain?</li>
                     </ul>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       className="text-xs text-blue-400 p-1 h-auto mt-2"
                       onClick={() => {
-                        const followUpText = "Some important follow-up questions: [Follow-up Questions]";
+                        const followUpText =
+                          "Some important follow-up questions: [Follow-up Questions]";
                         onSendMessage(followUpText);
-                        setPreviewContent(prevContent => prevContent + 
-                          (prevContent ? '\n\n' : '') + 
-                          '📋 Follow-up Questions Added');
+                        setPreviewContent(
+                          (prevContent) =>
+                            prevContent +
+                            (prevContent ? "\n\n" : "") +
+                            "📋 Follow-up Questions Added"
+                        );
                       }}
                     >
                       <Clipboard className="h-3 w-3 mr-1" />
@@ -821,31 +964,33 @@ export default function AiAssistantPanel({
             </div>
           </ScrollArea>
         </TabsContent>
-        
+
         <TabsContent value="custom" className="flex-1 flex flex-col p-0 m-0">
           <div className="flex-1 p-4">
             <p className="text-sm text-gray-400 mb-4">
-              {language === 'french' 
-                ? "Générer une réponse personnalisée ou une documentation à l'aide de l'IA" 
+              {language === "french"
+                ? "Générer une réponse personnalisée ou une documentation à l'aide de l'IA"
                 : "Generate a custom response or documentation using AI"}
             </p>
-            
+
             <Textarea
-              placeholder={language === 'french' 
-                ? "Entrez votre requête ici (par exemple 'créer une note SOAP pour cette consultation')" 
-                : "Enter your prompt here (e.g. 'create a SOAP note for this consultation')"}
+              placeholder={
+                language === "french"
+                  ? "Entrez votre requête ici (par exemple 'créer une note SOAP pour cette consultation')"
+                  : "Enter your prompt here (e.g. 'create a SOAP note for this consultation')"
+              }
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               className="min-h-[200px] bg-[#1e1e1e] border-gray-700 text-white"
             />
-            
+
             {generateMutation.error && (
               <p className="text-red-400 mt-2 text-sm">
                 Error generating response. Please try again.
               </p>
             )}
           </div>
-          
+
           <div className="p-3 bg-[#1e1e1e] border-t border-gray-800 flex justify-end">
             <Button
               onClick={() => generateMutation.mutate()}
@@ -856,7 +1001,7 @@ export default function AiAssistantPanel({
               ) : (
                 <Sparkles className="h-4 w-4 mr-1" />
               )}
-              {language === 'french' ? 'Générer' : 'Generate'}
+              {language === "french" ? "Générer" : "Generate"}
             </Button>
           </div>
         </TabsContent>

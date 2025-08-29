@@ -16,7 +16,7 @@
   },
   "key_features": [
     "Patient management system",
-    "Real-time messaging via Spruce Health API", 
+    "Real-time messaging via Spruce Health API",
     "AI-powered medical documentation",
     "Multi-language support (French/English)",
     "Document verification and management",
@@ -31,7 +31,7 @@
     "package.json": {
       "name": "rest-express",
       "version": "1.0.0",
-      "type": "module", 
+      "type": "module",
       "scripts": {
         "dev": "NODE_ENV=development tsx server/index.ts",
         "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
@@ -61,7 +61,7 @@
       "App.tsx": "Main React application with routing",
       "AppLayoutSpruce.tsx": "Main layout with muted styling and RetroGrid",
       "HomePage.tsx": "Dashboard with glowing boxes",
-      "PatientsPage.tsx": "Patient management interface", 
+      "PatientsPage.tsx": "Patient management interface",
       "InboxPage.tsx": "Real-time messaging interface",
       "DocumentsPage.tsx": "Document management system"
     },
@@ -74,7 +74,7 @@
     },
     "database_schema": {
       "users": "Authentication and user management",
-      "patients": "Patient records with language preferences", 
+      "patients": "Patient records with language preferences",
       "messages": "Real-time messaging system",
       "ai_documentation": "AI-generated medical notes",
       "pending_items": "Task management system",

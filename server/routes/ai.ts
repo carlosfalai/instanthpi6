@@ -1,83 +1,107 @@
-import { Router } from 'express';
-import { v4 as uuidv4 } from 'uuid';
-import { storage } from '../storage';
-import OpenAI from 'openai';
+import { Router } from "express";
+import { v4 as uuidv4 } from "uuid";
+import { storage } from "../storage";
+import OpenAI from "openai";
 
 // Initialize OpenAI client
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+// Spruce API configuration (for future use)
+const SPRUCE_ACCESS_ID = process.env.SPRUCE_ACCESS_ID;
+const SPRUCE_API_KEY = process.env.SPRUCE_API_KEY;
+
 export const router = Router();
 
 // Get AI suggestions for a patient
-router.get('/suggestions', async (req, res) => {
+router.get("/suggestions", async (req, res) => {
   try {
-    const { patientId, language = 'english' } = req.query;
-    
+    const { patientId, language = "english" } = req.query;
+
     if (!patientId) {
-      return res.status(400).json({ message: 'Patient ID is required' });
+      return res.status(400).json({ message: "Patient ID is required" });
     }
-    
+
     // This would normally fetch real suggestions from an AI model
     // based on patient data, conversation history, etc.
-    
+
     // For now, we'll return mock suggestions to test the UI
     const suggestions = [
       {
         id: uuidv4(),
-        text: language === 'french' ? 'Ressentez-vous toujours des douleurs abdominales?' : 'Are you still experiencing abdominal pain?',
-        type: 'followup'
+        text:
+          language === "french"
+            ? "Ressentez-vous toujours des douleurs abdominales?"
+            : "Are you still experiencing abdominal pain?",
+        type: "followup",
       },
       {
         id: uuidv4(),
-        text: language === 'french' ? 'Avez-vous pris les médicaments comme prescrit?' : 'Have you been taking the medication as prescribed?',
-        type: 'followup'
+        text:
+          language === "french"
+            ? "Avez-vous pris les médicaments comme prescrit?"
+            : "Have you been taking the medication as prescribed?",
+        type: "followup",
       },
       {
         id: uuidv4(),
-        text: language === 'french' ? 'Avez-vous remarqué d\'autres symptômes?' : 'Have you noticed any other symptoms?',
-        type: 'followup'
+        text:
+          language === "french"
+            ? "Avez-vous remarqué d'autres symptômes?"
+            : "Have you noticed any other symptoms?",
+        type: "followup",
       },
       {
         id: uuidv4(),
-        text: language === 'french' ? 'Continuer le traitement actuel pendant 7 jours' : 'Continue current treatment for 7 days',
-        type: 'plan'
+        text:
+          language === "french"
+            ? "Continuer le traitement actuel pendant 7 jours"
+            : "Continue current treatment for 7 days",
+        type: "plan",
       },
       {
         id: uuidv4(),
-        text: language === 'french' ? 'Programmer une visite de suivi dans 2 semaines' : 'Schedule follow-up visit in 2 weeks',
-        type: 'plan'
+        text:
+          language === "french"
+            ? "Programmer une visite de suivi dans 2 semaines"
+            : "Schedule follow-up visit in 2 weeks",
+        type: "plan",
       },
       {
         id: uuidv4(),
-        text: language === 'french' ? 'Bonjour, comment vous sentez-vous aujourd\'hui? Je suis disponible pour répondre à vos questions.' : 'Hello, how are you feeling today? I am available to answer any questions you may have.',
-        type: 'response'
+        text:
+          language === "french"
+            ? "Bonjour, comment vous sentez-vous aujourd'hui? Je suis disponible pour répondre à vos questions."
+            : "Hello, how are you feeling today? I am available to answer any questions you may have.",
+        type: "response",
       },
       {
         id: uuidv4(),
-        text: language === 'french' ? 'Je vous recommande de vous reposer et de bien vous hydrater. Contactez-moi si les symptômes s\'aggravent.' : 'I recommend getting plenty of rest and staying hydrated. Please contact me if your symptoms worsen.',
-        type: 'response'
-      }
+        text:
+          language === "french"
+            ? "Je vous recommande de vous reposer et de bien vous hydrater. Contactez-moi si les symptômes s'aggravent."
+            : "I recommend getting plenty of rest and staying hydrated. Please contact me if your symptoms worsen.",
+        type: "response",
+      },
     ];
-    
+
     res.json(suggestions);
   } catch (error) {
-    console.error('Error fetching AI suggestions:', error);
-    res.status(500).json({ message: 'Failed to fetch AI suggestions' });
+    console.error("Error fetching AI suggestions:", error);
+    res.status(500).json({ message: "Failed to fetch AI suggestions" });
   }
 });
 
 // Generate AI response
-router.post('/generate', async (req, res) => {
+router.post("/generate", async (req, res) => {
   try {
-    const { prompt, patientId, patientLanguage = 'english', maxLength = 5 } = req.body;
-    
+    const { prompt, patientId, patientLanguage = "english", maxLength = 5 } = req.body;
+
     if (!prompt) {
-      return res.status(400).json({ message: 'Missing prompt' });
+      return res.status(400).json({ message: "Missing prompt" });
     }
-    
+
     // Get patient information if patientId is provided
     let patient = null;
     if (patientId) {
@@ -87,69 +111,68 @@ router.post('/generate', async (req, res) => {
         console.warn(`Could not fetch patient with ID ${patientId}:`, error);
       }
     }
-    
+
     // Determine language based on patient preference if not explicitly specified
-    const language = patientLanguage || (patient?.language || 'english');
-    
+    const language = patientLanguage || patient?.language || "english";
+
     // Create system prompt based on language
-    const systemMessage = language === 'french' 
-      ? `Vous êtes un assistant médical rédigeant des messages pour un médecin à ses patients. Répondez en français de manière professionnelle mais chaleureuse. Limitez votre réponse à ${maxLength} phrases maximum, dans un seul paragraphe. Utilisez un ton spartiate et direct. N'utilisez pas de formules de politesse excessives.`
-      : `You are a medical assistant crafting messages for a doctor to send to patients. Respond in English in a professional but warm manner. Limit your response to ${maxLength} sentences maximum, in a single paragraph. Use a spartan and direct tone. Do not use excessive politeness.`;
-    
+    const systemMessage =
+      language === "french"
+        ? `Vous êtes un assistant médical rédigeant des messages pour un médecin à ses patients. Répondez en français de manière professionnelle mais chaleureuse. Limitez votre réponse à ${maxLength} phrases maximum, dans un seul paragraphe. Utilisez un ton spartiate et direct. N'utilisez pas de formules de politesse excessives.`
+        : `You are a medical assistant crafting messages for a doctor to send to patients. Respond in English in a professional but warm manner. Limit your response to ${maxLength} sentences maximum, in a single paragraph. Use a spartan and direct tone. Do not use excessive politeness.`;
+
     // Use Anthropic if available (better multilingual abilities)
     if (process.env.ANTHROPIC_API_KEY) {
       try {
         // Import Anthropic SDK dynamically
-        const Anthropic = require('@anthropic-ai/sdk');
+        const Anthropic = require("@anthropic-ai/sdk");
         const anthropic = new Anthropic({
           apiKey: process.env.ANTHROPIC_API_KEY,
         });
-        
+
         // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
         const response = await anthropic.messages.create({
-          model: 'claude-3-7-sonnet-20250219',
+          model: "claude-3-7-sonnet-20250219",
           system: systemMessage,
           max_tokens: 1024,
-          messages: [
-            { role: 'user', content: prompt }
-          ],
+          messages: [{ role: "user", content: prompt }],
         });
-        
+
         return res.json({ text: response.content[0].text.trim() });
       } catch (error) {
-        console.error('Error using Anthropic:', error);
+        console.error("Error using Anthropic:", error);
         // Fall back to OpenAI if Anthropic fails
       }
     }
-    
+
     // Use OpenAI as fallback
     if (process.env.OPENAI_API_KEY) {
       const response = await openai.chat.completions.create({
-        model: 'gpt-4o', // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
         messages: [
-          { role: 'system', content: systemMessage },
-          { role: 'user', content: prompt }
+          { role: "system", content: systemMessage },
+          { role: "user", content: prompt },
         ],
       });
-      
-      return res.json({ text: response.choices[0].message.content.trim() });
+
+      return res.json({ text: response.choices[0].message.content?.trim() || "" });
     }
-    
+
     // No API keys available, return error
-    return res.status(503).json({ message: 'AI services not configured' });
+    return res.status(503).json({ message: "AI services not configured" });
   } catch (error) {
-    console.error('Error generating AI response:', error);
-    res.status(500).json({ message: 'Failed to generate AI response' });
+    console.error("Error generating AI response:", error);
+    res.status(500).json({ message: "Failed to generate AI response" });
   }
 });
 
 // Generate documentation based on patient data
-router.post('/generate-documentation', async (req, res) => {
+router.post("/generate-documentation", async (req, res) => {
   try {
     const { patientId, formData, patientMessages } = req.body;
 
     if (!patientId || !formData) {
-      return res.status(400).json({ message: 'Missing required data' });
+      return res.status(400).json({ message: "Missing required data" });
     }
 
     // Construct prompt for OpenAI
@@ -158,7 +181,7 @@ router.post('/generate-documentation', async (req, res) => {
       
       Form data: ${JSON.stringify(formData)}
       
-      ${patientMessages ? `Recent messages: ${JSON.stringify(patientMessages)}` : ''}
+      ${patientMessages ? `Recent messages: ${JSON.stringify(patientMessages)}` : ""}
       
       Please provide a complete set of medical documentation including:
       1. History of Present Illness (HPI)
@@ -177,32 +200,36 @@ router.post('/generate-documentation', async (req, res) => {
     `;
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: "gpt-4o",
       messages: [
-        { role: 'system', content: 'You are an AI medical assistant generating clinical documentation for a physician.' },
-        { role: 'user', content: prompt }
+        {
+          role: "system",
+          content:
+            "You are an AI medical assistant generating clinical documentation for a physician.",
+        },
+        { role: "user", content: prompt },
       ],
-      response_format: { type: 'json_object' }
+      response_format: { type: "json_object" },
     });
 
-    const aiContent = JSON.parse(response.choices[0].message.content || '{}');
-    
+    const aiContent = JSON.parse(response.choices[0].message.content || "{}");
+
     // Save the generated documentation to storage
     const documentation = await storage.createDocumentation({
       patientId: parseInt(patientId),
-      hpi: aiContent.hpi || '',
-      subjective: aiContent.subjective || '',
-      objective: aiContent.objective || '',
-      assessment: aiContent.assessment || '',
-      plan: aiContent.plan || '',
+      hpi: aiContent.hpi || "",
+      subjective: aiContent.subjective || "",
+      objective: aiContent.objective || "",
+      assessment: aiContent.assessment || "",
+      plan: aiContent.plan || "",
       prescription: aiContent.prescription || null,
       followUpQuestions: aiContent.followUpQuestions || [],
-      isApproved: false
+      isApproved: false,
     });
 
     res.json(documentation);
   } catch (error) {
-    console.error('Error generating documentation:', error);
-    res.status(500).json({ message: 'Failed to generate documentation' });
+    console.error("Error generating documentation:", error);
+    res.status(500).json({ message: "Failed to generate documentation" });
   }
 });

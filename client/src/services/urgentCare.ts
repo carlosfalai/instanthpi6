@@ -21,29 +21,33 @@ export interface AnalyzeMessageResponse {
     priority: "high" | "medium" | "low";
     problemDescription: string;
     analysisNotes: string;
-    waitingFor: "patient_reply" | "lab_results" | "symptoms_resolution" | "medication_effect" | "specialist_input" | "other";
+    waitingFor:
+      | "patient_reply"
+      | "lab_results"
+      | "symptoms_resolution"
+      | "medication_effect"
+      | "specialist_input"
+      | "other";
     waitingForDetails: string;
   };
   request?: UrgentCareRequest;
 }
 
 // Get all urgent care requests (with filtering options)
-export async function getUrgentCareRequests(
-  params?: {
-    status?: string;
-    type?: string;
-    timeframe?: number;
-  }
-): Promise<UrgentCareWithDetails[]> {
+export async function getUrgentCareRequests(params?: {
+  status?: string;
+  type?: string;
+  timeframe?: number;
+}): Promise<UrgentCareWithDetails[]> {
   // Build query parameters
   const queryParams = new URLSearchParams();
   if (params?.status) queryParams.append("status", params.status);
   if (params?.type) queryParams.append("type", params.type);
   if (params?.timeframe) queryParams.append("timeframe", params.timeframe.toString());
-  
+
   const queryString = queryParams.toString();
-  const url = `/api/urgent-care${queryString ? `?${queryString}` : ''}`;
-  
+  const url = `/api/urgent-care${queryString ? `?${queryString}` : ""}`;
+
   const response = await apiRequest("GET", url);
   const data = await response.json();
   return data;
@@ -56,7 +60,9 @@ export async function getUrgentCareRequest(id: number): Promise<UrgentCareWithDe
 }
 
 // Create a new urgent care request manually
-export async function createUrgentCareRequest(requestData: Partial<UrgentCareRequest>): Promise<UrgentCareRequest> {
+export async function createUrgentCareRequest(
+  requestData: Partial<UrgentCareRequest>
+): Promise<UrgentCareRequest> {
   const response = await apiRequest("POST", "/api/urgent-care", requestData);
   return await response.json();
 }
@@ -70,7 +76,7 @@ export async function analyzeMessage(
   const response = await apiRequest("POST", "/api/urgent-care/analyze-message", {
     messageId,
     patientId,
-    content
+    content,
   });
   return await response.json();
 }

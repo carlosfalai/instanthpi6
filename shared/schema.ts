@@ -1,4 +1,16 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, uuid, real, numeric, date } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  boolean,
+  timestamp,
+  jsonb,
+  uuid,
+  real,
+  numeric,
+  date,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -15,7 +27,7 @@ export const users = pgTable("users", {
   navPreferences: jsonb("nav_preferences").default({
     showChronicConditions: true,
     showMedicationRefills: true,
-    showUrgentCare: true
+    showUrgentCare: true,
   }),
   // Stripe subscription fields
   stripeCustomerId: text("stripe_customer_id"),
@@ -181,7 +193,7 @@ export const insertPreventativeCareSchema = createInsertSchema(preventativeCare)
   name: true,
   description: true,
   relevantTo: true,
-  messageTemplate: true, 
+  messageTemplate: true,
   suggestedDate: true,
   status: true,
   billingCode: true,
@@ -248,9 +260,13 @@ export type InsertAiSettings = z.infer<typeof insertAiSettingsSchema>;
 // Chronic Conditions model
 export const chronicConditions = pgTable("chronic_conditions", {
   id: serial("id").primaryKey(),
-  patientId: integer("patient_id").notNull().references(() => patients.id),
+  patientId: integer("patient_id")
+    .notNull()
+    .references(() => patients.id),
   name: text("name").notNull(),
-  status: text("status", { enum: ["active", "resolved", "managed"] }).notNull().default("active"),
+  status: text("status", { enum: ["active", "resolved", "managed"] })
+    .notNull()
+    .default("active"),
   diagnosisDate: timestamp("diagnosis_date"),
   lastReviewDate: timestamp("last_review_date"),
   notes: text("notes"),
@@ -273,7 +289,9 @@ export type InsertChronicCondition = z.infer<typeof insertChronicConditionSchema
 // Medications model
 export const medications = pgTable("medications", {
   id: serial("id").primaryKey(),
-  patientId: integer("patient_id").notNull().references(() => patients.id),
+  patientId: integer("patient_id")
+    .notNull()
+    .references(() => patients.id),
   name: text("name").notNull(),
   dosage: text("dosage").notNull(),
   frequency: text("frequency").notNull(),
@@ -306,10 +324,12 @@ export type InsertMedication = z.infer<typeof insertMedicationSchema>;
 // Patient Documents model
 export const patientDocuments = pgTable("patient_documents", {
   id: serial("id").primaryKey(),
-  patientId: integer("patient_id").notNull().references(() => patients.id),
+  patientId: integer("patient_id")
+    .notNull()
+    .references(() => patients.id),
   title: text("title").notNull(),
-  documentType: text("document_type", { 
-    enum: ["lab_result", "imaging", "consultation", "prescription", "other"] 
+  documentType: text("document_type", {
+    enum: ["lab_result", "imaging", "consultation", "prescription", "other"],
   }).notNull(),
   fileUrl: text("file_url").notNull(),
   fileContentType: text("file_content_type"),
@@ -318,8 +338,8 @@ export const patientDocuments = pgTable("patient_documents", {
   sourceSystem: text("source_system"),
   // AI-processed fields
   interpretationSummary: text("interpretation_summary"),
-  verificationStatus: text("verification_status", { 
-    enum: ["unverified", "in_progress", "verified", "conflict"] 
+  verificationStatus: text("verification_status", {
+    enum: ["unverified", "in_progress", "verified", "conflict"],
   }).default("unverified"),
   keyFindings: text("key_findings"),
   actionNeeded: boolean("action_needed").default(false),
@@ -346,7 +366,9 @@ export type InsertPatientDocument = z.infer<typeof insertPatientDocumentSchema>;
 // AI Document Verification model
 export const aiDocumentVerifications = pgTable("ai_document_verifications", {
   id: serial("id").primaryKey(),
-  documentId: integer("document_id").notNull().references(() => patientDocuments.id),
+  documentId: integer("document_id")
+    .notNull()
+    .references(() => patientDocuments.id),
   modelName: text("model_name").notNull(), // "openai", "anthropic", "xai"
   modelVersion: text("model_version").notNull(),
   interpretationSummary: text("interpretation_summary"),
@@ -374,15 +396,21 @@ export type InsertAiDocumentVerification = z.infer<typeof insertAiDocumentVerifi
 // Urgent Care Requests model
 export const urgentCareRequests = pgTable("urgent_care_requests", {
   id: serial("id").primaryKey(),
-  patientId: integer("patient_id").notNull().references(() => patients.id),
+  patientId: integer("patient_id")
+    .notNull()
+    .references(() => patients.id),
   messageId: integer("message_id").references(() => messages.id),
-  requestType: text("request_type", { 
-    enum: ["new_problem", "medication_refill", "follow_up", "symptom_check", "other"] 
+  requestType: text("request_type", {
+    enum: ["new_problem", "medication_refill", "follow_up", "symptom_check", "other"],
   }).notNull(),
-  priority: text("priority", { enum: ["high", "medium", "low"] }).notNull().default("medium"),
-  status: text("status", { 
-    enum: ["new", "in_progress", "completed", "cancelled"] 
-  }).notNull().default("new"),
+  priority: text("priority", { enum: ["high", "medium", "low"] })
+    .notNull()
+    .default("medium"),
+  status: text("status", {
+    enum: ["new", "in_progress", "completed", "cancelled"],
+  })
+    .notNull()
+    .default("new"),
   problemDescription: text("problem_description").notNull(),
   aiAnalysis: text("ai_analysis"),
   waitingFor: text("waiting_for"), // What we're waiting for (lab results, patient reply, etc.)
@@ -415,7 +443,9 @@ export type InsertUrgentCareRequest = z.infer<typeof insertUrgentCareRequestSche
 // Physician Priority AI - Track task interactions to learn behavior patterns
 export const taskInteractions = pgTable("task_interactions", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
   taskType: text("task_type").notNull(), // "pending_item", "message", "urgent_care", "medication_refill", etc.
   taskId: text("task_id").notNull(), // ID of the task (could be from different tables)
   action: text("action").notNull(), // "viewed", "prioritized", "completed", "postponed", "dismissed"
@@ -429,7 +459,9 @@ export const taskInteractions = pgTable("task_interactions", {
 // AI learned priority model for a physician
 export const priorityModels = pgTable("priority_models", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
   modelVersion: integer("model_version").default(1),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -446,7 +478,9 @@ export const priorityModels = pgTable("priority_models", {
 // Tasks prioritized by AI for a physician
 export const prioritizedTasks = pgTable("prioritized_tasks", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
   taskType: text("task_type").notNull(), // "pending_item", "message", "urgent_care", "medication_refill"
   taskId: text("task_id").notNull(), // ID of the original task
   priorityScore: real("priority_score").notNull(), // AI-calculated priority score (higher = more important)
@@ -527,7 +561,9 @@ export type InsertAiPrompt = z.infer<typeof insertAiPromptSchema>;
 // Formsite Integration model for doctor-specific configurations
 export const formsiteIntegrations = pgTable("formsite_integrations", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
   apiKey: text("api_key").notNull(),
   apiBaseUrl: text("api_base_url").notNull().default("https://fs3.formsite.com/api/v2"),
   isVerified: boolean("is_verified").default(false),
@@ -583,9 +619,15 @@ export type InsertEducationModule = z.infer<typeof insertEducationModuleSchema>;
 // User Education Progress model for tracking user progress
 export const userEducationProgress = pgTable("user_education_progress", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").notNull().references(() => users.id),
-  moduleId: integer("module_id").notNull().references(() => educationModules.id),
-  status: text("status", { enum: ["not_started", "in_progress", "completed"] }).notNull().default("not_started"),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id),
+  moduleId: integer("module_id")
+    .notNull()
+    .references(() => educationModules.id),
+  status: text("status", { enum: ["not_started", "in_progress", "completed"] })
+    .notNull()
+    .default("not_started"),
   completedAt: timestamp("completed_at"),
   quizScore: integer("quiz_score"), // If applicable
   notes: text("notes"),
@@ -615,7 +657,7 @@ export const formTemplates = pgTable("form_templates", {
   userId: integer("user_id").references(() => users.id),
   isPublic: boolean("is_public").default(false).notNull(),
   category: text("category").notNull(),
-  questions: jsonb("questions").notNull()
+  questions: jsonb("questions").notNull(),
 });
 
 export const insertFormTemplateSchema = createInsertSchema(formTemplates).pick({
@@ -624,7 +666,7 @@ export const insertFormTemplateSchema = createInsertSchema(formTemplates).pick({
   userId: true,
   isPublic: true,
   category: true,
-  questions: true
+  questions: true,
 });
 
 export type FormTemplate = typeof formTemplates.$inferSelect;
@@ -633,14 +675,18 @@ export type InsertFormTemplate = z.infer<typeof insertFormTemplateSchema>;
 // Form responses
 export const formResponses = pgTable("form_responses", {
   id: serial("id").primaryKey(),
-  formTemplateId: integer("form_template_id").references(() => formTemplates.id).notNull(),
-  patientId: integer("patient_id").references(() => patients.id).notNull(),
+  formTemplateId: integer("form_template_id")
+    .references(() => formTemplates.id)
+    .notNull(),
+  patientId: integer("patient_id")
+    .references(() => patients.id)
+    .notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
   completedAt: timestamp("completed_at"),
   answers: jsonb("answers").notNull(),
   status: text("status").default("in_progress").notNull(), // in_progress, completed
-  notes: text("notes")
+  notes: text("notes"),
 });
 
 export const insertFormResponseSchema = createInsertSchema(formResponses).pick({
@@ -649,7 +695,7 @@ export const insertFormResponseSchema = createInsertSchema(formResponses).pick({
   completedAt: true,
   answers: true,
   status: true,
-  notes: true
+  notes: true,
 });
 
 export type FormResponse = typeof formResponses.$inferSelect;
@@ -660,7 +706,9 @@ export const medicationRefills = pgTable("medication_refills", {
   id: text("id").primaryKey(), // UUID
   patientName: text("patient_name").notNull(),
   dateReceived: timestamp("date_received").notNull(),
-  status: text("status", { enum: ["pending", "approved", "denied", "needs_info"] }).notNull().default("pending"),
+  status: text("status", { enum: ["pending", "approved", "denied", "needs_info"] })
+    .notNull()
+    .default("pending"),
   medicationName: text("medication_name").notNull(),
   prescriptionNumber: text("prescription_number"),
   pharmacy: text("pharmacy"),
@@ -696,7 +744,9 @@ export const insuranceDocuments = pgTable("insurance_documents", {
   id: uuid("id").primaryKey().defaultRandom(),
   patientName: text("patient_name").notNull(),
   dateReceived: timestamp("date_received").defaultNow(),
-  status: text("status", { enum: ["pending", "processed", "needs_info"] }).notNull().default("pending"),
+  status: text("status", { enum: ["pending", "processed", "needs_info"] })
+    .notNull()
+    .default("pending"),
   documentType: text("document_type").notNull(), // e.g., 'claim', 'prior_authorization', 'coverage', etc.
   pdfUrl: text("pdf_url").notNull(),
   emailSource: text("email_source"),

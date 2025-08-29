@@ -3,7 +3,14 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { queryClient } from "@/lib/queryClient";
@@ -40,9 +47,17 @@ interface UserEducationProgress {
 // Component for status badge
 function StatusBadge({ status }: { status: string }) {
   if (status === "completed") {
-    return <Badge variant="default" className="bg-green-500">Completed</Badge>;
+    return (
+      <Badge variant="default" className="bg-green-500">
+        Completed
+      </Badge>
+    );
   } else if (status === "in_progress") {
-    return <Badge variant="secondary" className="bg-amber-500 text-white">In Progress</Badge>;
+    return (
+      <Badge variant="secondary" className="bg-amber-500 text-white">
+        In Progress
+      </Badge>
+    );
   } else {
     return <Badge variant="outline">Not Started</Badge>;
   }
@@ -51,17 +66,17 @@ function StatusBadge({ status }: { status: string }) {
 export default function EducationPage() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("all");
-  
+
   // Get all education modules
   const { data: modules = [], isLoading: modulesLoading } = useQuery<EducationModule[]>({
     queryKey: ["/api/education/modules"],
-    queryFn: ({ signal }) => 
+    queryFn: ({ signal }) =>
       fetch("/api/education/modules", { signal })
-        .then(res => {
+        .then((res) => {
           if (!res.ok) throw new Error("Failed to fetch education modules");
           return res.json();
         })
-        .catch(error => {
+        .catch((error) => {
           // For now, return empty array
           console.error("Error fetching modules:", error);
           return [];
@@ -73,11 +88,11 @@ export default function EducationPage() {
     queryKey: ["/api/education/progress"],
     queryFn: ({ signal }) =>
       fetch("/api/education/progress", { signal })
-        .then(res => {
+        .then((res) => {
           if (!res.ok) throw new Error("Failed to fetch education progress");
           return res.json();
         })
-        .catch(error => {
+        .catch((error) => {
           // For now, return empty array
           console.error("Error fetching progress:", error);
           return [];
@@ -89,11 +104,11 @@ export default function EducationPage() {
     queryKey: ["/api/education/unlocked-features"],
     queryFn: ({ signal }) =>
       fetch("/api/education/unlocked-features", { signal })
-        .then(res => {
+        .then((res) => {
           if (!res.ok) throw new Error("Failed to fetch unlocked features");
           return res.json();
         })
-        .catch(error => {
+        .catch((error) => {
           // For now, return empty array
           console.error("Error fetching unlocked features:", error);
           return [];
@@ -125,9 +140,10 @@ export default function EducationPage() {
 
   // Calculate overall progress
   const totalModules = modules.length;
-  const completedModules = progress.filter(p => p.status === "completed").length;
-  const inProgressModules = progress.filter(p => p.status === "in_progress").length;
-  const overallProgressPercent = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
+  const completedModules = progress.filter((p) => p.status === "completed").length;
+  const inProgressModules = progress.filter((p) => p.status === "in_progress").length;
+  const overallProgressPercent =
+    totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
 
   const startModule = (moduleId: number) => {
     updateProgressMutation.mutate({ moduleId, status: "in_progress" });
@@ -139,22 +155,22 @@ export default function EducationPage() {
 
   // Get module status for display
   const getModuleStatus = (moduleId: number) => {
-    const moduleProgress = progress.find(p => p.moduleId === moduleId);
+    const moduleProgress = progress.find((p) => p.moduleId === moduleId);
     return moduleProgress?.status || "not_started";
   };
 
   // Check if a module can be started (prerequisites are completed)
   const canStartModule = (module: EducationModule) => {
     if (!module.prerequisiteModules || module.prerequisiteModules.length === 0) return true;
-    
-    return module.prerequisiteModules.every(prerequisiteId => {
-      const prerequisiteProgress = progress.find(p => p.moduleId === prerequisiteId);
+
+    return module.prerequisiteModules.every((prerequisiteId) => {
+      const prerequisiteProgress = progress.find((p) => p.moduleId === prerequisiteId);
       return prerequisiteProgress?.status === "completed";
     });
   };
 
   // Filter modules based on active tab
-  const filteredModules = modules.filter(module => {
+  const filteredModules = modules.filter((module) => {
     const status = getModuleStatus(module.id);
     if (activeTab === "all") return true;
     if (activeTab === "in-progress") return status === "in_progress";
@@ -204,7 +220,7 @@ export default function EducationPage() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle>Completed</CardTitle>
@@ -214,7 +230,7 @@ export default function EducationPage() {
                 <span className="text-2xl font-bold">{completedModules}</span>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle>In Progress</CardTitle>
@@ -224,7 +240,7 @@ export default function EducationPage() {
                 <span className="text-2xl font-bold">{inProgressModules}</span>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle>Features Unlocked</CardTitle>
@@ -244,13 +260,13 @@ export default function EducationPage() {
               <TabsTrigger value="in-progress">In Progress</TabsTrigger>
               <TabsTrigger value="completed">Completed</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value={activeTab} className="mt-0">
               <div className="flex flex-col space-y-4 max-w-3xl mx-auto">
                 {filteredModules.map((module) => {
                   const status = getModuleStatus(module.id);
                   const isLocked = !canStartModule(module);
-                  
+
                   return (
                     <Card key={module.id} className={isLocked ? "opacity-70" : ""}>
                       <CardHeader>
@@ -271,12 +287,12 @@ export default function EducationPage() {
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-muted-foreground mb-2">{module.description}</p>
-                        
+
                         {module.featuresUnlocked.length > 0 && (
                           <div className="mt-2">
                             <p className="text-xs font-medium mb-1">Unlocks:</p>
                             <div className="flex flex-wrap gap-1">
-                              {module.featuresUnlocked.map(feature => (
+                              {module.featuresUnlocked.map((feature) => (
                                 <Badge key={feature} variant="outline" className="text-xs">
                                   {feature}
                                 </Badge>
@@ -293,17 +309,17 @@ export default function EducationPage() {
                               Complete prerequisites first
                             </Button>
                           ) : status === "not_started" ? (
-                            <Button 
-                              onClick={() => startModule(module.id)} 
-                              className="w-full" 
+                            <Button
+                              onClick={() => startModule(module.id)}
+                              className="w-full"
                               size="sm"
                             >
                               Start Module
                             </Button>
                           ) : status === "in_progress" ? (
-                            <Button 
+                            <Button
                               onClick={() => completeModule(module.id)}
-                              className="w-full" 
+                              className="w-full"
                               size="sm"
                             >
                               Complete Module
@@ -328,7 +344,7 @@ export default function EducationPage() {
             <div className="mt-8">
               <h2 className="text-xl font-bold mb-4">Unlocked Features</h2>
               <div className="flex flex-wrap gap-2">
-                {unlockedFeatures.map(feature => (
+                {unlockedFeatures.map((feature) => (
                   <Badge key={feature} variant="default">
                     <CheckCircle className="h-3 w-3 mr-1" />
                     {feature}

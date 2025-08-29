@@ -12,13 +12,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Save, 
-  User, 
-  FileSignature, 
-  ShieldCheck, 
-  AlertCircle, 
-  ArrowRight, 
+import {
+  Save,
+  User,
+  FileSignature,
+  ShieldCheck,
+  AlertCircle,
+  ArrowRight,
   FileText,
   Clipboard,
   Building,
@@ -27,13 +27,29 @@ import {
   Eye,
   Upload,
   Trash2,
-  Image
+  Image,
 } from "lucide-react";
 import BaseLayout from "@/components/layout/BaseLayout";
 import SignaturePad from "@/components/doctor/SignaturePad";
 import SignaturePinModal from "@/components/doctor/SignaturePinModal";
-import DocumentTemplateEditor, { DocumentTemplate } from "@/components/doctor/DocumentTemplateEditor";
+import DocumentTemplateEditor, {
+  DocumentTemplate,
+} from "@/components/doctor/DocumentTemplateEditor";
 import { Textarea } from "@/components/ui/textarea";
+
+// Component for document template editor
+function DocumentTemplateEditorComponent({
+  initialData,
+  onSave,
+}: {
+  initialData?: DocumentTemplate;
+  onSave: (template: DocumentTemplate) => void;
+}) {
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewMode, setPreviewMode] = useState(false);
+  const [template, setTemplate] = useState<DocumentTemplate>(
+    initialData || {
       name: "Default Template",
       clinicName: "",
       clinicAddress: "",
@@ -46,13 +62,9 @@ import { Textarea } from "@/components/ui/textarea";
     }
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | undefined>(
-    initialData?.logoUrl
-  );
+  const [logoPreview, setLogoPreview] = useState<string | undefined>(initialData?.logoUrl);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setTemplate({
       ...template,
@@ -63,7 +75,7 @@ import { Textarea } from "@/components/ui/textarea";
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
+
       // Check file size (limit to 2MB)
       if (file.size > 2 * 1024 * 1024) {
         toast({
@@ -73,9 +85,9 @@ import { Textarea } from "@/components/ui/textarea";
         });
         return;
       }
-      
+
       // Check file type
-      if (!file.type.startsWith('image/')) {
+      if (!file.type.startsWith("image/")) {
         toast({
           variant: "destructive",
           title: "Invalid file type",
@@ -83,7 +95,7 @@ import { Textarea } from "@/components/ui/textarea";
         });
         return;
       }
-      
+
       setLogoFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -108,10 +120,10 @@ import { Textarea } from "@/components/ui/textarea";
         ...template,
         logoUrl: logoPreview,
       };
-      
+
       // Call the save function
       onSave(templateToSave);
-      
+
       toast({
         title: "Template saved",
         description: "Your document template has been saved successfully",
@@ -152,7 +164,7 @@ import { Textarea } from "@/components/ui/textarea";
             <p>{template.clinicEmail || "Email"}</p>
           </div>
         </div>
-        
+
         {/* Content Area (Sample) */}
         <div className="p-6 min-h-[300px] border-l border-r border-gray-300">
           <div className="mb-6">
@@ -169,15 +181,17 @@ import { Textarea } from "@/components/ui/textarea";
                 <p>Rx #: 12345678</p>
               </div>
             </div>
-            
+
             <div className="border-t border-gray-300 pt-4 mt-4">
               <h3 className="font-bold mb-2">Medication:</h3>
-              <p>Medication Name: <span className="font-semibold">Amoxicillin 500mg</span></p>
+              <p>
+                Medication Name: <span className="font-semibold">Amoxicillin 500mg</span>
+              </p>
               <p>Sig: 1 capsule by mouth three times daily for 10 days</p>
               <p>Quantity: 30</p>
               <p>Refills: 0</p>
             </div>
-            
+
             <div className="border-t border-gray-300 pt-4 mt-4">
               <h3 className="font-bold mb-2">Prescriber:</h3>
               <p>Dr. Jane Smith, MD</p>
@@ -191,7 +205,7 @@ import { Textarea } from "@/components/ui/textarea";
             </div>
           </div>
         </div>
-        
+
         {/* Footer */}
         <div
           className="p-3 text-center text-white text-sm rounded-b-md"
@@ -214,7 +228,7 @@ import { Textarea } from "@/components/ui/textarea";
           <Eye className="mr-2 h-4 w-4" />
           {previewMode ? "Edit Template" : "Preview Template"}
         </Button>
-        
+
         <Button
           className="bg-blue-600 hover:bg-blue-700 flex items-center"
           onClick={handleSaveTemplate}
@@ -223,7 +237,7 @@ import { Textarea } from "@/components/ui/textarea";
           Save Template
         </Button>
       </div>
-      
+
       {previewMode ? (
         renderPreview()
       ) : (
@@ -240,7 +254,7 @@ import { Textarea } from "@/components/ui/textarea";
                 placeholder="Template Name"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label>Clinic Logo</Label>
               <div className="flex items-center space-x-4">
@@ -254,12 +268,7 @@ import { Textarea } from "@/components/ui/textarea";
                   Upload Logo
                 </Button>
                 {logoPreview && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleRemoveLogo}
-                  >
+                  <Button type="button" variant="destructive" size="sm" onClick={handleRemoveLogo}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
@@ -283,14 +292,12 @@ import { Textarea } from "@/components/ui/textarea";
               {!logoPreview && (
                 <div className="mt-2 border border-dashed border-gray-700 p-4 rounded-md bg-[#262626] flex flex-col items-center justify-center">
                   <Image className="h-8 w-8 text-gray-500 mb-2" />
-                  <p className="text-gray-500 text-sm text-center">
-                    No logo uploaded
-                  </p>
+                  <p className="text-gray-500 text-sm text-center">No logo uploaded</p>
                 </div>
               )}
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="clinicName">Clinic Name</Label>
             <Input
@@ -302,7 +309,7 @@ import { Textarea } from "@/components/ui/textarea";
               placeholder="Enter your clinic name"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="clinicAddress">Clinic Address</Label>
             <Textarea
@@ -315,7 +322,7 @@ import { Textarea } from "@/components/ui/textarea";
               rows={2}
             />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label htmlFor="clinicPhone">Phone Number</Label>
@@ -328,7 +335,7 @@ import { Textarea } from "@/components/ui/textarea";
                 placeholder="Phone number"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="clinicFax">Fax Number</Label>
               <Input
@@ -340,7 +347,7 @@ import { Textarea } from "@/components/ui/textarea";
                 placeholder="Fax number"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="clinicEmail">Email</Label>
               <Input
@@ -353,7 +360,7 @@ import { Textarea } from "@/components/ui/textarea";
               />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="footerText">Footer Text</Label>
             <Input
@@ -365,7 +372,7 @@ import { Textarea } from "@/components/ui/textarea";
               placeholder="Footer text"
             />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="headerColor">Header Color</Label>
@@ -386,7 +393,7 @@ import { Textarea } from "@/components/ui/textarea";
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="footerColor">Footer Color</Label>
               <div className="flex">
@@ -411,7 +418,7 @@ import { Textarea } from "@/components/ui/textarea";
       )}
     </div>
   );
-};
+}
 
 interface DoctorSettings {
   id: number;
@@ -424,10 +431,6 @@ interface DoctorSettings {
   hasSignature: boolean;
   documentTemplates?: DocumentTemplate[];
 }
-
-import { useRef } from "react";
-import { Upload, Trash2, Eye, Image, Check } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
 
 export default function DoctorSettingsPage() {
   const { toast } = useToast();
@@ -448,16 +451,16 @@ export default function DoctorSettingsPage() {
     phoneNumber: "555-123-4567",
     specialty: "Family Medicine",
     hasSignature: false,
-    documentTemplates: []
+    documentTemplates: [],
   });
 
   useEffect(() => {
     // Simulate loading doctor settings data
     setTimeout(() => {
       setLoading(false);
-      
+
       // Simulate existing template data
-      setDoctorSettings(prev => ({
+      setDoctorSettings((prev) => ({
         ...prev,
         documentTemplates: [
           {
@@ -470,9 +473,9 @@ export default function DoctorSettingsPage() {
             clinicEmail: "info@downtownmedical.example",
             footerText: "Confidential medical document. For patient use only.",
             headerColor: "#0f766e",
-            footerColor: "#0f766e"
-          }
-        ]
+            footerColor: "#0f766e",
+          },
+        ],
       }));
     }, 1000);
   }, []);
@@ -502,14 +505,14 @@ export default function DoctorSettingsPage() {
     setSignaturePin(pin);
     setIsPinModalOpen(false);
     setIsCreatingSignature(false);
-    
+
     // Update doctor settings with signature
     setDoctorSettings({
       ...doctorSettings,
       hasSignature: true,
-      signatureId: Date.now().toString()
+      signatureId: Date.now().toString(),
     });
-    
+
     toast({
       title: "Signature created",
       description: "Your electronic signature has been created and secured with a PIN.",
@@ -518,7 +521,7 @@ export default function DoctorSettingsPage() {
 
   const handlePinVerify = (pin: string) => {
     setIsVerifyingPin(true);
-    
+
     // Simulate PIN verification
     setTimeout(() => {
       if (pin === signaturePin) {
@@ -545,20 +548,20 @@ export default function DoctorSettingsPage() {
         ...template,
         id: `template_${Date.now()}`,
       };
-      
-      setDoctorSettings(prev => ({
+
+      setDoctorSettings((prev) => ({
         ...prev,
-        documentTemplates: [...(prev.documentTemplates || []), newTemplate]
+        documentTemplates: [...(prev.documentTemplates || []), newTemplate],
       }));
-      
+
       setActiveTemplate(newTemplate.id);
     } else {
       // Updating existing template
-      setDoctorSettings(prev => ({
+      setDoctorSettings((prev) => ({
         ...prev,
-        documentTemplates: prev.documentTemplates?.map(t => 
+        documentTemplates: prev.documentTemplates?.map((t) =>
           t.id === activeTemplate ? { ...template, id: t.id } : t
-        )
+        ),
       }));
     }
   };
@@ -567,7 +570,7 @@ export default function DoctorSettingsPage() {
     if (activeTemplate === "create") {
       return undefined;
     }
-    return doctorSettings.documentTemplates?.find(t => t.id === activeTemplate);
+    return doctorSettings.documentTemplates?.find((t) => t.id === activeTemplate);
   };
 
   if (loading) {
@@ -600,7 +603,7 @@ export default function DoctorSettingsPage() {
             <TabsTrigger value="signature">Signature</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="profile" className="mt-6">
             <Card className="bg-[#1e1e1e] border-gray-800">
               <CardHeader>
@@ -608,9 +611,7 @@ export default function DoctorSettingsPage() {
                   <User className="mr-2 h-5 w-5" />
                   Doctor Profile
                 </CardTitle>
-                <CardDescription>
-                  Your personal and contact information
-                </CardDescription>
+                <CardDescription>Your personal and contact information</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -619,7 +620,9 @@ export default function DoctorSettingsPage() {
                     <Input
                       id="name"
                       value={doctorSettings.name}
-                      onChange={(e) => setDoctorSettings({...doctorSettings, name: e.target.value})}
+                      onChange={(e) =>
+                        setDoctorSettings({ ...doctorSettings, name: e.target.value })
+                      }
                       className="bg-[#262626] border-gray-700"
                     />
                   </div>
@@ -629,7 +632,9 @@ export default function DoctorSettingsPage() {
                       id="email"
                       type="email"
                       value={doctorSettings.email}
-                      onChange={(e) => setDoctorSettings({...doctorSettings, email: e.target.value})}
+                      onChange={(e) =>
+                        setDoctorSettings({ ...doctorSettings, email: e.target.value })
+                      }
                       className="bg-[#262626] border-gray-700"
                     />
                   </div>
@@ -638,7 +643,9 @@ export default function DoctorSettingsPage() {
                     <Input
                       id="phone"
                       value={doctorSettings.phoneNumber}
-                      onChange={(e) => setDoctorSettings({...doctorSettings, phoneNumber: e.target.value})}
+                      onChange={(e) =>
+                        setDoctorSettings({ ...doctorSettings, phoneNumber: e.target.value })
+                      }
                       className="bg-[#262626] border-gray-700"
                     />
                   </div>
@@ -647,14 +654,16 @@ export default function DoctorSettingsPage() {
                     <Input
                       id="specialty"
                       value={doctorSettings.specialty}
-                      onChange={(e) => setDoctorSettings({...doctorSettings, specialty: e.target.value})}
+                      onChange={(e) =>
+                        setDoctorSettings({ ...doctorSettings, specialty: e.target.value })
+                      }
                       className="bg-[#262626] border-gray-700"
                     />
                   </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button 
+                <Button
                   onClick={handleSaveSettings}
                   className="ml-auto bg-blue-600 hover:bg-blue-700"
                   disabled={saving}
@@ -671,7 +680,7 @@ export default function DoctorSettingsPage() {
               </CardFooter>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="license" className="mt-6">
             <Card className="bg-[#1e1e1e] border-gray-800">
               <CardHeader>
@@ -679,9 +688,7 @@ export default function DoctorSettingsPage() {
                   <ShieldCheck className="mr-2 h-5 w-5" />
                   License Information
                 </CardTitle>
-                <CardDescription>
-                  Your professional license and certifications
-                </CardDescription>
+                <CardDescription>Your professional license and certifications</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="space-y-2">
@@ -689,7 +696,9 @@ export default function DoctorSettingsPage() {
                   <Input
                     id="license"
                     value={doctorSettings.licenseNumber}
-                    onChange={(e) => setDoctorSettings({...doctorSettings, licenseNumber: e.target.value})}
+                    onChange={(e) =>
+                      setDoctorSettings({ ...doctorSettings, licenseNumber: e.target.value })
+                    }
                     className="bg-[#262626] border-gray-700"
                     placeholder="Enter your medical license number"
                   />
@@ -697,19 +706,20 @@ export default function DoctorSettingsPage() {
                     This license number will appear on prescriptions and medical documents
                   </p>
                 </div>
-                
+
                 <div className="flex items-center p-4 bg-yellow-900 bg-opacity-20 rounded-md border border-yellow-800">
                   <AlertCircle className="h-5 w-5 text-yellow-500 mr-3 flex-shrink-0" />
                   <div>
                     <h3 className="text-sm font-medium text-yellow-500">Important Note</h3>
                     <p className="text-sm text-gray-400">
-                      Your license information will be verified and validated. Please ensure you enter the correct information.
+                      Your license information will be verified and validated. Please ensure you
+                      enter the correct information.
                     </p>
                   </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button 
+                <Button
                   onClick={handleSaveSettings}
                   className="ml-auto bg-blue-600 hover:bg-blue-700"
                   disabled={saving}
@@ -726,7 +736,7 @@ export default function DoctorSettingsPage() {
               </CardFooter>
             </Card>
           </TabsContent>
-          
+
           <TabsContent value="signature" className="mt-6">
             <Card className="bg-[#1e1e1e] border-gray-800">
               <CardHeader>
@@ -746,12 +756,12 @@ export default function DoctorSettingsPage() {
                         <FileSignature className="h-12 w-12 text-blue-500 mx-auto mb-3" />
                         <h3 className="text-lg font-medium">Signature Active</h3>
                         <p className="text-sm text-gray-400 max-w-md mt-2">
-                          Your electronic signature is active and secured with a 4-digit PIN.
-                          Use your PIN when prompted to sign documents and prescriptions.
+                          Your electronic signature is active and secured with a 4-digit PIN. Use
+                          your PIN when prompted to sign documents and prescriptions.
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex flex-col sm:flex-row gap-3">
                       <Button
                         variant="outline"
@@ -776,10 +786,7 @@ export default function DoctorSettingsPage() {
                     </p>
                     <SignaturePad onComplete={handleSignatureComplete} />
                     <div className="flex justify-end gap-3 mt-4">
-                      <Button 
-                        variant="outline"
-                        onClick={() => setIsCreatingSignature(false)}
-                      >
+                      <Button variant="outline" onClick={() => setIsCreatingSignature(false)}>
                         Cancel
                       </Button>
                     </div>
@@ -791,7 +798,8 @@ export default function DoctorSettingsPage() {
                         <FileSignature className="h-12 w-12 text-gray-500 mx-auto mb-3" />
                         <h3 className="text-lg font-medium">No Signature Created</h3>
                         <p className="text-sm text-gray-400 max-w-md mt-2">
-                          You haven't created an electronic signature yet. Create one to sign prescriptions and medical documents electronically.
+                          You haven't created an electronic signature yet. Create one to sign
+                          prescriptions and medical documents electronically.
                         </p>
                         <Button
                           onClick={handleCreateSignature}
@@ -802,7 +810,7 @@ export default function DoctorSettingsPage() {
                         </Button>
                       </div>
                     </div>
-                    
+
                     <div className="p-4 bg-blue-900 bg-opacity-20 rounded-md border border-blue-800">
                       <h3 className="text-sm font-medium text-blue-500">How It Works</h3>
                       <ul className="mt-2 text-sm text-gray-400 space-y-1 list-disc pl-5">
@@ -836,19 +844,19 @@ export default function DoctorSettingsPage() {
                     <div className="flex flex-col gap-2">
                       <Button
                         variant={activeTemplate === "create" ? "default" : "outline"}
-                        className={`justify-start h-auto py-3 ${activeTemplate === "create" ? 'bg-blue-600 hover:bg-blue-700' : ''}`}
+                        className={`justify-start h-auto py-3 ${activeTemplate === "create" ? "bg-blue-600 hover:bg-blue-700" : ""}`}
                         onClick={() => setActiveTemplate("create")}
                       >
                         <Clipboard className="mr-2 h-4 w-4" />
                         Create New Template
                       </Button>
-                      
+
                       {doctorSettings.documentTemplates?.map((template) => (
                         <Button
                           key={template.id}
                           variant={activeTemplate === template.id ? "default" : "outline"}
-                          className={`justify-start h-auto py-3 ${activeTemplate === template.id ? 'bg-blue-600 hover:bg-blue-700' : ''}`}
-                          onClick={() => setActiveTemplate(template.id || '')}
+                          className={`justify-start h-auto py-3 ${activeTemplate === template.id ? "bg-blue-600 hover:bg-blue-700" : ""}`}
+                          onClick={() => setActiveTemplate(template.id || "")}
                         >
                           <Building className="mr-2 h-4 w-4" />
                           {template.name}
@@ -856,10 +864,9 @@ export default function DoctorSettingsPage() {
                       ))}
                     </div>
                   </div>
-                  
+
                   <div className="md:col-span-3">
-                    <DocumentTemplateEditor
-                      templateId={activeTemplate === "create" ? undefined : activeTemplate}
+                    <DocumentTemplateEditorComponent
                       initialData={getActiveTemplateData()}
                       onSave={handleSaveTemplate}
                     />
@@ -870,7 +877,7 @@ export default function DoctorSettingsPage() {
           </TabsContent>
         </Tabs>
       </div>
-      
+
       {isPinModalOpen && (
         <SignaturePinModal
           isOpen={isPinModalOpen}
@@ -883,5 +890,4 @@ export default function DoctorSettingsPage() {
       )}
     </BaseLayout>
   );
-}
 }

@@ -7,11 +7,11 @@ import { db } from "../db";
 
 // Initialize AI clients
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
+  apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
 // For xAI (Grok), we'll use a custom API client
@@ -26,17 +26,17 @@ class XaiClient {
 
   async getCompletion(prompt: string, options: any = {}) {
     const response = await fetch(`${this.baseUrl}/chat/completions`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.apiKey}`
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify({
         model: options.model || "grok-2-1212",
         messages: [{ role: "user", content: prompt }],
         max_tokens: options.max_tokens || 500,
-        temperature: options.temperature || 0.7
-      })
+        temperature: options.temperature || 0.7,
+      }),
     });
 
     if (!response.ok) {
@@ -72,41 +72,53 @@ export async function verifyDocumentWithMultipleModels(
   const startTimes = {
     openai: Date.now(),
     anthropic: Date.now(),
-    xai: Date.now()
+    xai: Date.now(),
   };
 
   // Process with all models in parallel
   const [openaiResult, anthropicResult, xaiResult] = await Promise.all([
-    processWithOpenAI(documentText).catch(error => {
+    processWithOpenAI(documentText).catch((error) => {
       console.error("OpenAI processing error:", error);
       return null;
     }),
-    processWithAnthropic(documentText).catch(error => {
+    processWithAnthropic(documentText).catch((error) => {
       console.error("Anthropic processing error:", error);
       return null;
     }),
-    processWithXai(documentText).catch(error => {
+    processWithXai(documentText).catch((error) => {
       console.error("XAI processing error:", error);
       return null;
-    })
+    }),
   ]);
 
   // Calculate processing times
   const processingTimes = {
     openai: openaiResult ? (Date.now() - startTimes.openai) / 1000 : null,
     anthropic: anthropicResult ? (Date.now() - startTimes.anthropic) / 1000 : null,
-    xai: xaiResult ? (Date.now() - startTimes.xai) / 1000 : null
+    xai: xaiResult ? (Date.now() - startTimes.xai) / 1000 : null,
   };
 
   // Store individual model results
   if (openaiResult) {
-    await storeModelVerification(documentId, "openai", "gpt-4o", openaiResult, processingTimes.openai);
+    await storeModelVerification(
+      documentId,
+      "openai",
+      "gpt-4o",
+      openaiResult,
+      processingTimes.openai
+    );
   }
-  
+
   if (anthropicResult) {
-    await storeModelVerification(documentId, "anthropic", "claude-3-7-sonnet-20250219", anthropicResult, processingTimes.anthropic);
+    await storeModelVerification(
+      documentId,
+      "anthropic",
+      "claude-3-7-sonnet-20250219",
+      anthropicResult,
+      processingTimes.anthropic
+    );
   }
-  
+
   if (xaiResult) {
     await storeModelVerification(documentId, "xai", "grok-2-1212", xaiResult, processingTimes.xai);
   }
@@ -119,15 +131,16 @@ export async function verifyDocumentWithMultipleModels(
 
   // Compare results and find consensus
   const consensus = compareResults(validResults);
-  
+
   // Update the document with consensus results
-  await db.update(patientDocuments)
+  await db
+    .update(patientDocuments)
     .set({
       interpretationSummary: consensus.consensusSummary,
       keyFindings: consensus.keyFindings,
       verificationStatus: consensus.verified ? "verified" : "conflict",
       actionNeeded: consensus.actionNeeded,
-      aiProcessedAt: new Date()
+      aiProcessedAt: new Date(),
     })
     .where(eq(patientDocuments.id, documentId));
 
@@ -149,7 +162,8 @@ async function processWithOpenAI(documentText: string): Promise<{
     messages: [
       {
         role: "system",
-        content: "You are a medical document analysis assistant. Analyze the document carefully and extract key medical information. Focus on lab results, diagnoses, recommended actions, and abnormal findings."
+        content:
+          "You are a medical document analysis assistant. Analyze the document carefully and extract key medical information. Focus on lab results, diagnoses, recommended actions, and abnormal findings.",
       },
       {
         role: "user",
@@ -160,10 +174,10 @@ async function processWithOpenAI(documentText: string): Promise<{
 4. Action Needed: Whether clinical action is needed based on the document (true/false)
 
 Document:
-${documentText}`
-      }
+${documentText}`,
+      },
     ],
-    response_format: { type: "json_object" }
+    response_format: { type: "json_object" },
   });
 
   const result = JSON.parse(response.choices[0].message.content);
@@ -171,7 +185,7 @@ ${documentText}`
     summary: result.summary || "",
     keyFindings: result.key_findings || "",
     confidence: result.confidence || 0,
-    actionRecommended: result.action_needed || false
+    actionRecommended: result.action_needed || false,
   };
 }
 
@@ -187,7 +201,8 @@ async function processWithAnthropic(documentText: string): Promise<{
   // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
   const response = await anthropic.messages.create({
     model: "claude-3-7-sonnet-20250219",
-    system: "You are a medical document analysis assistant. Analyze the document carefully and extract key medical information. Focus on lab results, diagnoses, recommended actions, and abnormal findings. Respond in JSON format.",
+    system:
+      "You are a medical document analysis assistant. Analyze the document carefully and extract key medical information. Focus on lab results, diagnoses, recommended actions, and abnormal findings. Respond in JSON format.",
     max_tokens: 1024,
     messages: [
       {
@@ -199,9 +214,9 @@ async function processWithAnthropic(documentText: string): Promise<{
 4. Action Needed: Whether clinical action is needed based on the document (true/false)
 
 Document:
-${documentText}`
-      }
-    ]
+${documentText}`,
+      },
+    ],
   });
 
   // Parse the JSON from Claude's response
@@ -209,23 +224,23 @@ ${documentText}`
     const jsonMatch = response.content[0].text.match(/\{[\s\S]*\}/);
     const jsonText = jsonMatch ? jsonMatch[0] : response.content[0].text;
     const result = JSON.parse(jsonText);
-    
+
     return {
       summary: result.summary || "",
       keyFindings: result.key_findings || "",
       confidence: result.confidence || 0,
-      actionRecommended: result.action_needed || false
+      actionRecommended: result.action_needed || false,
     };
   } catch (error) {
     console.error("Error parsing Anthropic response:", error);
-    
+
     // Fallback parsing if JSON extraction fails
     const text = response.content[0].text;
     return {
       summary: extractSection(text, "Summary:"),
       keyFindings: extractSection(text, "Key Findings:"),
       confidence: extractConfidence(text),
-      actionRecommended: text.toLowerCase().includes("action needed: true")
+      actionRecommended: text.toLowerCase().includes("action needed: true"),
     };
   }
 }
@@ -257,18 +272,18 @@ ${documentText}`,
       summary: result.summary || "",
       keyFindings: result.key_findings || "",
       confidence: result.confidence || 0,
-      actionRecommended: result.action_needed || false
+      actionRecommended: result.action_needed || false,
     };
   } catch (error) {
     console.error("Error parsing xAI response:", error);
-    
+
     // Fallback parsing if JSON extraction fails
     const text = response.choices[0].message.content;
     return {
       summary: extractSection(text, "Summary:"),
       keyFindings: extractSection(text, "Key Findings:"),
       confidence: extractConfidence(text),
-      actionRecommended: text.toLowerCase().includes("action needed: true")
+      actionRecommended: text.toLowerCase().includes("action needed: true"),
     };
   }
 }
@@ -308,29 +323,32 @@ function compareResults(results: any[]): {
   // Use the model with highest confidence as primary source
   results.sort((a, b) => b.confidence - a.confidence);
   const primaryResult = results[0];
-  
+
   // Check if action recommendations are consistent
-  const actionConsensus = results.every(r => r.actionRecommended === primaryResult.actionRecommended);
-  
+  const actionConsensus = results.every(
+    (r) => r.actionRecommended === primaryResult.actionRecommended
+  );
+
   // Check similarity of key findings (simple implementation - in production would use more sophisticated NLP)
   let findingsConsensus = true;
   for (let i = 1; i < results.length; i++) {
     const similarity = calculateTextSimilarity(primaryResult.keyFindings, results[i].keyFindings);
-    if (similarity < 0.7) { // Threshold for consensus
+    if (similarity < 0.7) {
+      // Threshold for consensus
       findingsConsensus = false;
       break;
     }
   }
-  
+
   // Calculate average confidence
   const avgConfidence = results.reduce((sum, r) => sum + r.confidence, 0) / results.length;
-  
+
   return {
     verified: actionConsensus && findingsConsensus && avgConfidence > 0.8,
     consensusSummary: primaryResult.summary,
     keyFindings: primaryResult.keyFindings,
     confidenceScore: avgConfidence,
-    actionNeeded: primaryResult.actionRecommended
+    actionNeeded: primaryResult.actionRecommended,
   };
 }
 
@@ -339,12 +357,22 @@ function compareResults(results: any[]): {
  */
 function calculateTextSimilarity(text1: string, text2: string): number {
   // This is a very basic implementation - in production would use proper NLP methods
-  const words1 = new Set(text1.toLowerCase().split(/\W+/).filter(w => w.length > 3));
-  const words2 = new Set(text2.toLowerCase().split(/\W+/).filter(w => w.length > 3));
-  
-  const intersection = new Set([...words1].filter(x => words2.has(x)));
+  const words1 = new Set(
+    text1
+      .toLowerCase()
+      .split(/\W+/)
+      .filter((w) => w.length > 3)
+  );
+  const words2 = new Set(
+    text2
+      .toLowerCase()
+      .split(/\W+/)
+      .filter((w) => w.length > 3)
+  );
+
+  const intersection = new Set([...words1].filter((x) => words2.has(x)));
   const union = new Set([...words1, ...words2]);
-  
+
   return intersection.size / union.size;
 }
 

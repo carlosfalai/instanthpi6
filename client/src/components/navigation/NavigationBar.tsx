@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'wouter';
-import { 
-  Home, 
-  Users, 
-  FileText, 
-  Calendar, 
-  Settings, 
+import React, { useState, useEffect } from "react";
+import { Link, useLocation } from "wouter";
+import {
+  Home,
+  Users,
+  FileText,
+  Calendar,
+  Settings,
   MessageSquare,
   User,
   GraduationCap,
@@ -18,11 +18,11 @@ import {
   Receipt,
   DollarSign,
   CreditCard,
-  UsersIcon
-} from 'lucide-react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { User as UserType } from '@shared/schema';
-import { apiRequest, queryClient } from '@/lib/queryClient';
+  UsersIcon,
+} from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { User as UserType } from "@shared/schema";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 // Badge component to show unread/pending counts
 interface NotificationBadgeProps {
@@ -31,10 +31,10 @@ interface NotificationBadgeProps {
 
 const NotificationBadge: React.FC<NotificationBadgeProps> = ({ count }) => {
   if (count <= 0) return null;
-  
+
   return (
     <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full">
-      {count > 99 ? '99+' : count}
+      {count > 99 ? "99+" : count}
     </div>
   );
 };
@@ -47,105 +47,237 @@ interface NavItem {
   label: string;
   visible: boolean;
   order: number;
-  row: 'primary' | 'secondary' | 'tertiary';
+  row: "primary" | "secondary" | "tertiary";
   notificationCount?: number;
 }
 
 export default function NavigationBar() {
   const [location] = useLocation();
-  
+
   // Fetch current user to get navigation preferences
   const { data: currentUser } = useQuery<UserType>({
-    queryKey: ['/api/user'],
+    queryKey: ["/api/user"],
   });
-  
+
   // Fetch notification counts
   const { data: notificationCounts = {} } = useQuery<Record<string, number>>({
-    queryKey: ['/api/notifications/counts'],
+    queryKey: ["/api/notifications/counts"],
     refetchInterval: 30000, // Refresh every 30 seconds
   });
-  
+
   // Default navigation preferences if user not loaded yet
-  const navPreferences = currentUser?.navPreferences as {
+  const navPreferences = (currentUser?.navPreferences as {
     showChronicConditions: boolean;
     showMedicationRefills: boolean;
     showUrgentCare: boolean;
     navItems?: NavItem[];
-  } || {
+  }) || {
     showChronicConditions: true,
     showMedicationRefills: true,
-    showUrgentCare: true
+    showUrgentCare: true,
   };
-  
+
   // Default navigation items
   const defaultNavItems: NavItem[] = [
-    { id: 'home', path: '/', icon: <Home className="h-5 w-5" />, label: 'Home', visible: true, order: 1, row: 'primary' },
-    { id: 'patients', path: '/patients', icon: <Users className="h-5 w-5" />, label: 'Patients', visible: true, order: 2, row: 'primary' },
-    { id: 'documents', path: '/documents', icon: <FileText className="h-5 w-5" />, label: 'Documents', visible: true, order: 3, row: 'primary' },
-    { id: 'messages', path: '/messages', icon: <MessageSquare className="h-5 w-5" />, label: 'Messages', visible: true, order: 4, row: 'primary' },
-    { id: 'scheduler', path: '/scheduler', icon: <Calendar className="h-5 w-5" />, label: 'Scheduler', visible: true, order: 5, row: 'primary' },
-    { id: 'formsite', path: '/formsite', icon: <FormInput className="h-5 w-5" />, label: 'formsite', visible: true, order: 6, row: 'primary' },
-    { id: 'knowledgeBase', path: '/knowledge-base', icon: <BookOpen className="h-5 w-5" />, label: 'Knowledge Base', visible: true, order: 7, row: 'primary' },
-    { id: 'aiBilling', path: '/ai-billing', icon: <Receipt className="h-5 w-5" />, label: 'AI Billing', visible: true, order: 8, row: 'primary' },
-    { id: 'forms', path: '/forms', icon: <ClipboardList className="h-5 w-5" />, label: 'Forms', visible: true, order: 1, row: 'secondary' },
-    { id: 'chronicConditions', path: '/chronic-conditions', icon: <Heart className="h-5 w-5" />, label: 'Chronic Conditions', visible: navPreferences.showChronicConditions, order: 2, row: 'secondary' },
-    { id: 'medicationRefills', path: '/medication-refills', icon: <PillIcon className="h-5 w-5" />, label: 'Medication Refills', visible: navPreferences.showMedicationRefills, order: 3, row: 'secondary' },
-    { id: 'urgentCare', path: '/urgent-care', icon: <AlertCircle className="h-5 w-5" />, label: 'Urgent Care', visible: navPreferences.showUrgentCare, order: 4, row: 'secondary' },
-    { id: 'education', path: '/education', icon: <GraduationCap className="h-5 w-5" />, label: 'Education', visible: true, order: 5, row: 'secondary' },
-    { id: 'subscription', path: '/subscription', icon: <CreditCard className="h-5 w-5" />, label: 'Subscription', visible: true, order: 6, row: 'secondary' },
-    { id: 'settings', path: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Organization Settings', visible: true, order: 7, row: 'secondary' },
-    { id: 'leadershipAssociation', path: '/leadership-association', icon: <UsersIcon className="h-5 w-5" />, label: 'Leadership Association', visible: true, order: 1, row: 'tertiary' },
+    {
+      id: "home",
+      path: "/",
+      icon: <Home className="h-5 w-5" />,
+      label: "Home",
+      visible: true,
+      order: 1,
+      row: "primary",
+    },
+    {
+      id: "patients",
+      path: "/patients",
+      icon: <Users className="h-5 w-5" />,
+      label: "Patients",
+      visible: true,
+      order: 2,
+      row: "primary",
+    },
+    {
+      id: "documents",
+      path: "/documents",
+      icon: <FileText className="h-5 w-5" />,
+      label: "Documents",
+      visible: true,
+      order: 3,
+      row: "primary",
+    },
+    {
+      id: "messages",
+      path: "/messages",
+      icon: <MessageSquare className="h-5 w-5" />,
+      label: "Messages",
+      visible: true,
+      order: 4,
+      row: "primary",
+    },
+    {
+      id: "scheduler",
+      path: "/scheduler",
+      icon: <Calendar className="h-5 w-5" />,
+      label: "Scheduler",
+      visible: true,
+      order: 5,
+      row: "primary",
+    },
+    {
+      id: "formsite",
+      path: "/formsite",
+      icon: <FormInput className="h-5 w-5" />,
+      label: "formsite",
+      visible: true,
+      order: 6,
+      row: "primary",
+    },
+    {
+      id: "knowledgeBase",
+      path: "/knowledge-base",
+      icon: <BookOpen className="h-5 w-5" />,
+      label: "Knowledge Base",
+      visible: true,
+      order: 7,
+      row: "primary",
+    },
+    {
+      id: "aiBilling",
+      path: "/ai-billing",
+      icon: <Receipt className="h-5 w-5" />,
+      label: "AI Billing",
+      visible: true,
+      order: 8,
+      row: "primary",
+    },
+    {
+      id: "forms",
+      path: "/forms",
+      icon: <ClipboardList className="h-5 w-5" />,
+      label: "Forms",
+      visible: true,
+      order: 1,
+      row: "secondary",
+    },
+    {
+      id: "chronicConditions",
+      path: "/chronic-conditions",
+      icon: <Heart className="h-5 w-5" />,
+      label: "Chronic Conditions",
+      visible: navPreferences.showChronicConditions,
+      order: 2,
+      row: "secondary",
+    },
+    {
+      id: "medicationRefills",
+      path: "/medication-refills",
+      icon: <PillIcon className="h-5 w-5" />,
+      label: "Medication Refills",
+      visible: navPreferences.showMedicationRefills,
+      order: 3,
+      row: "secondary",
+    },
+    {
+      id: "urgentCare",
+      path: "/urgent-care",
+      icon: <AlertCircle className="h-5 w-5" />,
+      label: "Urgent Care",
+      visible: navPreferences.showUrgentCare,
+      order: 4,
+      row: "secondary",
+    },
+    {
+      id: "education",
+      path: "/education",
+      icon: <GraduationCap className="h-5 w-5" />,
+      label: "Education",
+      visible: true,
+      order: 5,
+      row: "secondary",
+    },
+    {
+      id: "subscription",
+      path: "/subscription",
+      icon: <CreditCard className="h-5 w-5" />,
+      label: "Subscription",
+      visible: true,
+      order: 6,
+      row: "secondary",
+    },
+    {
+      id: "settings",
+      path: "/settings",
+      icon: <Settings className="h-5 w-5" />,
+      label: "Organization Settings",
+      visible: true,
+      order: 7,
+      row: "secondary",
+    },
+    {
+      id: "leadershipAssociation",
+      path: "/leadership-association",
+      icon: <UsersIcon className="h-5 w-5" />,
+      label: "Leadership Association",
+      visible: true,
+      order: 1,
+      row: "tertiary",
+    },
   ];
-  
+
   // State for navigation items, initialized from user preferences or defaults
-  const [navItems, setNavItems] = useState<NavItem[]>(
-    navPreferences.navItems || defaultNavItems
-  );
-  
+  const [navItems, setNavItems] = useState<NavItem[]>(navPreferences.navItems || defaultNavItems);
+
   // Update navItems when user preferences change
   useEffect(() => {
-    if (currentUser?.navPreferences && 
-        typeof currentUser.navPreferences === 'object' && 
-        currentUser.navPreferences !== null &&
-        'navItems' in currentUser.navPreferences && 
-        Array.isArray(currentUser.navPreferences.navItems)) {
+    if (
+      currentUser?.navPreferences &&
+      typeof currentUser.navPreferences === "object" &&
+      currentUser.navPreferences !== null &&
+      "navItems" in currentUser.navPreferences &&
+      Array.isArray(currentUser.navPreferences.navItems)
+    ) {
       setNavItems(currentUser.navPreferences.navItems as NavItem[]);
     }
   }, [currentUser]);
-  
+
   // Update notification counts
   useEffect(() => {
     if (Object.keys(notificationCounts).length > 0) {
-      setNavItems(prev => prev.map(item => ({
-        ...item,
-        notificationCount: notificationCounts[item.id] || 0
-      })));
+      setNavItems((prev) =>
+        prev.map((item) => ({
+          ...item,
+          notificationCount: notificationCounts[item.id] || 0,
+        }))
+      );
     }
   }, [notificationCounts]);
-  
+
   // Filter and sort items for primary, secondary, and tertiary rows
   const primaryNavItems = navItems
-    .filter(item => item.visible && item.row === 'primary')
+    .filter((item) => item.visible && item.row === "primary")
     .sort((a, b) => a.order - b.order);
-    
+
   const secondaryNavItems = navItems
-    .filter(item => item.visible && item.row === 'secondary')
+    .filter((item) => item.visible && item.row === "secondary")
     .sort((a, b) => a.order - b.order);
-    
+
   const tertiaryNavItems = navItems
-    .filter(item => item.visible && item.row === 'tertiary')
+    .filter((item) => item.visible && item.row === "tertiary")
     .sort((a, b) => a.order - b.order);
-  
+
   // Render navigation item with notification badge
   const renderNavItem = (item: NavItem) => (
-    <Link 
-      key={item.id} 
+    <Link
+      key={item.id}
       href={item.path}
       className={`
         relative flex items-center p-2 px-3 text-sm rounded-md transition-colors
-        ${location === item.path 
-          ? 'bg-blue-600 text-white font-medium' 
-          : 'text-gray-200 bg-[#2a2a2a] hover:bg-[#333333]'}
+        ${
+          location === item.path
+            ? "bg-blue-600 text-white font-medium"
+            : "text-gray-200 bg-[#2a2a2a] hover:bg-[#333333]"
+        }
         min-w-fit whitespace-nowrap mr-2 my-1 shadow-sm
       `}
     >
@@ -158,7 +290,7 @@ export default function NavigationBar() {
       <span className="truncate">{item.label}</span>
     </Link>
   );
-  
+
   return (
     <nav className="w-full bg-[#1a1a1a] border-b border-gray-800 py-1 sticky top-14 z-40">
       {/* Primary Nav Row - Must be visible */}
@@ -170,14 +302,14 @@ export default function NavigationBar() {
             </div>
           ))}
         </div>
-        
+
         <div className="ml-auto flex items-center pl-4 flex-shrink-0">
           <div className="w-8 h-8 rounded-full bg-[#262626] flex items-center justify-center">
             <User className="h-4 w-4 text-gray-300" />
           </div>
         </div>
       </div>
-      
+
       {/* Secondary Nav Row */}
       <div className="flex items-center px-4 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 py-2 border-t border-gray-800">
         <div className="flex items-center space-x-2">

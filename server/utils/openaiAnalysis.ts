@@ -10,19 +10,22 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
  * @param messages Array of messages from the conversation
  * @returns Array of identified pending items
  */
-export async function analyzePendingItems(patientId: number, messages: any[]): Promise<PendingItem[]> {
+export async function analyzePendingItems(
+  patientId: number,
+  messages: any[]
+): Promise<PendingItem[]> {
   // Sort messages by timestamp to ensure chronological order
-  const sortedMessages = [...messages].sort((a, b) => 
-    new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  const sortedMessages = [...messages].sort(
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
   );
-  
+
   // Create conversation history for analysis
-  const conversationHistory = sortedMessages.map(msg => ({
+  const conversationHistory = sortedMessages.map((msg) => ({
     role: msg.isFromPatient ? "patient" : "doctor",
     content: msg.content,
-    timestamp: msg.timestamp
+    timestamp: msg.timestamp,
   }));
-  
+
   try {
     // Call OpenAI to analyze the conversation
     // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -50,19 +53,19 @@ export async function analyzePendingItems(patientId: number, messages: any[]): P
             }
           ]
           
-          If no pending items are found, respond with an empty array [].`
+          If no pending items are found, respond with an empty array [].`,
         },
-        ...conversationHistory.map(msg => ({
-          role: msg.role === "doctor" ? "assistant" as const : "user" as const,
-          content: `[${msg.role.toUpperCase()}] ${msg.timestamp}: ${msg.content}`
-        }))
+        ...conversationHistory.map((msg) => ({
+          role: msg.role === "doctor" ? ("assistant" as const) : ("user" as const),
+          content: `[${msg.role.toUpperCase()}] ${msg.timestamp}: ${msg.content}`,
+        })),
       ],
-      response_format: { type: "json_object" }
+      response_format: { type: "json_object" },
     });
 
     // Parse and return the results
     const result = JSON.parse(response.choices[0].message.content || "{}");
-    
+
     // Return the pending items array, or an empty array if none were found
     return result.pendingItems || result || [];
   } catch (error) {

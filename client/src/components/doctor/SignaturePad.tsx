@@ -22,13 +22,13 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onComplete }) => {
     canvas.width = canvas.offsetWidth;
     canvas.height = 200;
 
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
     if (context) {
       // Set up the context
-      context.lineJoin = 'round';
-      context.lineCap = 'round';
+      context.lineJoin = "round";
+      context.lineCap = "round";
       context.lineWidth = 2.5;
-      context.strokeStyle = '#FFFFFF';
+      context.strokeStyle = "#FFFFFF";
       setCtx(context);
     }
 
@@ -37,13 +37,13 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onComplete }) => {
       if (!canvas) return;
       const prevImg = canvas.toDataURL();
       canvas.width = canvas.offsetWidth;
-      
+
       if (context) {
-        context.lineJoin = 'round';
-        context.lineCap = 'round';
+        context.lineJoin = "round";
+        context.lineCap = "round";
         context.lineWidth = 2.5;
-        context.strokeStyle = '#FFFFFF';
-        
+        context.strokeStyle = "#FFFFFF";
+
         // Redraw the previous content
         if (hasContent) {
           const img = new Image();
@@ -55,21 +55,21 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onComplete }) => {
       }
     };
 
-    window.addEventListener('resize', handleResize);
-    
+    window.addEventListener("resize", handleResize);
+
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     };
   }, [hasContent]);
 
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
     if (!ctx) return;
-    
+
     setIsDrawing(true);
-    
+
     // Get the position
     let x, y;
-    if ('touches' in e) {
+    if ("touches" in e) {
       // Touch event
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -80,17 +80,17 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onComplete }) => {
       x = e.nativeEvent.offsetX;
       y = e.nativeEvent.offsetY;
     }
-    
+
     setLastX(x);
     setLastY(y);
   };
 
   const draw = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDrawing || !ctx) return;
-    
+
     // Get the position
     let x, y;
-    if ('touches' in e) {
+    if ("touches" in e) {
       // Touch event
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
@@ -102,13 +102,13 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onComplete }) => {
       x = e.nativeEvent.offsetX;
       y = e.nativeEvent.offsetY;
     }
-    
+
     // Drawing logic
     ctx.beginPath();
     ctx.moveTo(lastX, lastY);
     ctx.lineTo(x, y);
     ctx.stroke();
-    
+
     setLastX(x);
     setLastY(y);
     setHasContent(true);
@@ -126,17 +126,15 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onComplete }) => {
 
   const completeSignature = () => {
     if (!canvasRef.current || !hasContent) return;
-    
+
     // Get the signature as a data URL
-    const signatureDataUrl = canvasRef.current.toDataURL('image/png');
+    const signatureDataUrl = canvasRef.current.toDataURL("image/png");
     onComplete(signatureDataUrl);
   };
 
   return (
     <div className="space-y-4">
-      <div 
-        className="border-2 border-gray-700 rounded-md overflow-hidden bg-[#262626] touch-none"
-      >
+      <div className="border-2 border-gray-700 rounded-md overflow-hidden bg-[#262626] touch-none">
         <canvas
           ref={canvasRef}
           className="w-full cursor-crosshair"
@@ -149,30 +147,25 @@ const SignaturePad: React.FC<SignaturePadProps> = ({ onComplete }) => {
           onTouchEnd={endDrawing}
         />
       </div>
-      
+
       <div className="flex justify-between">
-        <Button 
-          variant="outline" 
-          onClick={clearCanvas}
-          className="flex items-center"
-          type="button"
-        >
+        <Button variant="outline" onClick={clearCanvas} className="flex items-center" type="button">
           <ArrowRight className="mr-2 h-4 w-4" />
           Clear
         </Button>
-        
+
         <div className="space-x-2">
-          <Button 
-            variant="outline" 
-            onClick={() => onComplete('')}
+          <Button
+            variant="outline"
+            onClick={() => onComplete("")}
             className="flex items-center"
             type="button"
           >
             <AlertCircle className="mr-2 h-4 w-4" />
             Cancel
           </Button>
-          
-          <Button 
+
+          <Button
             onClick={completeSignature}
             disabled={!hasContent}
             className="bg-blue-600 hover:bg-blue-700 flex items-center"

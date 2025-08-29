@@ -1,25 +1,48 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
-import { Loader2, AlertTriangle, Clock, User, Phone, MapPin, Search, Filter, RefreshCw } from 'lucide-react';
-import { format } from 'date-fns';
+import React, { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import {
+  Loader2,
+  AlertTriangle,
+  Clock,
+  User,
+  Phone,
+  MapPin,
+  Search,
+  Filter,
+  RefreshCw,
+} from "lucide-react";
+import { format } from "date-fns";
 
-import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useToast } from '@/hooks/use-toast';
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 // Types
 interface UrgentCarePatient {
   id: string;
   name: string;
   age: number;
-  gender: 'male' | 'female' | 'other';
+  gender: "male" | "female" | "other";
   phone: string;
   address: string;
   chiefComplaint: string;
@@ -33,7 +56,7 @@ interface UrgentCarePatient {
   };
   triageLevel: 1 | 2 | 3 | 4 | 5; // 1 = Critical, 5 = Non-urgent
   arrivalTime: string;
-  status: 'waiting' | 'in_progress' | 'completed' | 'discharged';
+  status: "waiting" | "in_progress" | "completed" | "discharged";
   assignedProvider?: string;
   estimatedWaitTime?: number;
   notes?: string;
@@ -41,24 +64,24 @@ interface UrgentCarePatient {
 
 const UrgentCarePage: React.FC = () => {
   const { toast } = useToast();
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedPatient, setSelectedPatient] = useState<UrgentCarePatient | null>(null);
-  const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [filterTriage, setFilterTriage] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterTriage, setFilterTriage] = useState<string>("all");
 
   // Fetch urgent care patients
   const {
     data: patients = [],
     isLoading,
     error,
-    refetch
+    refetch,
   } = useQuery<UrgentCarePatient[]>({
-    queryKey: ['/api/urgent-care/patients'],
+    queryKey: ["/api/urgent-care/patients"],
     queryFn: async () => {
       // Use authentic data from your API - replace with actual endpoint when available
-      const response = await fetch('/api/urgent-care/patients');
+      const response = await fetch("/api/urgent-care/patients");
       if (!response.ok) {
-        throw new Error('Failed to fetch urgent care patients');
+        throw new Error("Failed to fetch urgent care patients");
       }
       return await response.json();
     },
@@ -67,40 +90,40 @@ const UrgentCarePage: React.FC = () => {
 
   // Update patient status mutation
   const updatePatientMutation = useMutation({
-    mutationFn: async ({ 
-      patientId, 
-      status, 
+    mutationFn: async ({
+      patientId,
+      status,
       assignedProvider,
-      notes 
-    }: { 
-      patientId: string; 
-      status: UrgentCarePatient['status']; 
+      notes,
+    }: {
+      patientId: string;
+      status: UrgentCarePatient["status"];
       assignedProvider?: string;
       notes?: string;
     }) => {
       const response = await fetch(`/api/urgent-care/patients/${patientId}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ status, assignedProvider, notes }),
       });
-      
-      if (!response.ok) throw new Error('Failed to update patient');
+
+      if (!response.ok) throw new Error("Failed to update patient");
       return await response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/urgent-care/patients'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/urgent-care/patients"] });
       toast({
-        title: 'Patient updated',
-        description: 'Patient status has been updated successfully.',
+        title: "Patient updated",
+        description: "Patient status has been updated successfully.",
       });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Update failed',
+        title: "Update failed",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
@@ -109,31 +132,67 @@ const UrgentCarePage: React.FC = () => {
   const getTriageBadge = (level: number) => {
     switch (level) {
       case 1:
-        return <Badge variant="destructive" className="bg-red-600">Critical</Badge>;
+        return (
+          <Badge variant="destructive" className="bg-red-600">
+            Critical
+          </Badge>
+        );
       case 2:
-        return <Badge variant="destructive" className="bg-orange-600">Urgent</Badge>;
+        return (
+          <Badge variant="destructive" className="bg-orange-600">
+            Urgent
+          </Badge>
+        );
       case 3:
-        return <Badge variant="outline" className="bg-yellow-900/20 text-yellow-500 border-yellow-800">Semi-Urgent</Badge>;
+        return (
+          <Badge variant="outline" className="bg-yellow-900/20 text-yellow-500 border-yellow-800">
+            Semi-Urgent
+          </Badge>
+        );
       case 4:
-        return <Badge variant="outline" className="bg-green-900/20 text-green-500 border-green-800">Less Urgent</Badge>;
+        return (
+          <Badge variant="outline" className="bg-green-900/20 text-green-500 border-green-800">
+            Less Urgent
+          </Badge>
+        );
       case 5:
-        return <Badge variant="outline" className="bg-blue-900/20 text-blue-500 border-blue-800">Non-Urgent</Badge>;
+        return (
+          <Badge variant="outline" className="bg-blue-900/20 text-blue-500 border-blue-800">
+            Non-Urgent
+          </Badge>
+        );
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
   // Get status badge
-  const getStatusBadge = (status: UrgentCarePatient['status']) => {
+  const getStatusBadge = (status: UrgentCarePatient["status"]) => {
     switch (status) {
-      case 'waiting':
-        return <Badge variant="outline" className="bg-yellow-900/20 text-yellow-500 border-yellow-800">Waiting</Badge>;
-      case 'in_progress':
-        return <Badge variant="outline" className="bg-blue-900/20 text-blue-500 border-blue-800">In Progress</Badge>;
-      case 'completed':
-        return <Badge variant="outline" className="bg-green-900/20 text-green-500 border-green-800">Completed</Badge>;
-      case 'discharged':
-        return <Badge variant="outline" className="bg-gray-900/20 text-gray-500 border-gray-800">Discharged</Badge>;
+      case "waiting":
+        return (
+          <Badge variant="outline" className="bg-yellow-900/20 text-yellow-500 border-yellow-800">
+            Waiting
+          </Badge>
+        );
+      case "in_progress":
+        return (
+          <Badge variant="outline" className="bg-blue-900/20 text-blue-500 border-blue-800">
+            In Progress
+          </Badge>
+        );
+      case "completed":
+        return (
+          <Badge variant="outline" className="bg-green-900/20 text-green-500 border-green-800">
+            Completed
+          </Badge>
+        );
+      case "discharged":
+        return (
+          <Badge variant="outline" className="bg-gray-900/20 text-gray-500 border-gray-800">
+            Discharged
+          </Badge>
+        );
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
@@ -144,7 +203,7 @@ const UrgentCarePage: React.FC = () => {
     const arrival = new Date(arrivalTime);
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - arrival.getTime()) / (1000 * 60));
-    
+
     if (diffInMinutes < 60) {
       return `${diffInMinutes}m ago`;
     } else {
@@ -155,12 +214,13 @@ const UrgentCarePage: React.FC = () => {
   };
 
   // Filter patients
-  const filteredPatients = patients.filter(patient => {
-    const matchesSearch = patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         patient.chiefComplaint.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = filterStatus === 'all' || patient.status === filterStatus;
-    const matchesTriage = filterTriage === 'all' || patient.triageLevel.toString() === filterTriage;
-    
+  const filteredPatients = patients.filter((patient) => {
+    const matchesSearch =
+      patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.chiefComplaint.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = filterStatus === "all" || patient.status === filterStatus;
+    const matchesTriage = filterTriage === "all" || patient.triageLevel.toString() === filterTriage;
+
     return matchesSearch && matchesStatus && matchesTriage;
   });
 
@@ -173,13 +233,13 @@ const UrgentCarePage: React.FC = () => {
   });
 
   // Handle patient status update
-  const handleStatusUpdate = (status: UrgentCarePatient['status'], assignedProvider?: string) => {
+  const handleStatusUpdate = (status: UrgentCarePatient["status"], assignedProvider?: string) => {
     if (!selectedPatient) return;
-    
+
     updatePatientMutation.mutate({
       patientId: selectedPatient.id,
       status,
-      assignedProvider
+      assignedProvider,
     });
   };
 
@@ -191,7 +251,8 @@ const UrgentCarePage: React.FC = () => {
             <AlertTriangle className="h-12 w-12 mx-auto mb-4" />
             <h2 className="text-xl font-semibold mb-3">Error Loading Urgent Care Data</h2>
             <p className="max-w-md mb-4">
-              Unable to connect to the urgent care system. Please check your connection or contact support.
+              Unable to connect to the urgent care system. Please check your connection or contact
+              support.
             </p>
             <Button onClick={() => refetch()} variant="outline">
               Try Again
@@ -214,13 +275,8 @@ const UrgentCarePage: React.FC = () => {
           </div>
         </div>
         <div className="flex space-x-2">
-          <Button
-            onClick={() => refetch()}
-            disabled={isLoading}
-            variant="outline"
-            size="sm"
-          >
-            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          <Button onClick={() => refetch()} disabled={isLoading} variant="outline" size="sm">
+            <RefreshCw className={`mr-2 h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
           <Button className="bg-red-600 hover:bg-red-700">
@@ -243,42 +299,46 @@ const UrgentCarePage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-[#1A1A1A] border-[#333]">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-400">Waiting</p>
                 <p className="text-2xl font-bold text-yellow-500">
-                  {patients.filter(p => p.status === 'waiting').length}
+                  {patients.filter((p) => p.status === "waiting").length}
                 </p>
               </div>
               <Clock className="h-8 w-8 text-yellow-500" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-[#1A1A1A] border-[#333]">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-400">Critical/Urgent</p>
                 <p className="text-2xl font-bold text-red-500">
-                  {patients.filter(p => p.triageLevel <= 2).length}
+                  {patients.filter((p) => p.triageLevel <= 2).length}
                 </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-[#1A1A1A] border-[#333]">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-400">Avg Wait Time</p>
                 <p className="text-2xl font-bold">
-                  {Math.round(patients.reduce((acc, p) => acc + (p.estimatedWaitTime || 0), 0) / patients.length || 0)}m
+                  {Math.round(
+                    patients.reduce((acc, p) => acc + (p.estimatedWaitTime || 0), 0) /
+                      patients.length || 0
+                  )}
+                  m
                 </p>
               </div>
               <Clock className="h-8 w-8 text-blue-500" />
@@ -293,7 +353,7 @@ const UrgentCarePage: React.FC = () => {
         <div className="bg-[#1A1A1A] rounded-lg p-4 border border-[#333] h-[calc(100vh-300px)] flex flex-col">
           <div className="mb-4">
             <h2 className="text-lg font-semibold mb-3">Patient Queue</h2>
-            
+
             {/* Search and Filters */}
             <div className="space-y-3">
               <div className="relative">
@@ -305,7 +365,7 @@ const UrgentCarePage: React.FC = () => {
                 />
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
               </div>
-              
+
               <div className="flex space-x-2">
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
                   <SelectTrigger className="flex-1 bg-[#252525] border-[#444]">
@@ -319,7 +379,7 @@ const UrgentCarePage: React.FC = () => {
                     <SelectItem value="discharged">Discharged</SelectItem>
                   </SelectContent>
                 </Select>
-                
+
                 <Select value={filterTriage} onValueChange={setFilterTriage}>
                   <SelectTrigger className="flex-1 bg-[#252525] border-[#444]">
                     <SelectValue placeholder="Filter by triage" />
@@ -351,12 +411,12 @@ const UrgentCarePage: React.FC = () => {
             ) : (
               <div className="space-y-2">
                 {sortedPatients.map((patient) => (
-                  <Card 
+                  <Card
                     key={patient.id}
                     className={`cursor-pointer transition-colors border-[#333] ${
-                      selectedPatient?.id === patient.id 
-                        ? 'bg-[#2A2A2A] border-blue-500' 
-                        : 'bg-[#222] hover:bg-[#2A2A2A]'
+                      selectedPatient?.id === patient.id
+                        ? "bg-[#2A2A2A] border-blue-500"
+                        : "bg-[#222] hover:bg-[#2A2A2A]"
                     }`}
                     onClick={() => setSelectedPatient(patient)}
                   >
@@ -373,11 +433,9 @@ const UrgentCarePage: React.FC = () => {
                           {getStatusBadge(patient.status)}
                         </div>
                       </div>
-                      
-                      <p className="text-sm text-gray-300 mb-2">
-                        {patient.chiefComplaint}
-                      </p>
-                      
+
+                      <p className="text-sm text-gray-300 mb-2">{patient.chiefComplaint}</p>
+
                       <div className="flex justify-between items-center text-xs text-gray-500">
                         <span>{getTimeSinceArrival(patient.arrivalTime)}</span>
                         {patient.estimatedWaitTime && (
@@ -412,26 +470,26 @@ const UrgentCarePage: React.FC = () => {
 
                 {/* Quick Actions */}
                 <div className="flex space-x-2 mb-4">
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     variant="outline"
-                    onClick={() => handleStatusUpdate('in_progress', 'Dr. Font')}
+                    onClick={() => handleStatusUpdate("in_progress", "Dr. Font")}
                     disabled={updatePatientMutation.isPending}
                   >
                     Start Treatment
                   </Button>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     variant="outline"
-                    onClick={() => handleStatusUpdate('completed')}
+                    onClick={() => handleStatusUpdate("completed")}
                     disabled={updatePatientMutation.isPending}
                   >
                     Complete
                   </Button>
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     variant="outline"
-                    onClick={() => handleStatusUpdate('discharged')}
+                    onClick={() => handleStatusUpdate("discharged")}
                     disabled={updatePatientMutation.isPending}
                   >
                     Discharge
@@ -446,7 +504,7 @@ const UrgentCarePage: React.FC = () => {
                     <TabsTrigger value="vitals">Vitals</TabsTrigger>
                     <TabsTrigger value="notes">Notes</TabsTrigger>
                   </TabsList>
-                  
+
                   <TabsContent value="overview" className="space-y-4">
                     <Card className="bg-[#222] border-[#333]">
                       <CardHeader className="pb-2">
@@ -488,7 +546,7 @@ const UrgentCarePage: React.FC = () => {
                       </CardContent>
                     </Card>
                   </TabsContent>
-                  
+
                   <TabsContent value="vitals" className="space-y-4">
                     <Card className="bg-[#222] border-[#333]">
                       <CardHeader className="pb-2">
@@ -498,37 +556,47 @@ const UrgentCarePage: React.FC = () => {
                         {selectedPatient.vitalSigns.temperature && (
                           <div className="flex justify-between">
                             <span className="text-gray-400">Temperature</span>
-                            <span className="text-white">{selectedPatient.vitalSigns.temperature}°F</span>
+                            <span className="text-white">
+                              {selectedPatient.vitalSigns.temperature}°F
+                            </span>
                           </div>
                         )}
                         {selectedPatient.vitalSigns.bloodPressure && (
                           <div className="flex justify-between">
                             <span className="text-gray-400">Blood Pressure</span>
-                            <span className="text-white">{selectedPatient.vitalSigns.bloodPressure}</span>
+                            <span className="text-white">
+                              {selectedPatient.vitalSigns.bloodPressure}
+                            </span>
                           </div>
                         )}
                         {selectedPatient.vitalSigns.heartRate && (
                           <div className="flex justify-between">
                             <span className="text-gray-400">Heart Rate</span>
-                            <span className="text-white">{selectedPatient.vitalSigns.heartRate} bpm</span>
+                            <span className="text-white">
+                              {selectedPatient.vitalSigns.heartRate} bpm
+                            </span>
                           </div>
                         )}
                         {selectedPatient.vitalSigns.respiratoryRate && (
                           <div className="flex justify-between">
                             <span className="text-gray-400">Respiratory Rate</span>
-                            <span className="text-white">{selectedPatient.vitalSigns.respiratoryRate} /min</span>
+                            <span className="text-white">
+                              {selectedPatient.vitalSigns.respiratoryRate} /min
+                            </span>
                           </div>
                         )}
                         {selectedPatient.vitalSigns.oxygenSaturation && (
                           <div className="flex justify-between">
                             <span className="text-gray-400">O2 Saturation</span>
-                            <span className="text-white">{selectedPatient.vitalSigns.oxygenSaturation}%</span>
+                            <span className="text-white">
+                              {selectedPatient.vitalSigns.oxygenSaturation}%
+                            </span>
                           </div>
                         )}
                       </CardContent>
                     </Card>
                   </TabsContent>
-                  
+
                   <TabsContent value="notes" className="space-y-4">
                     <Card className="bg-[#222] border-[#333]">
                       <CardHeader className="pb-2">

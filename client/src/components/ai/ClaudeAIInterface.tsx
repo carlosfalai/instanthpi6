@@ -1,78 +1,78 @@
-import React, { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
-import { apiRequest } from '@/lib/queryClient';
+import React, { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2 } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
 
 const ClaudeAIInterface = () => {
-  const [activeTab, setActiveTab] = useState('text-generation');
-  const [textInput, setTextInput] = useState('');
-  const [summarizeInput, setSummarizeInput] = useState('');
-  const [imageAnalysisPrompt, setImageAnalysisPrompt] = useState('');
-  const [imageBase64, setImageBase64] = useState('');
-  const [sentimentText, setSentimentText] = useState('');
-  const [medicalDocSymptoms, setMedicalDocSymptoms] = useState('');
-  const [medicalDocComplaint, setMedicalDocComplaint] = useState('');
-  const [treatmentDiagnosis, setTreatmentDiagnosis] = useState('');
-  const [wordLimit, setWordLimit] = useState('250');
-  
+  const [activeTab, setActiveTab] = useState("text-generation");
+  const [textInput, setTextInput] = useState("");
+  const [summarizeInput, setSummarizeInput] = useState("");
+  const [imageAnalysisPrompt, setImageAnalysisPrompt] = useState("");
+  const [imageBase64, setImageBase64] = useState("");
+  const [sentimentText, setSentimentText] = useState("");
+  const [medicalDocSymptoms, setMedicalDocSymptoms] = useState("");
+  const [medicalDocComplaint, setMedicalDocComplaint] = useState("");
+  const [treatmentDiagnosis, setTreatmentDiagnosis] = useState("");
+  const [wordLimit, setWordLimit] = useState("250");
+
   const { toast } = useToast();
 
   // Text generation mutation
   const textGenerationMutation = useMutation({
     mutationFn: async (prompt: string) => {
-      const res = await apiRequest('POST', '/api/anthropic/generate-text', { prompt });
+      const res = await apiRequest("POST", "/api/anthropic/generate-text", { prompt });
       return res.json();
     },
     onSuccess: (data) => {
       toast({
-        title: 'Text generated',
-        description: 'Claude has generated a response.',
+        title: "Text generated",
+        description: "Claude has generated a response.",
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
+        title: "Error",
         description: `Failed to generate text: ${error.message}`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
 
   // Summarization mutation
   const summarizeMutation = useMutation({
-    mutationFn: async (data: { text: string, wordLimit?: string }) => {
-      const res = await apiRequest('POST', '/api/anthropic/summarize-text', {
+    mutationFn: async (data: { text: string; wordLimit?: string }) => {
+      const res = await apiRequest("POST", "/api/anthropic/summarize-text", {
         text: data.text,
-        wordLimit: parseInt(data.wordLimit || '250'),
+        wordLimit: parseInt(data.wordLimit || "250"),
       });
       return res.json();
     },
     onSuccess: (data) => {
       toast({
-        title: 'Text summarized',
-        description: 'Claude has summarized the text.',
+        title: "Text summarized",
+        description: "Claude has summarized the text.",
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
+        title: "Error",
         description: `Failed to summarize text: ${error.message}`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
 
   // Image analysis mutation
   const imageAnalysisMutation = useMutation({
-    mutationFn: async (data: { imageBase64: string, prompt: string }) => {
-      const res = await apiRequest('POST', '/api/anthropic/analyze-image', {
+    mutationFn: async (data: { imageBase64: string; prompt: string }) => {
+      const res = await apiRequest("POST", "/api/anthropic/analyze-image", {
         imageBase64: data.imageBase64,
         prompt: data.prompt,
       });
@@ -80,15 +80,15 @@ const ClaudeAIInterface = () => {
     },
     onSuccess: (data) => {
       toast({
-        title: 'Image analyzed',
-        description: 'Claude has analyzed the image.',
+        title: "Image analyzed",
+        description: "Claude has analyzed the image.",
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
+        title: "Error",
         description: `Failed to analyze image: ${error.message}`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
@@ -96,62 +96,62 @@ const ClaudeAIInterface = () => {
   // Sentiment analysis mutation
   const sentimentAnalysisMutation = useMutation({
     mutationFn: async (text: string) => {
-      const res = await apiRequest('POST', '/api/anthropic/analyze-sentiment', { text });
+      const res = await apiRequest("POST", "/api/anthropic/analyze-sentiment", { text });
       return res.json();
     },
     onSuccess: (data) => {
       toast({
-        title: 'Sentiment analyzed',
+        title: "Sentiment analyzed",
         description: `Sentiment: ${data.result.sentiment} (${Math.round(data.result.confidence * 100)}% confidence)`,
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
+        title: "Error",
         description: `Failed to analyze sentiment: ${error.message}`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
 
   // Medical documentation generation mutation
   const medicalDocMutation = useMutation({
-    mutationFn: async (data: { patientData: any, options?: any }) => {
-      const res = await apiRequest('POST', '/api/anthropic/generate-medical-documentation', data);
+    mutationFn: async (data: { patientData: any; options?: any }) => {
+      const res = await apiRequest("POST", "/api/anthropic/generate-medical-documentation", data);
       return res.json();
     },
     onSuccess: (data) => {
       toast({
-        title: 'Medical documentation generated',
-        description: 'Claude has generated the medical documentation.',
+        title: "Medical documentation generated",
+        description: "Claude has generated the medical documentation.",
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
+        title: "Error",
         description: `Failed to generate medical documentation: ${error.message}`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
 
   // Treatment plan generation mutation
   const treatmentPlanMutation = useMutation({
-    mutationFn: async (data: { diagnosis: string, patientDetails?: any }) => {
-      const res = await apiRequest('POST', '/api/anthropic/generate-treatment-plan', data);
+    mutationFn: async (data: { diagnosis: string; patientDetails?: any }) => {
+      const res = await apiRequest("POST", "/api/anthropic/generate-treatment-plan", data);
       return res.json();
     },
     onSuccess: (data) => {
       toast({
-        title: 'Treatment plan generated',
-        description: 'Claude has generated a treatment plan.',
+        title: "Treatment plan generated",
+        description: "Claude has generated a treatment plan.",
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
+        title: "Error",
         description: `Failed to generate treatment plan: ${error.message}`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
@@ -162,7 +162,7 @@ const ClaudeAIInterface = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        const base64 = reader.result?.toString().split(',')[1];
+        const base64 = reader.result?.toString().split(",")[1];
         if (base64) {
           setImageBase64(base64);
         }
@@ -215,7 +215,9 @@ const ClaudeAIInterface = () => {
               {textGenerationMutation.data && (
                 <div className="mt-4 p-4 border rounded-md bg-muted">
                   <Label>Claude Response:</Label>
-                  <div className="mt-2 whitespace-pre-wrap">{textGenerationMutation.data.result}</div>
+                  <div className="mt-2 whitespace-pre-wrap">
+                    {textGenerationMutation.data.result}
+                  </div>
                 </div>
               )}
             </div>
@@ -250,9 +252,7 @@ const ClaudeAIInterface = () => {
                 onClick={() => summarizeMutation.mutate({ text: summarizeInput, wordLimit })}
                 disabled={summarizeMutation.isPending || !summarizeInput.trim()}
               >
-                {summarizeMutation.isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
+                {summarizeMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Summarize
               </Button>
               {summarizeMutation.data && (
@@ -288,8 +288,12 @@ const ClaudeAIInterface = () => {
                 />
               </div>
               <Button
-                onClick={() => imageAnalysisMutation.mutate({ imageBase64, prompt: imageAnalysisPrompt })}
-                disabled={imageAnalysisMutation.isPending || !imageBase64 || !imageAnalysisPrompt.trim()}
+                onClick={() =>
+                  imageAnalysisMutation.mutate({ imageBase64, prompt: imageAnalysisPrompt })
+                }
+                disabled={
+                  imageAnalysisMutation.isPending || !imageBase64 || !imageAnalysisPrompt.trim()
+                }
               >
                 {imageAnalysisMutation.isPending && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -300,10 +304,10 @@ const ClaudeAIInterface = () => {
                 <div className="mt-4">
                   <Label>Selected Image:</Label>
                   <div className="mt-2">
-                    <img 
-                      src={`data:image/jpeg;base64,${imageBase64}`} 
-                      alt="Uploaded" 
-                      className="max-h-48 rounded-md" 
+                    <img
+                      src={`data:image/jpeg;base64,${imageBase64}`}
+                      alt="Uploaded"
+                      className="max-h-48 rounded-md"
                     />
                   </div>
                 </div>
@@ -311,7 +315,9 @@ const ClaudeAIInterface = () => {
               {imageAnalysisMutation.data && (
                 <div className="mt-4 p-4 border rounded-md bg-muted">
                   <Label>Analysis:</Label>
-                  <div className="mt-2 whitespace-pre-wrap">{imageAnalysisMutation.data.result}</div>
+                  <div className="mt-2 whitespace-pre-wrap">
+                    {imageAnalysisMutation.data.result}
+                  </div>
                 </div>
               )}
             </div>
@@ -343,8 +349,13 @@ const ClaudeAIInterface = () => {
                 <div className="mt-4 p-4 border rounded-md bg-muted">
                   <Label>Results:</Label>
                   <div className="mt-2">
-                    <p><strong>Sentiment:</strong> {sentimentAnalysisMutation.data.result.sentiment}</p>
-                    <p><strong>Confidence:</strong> {Math.round(sentimentAnalysisMutation.data.result.confidence * 100)}%</p>
+                    <p>
+                      <strong>Sentiment:</strong> {sentimentAnalysisMutation.data.result.sentiment}
+                    </p>
+                    <p>
+                      <strong>Confidence:</strong>{" "}
+                      {Math.round(sentimentAnalysisMutation.data.result.confidence * 100)}%
+                    </p>
                   </div>
                 </div>
               )}
@@ -374,20 +385,24 @@ const ClaudeAIInterface = () => {
                 />
               </div>
               <Button
-                onClick={() => medicalDocMutation.mutate({
-                  patientData: {
-                    chiefComplaint: medicalDocComplaint,
-                    symptoms: medicalDocSymptoms,
-                  },
-                  options: {
-                    documentType: 'soap'
-                  }
-                })}
-                disabled={medicalDocMutation.isPending || !medicalDocComplaint.trim() || !medicalDocSymptoms.trim()}
+                onClick={() =>
+                  medicalDocMutation.mutate({
+                    patientData: {
+                      chiefComplaint: medicalDocComplaint,
+                      symptoms: medicalDocSymptoms,
+                    },
+                    options: {
+                      documentType: "soap",
+                    },
+                  })
+                }
+                disabled={
+                  medicalDocMutation.isPending ||
+                  !medicalDocComplaint.trim() ||
+                  !medicalDocSymptoms.trim()
+                }
               >
-                {medicalDocMutation.isPending && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                )}
+                {medicalDocMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Generate Medical Documentation
               </Button>
               {medicalDocMutation.data && (
@@ -412,9 +427,11 @@ const ClaudeAIInterface = () => {
                 />
               </div>
               <Button
-                onClick={() => treatmentPlanMutation.mutate({
-                  diagnosis: treatmentDiagnosis,
-                })}
+                onClick={() =>
+                  treatmentPlanMutation.mutate({
+                    diagnosis: treatmentDiagnosis,
+                  })
+                }
                 disabled={treatmentPlanMutation.isPending || !treatmentDiagnosis.trim()}
               >
                 {treatmentPlanMutation.isPending && (
@@ -425,7 +442,9 @@ const ClaudeAIInterface = () => {
               {treatmentPlanMutation.data && (
                 <div className="mt-4 p-4 border rounded-md bg-muted">
                   <Label>Treatment Plan:</Label>
-                  <div className="mt-2 whitespace-pre-wrap">{treatmentPlanMutation.data.result}</div>
+                  <div className="mt-2 whitespace-pre-wrap">
+                    {treatmentPlanMutation.data.result}
+                  </div>
                 </div>
               )}
             </div>

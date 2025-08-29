@@ -1,0 +1,9 @@
+tunnel: 08e7bdbf-f9f4-472c-bda9-dedadf8caec5
+credentials-file: /Users/carlosfavielfont/Downloads/Instanthpi 6/tunnel-credentials.json
+
+ingress:
+  - hostname: ollama.instanthpi.ca
+    service: http://localhost:11434
+    originRequest:
+      noTLSVerify: true
+  - service: http_status:404

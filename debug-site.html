@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Debug InstantHPI</title>
+  </head>
+  <body>
+    <h1>Debugging InstantHPI Site</h1>
+    <iframe id="site" src="https://instanthpi.ca/login" width="100%" height="400"></iframe>
+
+    <h2>Tests:</h2>
+    <div id="tests"></div>
+
+    <script>
+      async function runTests() {
+        const tests = document.getElementById("tests");
+
+        // Test 1: Site responds
+        try {
+          const response = await fetch("https://instanthpi.ca");
+          tests.innerHTML += `<p>✅ Site responds: ${response.status}</p>`;
+        } catch (e) {
+          tests.innerHTML += `<p>❌ Site error: ${e.message}</p>`;
+        }
+
+        // Test 2: JS loads
+        try {
+          const jsResponse = await fetch("https://instanthpi.ca/assets/index-WQdvPy7-.js");
+          tests.innerHTML += `<p>✅ JS loads: ${jsResponse.status}</p>`;
+        } catch (e) {
+          tests.innerHTML += `<p>❌ JS error: ${e.message}</p>`;
+        }
+
+        // Test 3: CSS loads
+        try {
+          const cssResponse = await fetch("https://instanthpi.ca/assets/index-DKfFOBgf.css");
+          tests.innerHTML += `<p>✅ CSS loads: ${cssResponse.status}</p>`;
+        } catch (e) {
+          tests.innerHTML += `<p>❌ CSS error: ${e.message}</p>`;
+        }
+      }
+
+      runTests();
+    </script>
+  </body>
+</html>

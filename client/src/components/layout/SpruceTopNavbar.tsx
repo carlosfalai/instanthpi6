@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, useLocation } from 'wouter';
+import React from "react";
+import { Link, useLocation } from "wouter";
 import {
   Home,
   Users,
@@ -16,10 +16,10 @@ import {
   GraduationCap,
   CreditCard,
   Settings,
-  User
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { Separator } from '@/components/ui/separator';
+  User,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 interface TopNavItemProps {
   href: string;
@@ -35,9 +35,7 @@ const TopNavItem: React.FC<TopNavItemProps> = ({ href, icon, label, isActive }) 
       <a
         className={cn(
           "flex h-10 items-center gap-2 px-3 text-sm rounded-md transition-colors",
-          isActive 
-            ? "bg-blue-600 text-white" 
-            : "text-gray-200 hover:bg-[#2a2a2a]"
+          isActive ? "bg-blue-600 text-white" : "text-gray-200 hover:bg-[#2a2a2a]"
         )}
       >
         {icon}
@@ -49,40 +47,52 @@ const TopNavItem: React.FC<TopNavItemProps> = ({ href, icon, label, isActive }) 
 
 const SpruceTopNavbar: React.FC = () => {
   const [location] = useLocation();
-  const currentPath = location.split('/')[1] || '';
+  const currentPath = location.split("/")[1] || "";
 
   // First row navigation items (exactly matching the screenshot)
   const primaryNavItems = [
-    { href: '/', icon: <Home className="h-5 w-5" />, label: 'Home' },
-    { href: '/patients', icon: <Users className="h-5 w-5" />, label: 'Patients' },
-    { href: '/documents', icon: <FileText className="h-5 w-5" />, label: 'Documents' },
-    { href: '/messages', icon: <MessageSquare className="h-5 w-5" />, label: 'Messages' },
-    { href: '/scheduler', icon: <Calendar className="h-5 w-5" />, label: 'Scheduler' },
-    { href: '/formsite', icon: <FileCode className="h-5 w-5" />, label: 'Formsite' },
-    { href: '/knowledge-base', icon: <Brain className="h-5 w-5" />, label: 'Knowledge Base' },
-    { href: '/ai-billing', icon: <DollarSign className="h-5 w-5" />, label: 'AI Billing' }
+    { href: "/", icon: <Home className="h-5 w-5" />, label: "Home" },
+    { href: "/patients", icon: <Users className="h-5 w-5" />, label: "Patients" },
+    { href: "/documents", icon: <FileText className="h-5 w-5" />, label: "Documents" },
+    { href: "/messages", icon: <MessageSquare className="h-5 w-5" />, label: "Messages" },
+    { href: "/scheduler", icon: <Calendar className="h-5 w-5" />, label: "Scheduler" },
+    { href: "/formsite", icon: <FileCode className="h-5 w-5" />, label: "Formsite" },
+    { href: "/knowledge-base", icon: <Brain className="h-5 w-5" />, label: "Knowledge Base" },
+    { href: "/ai-billing", icon: <DollarSign className="h-5 w-5" />, label: "AI Billing" },
   ];
 
   // Second row navigation items
   const secondaryNavItems = [
-    { href: '/forms', icon: <LayoutList className="h-5 w-5" />, label: 'Forms' },
-    { href: '/chronic-conditions', icon: <Heart className="h-5 w-5" />, label: 'Chronic Conditions' },
-    { href: '/medication-refills', icon: <PillIcon className="h-5 w-5" />, label: 'Medication Refills' },
-    { href: '/urgent-care', icon: <Clock className="h-5 w-5" />, label: 'Urgent Care' },
-    { href: '/education', icon: <GraduationCap className="h-5 w-5" />, label: 'Education' },
-    { href: '/subscription', icon: <CreditCard className="h-5 w-5" />, label: 'Subscription' },
-    { href: '/settings', icon: <Settings className="h-5 w-5" />, label: 'Organization Settings' }
+    { href: "/forms", icon: <LayoutList className="h-5 w-5" />, label: "Forms" },
+    {
+      href: "/chronic-conditions",
+      icon: <Heart className="h-5 w-5" />,
+      label: "Chronic Conditions",
+    },
+    {
+      href: "/medication-refills",
+      icon: <PillIcon className="h-5 w-5" />,
+      label: "Medication Refills",
+    },
+    { href: "/urgent-care", icon: <Clock className="h-5 w-5" />, label: "Urgent Care" },
+    { href: "/education", icon: <GraduationCap className="h-5 w-5" />, label: "Education" },
+    { href: "/subscription", icon: <CreditCard className="h-5 w-5" />, label: "Subscription" },
+    { href: "/settings", icon: <Settings className="h-5 w-5" />, label: "Organization Settings" },
   ];
 
   // Add a third row for Leadership Association
   const tertiaryNavItems = [
-    { href: '/leadership-association', icon: <User className="h-5 w-5" />, label: 'Leadership Association' }
+    {
+      href: "/leadership-association",
+      icon: <User className="h-5 w-5" />,
+      label: "Leadership Association",
+    },
   ];
 
   // Check if a path is active
   const isActiveLink = (href: string): boolean => {
-    if (href === '/') {
-      return location === '/';
+    if (href === "/") {
+      return location === "/";
     }
     return location.startsWith(href);
   };
@@ -93,9 +103,7 @@ const SpruceTopNavbar: React.FC = () => {
         {/* App Logo */}
         <div className="px-4 py-3 flex items-center">
           <Link href="/">
-            <a className="text-xl font-bold text-blue-500 tracking-tight">
-              InstantHPI
-            </a>
+            <a className="text-xl font-bold text-blue-500 tracking-tight">InstantHPI</a>
           </Link>
         </div>
 
@@ -142,13 +150,20 @@ const SpruceTopNavbar: React.FC = () => {
         {currentPath && (
           <div className="px-4 py-3 bg-[#121212] border-t border-[#333]">
             <h1 className="text-2xl font-bold text-blue-500">
-              {currentPath === 'scheduler' ? 'AI Scheduler' : 
-               currentPath === 'knowledge-base' ? 'Knowledge Base' :
-               currentPath === 'chronic-conditions' ? 'Chronic Conditions' :
-               currentPath === 'ai-billing' ? 'AI Billing' :
-               currentPath === 'priority-tasks' ? 'Priority AI' :
-               currentPath === 'leadership-association' ? 'Leadership Association' :
-               currentPath.charAt(0).toUpperCase() + currentPath.slice(1).replace(/-/g, ' ')}
+              {currentPath === "scheduler"
+                ? "AI Scheduler"
+                : currentPath === "knowledge-base"
+                  ? "Knowledge Base"
+                  : currentPath === "chronic-conditions"
+                    ? "Chronic Conditions"
+                    : currentPath === "ai-billing"
+                      ? "AI Billing"
+                      : currentPath === "priority-tasks"
+                        ? "Priority AI"
+                        : currentPath === "leadership-association"
+                          ? "Leadership Association"
+                          : currentPath.charAt(0).toUpperCase() +
+                            currentPath.slice(1).replace(/-/g, " ")}
             </h1>
           </div>
         )}

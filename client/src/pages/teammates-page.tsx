@@ -1,76 +1,90 @@
-import React, { useState } from 'react';
-import SpruceLikeLayout from '@/components/layout/SpruceLikeLayout';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
-import { Plus, Search, Mail, Trash2, Edit, MoveUp, AlertTriangle } from 'lucide-react';
-import { Separator } from '@/components/ui/separator';
+import React, { useState } from "react";
+import SpruceLikeLayout from "@/components/layout/SpruceLikeLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Plus, Search, Mail, Trash2, Edit, MoveUp, AlertTriangle } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 // Mock data for teammates
 const initialTeammates = [
   {
     id: 1,
-    name: 'Dr. Carlos Font',
-    email: 'carlos.font@centremfont.com',
-    role: 'Admin',
-    department: 'Family Medicine',
-    status: 'Active',
+    name: "Dr. Carlos Font",
+    email: "carlos.font@centremfont.com",
+    role: "Admin",
+    department: "Family Medicine",
+    status: "Active",
     avatar: null,
   },
   {
     id: 2,
-    name: 'Dr. Sonia Font del Pino',
-    email: 'sonia.font@centremfont.com',
-    role: 'Doctor',
-    department: 'Anesthesiology',
-    status: 'Active',
+    name: "Dr. Sonia Font del Pino",
+    email: "sonia.font@centremfont.com",
+    role: "Doctor",
+    department: "Anesthesiology",
+    status: "Active",
     avatar: null,
   },
   {
     id: 3,
-    name: 'Mme Sonia Truchon',
-    email: 'sonia.truchon@centremfont.com',
-    role: 'Staff',
-    department: 'Marketing',
-    status: 'Invited',
+    name: "Mme Sonia Truchon",
+    email: "sonia.truchon@centremfont.com",
+    role: "Staff",
+    department: "Marketing",
+    status: "Invited",
     avatar: null,
   },
   {
     id: 4,
-    name: 'Dr. James Smith',
-    email: 'james.smith@centremfont.com',
-    role: 'Doctor',
-    department: 'General Practice',
-    status: 'Active',
+    name: "Dr. James Smith",
+    email: "james.smith@centremfont.com",
+    role: "Doctor",
+    department: "General Practice",
+    status: "Active",
     avatar: null,
   },
   {
     id: 5,
-    name: 'Marie Johnson',
-    email: 'marie.johnson@centremfont.com',
-    role: 'Nurse',
-    department: 'Family Medicine',
-    status: 'Active',
+    name: "Marie Johnson",
+    email: "marie.johnson@centremfont.com",
+    role: "Nurse",
+    department: "Family Medicine",
+    status: "Active",
     avatar: null,
   },
 ];
 
 export default function TeammatesPage() {
   const [teammates, setTeammates] = useState(initialTeammates);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [currentTeammate, setCurrentTeammate] = useState<any>(null);
 
   // Filter teammates based on search term
   const filteredTeammates = teammates.filter(
-    teammate => 
+    (teammate) =>
       teammate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       teammate.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       teammate.department.toLowerCase().includes(searchTerm.toLowerCase())
@@ -85,10 +99,10 @@ export default function TeammatesPage() {
       email: data.email,
       role: data.role,
       department: data.department,
-      status: 'Invited',
+      status: "Invited",
       avatar: null,
     };
-    
+
     setTeammates([...teammates, newTeammate]);
     setInviteDialogOpen(false);
   };
@@ -101,10 +115,10 @@ export default function TeammatesPage() {
 
   // Handle saving edited teammate
   const handleSaveEdit = (data: any) => {
-    const updatedTeammates = teammates.map(t => 
+    const updatedTeammates = teammates.map((t) =>
       t.id === currentTeammate.id ? { ...t, ...data } : t
     );
-    
+
     setTeammates(updatedTeammates);
     setEditDialogOpen(false);
     setCurrentTeammate(null);
@@ -112,28 +126,28 @@ export default function TeammatesPage() {
 
   // Handle deleting a teammate
   const handleDelete = (id: number) => {
-    const updatedTeammates = teammates.filter(teammate => teammate.id !== id);
+    const updatedTeammates = teammates.filter((teammate) => teammate.id !== id);
     setTeammates(updatedTeammates);
   };
 
   // Status badge component
   const StatusBadge = ({ status }: { status: string }) => {
-    let color = '';
-    
+    let color = "";
+
     switch (status) {
-      case 'Active':
-        color = 'bg-green-500/20 text-green-500 border-green-500/20';
+      case "Active":
+        color = "bg-green-500/20 text-green-500 border-green-500/20";
         break;
-      case 'Invited':
-        color = 'bg-yellow-500/20 text-yellow-500 border-yellow-500/20';
+      case "Invited":
+        color = "bg-yellow-500/20 text-yellow-500 border-yellow-500/20";
         break;
-      case 'Inactive':
-        color = 'bg-gray-500/20 text-gray-400 border-gray-500/20';
+      case "Inactive":
+        color = "bg-gray-500/20 text-gray-400 border-gray-500/20";
         break;
       default:
-        color = 'bg-blue-500/20 text-blue-500 border-blue-500/20';
+        color = "bg-blue-500/20 text-blue-500 border-blue-500/20";
     }
-    
+
     return (
       <Badge variant="outline" className={`${color}`}>
         {status}
@@ -147,9 +161,7 @@ export default function TeammatesPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">Teammates</h1>
-            <p className="text-gray-400 mt-1">
-              Manage your team members and their permissions
-            </p>
+            <p className="text-gray-400 mt-1">Manage your team members and their permissions</p>
           </div>
           <Dialog open={inviteDialogOpen} onOpenChange={setInviteDialogOpen}>
             <DialogTrigger asChild>
@@ -171,7 +183,12 @@ export default function TeammatesPage() {
                 </div>
                 <div>
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" className="bg-[#252525] border-[#444]" placeholder="email@example.com" type="email" />
+                  <Input
+                    id="email"
+                    className="bg-[#252525] border-[#444]"
+                    placeholder="email@example.com"
+                    type="email"
+                  />
                 </div>
                 <div>
                   <Label htmlFor="role">Role</Label>
@@ -189,17 +206,28 @@ export default function TeammatesPage() {
                 </div>
                 <div>
                   <Label htmlFor="department">Department</Label>
-                  <Input id="department" className="bg-[#252525] border-[#444]" placeholder="e.g., Family Medicine" />
+                  <Input
+                    id="department"
+                    className="bg-[#252525] border-[#444]"
+                    placeholder="e.g., Family Medicine"
+                  />
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>Cancel</Button>
-                <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => handleInvite({
-                  name: (document.getElementById('name') as HTMLInputElement).value,
-                  email: (document.getElementById('email') as HTMLInputElement).value,
-                  role: 'Doctor', // This would be from the select in a real implementation
-                  department: (document.getElementById('department') as HTMLInputElement).value,
-                })}>
+                <Button variant="outline" onClick={() => setInviteDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700"
+                  onClick={() =>
+                    handleInvite({
+                      name: (document.getElementById("name") as HTMLInputElement).value,
+                      email: (document.getElementById("email") as HTMLInputElement).value,
+                      role: "Doctor", // This would be from the select in a real implementation
+                      department: (document.getElementById("department") as HTMLInputElement).value,
+                    })
+                  }
+                >
                   Send Invitation
                 </Button>
               </DialogFooter>
@@ -221,20 +249,24 @@ export default function TeammatesPage() {
                 />
               </div>
             </div>
-            <CardDescription>
-              {filteredTeammates.length} team members
-            </CardDescription>
+            <CardDescription>{filteredTeammates.length} team members</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {filteredTeammates.length > 0 ? (
                 filteredTeammates.map((teammate) => (
-                  <div key={teammate.id} className="flex items-center justify-between p-4 bg-[#252525] rounded-lg">
+                  <div
+                    key={teammate.id}
+                    className="flex items-center justify-between p-4 bg-[#252525] rounded-lg"
+                  >
                     <div className="flex items-center">
                       <Avatar className="h-10 w-10 mr-4">
-                        <AvatarImage src={teammate.avatar || ''} alt={teammate.name} />
+                        <AvatarImage src={teammate.avatar || ""} alt={teammate.name} />
                         <AvatarFallback className="bg-blue-700">
-                          {teammate.name.split(' ').map(n => n[0]).join('')}
+                          {teammate.name
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
@@ -255,7 +287,11 @@ export default function TeammatesPage() {
                         <Button variant="ghost" size="icon" onClick={() => handleEdit(teammate)}>
                           <Edit className="h-4 w-4 text-gray-400" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(teammate.id)}>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(teammate.id)}
+                        >
                           <Trash2 className="h-4 w-4 text-gray-400" />
                         </Button>
                       </div>
@@ -267,7 +303,8 @@ export default function TeammatesPage() {
                   <AlertTriangle className="h-10 w-10 text-gray-400 mb-4" />
                   <h3 className="text-xl font-medium mb-2">No results found</h3>
                   <p className="text-gray-400 text-center">
-                    No team members match your search criteria. Try different keywords or invite a new teammate.
+                    No team members match your search criteria. Try different keywords or invite a
+                    new teammate.
                   </p>
                 </div>
               )}
@@ -278,9 +315,7 @@ export default function TeammatesPage() {
         <Card className="bg-[#1e1e1e] border-[#333]">
           <CardHeader>
             <CardTitle>User Permissions</CardTitle>
-            <CardDescription>
-              Configure default permissions for each user role
-            </CardDescription>
+            <CardDescription>Configure default permissions for each user role</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -350,27 +385,25 @@ export default function TeammatesPage() {
           <DialogContent className="bg-[#1e1e1e] border-[#333]">
             <DialogHeader>
               <DialogTitle>Edit Team Member</DialogTitle>
-              <DialogDescription>
-                Update team member information and permissions
-              </DialogDescription>
+              <DialogDescription>Update team member information and permissions</DialogDescription>
             </DialogHeader>
             {currentTeammate && (
               <div className="space-y-4 py-4">
                 <div>
                   <Label htmlFor="edit-name">Name</Label>
-                  <Input 
-                    id="edit-name" 
-                    className="bg-[#252525] border-[#444]" 
-                    defaultValue={currentTeammate.name} 
+                  <Input
+                    id="edit-name"
+                    className="bg-[#252525] border-[#444]"
+                    defaultValue={currentTeammate.name}
                   />
                 </div>
                 <div>
                   <Label htmlFor="edit-email">Email</Label>
-                  <Input 
-                    id="edit-email" 
-                    className="bg-[#252525] border-[#444]" 
-                    defaultValue={currentTeammate.email} 
-                    type="email" 
+                  <Input
+                    id="edit-email"
+                    className="bg-[#252525] border-[#444]"
+                    defaultValue={currentTeammate.email}
+                    type="email"
                   />
                 </div>
                 <div>
@@ -389,10 +422,10 @@ export default function TeammatesPage() {
                 </div>
                 <div>
                   <Label htmlFor="edit-department">Department</Label>
-                  <Input 
-                    id="edit-department" 
-                    className="bg-[#252525] border-[#444]" 
-                    defaultValue={currentTeammate.department} 
+                  <Input
+                    id="edit-department"
+                    className="bg-[#252525] border-[#444]"
+                    defaultValue={currentTeammate.department}
                   />
                 </div>
                 <div>
@@ -411,13 +444,21 @@ export default function TeammatesPage() {
               </div>
             )}
             <DialogFooter>
-              <Button variant="outline" onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-              <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => handleSaveEdit({
-                name: (document.getElementById('edit-name') as HTMLInputElement).value,
-                email: (document.getElementById('edit-email') as HTMLInputElement).value,
-                department: (document.getElementById('edit-department') as HTMLInputElement).value,
-                // Role and status would come from the select in a real implementation
-              })}>
+              <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={() =>
+                  handleSaveEdit({
+                    name: (document.getElementById("edit-name") as HTMLInputElement).value,
+                    email: (document.getElementById("edit-email") as HTMLInputElement).value,
+                    department: (document.getElementById("edit-department") as HTMLInputElement)
+                      .value,
+                    // Role and status would come from the select in a real implementation
+                  })
+                }
+              >
                 Save Changes
               </Button>
             </DialogFooter>

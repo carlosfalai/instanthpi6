@@ -12,16 +12,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  AlertCircle, 
-  Check, 
-  Clipboard, 
-  FileSignature, 
-  FileText, 
-  Pill, 
-  Printer, 
-  Send, 
-  Phone 
+import {
+  AlertCircle,
+  Check,
+  Clipboard,
+  FileSignature,
+  FileText,
+  Pill,
+  Printer,
+  Send,
+  Phone,
 } from "lucide-react";
 import SignaturePinModal from "./SignaturePinModal";
 import { DocumentTemplate } from "./DocumentTemplateEditor";
@@ -110,13 +110,13 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
     if (aiGeneratedInstructions) {
       // Try to extract medication information from AI instructions
       // This is a simplified example - in a real app, you'd use more sophisticated parsing
-      const lines = aiGeneratedInstructions.split('\n');
+      const lines = aiGeneratedInstructions.split("\n");
       const extractedMeds: Medication[] = [];
-      
+
       let currentMed: Partial<Medication> = {};
-      
-      lines.forEach(line => {
-        if (line.includes('Name:') || line.includes('Medication:')) {
+
+      lines.forEach((line) => {
+        if (line.includes("Name:") || line.includes("Medication:")) {
           // If we already have a medication being built, save it before starting a new one
           if (currentMed.name) {
             extractedMeds.push({
@@ -127,22 +127,28 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
               refills: currentMed.refills || "0",
             });
           }
-          
+
           // Start a new medication
           currentMed = {
-            name: line.split(':')[1]?.trim() || "",
+            name: line.split(":")[1]?.trim() || "",
           };
-        } else if (line.toLowerCase().includes('dosage:')) {
-          currentMed.dosage = line.split(':')[1]?.trim() || "";
-        } else if (line.toLowerCase().includes('instructions:') || line.toLowerCase().includes('sig:')) {
-          currentMed.instructions = line.split(':')[1]?.trim() || "";
-        } else if (line.toLowerCase().includes('quantity:') || line.toLowerCase().includes('qty:')) {
-          currentMed.quantity = line.split(':')[1]?.trim() || "";
-        } else if (line.toLowerCase().includes('refills:')) {
-          currentMed.refills = line.split(':')[1]?.trim() || "0";
+        } else if (line.toLowerCase().includes("dosage:")) {
+          currentMed.dosage = line.split(":")[1]?.trim() || "";
+        } else if (
+          line.toLowerCase().includes("instructions:") ||
+          line.toLowerCase().includes("sig:")
+        ) {
+          currentMed.instructions = line.split(":")[1]?.trim() || "";
+        } else if (
+          line.toLowerCase().includes("quantity:") ||
+          line.toLowerCase().includes("qty:")
+        ) {
+          currentMed.quantity = line.split(":")[1]?.trim() || "";
+        } else if (line.toLowerCase().includes("refills:")) {
+          currentMed.refills = line.split(":")[1]?.trim() || "0";
         }
       });
-      
+
       // Add the last medication if it exists
       if (currentMed.name) {
         extractedMeds.push({
@@ -153,11 +159,11 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
           refills: currentMed.refills || "0",
         });
       }
-      
+
       if (extractedMeds.length > 0) {
         setMedications(extractedMeds);
       }
-      
+
       // Set any additional notes
       const notesMatch = aiGeneratedInstructions.match(/Notes:([\s\S]+?)(?:\n\n|$)/);
       if (notesMatch) {
@@ -185,16 +191,8 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
     }
   };
 
-  const handleMedicationChange = (
-    index: number,
-    field: keyof Medication,
-    value: string
-  ) => {
-    setMedications(
-      medications.map((med, i) =>
-        i === index ? { ...med, [field]: value } : med
-      )
-    );
+  const handleMedicationChange = (index: number, field: keyof Medication, value: string) => {
+    setMedications(medications.map((med, i) => (i === index ? { ...med, [field]: value } : med)));
   };
 
   const validatePrescription = (): boolean => {
@@ -209,7 +207,7 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
         return false;
       }
     }
-    
+
     // Check doctor license
     if (!doctorData.licenseNumber) {
       toast({
@@ -219,13 +217,13 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
       });
       return false;
     }
-    
+
     return true;
   };
 
   const handleSign = (action: "patient" | "pharmacy") => {
     if (!validatePrescription()) return;
-    
+
     // Check if doctor has signature
     if (!doctorData.hasSignature) {
       toast({
@@ -235,24 +233,24 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
       });
       return;
     }
-    
+
     // If sending to pharmacy but no pharmacy info
     if (action === "pharmacy" && !hasPharmacy) {
       onRequestPharmacyInfo();
       return;
     }
-    
+
     setCurrentAction(action);
     setIsPinModalOpen(true);
   };
 
   const handleVerifyPin = async (pin: string) => {
     setIsVerifyingPin(true);
-    
+
     try {
       // In a real app, you would verify the PIN against a stored hash
       // Here we simulate the verification process
-      
+
       // Create the prescription data
       const prescriptionData: PrescriptionData = {
         patientId: patient.id,
@@ -266,16 +264,16 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
         signatureTimestamp: new Date().toISOString(),
         pharmacy: patient.pharmacy,
       };
-      
+
       // Send to appropriate destination
       let success = false;
-      
+
       if (currentAction === "patient") {
         success = await onSendToPatient(prescriptionData);
       } else if (currentAction === "pharmacy") {
         success = await onSendToPharmacy(prescriptionData);
       }
-      
+
       if (success) {
         toast({
           title: `Prescription ${currentAction === "patient" ? "sent to patient" : "faxed to pharmacy"}`,
@@ -329,9 +327,7 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
               <Input
                 id={`med-name-${index}`}
                 value={medication.name}
-                onChange={(e) =>
-                  handleMedicationChange(index, "name", e.target.value)
-                }
+                onChange={(e) => handleMedicationChange(index, "name", e.target.value)}
                 className="bg-[#262626] border-gray-700"
                 placeholder="Medication name"
               />
@@ -341,37 +337,31 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
               <Input
                 id={`med-dosage-${index}`}
                 value={medication.dosage}
-                onChange={(e) =>
-                  handleMedicationChange(index, "dosage", e.target.value)
-                }
+                onChange={(e) => handleMedicationChange(index, "dosage", e.target.value)}
                 className="bg-[#262626] border-gray-700"
                 placeholder="e.g., 500mg"
               />
             </div>
           </div>
-          
+
           <div className="space-y-2 mb-4">
             <Label htmlFor={`med-instructions-${index}`}>Instructions (Sig)</Label>
             <Textarea
               id={`med-instructions-${index}`}
               value={medication.instructions}
-              onChange={(e) =>
-                handleMedicationChange(index, "instructions", e.target.value)
-              }
+              onChange={(e) => handleMedicationChange(index, "instructions", e.target.value)}
               className="bg-[#262626] border-gray-700"
               placeholder="e.g., Take 1 tablet by mouth twice daily with food"
             />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor={`med-quantity-${index}`}>Quantity</Label>
               <Input
                 id={`med-quantity-${index}`}
                 value={medication.quantity}
-                onChange={(e) =>
-                  handleMedicationChange(index, "quantity", e.target.value)
-                }
+                onChange={(e) => handleMedicationChange(index, "quantity", e.target.value)}
                 className="bg-[#262626] border-gray-700"
                 placeholder="e.g., 30"
               />
@@ -381,9 +371,7 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
               <Input
                 id={`med-refills-${index}`}
                 value={medication.refills}
-                onChange={(e) =>
-                  handleMedicationChange(index, "refills", e.target.value)
-                }
+                onChange={(e) => handleMedicationChange(index, "refills", e.target.value)}
                 className="bg-[#262626] border-gray-700"
                 type="number"
                 min="0"
@@ -404,55 +392,61 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
             <FileText className="mr-2 h-5 w-5" />
             Prescription Information
           </CardTitle>
-          <CardDescription>
-            Create a prescription for {patient.name}
-          </CardDescription>
+          <CardDescription>Create a prescription for {patient.name}</CardDescription>
         </CardHeader>
         <CardContent className="pb-2">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
             <div>
               <h3 className="text-sm font-medium text-gray-300 mb-1">Patient Information</h3>
               <div className="p-3 bg-[#262626] rounded-md">
-                <p className="mb-1"><span className="font-semibold">Name:</span> {patient.name}</p>
-                <p className="mb-1"><span className="font-semibold">DOB:</span> {patient.dateOfBirth}</p>
-                <p><span className="font-semibold">Phone:</span> {patient.phoneNumber}</p>
+                <p className="mb-1">
+                  <span className="font-semibold">Name:</span> {patient.name}
+                </p>
+                <p className="mb-1">
+                  <span className="font-semibold">DOB:</span> {patient.dateOfBirth}
+                </p>
+                <p>
+                  <span className="font-semibold">Phone:</span> {patient.phoneNumber}
+                </p>
               </div>
             </div>
             <div>
               <h3 className="text-sm font-medium text-gray-300 mb-1">Pharmacy Information</h3>
               {hasPharmacy ? (
                 <div className="p-3 bg-[#262626] rounded-md">
-                  <p className="mb-1"><span className="font-semibold">Name:</span> {patient.pharmacy?.name}</p>
-                  <p className="mb-1"><span className="font-semibold">Fax:</span> {patient.pharmacy?.faxNumber}</p>
-                  <p><span className="font-semibold">Address:</span> {patient.pharmacy?.address}</p>
+                  <p className="mb-1">
+                    <span className="font-semibold">Name:</span> {patient.pharmacy?.name}
+                  </p>
+                  <p className="mb-1">
+                    <span className="font-semibold">Fax:</span> {patient.pharmacy?.faxNumber}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Address:</span> {patient.pharmacy?.address}
+                  </p>
                 </div>
               ) : (
                 <div className="p-3 bg-[#262626] rounded-md flex items-center">
                   <AlertCircle className="text-yellow-500 mr-2 h-5 w-5 flex-shrink-0" />
                   <p className="text-yellow-500 text-sm">
-                    No pharmacy information available. When sending, you'll need to ask the patient for their pharmacy details.
+                    No pharmacy information available. When sending, you'll need to ask the patient
+                    for their pharmacy details.
                   </p>
                 </div>
               )}
             </div>
           </div>
-          
+
           <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-md font-medium">Medications</h3>
-              <Button
-                onClick={handleAddMedication}
-                variant="outline"
-                size="sm"
-                className="h-8"
-              >
+              <Button onClick={handleAddMedication} variant="outline" size="sm" className="h-8">
                 Add Medication
               </Button>
             </div>
-            
+
             {medications.map((med, index) => renderMedicationForm(med, index))}
           </div>
-          
+
           <div className="space-y-2 mb-4">
             <Label htmlFor="notes">Additional Notes</Label>
             <Textarea
@@ -464,13 +458,14 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
               rows={3}
             />
           </div>
-          
+
           <div className="flex items-center p-3 bg-blue-900/20 border border-blue-800 rounded-md">
             <FileSignature className="h-5 w-5 text-blue-500 mr-3 flex-shrink-0" />
             <div>
               <h3 className="text-sm font-medium text-blue-500">Prescriber Information</h3>
               <p className="text-sm text-gray-400 mt-1">
-                <span className="font-semibold">Dr. {doctorData.name}</span> • License: {doctorData.licenseNumber || "Not set"}
+                <span className="font-semibold">Dr. {doctorData.name}</span> • License:{" "}
+                {doctorData.licenseNumber || "Not set"}
               </p>
             </div>
           </div>
@@ -493,7 +488,7 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
                 .join("\n\n")}\n\n${notes ? `Notes: ${notes}\n\n` : ""}Prescriber: Dr. ${
                 doctorData.name
               }\nLicense: ${doctorData.licenseNumber}`;
-              
+
               navigator.clipboard.writeText(prescriptionText);
               toast({
                 title: "Copied to clipboard",
@@ -504,7 +499,7 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
             <Clipboard className="mr-2 h-4 w-4" />
             Copy Text
           </Button>
-          
+
           <Button
             variant="outline"
             className="flex items-center"
@@ -519,7 +514,7 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
             <Printer className="mr-2 h-4 w-4" />
             Print
           </Button>
-          
+
           <div className="ml-auto flex flex-wrap gap-3">
             <Button
               className="bg-blue-600 hover:bg-blue-700 flex items-center"
@@ -528,7 +523,7 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
               <Send className="mr-2 h-4 w-4" />
               Send to Patient
             </Button>
-            
+
             <Button
               className="bg-green-600 hover:bg-green-700 flex items-center"
               onClick={() => handleSign("pharmacy")}
@@ -540,7 +535,7 @@ const PrescriptionGenerator: React.FC<PrescriptionGeneratorProps> = ({
           </div>
         </CardFooter>
       </Card>
-      
+
       {isPinModalOpen && (
         <SignaturePinModal
           isOpen={isPinModalOpen}

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
-import { useToast } from '@/hooks/use-toast';
+import React, { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import {
   Card,
   CardContent,
@@ -9,7 +9,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -17,14 +17,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, BrainCircuit, CheckCircle, BellRing, AlertTriangle, MessageSquare, ArrowUpCircle, LucideIcon } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Progress } from '@/components/ui/progress';
-import { format, formatDistanceToNow } from 'date-fns';
-import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Loader2,
+  BrainCircuit,
+  CheckCircle,
+  BellRing,
+  AlertTriangle,
+  MessageSquare,
+  ArrowUpCircle,
+  LucideIcon,
+} from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
+import { format, formatDistanceToNow } from "date-fns";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 
 // Type for prioritized tasks
 interface PrioritizedTask {
@@ -59,14 +68,18 @@ const PrioritizedTasksPage: React.FC = () => {
   const [orderInSession, setOrderInSession] = useState<number>(1);
 
   // Fetch prioritized tasks
-  const { data: tasks, isLoading, error } = useQuery<{ tasks: PrioritizedTask[] }>({
-    queryKey: ['/api/priority-ai/priority/tasks'],
+  const {
+    data: tasks,
+    isLoading,
+    error,
+  } = useQuery<{ tasks: PrioritizedTask[] }>({
+    queryKey: ["/api/priority-ai/priority/tasks"],
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Fetch model info
   const { data: modelInfo } = useQuery<ModelInfo>({
-    queryKey: ['/api/priority-ai/priority/model'],
+    queryKey: ["/api/priority-ai/priority/model"],
     staleTime: 1000 * 60 * 15, // 15 minutes
   });
 
@@ -79,21 +92,17 @@ const PrioritizedTasksPage: React.FC = () => {
       orderInSession: number;
       timeSpent?: number;
     }) => {
-      const response = await apiRequest(
-        'POST',
-        '/api/priority-ai/priority/interaction',
-        {
-          ...data,
-          sessionId,
-        }
-      );
+      const response = await apiRequest("POST", "/api/priority-ai/priority/interaction", {
+        ...data,
+        sessionId,
+      });
       return response.json();
     },
     onError: (error) => {
       toast({
-        title: 'Error recording interaction',
-        description: `Something went wrong: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        variant: 'destructive',
+        title: "Error recording interaction",
+        description: `Something went wrong: ${error instanceof Error ? error.message : "Unknown error"}`,
+        variant: "destructive",
       });
     },
   });
@@ -101,25 +110,21 @@ const PrioritizedTasksPage: React.FC = () => {
   // Mutation for training the model manually
   const trainModelMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest(
-        'POST',
-        '/api/priority-ai/priority/train',
-        {}
-      );
+      const response = await apiRequest("POST", "/api/priority-ai/priority/train", {});
       return response.json();
     },
     onSuccess: () => {
       toast({
-        title: 'Priority model trained',
-        description: 'The AI model has been updated based on your task interactions.',
+        title: "Priority model trained",
+        description: "The AI model has been updated based on your task interactions.",
       });
-      queryClient.invalidateQueries({ queryKey: ['/api/priority-ai/priority/model'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/priority-ai/priority/model"] });
     },
     onError: (error) => {
       toast({
-        title: 'Error training model',
-        description: `Something went wrong: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        variant: 'destructive',
+        title: "Error training model",
+        description: `Something went wrong: ${error instanceof Error ? error.message : "Unknown error"}`,
+        variant: "destructive",
       });
     },
   });
@@ -129,9 +134,9 @@ const PrioritizedTasksPage: React.FC = () => {
     if (tasks?.tasks && tasks.tasks.length > 0) {
       // Record that user viewed the task list
       recordInteractionMutation.mutate({
-        taskType: 'task_list',
-        taskId: 'all',
-        action: 'viewed',
+        taskType: "task_list",
+        taskId: "all",
+        action: "viewed",
         orderInSession: 0,
       });
     }
@@ -140,7 +145,7 @@ const PrioritizedTasksPage: React.FC = () => {
   // Record task interaction (click, complete, etc.)
   const handleTaskAction = (task: PrioritizedTask, action: string) => {
     const startTime = Date.now();
-    
+
     // Record the interaction
     recordInteractionMutation.mutate({
       taskType: task.taskType,
@@ -148,18 +153,18 @@ const PrioritizedTasksPage: React.FC = () => {
       action,
       orderInSession: orderInSession,
     });
-    
+
     // Increment order for next action
-    setOrderInSession(prev => prev + 1);
-    
+    setOrderInSession((prev) => prev + 1);
+
     // Provide user feedback
     toast({
       title: `Task ${action}`,
       description: `${task.title} has been ${action}`,
     });
-    
+
     // Navigate based on task type
-    if (task.patientId && action === 'selected') {
+    if (task.patientId && action === "selected") {
       // Here you could navigate to the appropriate page
       // window.location.href = `/patient/${task.patientId}/treatment`;
     }
@@ -168,13 +173,13 @@ const PrioritizedTasksPage: React.FC = () => {
   // Get icon for task type
   const getTaskIcon = (taskType: string): LucideIcon => {
     switch (taskType) {
-      case 'urgent_care':
+      case "urgent_care":
         return AlertTriangle;
-      case 'message':
+      case "message":
         return MessageSquare;
-      case 'medication_refill':
+      case "medication_refill":
         return BellRing;
-      case 'pending_item':
+      case "pending_item":
         return ArrowUpCircle;
       default:
         return CheckCircle;
@@ -183,10 +188,10 @@ const PrioritizedTasksPage: React.FC = () => {
 
   // Get color for priority score
   const getPriorityColor = (score: number): string => {
-    if (score >= 80) return 'bg-red-500';
-    if (score >= 60) return 'bg-orange-500';
-    if (score >= 40) return 'bg-yellow-500';
-    return 'bg-blue-500';
+    if (score >= 80) return "bg-red-500";
+    if (score >= 60) return "bg-orange-500";
+    if (score >= 40) return "bg-yellow-500";
+    return "bg-blue-500";
   };
 
   // Loading state
@@ -225,12 +230,12 @@ const PrioritizedTasksPage: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p>
-                {error instanceof Error ? error.message : 'Unknown error occurred'}
-              </p>
+              <p>{error instanceof Error ? error.message : "Unknown error occurred"}</p>
               <Button
                 className="mt-4"
-                onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/priority-ai/priority/tasks'] })}
+                onClick={() =>
+                  queryClient.invalidateQueries({ queryKey: ["/api/priority-ai/priority/tasks"] })
+                }
               >
                 Try Again
               </Button>
@@ -251,21 +256,21 @@ const PrioritizedTasksPage: React.FC = () => {
               AI-recommended tasks based on your previous work patterns
             </p>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             {modelInfo && (
               <div className="flex items-center bg-muted px-3 py-1 rounded-md text-sm">
                 <BrainCircuit className="h-4 w-4 mr-2" />
                 <div>
-                  {modelInfo.modelExists 
-                    ? `Model v${modelInfo.modelVersion} trained on ${modelInfo.interactionCount} interactions` 
-                    : 'No AI model trained yet'}
+                  {modelInfo.modelExists
+                    ? `Model v${modelInfo.modelVersion} trained on ${modelInfo.interactionCount} interactions`
+                    : "No AI model trained yet"}
                 </div>
               </div>
             )}
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               onClick={() => trainModelMutation.mutate()}
               disabled={trainModelMutation.isPending || (modelInfo?.interactionCount || 0) < 20}
             >
@@ -288,13 +293,18 @@ const PrioritizedTasksPage: React.FC = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Interactions recorded: {modelInfo.interactionCount}/20</span>
-                  <span>{Math.min(100, Math.round(modelInfo.interactionCount / 20 * 100))}% complete</span>
+                  <span>
+                    {Math.min(100, Math.round((modelInfo.interactionCount / 20) * 100))}% complete
+                  </span>
                 </div>
-                <Progress value={Math.min(100, Math.round(modelInfo.interactionCount / 20 * 100))} />
+                <Progress
+                  value={Math.min(100, Math.round((modelInfo.interactionCount / 20) * 100))}
+                />
               </div>
             </CardContent>
             <CardFooter className="text-sm text-muted-foreground pt-0">
-              Continue using the system naturally. The AI will learn from your interactions and build a personalized task priority model.
+              Continue using the system naturally. The AI will learn from your interactions and
+              build a personalized task priority model.
             </CardFooter>
           </Card>
         )}
@@ -324,7 +334,7 @@ const PrioritizedTasksPage: React.FC = () => {
                   tasks.tasks.map((task) => {
                     const TaskIcon = getTaskIcon(task.taskType);
                     const priorityColor = getPriorityColor(task.priorityScore);
-                    
+
                     return (
                       <TableRow key={`${task.taskType}-${task.id}`}>
                         <TableCell>
@@ -349,29 +359,33 @@ const PrioritizedTasksPage: React.FC = () => {
                           >
                             <TaskIcon className="h-3 w-3" />
                             <span>
-                              {task.taskType.replace('_', ' ').replace(/(^\w{1})|(\s+\w{1})/g, letter => letter.toUpperCase())}
+                              {task.taskType
+                                .replace("_", " ")
+                                .replace(/(^\w{1})|(\s+\w{1})/g, (letter) => letter.toUpperCase())}
                             </span>
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm">
-                          {task.createdAt ? formatDistanceToNow(new Date(task.createdAt), { addSuffix: true }) : '-'}
+                          {task.createdAt
+                            ? formatDistanceToNow(new Date(task.createdAt), { addSuffix: true })
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-sm">
-                          {task.dueDate ? format(new Date(task.dueDate), 'MMM d, yyyy') : '-'}
+                          {task.dueDate ? format(new Date(task.dueDate), "MMM d, yyyy") : "-"}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleTaskAction(task, 'selected')}
+                              onClick={() => handleTaskAction(task, "selected")}
                             >
                               Select
                             </Button>
                             <Button
-                              variant="ghost" 
+                              variant="ghost"
                               size="sm"
-                              onClick={() => handleTaskAction(task, 'completed')}
+                              onClick={() => handleTaskAction(task, "completed")}
                             >
                               Mark Done
                             </Button>
@@ -393,10 +407,12 @@ const PrioritizedTasksPage: React.FC = () => {
           <CardFooter className="border-t px-6 py-4">
             <div className="flex items-center justify-between w-full text-xs text-muted-foreground">
               <span>Tasks are prioritized based on your past interactions and due dates.</span>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 size="sm"
-                onClick={() => queryClient.invalidateQueries({ queryKey: ['/api/priority-ai/priority/tasks'] })}
+                onClick={() =>
+                  queryClient.invalidateQueries({ queryKey: ["/api/priority-ai/priority/tasks"] })
+                }
               >
                 Refresh
               </Button>

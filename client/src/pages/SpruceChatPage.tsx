@@ -1,37 +1,37 @@
-import React, { useState } from 'react';
-import { useParams, useLocation } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import React, { useState } from "react";
+import { useParams, useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
 
-import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
-import SpruceConversation from '@/components/conversation/SpruceConversation';
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import SpruceConversation from "@/components/conversation/SpruceConversation";
 
 export default function SpruceChatPage() {
   const [, setLocation] = useLocation();
   const params = useParams<{ patientId: string }>();
   const patientId = params?.patientId ? parseInt(params.patientId) : undefined;
-  
+
   // Fetch patient data
-  const { 
-    data: patient, 
-    isLoading, 
-    error 
+  const {
+    data: patient,
+    isLoading,
+    error,
   } = useQuery({
     queryKey: [`/api/patients/${patientId}`],
     enabled: !!patientId,
   });
-  
+
   // Handle patient selection
   const handlePatientSelect = (selectedId: number) => {
     setLocation(`/patients/${selectedId}`);
   };
-  
+
   // Handle sending a message
   const handleSendMessage = (message: string) => {
     // This is handled by the SpruceConversation component directly
-    console.log('Message sent:', message);
+    console.log("Message sent:", message);
   };
-  
+
   // If no patient is selected, show a placeholder
   if (!patientId) {
     return (
@@ -47,7 +47,7 @@ export default function SpruceChatPage() {
       </AppLayoutSpruce>
     );
   }
-  
+
   // Loading state
   if (isLoading) {
     return (
@@ -58,7 +58,7 @@ export default function SpruceChatPage() {
       </AppLayoutSpruce>
     );
   }
-  
+
   // Error state
   if (error || !patient) {
     return (
@@ -69,9 +69,9 @@ export default function SpruceChatPage() {
             <p className="max-w-md">
               Failed to load patient data. Please try again or select a different patient.
             </p>
-            <button 
+            <button
               className="mt-4 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-md"
-              onClick={() => setLocation('/')}
+              onClick={() => setLocation("/")}
             >
               Go Back
             </button>
@@ -80,13 +80,10 @@ export default function SpruceChatPage() {
       </AppLayoutSpruce>
     );
   }
-  
+
   return (
     <AppLayoutSpruce>
-      <SpruceConversation
-        patientId={patientId}
-        doctorName="Dr. Font"
-      />
+      <SpruceConversation patientId={patientId} doctorName="Dr. Font" />
     </AppLayoutSpruce>
   );
 }

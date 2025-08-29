@@ -10,13 +10,13 @@ router.get("/templates", async (req, res) => {
   try {
     const category = req.query.category as string | undefined;
     let templates;
-    
+
     if (category) {
       templates = await storage.getFormTemplatesByCategory(category);
     } else {
       templates = await storage.getAllFormTemplates();
     }
-    
+
     res.json(templates);
   } catch (error) {
     console.error("Error fetching form templates:", error);
@@ -29,11 +29,11 @@ router.get("/templates/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const template = await storage.getFormTemplate(id);
-    
+
     if (!template) {
       return res.status(404).json({ error: "Form template not found" });
     }
-    
+
     res.json(template);
   } catch (error) {
     console.error("Error fetching form template:", error);
@@ -47,12 +47,12 @@ router.post("/templates", async (req, res) => {
     // For now we'll use the first user (doctor) as our default user
     // In a real app, this would come from authentication
     const userId = 1;
-    
+
     const validatedData = insertFormTemplateSchema.parse({
       ...req.body,
-      userId
+      userId,
     });
-    
+
     const template = await storage.createFormTemplate(validatedData);
     res.status(201).json(template);
   } catch (error) {
@@ -69,14 +69,14 @@ router.put("/templates/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const template = await storage.getFormTemplate(id);
-    
+
     if (!template) {
       return res.status(404).json({ error: "Form template not found" });
     }
-    
+
     const validatedData = insertFormTemplateSchema.partial().parse(req.body);
     const updatedTemplate = await storage.updateFormTemplate(id, validatedData);
-    
+
     res.json(updatedTemplate);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -92,11 +92,11 @@ router.delete("/templates/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const success = await storage.deleteFormTemplate(id);
-    
+
     if (!success) {
       return res.status(404).json({ error: "Form template not found" });
     }
-    
+
     res.status(204).end();
   } catch (error) {
     console.error("Error deleting form template:", error);
@@ -133,11 +133,11 @@ router.get("/responses/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const response = await storage.getFormResponse(id);
-    
+
     if (!response) {
       return res.status(404).json({ error: "Form response not found" });
     }
-    
+
     res.json(response);
   } catch (error) {
     console.error("Error fetching form response:", error);
@@ -165,14 +165,14 @@ router.put("/responses/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const response = await storage.getFormResponse(id);
-    
+
     if (!response) {
       return res.status(404).json({ error: "Form response not found" });
     }
-    
+
     const validatedData = insertFormResponseSchema.partial().parse(req.body);
     const updatedResponse = await storage.updateFormResponse(id, validatedData);
-    
+
     res.json(updatedResponse);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -188,11 +188,11 @@ router.delete("/responses/:id", async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const success = await storage.deleteFormResponse(id);
-    
+
     if (!success) {
       return res.status(404).json({ error: "Form response not found" });
     }
-    
+
     res.status(204).end();
   } catch (error) {
     console.error("Error deleting form response:", error);

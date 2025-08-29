@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export function useBillingEntries() {
   return useQuery<BillingEntry[]>({
-    queryKey: ['/api/billing/entries'],
+    queryKey: ["/api/billing/entries"],
     staleTime: 60 * 1000, // 1 minute
   });
 }
@@ -15,11 +15,11 @@ export function useBillingMutations() {
 
   const createBillingEntry = useMutation({
     mutationFn: async (entry: InsertBillingEntry) => {
-      const res = await apiRequest('POST', '/api/billing/entries', entry);
+      const res = await apiRequest("POST", "/api/billing/entries", entry);
       return await res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/billing/entries'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/billing/entries"] });
       toast({
         title: "Billing entry created",
         description: "The billing entry has been successfully created.",
@@ -36,11 +36,11 @@ export function useBillingMutations() {
 
   const updateBillingEntry = useMutation({
     mutationFn: async ({ id, entry }: { id: number; entry: Partial<InsertBillingEntry> }) => {
-      const res = await apiRequest('PATCH', `/api/billing/entries/${id}`, entry);
+      const res = await apiRequest("PATCH", `/api/billing/entries/${id}`, entry);
       return await res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/billing/entries'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/billing/entries"] });
       toast({
         title: "Billing entry updated",
         description: "The billing entry has been successfully updated.",
@@ -57,10 +57,10 @@ export function useBillingMutations() {
 
   const deleteBillingEntry = useMutation({
     mutationFn: async (id: number) => {
-      await apiRequest('DELETE', `/api/billing/entries/${id}`);
+      await apiRequest("DELETE", `/api/billing/entries/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/billing/entries'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/billing/entries"] });
       toast({
         title: "Billing entry deleted",
         description: "The billing entry has been successfully deleted.",

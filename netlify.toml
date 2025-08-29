@@ -1,0 +1,81 @@
+# Netlify deployment configuration
+[build]
+  # Directory to change to before starting build
+  base = "/"
+  
+  # Build command
+  command = "npm run build"
+  
+  # Directory that contains the deploy-ready files
+  publish = "dist/public"
+  
+  # Node version
+  environment = { NODE_VERSION = "20" }
+
+# API redirects to Netlify Functions (must be before catch-all)
+[[redirects]]
+  from = "/api/inbox/conversations"
+  to = "/.netlify/functions/api-inbox-conversations"
+  status = 200
+  
+[[redirects]]
+  from = "/api/spruce/conversations/all"
+  to = "/.netlify/functions/api-spruce-conversations-all"
+  status = 200
+
+[[redirects]]
+  from = "/api/spruce/conversations"
+  to = "/.netlify/functions/api-spruce-conversations"
+  status = 200
+  
+[[redirects]]
+  from = "/api/spruce/conversations/*/history"
+  to = "/.netlify/functions/api-spruce-conversation-history"
+  status = 200
+
+[[redirects]]
+  from = "/api/spruce/conversations/*"
+  to = "/.netlify/functions/api-spruce-conversations-messages"
+  status = 200
+  
+[[redirects]]
+  from = "/api/spruce/webhook"
+  to = "/.netlify/functions/spruce-webhook"
+  status = 200
+
+# Assets manifest: map API to static JSON built at deploy
+[[redirects]]
+  from = "/api/assets/images"
+  to = "/assets/images.json"
+  status = 200
+
+# Ollama triage/status via Netlify Functions
+[[redirects]]
+  from = "/api/ollama/triage"
+  to = "/.netlify/functions/ollama-triage"
+  status = 200
+
+[[redirects]]
+  from = "/api/ollama/status"
+  to = "/.netlify/functions/ollama-status"
+  status = 200
+
+# Redirect all routes to index.html for client-side routing (must be last)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

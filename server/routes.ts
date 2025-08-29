@@ -2,8 +2,8 @@ import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ZodError } from "zod";
-import { v4 as uuidv4 } from 'uuid';
-import { db } from './db';
+import { v4 as uuidv4 } from "uuid";
+import { db } from "./db";
 import {
   insertUserSchema,
   insertPatientSchema,
@@ -12,7 +12,7 @@ import {
   insertFormSubmissionSchema,
   insertPendingItemSchema,
   medicationRefills,
-  insuranceDocuments
+  insuranceDocuments,
 } from "@shared/schema";
 import OpenAI from "openai";
 import axios from "axios";
@@ -25,6 +25,7 @@ import spruceWebhooksRouter from "./routes/spruce-webhooks";
 import { router as educationRouter } from "./routes/education";
 import { router as userRouter } from "./routes/user";
 import { router as anthropicRouter } from "./routes/anthropic";
+import ollamaTriageRouter from "./routes/ollama-triage";
 import formsRouter from "./routes/forms";
 import { schedulerRouter } from "./routes/scheduler";
 import { messagingRouter } from "./routes/messaging";
@@ -39,6 +40,13 @@ import urgentCareRouter from "./routes/urgentCare";
 import stripeRouter from "./routes/stripe";
 import priorityAIRouter from "./routes/priority-ai-routes";
 import documentsRouter from "./routes/documents";
+import interconsultationRouter from "./routes/interconsultation";
+import assetsRouter from "./routes/assets";
+import { router as medicalTranscriptionRouter } from "./routes/medical-transcription";
+import { router as triageGenerationRouter } from "./routes/triage-generation";
+import { router as twilioAuthRouter } from "./routes/twilio-auth";
+import consultationsSearchRouter from "./routes/consultations-search";
+import unifiedMedicalProcessingRouter from "./routes/unified-medical-processing";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -48,18 +56,19 @@ const openai = new OpenAI({
 
 // Setup Spruce Health API
 const spruceApi = axios.create({
-  baseURL: 'https://api.sprucehealth.com/v1',
+  baseURL: "https://api.sprucehealth.com/v1",
   headers: {
-    'Authorization': `Bearer ${process.env.SPRUCE_API_KEY || 'YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0='}`,
-    'Content-Type': 'application/json',
-    's-access-id': process.env.SPRUCE_ACCESS_ID || 'aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I='
-  }
+    Authorization: `Bearer ${process.env.SPRUCE_API_KEY || "YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0="}`,
+    "Content-Type": "application/json",
+    "s-access-id": process.env.SPRUCE_ACCESS_ID || "aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I=",
+  },
 });
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Register our API routers
   app.use("/api/ai", aiRouter);
   app.use("/api/anthropic", anthropicRouter);
+  app.use("/api/ollama", ollamaTriageRouter);
   app.use("/api/patients", patientsRouter);
   app.use("/api/spruce", spruceRouter);
   app.use("/api/webhooks/spruce", spruceWebhooksRouter);
@@ -78,8 +87,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/stripe", stripeRouter);
   app.use("/api/priority-ai", priorityAIRouter);
   app.use("/api/documents", documentsRouter);
+  app.use("/api/interconsultation", interconsultationRouter);
   app.use("/api", userRouter);
-  
+  // Assets API for listing project images used by the frontend
+  app.use("/api/assets", assetsRouter);
+  // Medical transcription API for French 5-section generation
+  app.use("/api", medicalTranscriptionRouter);
+  // Triage generation API (P1-P5 full document)
+  app.use("/api", triageGenerationRouter);
+  // Twilio SMS OTP authentication
+  app.use("/api/auth", twilioAuthRouter);
+  // Consultations search API
+  app.use("/api/consultations", consultationsSearchRouter);
+  // Unified medical processing API for two-stage documentation
+  app.use("/api/unified-medical-processing", unifiedMedicalProcessingRouter);
+
   // Error handling middleware for Zod validation errors
   const handleZodError = (error: unknown, res: Response) => {
     if (error instanceof ZodError) {
@@ -91,6 +113,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.error("Unexpected error:", error);
     return res.status(500).json({ message: "Internal server error" });
   };
+
+  // Lightweight webhook endpoint to receive Google Apps Script notifications
+  // This accepts POSTs from the InstantHPI Google Sheets "Webhook Notifier" script
+  app.post("/webhook", async (req: Request, res: Response) => {
+    try {
+      const { timestamp, trigger, changeType, lastRow, sheetName, spreadsheetId } = req.body || {};
+      console.log("📥 Received InstantHPI Webhook:", {
+        timestamp,
+        trigger,
+        changeType,
+        lastRow,
+        sheetName,
+        spreadsheetId,
+      });
+
+      // For now we just acknowledge. A future enhancement can fetch the row via Google Sheets API
+      // and then call our triage processor (/api/ollama/triage) using mapped columns.
+      return res.status(200).json({ status: "ok", received: true });
+    } catch (err) {
+      console.error("Webhook handling error:", err);
+      return res.status(200).json({ status: "ok" }); // Always 200 to avoid noisy retries in Apps Script
+    }
+  });
 
   // User routes
   app.get("/api/users/:id", async (req, res) => {
@@ -120,16 +165,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       handleZodError(error, res);
     }
   });
-  
+
   // User routes are now handled by the userRouter
 
   // Patient routes - All now use Spruce API exclusively
   app.get("/api/patients", async (req, res) => {
     try {
       const { search } = req.query;
-      
+
       // Redirect to Spruce API endpoint for all patient searches
-      const url = `/api/spruce/search-patients${search ? `?query=${encodeURIComponent(String(search))}` : ''}`;
+      const url = `/api/spruce/search-patients${search ? `?query=${encodeURIComponent(String(search))}` : ""}`;
       res.redirect(url);
     } catch (error) {
       console.error("Error redirecting patient search:", error);
@@ -176,35 +221,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/patients/:patientId/messages", async (req, res) => {
     try {
       const patientId = parseInt(req.params.patientId);
-      
+
       // Get today's date in ISO format (YYYY-MM-DD)
-      const today = new Date().toISOString().split('T')[0];
-      
+      const today = new Date().toISOString().split("T")[0];
+
       try {
         // Call the Spruce Health API to get today's messages for this patient
         const response = await spruceApi.get(`/patients/${patientId}/messages`, {
           params: {
             date_from: `${today}T00:00:00Z`,
-            date_to: `${today}T23:59:59Z`
-          }
+            date_to: `${today}T23:59:59Z`,
+          },
         });
-        
+
         // Process the Spruce API response and convert to our data format
         const spruceMessages = response.data.messages || [];
-        
+
         // Convert Spruce messages to our format and store them
         for (const msg of spruceMessages) {
           // Check if we already have this message stored (by Spruce ID)
           const existingMessage = await storage.getMessageBySpruceId(msg.id);
-          
+
           if (!existingMessage) {
             // Store the new message
             await storage.createMessage({
               patientId,
-              senderId: msg.sender_type === 'patient' ? patientId : 1, // 1 for doctor
+              senderId: msg.sender_type === "patient" ? patientId : 1, // 1 for doctor
               content: msg.content,
-              isFromPatient: msg.sender_type === 'patient',
-              spruceMessageId: msg.id
+              isFromPatient: msg.sender_type === "patient",
+              spruceMessageId: msg.id,
             });
           }
         }
@@ -212,7 +257,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("Error fetching messages from Spruce API:", spruceError);
         // We'll continue and return locally stored messages even if Spruce API fails
       }
-      
+
       // Return all messages for this patient from our database
       const messages = await storage.getMessagesByPatientId(patientId);
       res.json(messages);
@@ -226,24 +271,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const messageData = insertMessageSchema.parse(req.body);
       const message = await storage.createMessage(messageData);
-      
+
       // Process the message to detect medication refill requests
-      if (message.content && (
-        message.content.toLowerCase().includes('refill') || 
-        message.content.toLowerCase().includes('prescription') ||
-        message.content.toLowerCase().includes('medication')
-      )) {
+      if (
+        message.content &&
+        (message.content.toLowerCase().includes("refill") ||
+          message.content.toLowerCase().includes("prescription") ||
+          message.content.toLowerCase().includes("medication"))
+      ) {
         // Process with AI to determine if it's a refill request
         try {
           // We already have openai client initialized at the top level
           // Use the existing OpenAI instance
-          
+
           const aiResponse = await openai.chat.completions.create({
             model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
             messages: [
               {
                 role: "system",
-                content: "You are a medical assistant AI that analyzes patient messages to identify medication refill requests. Extract key information and return it in JSON format."
+                content:
+                  "You are a medical assistant AI that analyzes patient messages to identify medication refill requests. Extract key information and return it in JSON format.",
               },
               {
                 role: "user",
@@ -256,35 +303,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 }
                 
                 Patient message:
-                ${message.content}`
-              }
+                ${message.content}`,
+              },
             ],
-            response_format: { type: "json_object" }
+            response_format: { type: "json_object" },
           });
-          
+
           const result = JSON.parse(aiResponse.choices[0].message.content || "{}");
-          
+
           // If this is a refill request, create a medication refill entry
           if (result.isRefill) {
             console.log("Detected medication refill request in patient message");
-            
+
             // Get patient details
             const patient = await storage.getPatient(message.patientId);
-            
+
             // Create a medication refill entry
             await db.insert(medicationRefills).values({
               id: uuidv4(),
-              patientName: patient ? patient.name : (result.patientName || "Unknown Patient"),
+              patientName: patient ? patient.name : result.patientName || "Unknown Patient",
               dateReceived: new Date(),
               status: "pending",
               medicationName: result.medicationName || "Medication in message",
-              pdfUrl: "",  // No PDF for message-based requests
+              pdfUrl: "", // No PDF for message-based requests
               emailSource: "Patient message",
               aiProcessed: true,
               aiConfidence: result.confidence.toString(),
               processingNotes: `Detected in patient message: "${message.content}"`,
             });
-            
+
             // Create a pending item for the refill
             if (patient) {
               await storage.createPendingItem({
@@ -293,7 +340,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                 description: `Medication Refill Request: ${result.medicationName || "medication"}`,
                 status: "pending",
                 dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // due in 1 day
-                priority: "medium"
+                priority: "medium",
               });
             }
           }
@@ -302,7 +349,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           // Continue processing even if AI analysis fails
         }
       }
-      
+
       res.status(201).json(message);
     } catch (error) {
       handleZodError(error, res);
@@ -385,7 +432,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         
         Form data: ${JSON.stringify(formData)}
         
-        ${patientMessages ? `Recent messages: ${JSON.stringify(patientMessages)}` : ''}
+        ${patientMessages ? `Recent messages: ${JSON.stringify(patientMessages)}` : ""}
         
         Please provide a complete set of medical documentation including:
         1. History of Present Illness (HPI)
@@ -406,14 +453,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const response = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
-          { role: "system", content: "You are an AI medical assistant generating clinical documentation for a physician." },
-          { role: "user", content: prompt }
+          {
+            role: "system",
+            content:
+              "You are an AI medical assistant generating clinical documentation for a physician.",
+          },
+          { role: "user", content: prompt },
         ],
-        response_format: { type: "json_object" }
+        response_format: { type: "json_object" },
       });
 
       const aiContent = JSON.parse(response.choices[0].message.content || "{}");
-      
+
       // Save the generated documentation to storage
       const documentation = await storage.createDocumentation({
         patientId,
@@ -424,7 +475,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         plan: aiContent.plan || "",
         prescription: aiContent.prescription || null,
         followUpQuestions: aiContent.followUpQuestions || [],
-        isApproved: false
+        isApproved: false,
       });
 
       res.json(documentation);
@@ -433,16 +484,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to generate documentation" });
     }
   });
-  
+
   // New AI Message Generation endpoint for patient communications
   app.post("/api/ai/generate", async (req, res) => {
     try {
-      const { prompt, patientId, patientLanguage = 'english', maxLength = 5 } = req.body;
-      
+      const { prompt, patientId, patientLanguage = "english", maxLength = 5 } = req.body;
+
       if (!prompt) {
         return res.status(400).json({ message: "Missing prompt" });
       }
-      
+
       // Get patient information if patientId is provided
       let patient = null;
       if (patientId) {
@@ -452,54 +503,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.warn(`Could not fetch patient with ID ${patientId}:`, error);
         }
       }
-      
+
       // Determine language based on patient preference if not explicitly specified
-      const language = patientLanguage || (patient?.language || 'english');
-      
+      const language = patientLanguage || patient?.language || "english";
+
       // Create system prompt based on language
-      const systemMessage = language === 'french' 
-        ? `Vous êtes un assistant médical rédigeant des messages pour un médecin à ses patients. Répondez en français de manière professionnelle mais chaleureuse. Limitez votre réponse à ${maxLength} phrases maximum, dans un seul paragraphe. Utilisez un ton spartiate et direct. N'utilisez pas de formules de politesse excessives.`
-        : `You are a medical assistant crafting messages for a doctor to send to patients. Respond in English in a professional but warm manner. Limit your response to ${maxLength} sentences maximum, in a single paragraph. Use a spartan and direct tone. Do not use excessive politeness.`;
-      
+      const systemMessage =
+        language === "french"
+          ? `Vous êtes un assistant médical rédigeant des messages pour un médecin à ses patients. Répondez en français de manière professionnelle mais chaleureuse. Limitez votre réponse à ${maxLength} phrases maximum, dans un seul paragraphe. Utilisez un ton spartiate et direct. N'utilisez pas de formules de politesse excessives.`
+          : `You are a medical assistant crafting messages for a doctor to send to patients. Respond in English in a professional but warm manner. Limit your response to ${maxLength} sentences maximum, in a single paragraph. Use a spartan and direct tone. Do not use excessive politeness.`;
+
       // Use Anthropic if available (better multilingual abilities)
       if (process.env.ANTHROPIC_API_KEY) {
         try {
           // Import Anthropic SDK dynamically
-          const Anthropic = require('@anthropic-ai/sdk');
+          const Anthropic = require("@anthropic-ai/sdk");
           const anthropic = new Anthropic({
             apiKey: process.env.ANTHROPIC_API_KEY,
           });
-          
+
           // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
           const response = await anthropic.messages.create({
-            model: 'claude-3-7-sonnet-20250219',
+            model: "claude-3-7-sonnet-20250219",
             system: systemMessage,
             max_tokens: 1024,
-            messages: [
-              { role: 'user', content: prompt }
-            ],
+            messages: [{ role: "user", content: prompt }],
           });
-          
+
           return res.json({ text: response.content[0].text.trim() });
         } catch (error) {
           console.error("Error using Anthropic:", error);
           // Fall back to OpenAI if Anthropic fails
         }
       }
-      
+
       // Use OpenAI as fallback
       if (process.env.OPENAI_API_KEY) {
         const response = await openai.chat.completions.create({
           model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
           messages: [
             { role: "system", content: systemMessage },
-            { role: "user", content: prompt }
+            { role: "user", content: prompt },
           ],
         });
-        
-        return res.json({ text: response.choices[0].message.content?.trim() || "No response generated" });
+
+        return res.json({
+          text: response.choices[0].message.content?.trim() || "No response generated",
+        });
       }
-      
+
       // No API keys available, return error
       return res.status(503).json({ message: "AI services not configured" });
     } catch (error) {
@@ -512,7 +564,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/spruce/messages", async (req, res) => {
     try {
       const { patientId, message, messageType } = req.body;
-      
+
       if (!patientId || !message) {
         return res.status(400).json({ message: "Missing required fields" });
       }
@@ -522,35 +574,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const spruceResponse = await spruceApi.post(`/messages`, {
           patient_id: patientId,
           content: message,
-          message_type: messageType || 'GENERAL',
+          message_type: messageType || "GENERAL",
           sender_id: 1, // Doctor ID
         });
-        
+
         // Get the Spruce message ID from the response
         const spruceMessageId = spruceResponse.data.id;
-        
+
         // Save the message to our database
         const savedMessage = await storage.createMessage({
           patientId,
           senderId: 1, // Assume doctor with ID 1
           content: message,
           isFromPatient: false,
-          spruceMessageId: spruceMessageId
+          spruceMessageId: spruceMessageId,
         });
-        
+
         res.json(savedMessage);
       } catch (spruceError) {
         console.error("Error sending message to Spruce API:", spruceError);
-        
+
         // Fallback: Save the message to our database even if Spruce API fails
         const savedMessage = await storage.createMessage({
           patientId,
           senderId: 1, // Assume doctor with ID 1
           content: message,
           isFromPatient: false,
-          spruceMessageId: `local-${Date.now()}`
+          spruceMessageId: `local-${Date.now()}`,
         });
-        
+
         res.json(savedMessage);
       }
     } catch (error) {
@@ -563,7 +615,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/formsite/submissions", async (req, res) => {
     try {
       const { formType } = req.query;
-      
+
       if (!formType) {
         return res.status(400).json({ message: "Missing form type parameter" });
       }
@@ -571,26 +623,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Call Formsite API using the API key
       try {
         const formsiteClient = axios.create({
-          baseURL: 'https://fs3.formsite.com/api/v2',
+          baseURL: "https://fs3.formsite.com/api/v2",
           headers: {
-            'Authorization': `Bearer ${process.env.FORMSITE_API_KEY}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Bearer ${process.env.FORMSITE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
         });
 
         // This would be replaced with the actual form ID from your Formsite account
-        const formId = formType === 'urgent_care' ? 'form1' : 'form2';
-        
+        const formId = formType === "urgent_care" ? "form1" : "form2";
+
         const response = await formsiteClient.get(`/forms/${formId}/results`, {
           params: {
-            sort: 'date_desc',
-            limit: 10
-          }
+            sort: "date_desc",
+            limit: 10,
+          },
         });
-        
-        res.json({ 
-          formType, 
-          data: response.data 
+
+        res.json({
+          formType,
+          data: response.data,
         });
       } catch (formsiteError) {
         console.error("Error connecting to Formsite API:", formsiteError);
@@ -607,31 +659,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/verify/ramq-card", async (req, res) => {
     try {
       const { patientId, imageBase64 } = req.body;
-      
+
       if (!patientId || !imageBase64) {
         return res.status(400).json({ message: "Missing patient ID or image data" });
       }
-      
+
       // Verify the RAMQ card
       const verificationResult = await verifyRAMQCard(imageBase64);
-      
+
       if (!verificationResult.isValid || verificationResult.confidence < 0.7) {
         return res.status(400).json({
           success: false,
-          message: verificationResult.message || "The image does not appear to be a valid RAMQ health insurance card. Please provide a clear photo of the front of your RAMQ card."
+          message:
+            verificationResult.message ||
+            "The image does not appear to be a valid RAMQ health insurance card. Please provide a clear photo of the front of your RAMQ card.",
         });
       }
-      
+
       // Extract information from the RAMQ card
       const extractionResult = await extractRAMQInfo(imageBase64);
-      
+
       // Update patient record with RAMQ information if available
       if (extractionResult.success && extractionResult.ramqNumber) {
         await storage.updatePatient(patientId, {
-          healthCardNumber: extractionResult.ramqNumber
+          healthCardNumber: extractionResult.ramqNumber,
         });
       }
-      
+
       // Return success response with extraction data
       res.json({
         success: true,
@@ -639,54 +693,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
         data: {
           name: extractionResult.name,
           cardNumber: extractionResult.ramqNumber,
-          expirationDate: extractionResult.expirationDate
-        }
+          expirationDate: extractionResult.expirationDate,
+        },
       });
     } catch (error) {
       console.error("Error verifying RAMQ card:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         success: false,
-        message: "Failed to process RAMQ card verification"
+        message: "Failed to process RAMQ card verification",
       });
     }
   });
-  
+
   // 2. Pseudonym verification and form submission retrieval
   app.post("/api/verify/pseudonym", async (req, res) => {
     try {
       const { patientId, pseudonym } = req.body;
-      
+
       if (!patientId || !pseudonym) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           success: false,
-          message: "Missing patient ID or pseudonym"
+          message: "Missing patient ID or pseudonym",
         });
       }
-      
+
       // Find form submission by pseudonym
       const formResult = await findSubmissionByPseudonym(pseudonym);
-      
+
       if (!formResult.success) {
         return res.status(404).json({
           success: false,
-          message: formResult.message || "No form submission found with this pseudonym. Please check and try again."
+          message:
+            formResult.message ||
+            "No form submission found with this pseudonym. Please check and try again.",
         });
       }
-      
+
       // Generate HPI confirmation summary
       const hpiSummary = await generateHPIConfirmationSummary(
-        formResult.formType!, 
+        formResult.formType!,
         formResult.formData!
       );
-      
+
       // Save form submission to database
       const submission = await storage.createFormSubmission({
         patientId,
         formType: formResult.formType!,
         formData: formResult.formData!,
-        submissionId: pseudonym
+        submissionId: pseudonym,
       });
-      
+
       // Send a message to the patient with the HPI summary via Spruce
       try {
         const welcomeMessage = `Thank you for providing your form information. Here's a summary of your health information:
@@ -694,28 +750,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 ${hpiSummary}
 
 Is this information correct? If not, please let us know what needs to be corrected.`;
-        
+
         // Send the message through Spruce API
         const spruceResponse = await spruceApi.post(`/messages`, {
           patient_id: patientId,
           content: welcomeMessage,
-          message_type: 'MEDICAL',
+          message_type: "MEDICAL",
           sender_id: 1, // Doctor ID
         });
-        
+
         // Save the message to our database
         await storage.createMessage({
           patientId,
           senderId: 1, // Assume doctor with ID 1
           content: welcomeMessage,
           isFromPatient: false,
-          spruceMessageId: spruceResponse.data.id
+          spruceMessageId: spruceResponse.data.id,
         });
       } catch (spruceError) {
         console.error("Error sending HPI summary to patient:", spruceError);
         // Continue processing even if message sending fails
       }
-      
+
       // Return success response with form data
       res.json({
         success: true,
@@ -723,69 +779,71 @@ Is this information correct? If not, please let us know what needs to be correct
         data: {
           formType: formResult.formType,
           hpiSummary,
-          submissionId: submission.id
-        }
+          submissionId: submission.id,
+        },
       });
     } catch (error) {
       console.error("Error verifying pseudonym:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         success: false,
-        message: "Failed to process pseudonym verification"
+        message: "Failed to process pseudonym verification",
       });
     }
   });
-  
+
   // 3. Combined verification endpoint (for automating the whole process)
   app.post("/api/verify/patient", async (req, res) => {
     try {
       const { patientId, ramqImageBase64, pseudonym } = req.body;
-      
+
       if (!patientId || !ramqImageBase64 || !pseudonym) {
-        return res.status(400).json({ 
-          success: false, 
-          message: "Missing required verification data" 
+        return res.status(400).json({
+          success: false,
+          message: "Missing required verification data",
         });
       }
-      
+
       // Step 1: Verify RAMQ card
       const ramqResult = await verifyRAMQCard(ramqImageBase64);
-      
+
       if (!ramqResult.isValid || ramqResult.confidence < 0.7) {
         return res.status(400).json({
           success: false,
           step: "ramq",
-          message: ramqResult.message || "The image does not appear to be a valid RAMQ health insurance card."
+          message:
+            ramqResult.message ||
+            "The image does not appear to be a valid RAMQ health insurance card.",
         });
       }
-      
+
       // Extract RAMQ information
       const ramqInfo = await extractRAMQInfo(ramqImageBase64);
-      
+
       // Step 2: Verify pseudonym and get form data
       const formResult = await findSubmissionByPseudonym(pseudonym);
-      
+
       if (!formResult.success) {
         return res.status(404).json({
           success: false,
           step: "pseudonym",
-          message: formResult.message || "No form submission found with this pseudonym."
+          message: formResult.message || "No form submission found with this pseudonym.",
         });
       }
-      
+
       // Step 3: Generate HPI confirmation summary
       const hpiSummary = await generateHPIConfirmationSummary(
-        formResult.formType!, 
+        formResult.formType!,
         formResult.formData!
       );
-      
+
       // Step 4: Save form submission to database
       const submission = await storage.createFormSubmission({
         patientId,
         formType: formResult.formType!,
         formData: formResult.formData!,
-        submissionId: pseudonym
+        submissionId: pseudonym,
       });
-      
+
       // Step 5: Send a message to the patient with the HPI summary via Spruce
       try {
         const welcomeMessage = `Thank you for completing your verification process. Here's a summary of the information you provided:
@@ -793,28 +851,28 @@ Is this information correct? If not, please let us know what needs to be correct
 ${hpiSummary}
 
 Is this information correct? If not, please let us know what needs to be corrected.`;
-        
+
         // Send the message through Spruce API
         const spruceResponse = await spruceApi.post(`/messages`, {
           patient_id: patientId,
           content: welcomeMessage,
-          message_type: 'MEDICAL',
+          message_type: "MEDICAL",
           sender_id: 1, // Doctor ID
         });
-        
+
         // Save the message to our database
         await storage.createMessage({
           patientId,
           senderId: 1, // Assume doctor with ID 1
           content: welcomeMessage,
           isFromPatient: false,
-          spruceMessageId: spruceResponse.data.id
+          spruceMessageId: spruceResponse.data.id,
         });
       } catch (spruceError) {
         console.error("Error sending HPI summary to patient:", spruceError);
         // Continue processing even if message sending fails
       }
-      
+
       // Return success response with all verification data
       res.json({
         success: true,
@@ -823,26 +881,27 @@ Is this information correct? If not, please let us know what needs to be correct
           ramq: {
             name: ramqInfo.name,
             cardNumber: ramqInfo.ramqNumber,
-            expirationDate: ramqInfo.expirationDate
+            expirationDate: ramqInfo.expirationDate,
           },
           form: {
             formType: formResult.formType,
-            submissionId: submission.id
+            submissionId: submission.id,
           },
-          hpiSummary
-        }
+          hpiSummary,
+        },
       });
     } catch (error) {
       console.error("Error in patient verification process:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         success: false,
-        message: "Failed to complete patient verification process"
+        message: "Failed to complete patient verification process",
       });
     }
   });
 
   // Mount all API routers
   app.use("/api/ai", aiRouter);
+  app.use("/api/ollama", ollamaTriageRouter);
   app.use("/api/patients", patientsRouter);
   app.use("/api/spruce", spruceRouter);
   app.use("/api/webhooks/spruce", spruceWebhooksRouter);
@@ -863,6 +922,7 @@ Is this information correct? If not, please let us know what needs to be correct
   app.use("/api/stripe", stripeRouter);
   app.use("/api/priority-ai", priorityAIRouter);
   app.use("/api/documents", documentsRouter);
+  app.use("/api/interconsultation", interconsultationRouter);
 
   const httpServer = createServer(app);
   return httpServer;

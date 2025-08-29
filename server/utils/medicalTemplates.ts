@@ -63,30 +63,32 @@ export const HPI_CONFIRMATION_TEMPLATE = `
  * @param formData The form submission data
  * @returns A map of template variables to their values
  */
-export function mapFormDataToTemplateVariables(formData: Record<string, any>): Record<string, string> {
+export function mapFormDataToTemplateVariables(
+  formData: Record<string, any>
+): Record<string, string> {
   // Initialize the variables with default values
   const variables: Record<string, string> = {
-    'Age': extractFieldValue(formData, '7') || 'N/A',
-    'Gender': getGenderText(formData) || 'N/A',
-    'Chief Complaint': extractFieldValue(formData, '8') || 'N/A',
-    'Symptom Onset': extractFieldValue(formData, '9') || 'N/A',
-    'Trigger': extractFieldValue(formData, '10') || 'N/A',
-    'Location': extractFieldValue(formData, '11') || 'N/A',
-    'Description': extractFieldValue(formData, '12') || 'N/A',
-    'Aggravating Factors': extractFieldValue(formData, '13') || 'N/A',
-    'Relieving Factors': extractFieldValue(formData, '14') || 'N/A',
-    'Severity (0-10)': extractFieldValue(formData, '15') || 'N/A',
-    'Associated Symptoms': extractFieldValue(formData, '17') || 'N/A',
-    'Treatments Tried': getTreatmentsTriedText(formData),
-    'Chronic Conditions': extractFieldValue(formData, '20') || 'none',
-    'Medication Allergies': getMedicationAllergiesText(formData),
-    'Pregnancy': getPregnancyText(formData),
-    'Additional Info': extractFieldValue(formData, '25') || 'None provided',
+    Age: extractFieldValue(formData, "7") || "N/A",
+    Gender: getGenderText(formData) || "N/A",
+    "Chief Complaint": extractFieldValue(formData, "8") || "N/A",
+    "Symptom Onset": extractFieldValue(formData, "9") || "N/A",
+    Trigger: extractFieldValue(formData, "10") || "N/A",
+    Location: extractFieldValue(formData, "11") || "N/A",
+    Description: extractFieldValue(formData, "12") || "N/A",
+    "Aggravating Factors": extractFieldValue(formData, "13") || "N/A",
+    "Relieving Factors": extractFieldValue(formData, "14") || "N/A",
+    "Severity (0-10)": extractFieldValue(formData, "15") || "N/A",
+    "Associated Symptoms": extractFieldValue(formData, "17") || "N/A",
+    "Treatments Tried": getTreatmentsTriedText(formData),
+    "Chronic Conditions": extractFieldValue(formData, "20") || "none",
+    "Medication Allergies": getMedicationAllergiesText(formData),
+    Pregnancy: getPregnancyText(formData),
+    "Additional Info": extractFieldValue(formData, "25") || "None provided",
   };
-  
+
   // Log the extracted variables for debugging
-  console.log('Extracted variables from form data:', variables);
-  
+  console.log("Extracted variables from form data:", variables);
+
   return variables;
 }
 
@@ -96,14 +98,14 @@ export function mapFormDataToTemplateVariables(formData: Record<string, any>): R
  * @returns Formatted text about gender
  */
 function getGenderText(formData: Record<string, any>): string {
-  const gender = extractFieldValue(formData, '6');
-  
-  if (!gender) return 'not specified';
-  
-  if (gender.toLowerCase().includes('fem') || gender.toLowerCase() === 'f') {
-    return 'female';
-  } else if (gender.toLowerCase().includes('male') || gender.toLowerCase() === 'm') {
-    return 'male';
+  const gender = extractFieldValue(formData, "6");
+
+  if (!gender) return "not specified";
+
+  if (gender.toLowerCase().includes("fem") || gender.toLowerCase() === "f") {
+    return "female";
+  } else if (gender.toLowerCase().includes("male") || gender.toLowerCase() === "m") {
+    return "male";
   } else {
     return gender;
   }
@@ -115,14 +117,14 @@ function getGenderText(formData: Record<string, any>): string {
  * @returns Formatted text about pregnancy status
  */
 function getPregnancyText(formData: Record<string, any>): string {
-  const pregnancy = extractFieldValue(formData, '23');
-  
-  if (!pregnancy) return 'Pregnancy status not provided';
-  
-  if (pregnancy.toLowerCase().includes('yes')) {
-    return 'Patient is pregnant or breastfeeding';
-  } else if (pregnancy.toLowerCase().includes('no')) {
-    return 'Patient is not pregnant or breastfeeding';
+  const pregnancy = extractFieldValue(formData, "23");
+
+  if (!pregnancy) return "Pregnancy status not provided";
+
+  if (pregnancy.toLowerCase().includes("yes")) {
+    return "Patient is pregnant or breastfeeding";
+  } else if (pregnancy.toLowerCase().includes("no")) {
+    return "Patient is not pregnant or breastfeeding";
   } else {
     return `Pregnancy status: ${pregnancy}`;
   }
@@ -136,16 +138,16 @@ function getPregnancyText(formData: Record<string, any>): string {
  */
 export function fillTemplate(template: string, variables: Record<string, string>): string {
   let result = template;
-  
+
   // Replace all variables in the template
   for (const [key, value] of Object.entries(variables)) {
-    const regex = new RegExp(`{{${key}}}`, 'g');
+    const regex = new RegExp(`{{${key}}}`, "g");
     result = result.replace(regex, value);
   }
-  
+
   // Remove any remaining variable placeholders
-  result = result.replace(/{{[^}]+}}/g, 'N/A');
-  
+  result = result.replace(/{{[^}]+}}/g, "N/A");
+
   return result;
 }
 
@@ -160,23 +162,23 @@ function extractFieldValue(formData: Record<string, any>, fieldId: string): stri
   if (formData[fieldId] !== undefined) {
     return formatValueForDisplay(formData[fieldId]);
   }
-  
+
   // Check for field ID in various format patterns
   for (const key in formData) {
     // Check if the key contains the field ID (could be in format like "items[0][id]:5")
     if (key.includes(`:${fieldId}`) || key.includes(`[${fieldId}]`)) {
       return formatValueForDisplay(formData[key]);
     }
-    
+
     // Handle nested objects with ID and value properties
-    if (typeof formData[key] === 'object' && formData[key] !== null) {
+    if (typeof formData[key] === "object" && formData[key] !== null) {
       const item = formData[key];
       if (item.id === fieldId && item.value !== undefined) {
         return formatValueForDisplay(item.value);
       }
     }
   }
-  
+
   return undefined;
 }
 
@@ -187,19 +189,19 @@ function extractFieldValue(formData: Record<string, any>, fieldId: string): stri
  */
 function formatValueForDisplay(value: any): string {
   if (value === null || value === undefined) {
-    return '';
+    return "";
   }
-  
-  if (typeof value === 'object') {
+
+  if (typeof value === "object") {
     // If the value has a 'value' property, use that
     if (value.value !== undefined) {
       return String(value.value);
     }
-    
+
     // Otherwise convert the object to a string
     return JSON.stringify(value);
   }
-  
+
   return String(value);
 }
 
@@ -209,16 +211,20 @@ function formatValueForDisplay(value: any): string {
  * @returns Formatted text about treatments tried
  */
 function getTreatmentsTriedText(formData: Record<string, any>): string {
-  const treatmentsTried = extractFieldValue(formData, '18');
-  const treatmentsEffective = extractFieldValue(formData, '19');
-  
-  if (!treatmentsTried || treatmentsTried === 'No' || treatmentsTried.toLowerCase().includes('no')) {
-    return 'No treatments have been tried yet';
+  const treatmentsTried = extractFieldValue(formData, "18");
+  const treatmentsEffective = extractFieldValue(formData, "19");
+
+  if (
+    !treatmentsTried ||
+    treatmentsTried === "No" ||
+    treatmentsTried.toLowerCase().includes("no")
+  ) {
+    return "No treatments have been tried yet";
   }
-  
-  if (treatmentsEffective === 'Yes' || treatmentsEffective?.toLowerCase().includes('yes')) {
+
+  if (treatmentsEffective === "Yes" || treatmentsEffective?.toLowerCase().includes("yes")) {
     return `The patient has tried ${treatmentsTried}, which was effective`;
-  } else if (treatmentsEffective === 'No' || treatmentsEffective?.toLowerCase().includes('no')) {
+  } else if (treatmentsEffective === "No" || treatmentsEffective?.toLowerCase().includes("no")) {
     return `The patient has tried ${treatmentsTried}, which was not effective`;
   } else {
     return `The patient has tried ${treatmentsTried}`;
@@ -231,11 +237,11 @@ function getTreatmentsTriedText(formData: Record<string, any>): string {
  * @returns Formatted text about medication allergies
  */
 function getMedicationAllergiesText(formData: Record<string, any>): string {
-  const allergies = extractFieldValue(formData, '21');
-  
-  if (!allergies || allergies === 'No' || allergies.toLowerCase().includes('no')) {
-    return 'No medication allergies';
+  const allergies = extractFieldValue(formData, "21");
+
+  if (!allergies || allergies === "No" || allergies.toLowerCase().includes("no")) {
+    return "No medication allergies";
   }
-  
+
   return `Allergic to ${allergies}`;
 }

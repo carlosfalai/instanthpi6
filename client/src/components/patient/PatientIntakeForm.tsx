@@ -1,0 +1,1032 @@
+import React, { useState } from "react";
+import { supabase } from "../../lib/supabase";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+
+export function PatientIntakeForm() {
+  const [deIdentifiedId, setDeIdentifiedId] = useState("");
+  const [gender, setGender] = useState("");
+  const [age, setAge] = useState("");
+  const [reasonForVisit, setReasonForVisit] = useState("");
+  const [problemStartDate, setProblemStartDate] = useState("");
+  const [specificTrigger, setSpecificTrigger] = useState("");
+  const [symptomLocation, setSymptomLocation] = useState("");
+  const [symptomDescription, setSymptomDescription] = useState("");
+  const [symptomAggravators, setSymptomAggravators] = useState("");
+  const [symptomRelievers, setSymptomRelievers] = useState("");
+  const [severity, setSeverity] = useState("5");
+  const [symptomProgression, setSymptomProgression] = useState("");
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
+  const [treatmentsAttempted, setTreatmentsAttempted] = useState("");
+  const [treatmentEffectiveness, setTreatmentEffectiveness] = useState("");
+  const [chronicConditions, setChronicConditions] = useState("");
+  const [medicationAllergies, setMedicationAllergies] = useState("");
+  const [pregnancyStatus, setPregnancyStatus] = useState("");
+  const [additionalNotes, setAdditionalNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  // Organized symptom list by body systems (French translations from image)
+  const symptomsBySystem = {
+    Systemic: ["Fever", "Chills", "Night sweats", "Fatigue", "Weight loss", "Weight gain"],
+    Gastrointestinal: [
+      "Nausea",
+      "Vomiting",
+      "Diarrhea",
+      "Constipation",
+      "Abdominal pain",
+      "Heartburn",
+      "Difficulty swallowing",
+      "Change in appetite",
+      "Blood in stool",
+    ],
+    Genitourinary: [
+      "Painful urination",
+      "Frequent urination",
+      "Urgent urination",
+      "Blood in urine",
+      "Difficulty urinating",
+    ],
+    Respiratory: [
+      "Shortness of breath",
+      "Cough",
+      "Wheezing",
+      "Chest tightness",
+      "Sputum production",
+    ],
+    Cardiovascular: ["Chest pain", "Heart palpitations", "Swelling in legs", "High blood pressure"],
+    Neurological: [
+      "Headache",
+      "Dizziness",
+      "Fainting",
+      "Seizures",
+      "Memory problems",
+      "Confusion",
+      "Numbness/tingling",
+      "Weakness",
+      "Vision changes",
+      "Hearing changes",
+    ],
+    Dermatological: ["Rash", "Itching", "Unusual moles", "Hair loss", "Nail changes"],
+    Musculoskeletal: ["Joint pain", "Muscle pain", "Back pain", "Neck pain", "Stiffness"],
+    Psychological: [
+      "Depression",
+      "Anxiety",
+      "Difficulty falling asleep",
+      "Frequent waking",
+      "Early morning awakening",
+      "Mood changes",
+    ],
+  };
+
+  // Generate de-identified ID (Letter-Number pattern, 10 characters total)
+  const generateDeIdentifiedId = () => {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
+
+    let code = "";
+    for (let i = 0; i < 5; i++) {
+      // Add one random capital letter
+      const randomLetter = letters.charAt(Math.floor(Math.random() * letters.length));
+      code += randomLetter;
+
+      // Add one random digit
+      const randomDigit = numbers.charAt(Math.floor(Math.random() * numbers.length));
+      code += randomDigit;
+    }
+
+    setDeIdentifiedId(code);
+    return code;
+  };
+
+  const handleSymptomChange = (symptom: string, checked: boolean) => {
+    if (checked) {
+      setSelectedSymptoms([...selectedSymptoms, symptom]);
+    } else {
+      setSelectedSymptoms(selectedSymptoms.filter((s) => s !== symptom));
+    }
+  };
+
+  const [triageResult, setTriageResult] = useState<any>(null);
+
+  // Fill test data for quick testing
+  const fillTestData = () => {
+    // Generate test ID
+    const testId = generateDeIdentifiedId();
+
+    // Fill all form fields with realistic test data
+    setGender("male");
+    setAge("45");
+    setReasonForVisit("Sharp chest pain that started this morning, feeling short of breath");
+    setProblemStartDate("This morning around 8 AM");
+    setSpecificTrigger("Started after climbing stairs to my office");
+    setSymptomLocation("Left side of chest, radiating to left arm");
+    setSymptomDescription(
+      "Sharp, stabbing pain that comes in waves. Gets worse when I take deep breaths. Also feeling lightheaded and nauseous."
+    );
+    setSymptomAggravators("Deep breathing, movement, lying flat");
+    setSymptomRelievers("Sitting upright, staying still");
+    setSeverity("8");
+    setSymptomProgression("getting_worse");
+    setSelectedSymptoms([
+      "Chest pain",
+      "Shortness of breath",
+      "Nausea",
+      "Dizziness",
+      "Heart palpitations",
+    ]);
+    setTreatmentsAttempted("Took 2 Tylenol about an hour ago, tried resting");
+    setTreatmentEffectiveness(
+      "Tylenol didn't help much, resting helped a little but pain persists"
+    );
+    setChronicConditions("High blood pressure, family history of heart disease");
+    setMedicationAllergies("Penicillin - causes rash");
+    setPregnancyStatus("not_applicable");
+    setAdditionalNotes(
+      "I'm worried this might be a heart attack. My father had one at age 50. I've been under a lot of stress at work lately."
+    );
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      // Generate ID if not already generated
+      const patientId = deIdentifiedId || generateDeIdentifiedId();
+
+      // Prepare triage data for Ollama AI analysis
+      const triageData = {
+        patient_id: patientId,
+        gender,
+        age: parseInt(age) || null,
+        chief_complaint: reasonForVisit,
+        problem_start_date: problemStartDate,
+        specific_trigger: specificTrigger,
+        symptom_location: symptomLocation,
+        symptom_description: symptomDescription,
+        symptom_aggravators: symptomAggravators,
+        symptom_relievers: symptomRelievers,
+        severity: parseInt(severity),
+        symptom_progression: symptomProgression,
+        selected_symptoms: selectedSymptoms,
+        treatments_attempted: treatmentsAttempted,
+        treatment_effectiveness: treatmentEffectiveness,
+        chronic_conditions: chronicConditions,
+        medication_allergies: medicationAllergies,
+        pregnancy_status: pregnancyStatus,
+        additional_notes: additionalNotes,
+      };
+
+      // Send to Ollama for instant triage processing
+      const triageResponse = await fetch("/api/ollama/triage", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(triageData),
+      });
+
+      if (!triageResponse.ok) {
+        throw new Error("Triage processing failed");
+      }
+
+      const triageResult = await triageResponse.json();
+
+      // Show results immediately (do not block on persistence)
+      setTriageResult(triageResult);
+      setSubmitted(true);
+
+      // Fire-and-forget: Precompute full triage (P1–P5 HTML) on server to avoid repeated AI calls
+      (async () => {
+        try {
+          const body = {
+            patientId,
+            age: triageData.age,
+            gender: triageData.gender,
+            chiefComplaint: triageData.chief_complaint,
+            onset: triageData.problem_start_date,
+            trigger: triageData.specific_trigger,
+            location: triageData.symptom_location,
+            quality: triageData.symptom_description,
+            aggravatingFactors: triageData.symptom_aggravators,
+            relievingFactors: triageData.symptom_relievers,
+            severity: triageData.severity,
+            timePattern: triageData.symptom_progression,
+            associatedSymptoms: (triageData.selected_symptoms || []).join(", "),
+            treatmentsTried: triageData.treatments_attempted,
+            treatmentResponse: triageData.treatment_effectiveness,
+            chronicConditions: triageData.chronic_conditions,
+            allergies: triageData.medication_allergies,
+            pregnancyBreastfeeding: triageData.pregnancy_status,
+            otherNotes: triageData.additional_notes,
+          };
+          fetch("/api/generate-triage", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          }).catch(() => {});
+        } catch {}
+      })();
+
+      // Try to store consultation in Supabase in the background (non-blocking)
+      (async () => {
+        try {
+          // Detect placeholder env and skip
+          const url = (import.meta.env.VITE_SUPABASE_URL || "").toString();
+          if (!url || url.includes("your-project-id")) {
+            console.warn("Skipping Supabase save: VITE_SUPABASE_URL not configured");
+            return;
+          }
+
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 4000); // 4s safety timeout
+
+          // Ensure patient_id is uppercase and properly formatted
+          const consultationData = {
+            patient_id: patientId.toUpperCase(), // Ensure uppercase
+            gender: triageData.gender,
+            age: triageData.age,
+            chief_complaint: triageData.chief_complaint,
+            problem_start_date: triageData.problem_start_date,
+            specific_trigger: triageData.specific_trigger,
+            symptom_location: triageData.symptom_location,
+            symptom_description: triageData.symptom_description,
+            symptom_aggravators: triageData.symptom_aggravators,
+            symptom_relievers: triageData.symptom_relievers,
+            severity: triageData.severity,
+            symptom_progression: triageData.symptom_progression,
+            selected_symptoms: triageData.selected_symptoms,
+            treatments_attempted: triageData.treatments_attempted,
+            treatment_effectiveness: triageData.treatment_effectiveness,
+            chronic_conditions: triageData.chronic_conditions,
+            medication_allergies: triageData.medication_allergies,
+            pregnancy_status: triageData.pregnancy_status,
+            additional_notes: triageData.additional_notes,
+            triage_level: triageResult.triage_level,
+            triage_reasoning: triageResult.reasoning,
+            recommended_action: triageResult.recommended_action,
+            urgency_score: triageResult.urgency_score,
+            ai_analysis: triageResult.full_analysis,
+            symptoms: triageData.selected_symptoms?.join(", ") || "",
+            status: "triaged",
+            created_at: new Date().toISOString(),
+          };
+
+          console.log("Saving consultation with patient_id:", consultationData.patient_id);
+
+          const { data, error } = await supabase
+            .from("consultations")
+            .insert(consultationData)
+            .select();
+
+          clearTimeout(timer);
+          if (error) {
+            console.warn("Supabase save failed (continuing without persistence):", error.message);
+          } else {
+            console.log("Consultation saved successfully:", data);
+          }
+        } catch (e: any) {
+          console.warn("Supabase not reachable or timed out (continuing):", e?.message || e);
+        }
+      })();
+    } catch (error: any) {
+      console.error("Error submitting consultation:", error);
+      alert("Error processing your consultation. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (submitted) {
+    // Parse triage level to match your P1-P5 system
+    const level = String(triageResult?.triage_level || "").toUpperCase();
+
+    // Convert to P1-P5 format from your system
+    const priorityLevel = (() => {
+      switch (level) {
+        case "EMERGENCY":
+        case "URGENT":
+          return "P1";
+        case "SEMI-URGENT":
+          return "P2";
+        case "NON-URGENT":
+          return "P3";
+        case "SELF-CARE":
+          return "P4";
+        default:
+          return "P3";
+      }
+    })();
+
+    // Care locations from your system
+    const careLocations = {
+      P1: "911 (Transport en ambulance requis)",
+      P2: "Urgence hospitalière (Transport personnel ou ambulance)",
+      P3: "Urgence hospitalière ou urgence mineure",
+      P4: "Clinique sans rendez-vous",
+      P5: "Clinique avec rendez-vous ou télémédecine",
+    };
+
+    const priorityColors = {
+      P1: "bg-red-600 text-white",
+      P2: "bg-orange-600 text-white",
+      P3: "bg-yellow-600 text-black",
+      P4: "bg-green-600 text-white",
+      P5: "bg-blue-600 text-white",
+    };
+
+    // Generate HPI confirmation summary
+    const hpiSummary = `Patient ${gender === "female" ? "de sexe féminin" : gender === "male" ? "de sexe masculin" : ""} âgé(e) de ${age} ans présente:
+• Plainte principale: ${reasonForVisit}
+• Début: ${problemStartDate || "Non spécifié"}
+• Localisation: ${symptomLocation || "Non spécifié"}
+• Sévérité: ${severity}/10
+• Facteurs aggravants: ${symptomAggravators || "Aucun"}
+• Facteurs soulageants: ${symptomRelievers || "Aucun"}
+• Symptômes associés: ${selectedSymptoms.join(", ") || "Aucun"}
+• Conditions chroniques: ${chronicConditions || "Aucune"}
+• Allergies: ${medicationAllergies || "Aucune"}`;
+
+    // Generate 10 follow-up questions based on symptoms
+    const followUpQuestions = triageResult?.follow_up_questions || [
+      "Avez-vous des douleurs thoraciques ou des difficultés respiratoires?",
+      "Avez-vous eu de la fièvre dans les dernières 24 heures?",
+      "Vos symptômes vous réveillent-ils la nuit?",
+      "Avez-vous voyagé récemment?",
+      "Prenez-vous des médicaments actuellement?",
+      "Avez-vous des antécédents familiaux pertinents?",
+      "Votre appétit a-t-il changé?",
+      "Avez-vous perdu du poids récemment?",
+      "Avez-vous eu des étourdissements ou des pertes de conscience?",
+      "Y a-t-il quelque chose d'autre que vous aimeriez mentionner?",
+    ];
+
+    return (
+      <div className="max-w-4xl mx-auto p-8 print:p-0">
+        {/* Main document - printable format */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-8 print:shadow-none print:border-0 print:p-4">
+          {/* Print-only compact header */}
+          <div className="hidden print:block text-center mb-3">
+            <h2 className="text-lg font-bold">Document de Préparation - {deIdentifiedId}</h2>
+          </div>
+
+          {/* Screen version */}
+          <div className="print:hidden">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                🏥 Document de Préparation aux Soins
+              </h2>
+              <p className="text-gray-600">Votre évaluation médicale a été complétée</p>
+            </div>
+
+            {/* Patient ID */}
+            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-6 mb-6">
+              <p className="text-sm font-medium text-indigo-700 mb-2">
+                Identifiant Patient Dé-identifié:
+              </p>
+              <div className="text-3xl font-mono font-bold text-indigo-600 bg-white p-4 rounded-lg text-center border border-indigo-200">
+                {deIdentifiedId}
+              </div>
+              <p className="text-sm text-indigo-600 mt-2">
+                <strong>Conservez cet ID</strong> - Fournissez-le à votre professionnel de santé
+              </p>
+            </div>
+
+            {/* Priority Level Badge */}
+            <div className="text-center mb-6">
+              <div
+                className={`inline-block px-8 py-4 rounded-lg text-2xl font-bold ${priorityColors[priorityLevel]}`}
+              >
+                {priorityLevel}
+              </div>
+              <p className="mt-2 text-lg font-medium">
+                Où consulter: {careLocations[priorityLevel]}
+              </p>
+            </div>
+          </div>
+
+          {/* HPI Confirmation Section for Patient */}
+          <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-6 mb-6 print:bg-white print:border print:border-gray-400 print:p-3 print:mb-3 print:break-inside-avoid">
+            <h3 className="font-bold text-lg text-blue-900 mb-4 print:text-sm print:mb-2">
+              📋 Résumé de votre consultation - À CONFIRMER
+            </h3>
+            <div className="bg-white p-4 rounded border border-blue-200 mb-4 print:p-2 print:mb-2 print:text-xs">
+              <p className="text-sm leading-relaxed whitespace-pre-line print:text-xs print:leading-tight">
+                {hpiSummary}
+              </p>
+            </div>
+
+            <div className="print:block">
+              <p className="font-semibold text-blue-900 mb-3 print:text-xs print:mb-1">
+                Cette information est-elle correcte?
+              </p>
+              <div className="flex gap-8 mb-4 print:gap-4 print:mb-2">
+                <label className="flex items-center gap-3 print:gap-1">
+                  <input
+                    type="checkbox"
+                    className="w-5 h-5 print:w-4 print:h-4 print:border-2 print:border-black"
+                  />
+                  <span className="text-lg font-medium print:text-xs">✓ OUI</span>
+                </label>
+                <label className="flex items-center gap-3 print:gap-1">
+                  <input
+                    type="checkbox"
+                    className="w-5 h-5 print:w-4 print:h-4 print:border-2 print:border-black"
+                  />
+                  <span className="text-lg font-medium print:text-xs">✗ NON</span>
+                </label>
+              </div>
+
+              <div className="mt-4 print:mt-2">
+                <p className="font-semibold text-blue-900 mb-2 print:text-xs print:mb-1">
+                  Corrections:
+                </p>
+                <div className="border-2 border-gray-400 rounded p-2 bg-white print:bg-white print:p-1">
+                  <div className="h-20 print:h-8">
+                    <div className="border-b border-gray-300 h-6 print:h-4"></div>
+                    <div className="border-b border-gray-300 h-6 print:hidden"></div>
+                    <div className="border-b border-gray-300 h-6 print:hidden"></div>
+                    <div className="h-6 print:h-4"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 10 Follow-up Questions Section */}
+          <div className="bg-green-50 border-2 border-green-300 rounded-lg p-6 mb-6 print:bg-white print:border print:border-gray-400 print:p-3 print:mb-2 print:break-inside-avoid">
+            <h3 className="font-bold text-lg text-green-900 mb-4 print:text-sm print:mb-2">
+              📝 Questions importantes
+            </h3>
+            <p className="text-sm text-green-800 mb-4 print:hidden">
+              Veuillez répondre à ces questions. Vos réponses aideront le médecin.
+            </p>
+
+            <div className="space-y-4 print:space-y-1">
+              {followUpQuestions.slice(0, 10).map((question, index) => (
+                <div key={index} className="print:break-inside-avoid">
+                  <p className="font-medium text-sm mb-2 print:text-xs print:mb-0 print:leading-tight">
+                    {index + 1}. {question}
+                  </p>
+                  <div className="border-2 border-gray-400 rounded p-2 bg-white print:bg-white print:border print:p-0 print:mb-1">
+                    <div className="h-12 print:h-5">
+                      <div className="border-b border-gray-300 h-6 print:h-5 print:border-0 print:border-b print:border-gray-400"></div>
+                      <div className="h-6 print:hidden"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Hide these sections in print */}
+          <div className="print:hidden">
+            {/* Priority Levels Explanation */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-6">
+              <h4 className="font-semibold text-yellow-800 mb-3">
+                Explication des niveaux de priorité:
+              </h4>
+              <div className="text-yellow-800 text-sm space-y-1">
+                <p>
+                  <strong>P1 (Urgence vitale):</strong> 911 (Transport en ambulance requis)
+                </p>
+                <p>
+                  <strong>P2 (Urgence grave):</strong> Urgence hospitalière (Transport personnel ou
+                  ambulance)
+                </p>
+                <p>
+                  <strong>P3 (Urgence modérée):</strong> Urgence hospitalière ou urgence mineure
+                </p>
+                <p>
+                  <strong>P4 (Non urgent):</strong> Clinique sans rendez-vous
+                </p>
+                <p>
+                  <strong>P5 (Consultation régulière):</strong> Clinique avec rendez-vous ou
+                  télémédecine
+                </p>
+              </div>
+            </div>
+
+            {/* Warning Signals */}
+            <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
+              <h4 className="font-semibold text-red-800 mb-3">
+                ⚠️ Signaux d'alarme - Consultez immédiatement si:
+              </h4>
+              <ul className="text-red-800 text-sm space-y-1 ml-4">
+                <li>• Aggravation soudaine des symptômes</li>
+                <li>• Nouvelle difficulté à respirer</li>
+                <li>• Douleur thoracique</li>
+                <li>• Confusion ou changement de l'état mental</li>
+                <li>• Saignement important</li>
+                <li>• Perte de conscience</li>
+              </ul>
+            </div>
+
+            {/* Instructions for Patient */}
+            <div className="bg-amber-50 border-2 border-amber-300 rounded-lg p-6 mb-6">
+              <h3 className="font-bold text-lg text-amber-900 mb-3">📌 INSTRUCTIONS IMPORTANTES</h3>
+              <ol className="list-decimal list-inside space-y-2 text-amber-800">
+                <li className="font-medium">Imprimez ce document maintenant</li>
+                <li className="font-medium">Confirmez votre résumé médical (cochez OUI ou NON)</li>
+                <li className="font-medium">Répondez aux 10 questions À LA MAIN</li>
+                <li className="font-medium">Apportez ce document complété à l'urgence</li>
+                <li className="font-medium">Remettez-le à l'infirmière de triage</li>
+              </ol>
+              <div className="mt-4 p-3 bg-white border border-amber-400 rounded">
+                <p className="text-sm font-semibold text-amber-900">
+                  ⚠️ Ce document facilite votre prise en charge mais ne remplace PAS l'évaluation
+                  médicale. En cas d'urgence, appelez le 911.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Print-only simple instructions */}
+          <div className="hidden print:block print:mt-2 print:p-2 print:border print:border-gray-400 print:text-xs">
+            <p className="font-bold">Instructions: </p>
+            <p>1. Confirmez le résumé (cochez OUI ou NON)</p>
+            <p>2. Répondez aux questions à la main</p>
+            <p>3. Remettez ce document à l'infirmière de triage</p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-4 print:hidden">
+            <Button
+              onClick={() => {
+                setSubmitted(false);
+                setTriageResult(null);
+                // Reset all form fields
+                setDeIdentifiedId("");
+                setGender("");
+                setAge("");
+                setReasonForVisit("");
+                setProblemStartDate("");
+                setSpecificTrigger("");
+                setSymptomLocation("");
+                setSymptomDescription("");
+                setSymptomAggravators("");
+                setSymptomRelievers("");
+                setSeverity("5");
+                setSymptomProgression("");
+                setSelectedSymptoms([]);
+                setTreatmentsAttempted("");
+                setTreatmentEffectiveness("");
+                setChronicConditions("");
+                setMedicationAllergies("");
+                setPregnancyStatus("");
+                setAdditionalNotes("");
+              }}
+              variant="outline"
+              className="flex-1"
+            >
+              Nouvelle Consultation
+            </Button>
+
+            <Button
+              onClick={() => window.print()}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg py-3"
+            >
+              🖨️ IMPRIMER MAINTENANT
+            </Button>
+          </div>
+
+          {/* Print-only footer */}
+          <div className="hidden print:block print:mt-2 print:text-xs print:text-gray-600">
+            <p>
+              Date: {new Date().toLocaleDateString("fr-CA")} - ID: {deIdentifiedId}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-4xl mx-auto">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-8 bg-white rounded-xl shadow-sm border border-gray-200 p-8"
+      >
+        {/* Test Data Button - Development Only */}
+        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-sm font-medium text-yellow-800">🧪 Testing Mode</h3>
+              <p className="text-xs text-yellow-700 mt-1">
+                Click to populate the form with realistic test data for quick Llama 3.1 8B testing
+              </p>
+            </div>
+            <Button
+              type="button"
+              onClick={fillTestData}
+              variant="outline"
+              size="sm"
+              className="border-yellow-300 text-yellow-700 hover:bg-yellow-100"
+            >
+              🚀 Fill Test Data
+            </Button>
+          </div>
+        </div>
+
+        {/* Patient Identification */}
+        <div className="space-y-6">
+          <div className="border-b border-gray-200 pb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Patient Information</h2>
+          </div>
+
+          {/* De-Identified ID Generator */}
+          <div className="space-y-3">
+            <Label htmlFor="patientId" className="text-sm font-medium text-gray-700">
+              De-Identified Patient ID
+            </Label>
+            <div className="flex gap-3">
+              <Input
+                id="patientId"
+                type="text"
+                value={deIdentifiedId}
+                readOnly
+                placeholder="Click generate to create ID"
+                className="flex-1 font-mono text-lg bg-gray-50"
+              />
+              <Button
+                type="button"
+                onClick={generateDeIdentifiedId}
+                className="px-6 py-2 bg-blue-600 hover:bg-blue-700"
+              >
+                Generate De-Identified Name
+              </Button>
+            </div>
+            <p className="text-sm text-gray-500">
+              This unique ID will be used to maintain your privacy
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Gender */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium text-gray-700">Gender</Label>
+              <RadioGroup
+                value={gender}
+                onValueChange={setGender}
+                className="flex flex-col space-y-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="male" id="male" />
+                  <Label htmlFor="male">Male</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="female" id="female" />
+                  <Label htmlFor="female">Female</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="other" id="other" />
+                  <Label htmlFor="other">Other</Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* Age */}
+            <div className="space-y-3">
+              <Label htmlFor="age" className="text-sm font-medium text-gray-700">
+                Age
+              </Label>
+              <Input
+                id="age"
+                type="number"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="Enter your age"
+                min="0"
+                max="120"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Medical History */}
+        <div className="space-y-6">
+          <div className="border-b border-gray-200 pb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Medical History</h2>
+          </div>
+
+          {/* Reason for visit */}
+          <div className="space-y-3">
+            <Label htmlFor="reasonForVisit" className="text-sm font-medium text-gray-700">
+              Reason for clinic visit <span className="text-red-500">*</span>
+            </Label>
+            <Textarea
+              id="reasonForVisit"
+              value={reasonForVisit}
+              onChange={(e) => setReasonForVisit(e.target.value)}
+              required
+              placeholder="What brings you to the clinic today?"
+              rows={3}
+            />
+          </div>
+
+          {/* Problem start date */}
+          <div className="space-y-3">
+            <Label htmlFor="problemStartDate" className="text-sm font-medium text-gray-700">
+              When did this problem start?
+            </Label>
+            <Input
+              id="problemStartDate"
+              type="text"
+              value={problemStartDate}
+              onChange={(e) => setProblemStartDate(e.target.value)}
+              placeholder="e.g., 3 days ago, last week, 2 months ago"
+            />
+          </div>
+
+          {/* Specific trigger */}
+          <div className="space-y-3">
+            <Label htmlFor="specificTrigger" className="text-sm font-medium text-gray-700">
+              Was there a specific trigger or event?
+            </Label>
+            <Input
+              id="specificTrigger"
+              type="text"
+              value={specificTrigger}
+              onChange={(e) => setSpecificTrigger(e.target.value)}
+              placeholder="e.g., injury, stress, food, activity"
+            />
+          </div>
+
+          {/* Symptom location */}
+          <div className="space-y-3">
+            <Label htmlFor="symptomLocation" className="text-sm font-medium text-gray-700">
+              Where is the problem located?
+            </Label>
+            <Input
+              id="symptomLocation"
+              type="text"
+              value={symptomLocation}
+              onChange={(e) => setSymptomLocation(e.target.value)}
+              placeholder="e.g., chest, abdomen, head, back"
+            />
+          </div>
+
+          {/* Symptom description */}
+          <div className="space-y-3">
+            <Label htmlFor="symptomDescription" className="text-sm font-medium text-gray-700">
+              Describe your symptoms in detail
+            </Label>
+            <Textarea
+              id="symptomDescription"
+              value={symptomDescription}
+              onChange={(e) => setSymptomDescription(e.target.value)}
+              placeholder="Please describe your symptoms, how they feel, when they occur..."
+              rows={4}
+            />
+          </div>
+
+          {/* Symptom aggravators */}
+          <div className="space-y-3">
+            <Label htmlFor="symptomAggravators" className="text-sm font-medium text-gray-700">
+              What makes the symptoms worse?
+            </Label>
+            <Input
+              id="symptomAggravators"
+              type="text"
+              value={symptomAggravators}
+              onChange={(e) => setSymptomAggravators(e.target.value)}
+              placeholder="e.g., movement, eating, stress, lying down"
+            />
+          </div>
+
+          {/* Symptom relievers */}
+          <div className="space-y-3">
+            <Label htmlFor="symptomRelievers" className="text-sm font-medium text-gray-700">
+              What makes the symptoms better?
+            </Label>
+            <Input
+              id="symptomRelievers"
+              type="text"
+              value={symptomRelievers}
+              onChange={(e) => setSymptomRelievers(e.target.value)}
+              placeholder="e.g., rest, medication, heat, cold"
+            />
+          </div>
+
+          {/* Severity scale */}
+          <div className="space-y-3">
+            <Label htmlFor="severity" className="text-sm font-medium text-gray-700">
+              Symptom severity (0-10 scale)
+            </Label>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-500">0</span>
+              <input
+                id="severity"
+                type="range"
+                min="0"
+                max="10"
+                value={severity}
+                onChange={(e) => setSeverity(e.target.value)}
+                className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+              />
+              <span className="text-sm text-gray-500">10</span>
+              <div className="bg-blue-600 text-white px-3 py-1 rounded-md font-bold min-w-[3rem] text-center">
+                {severity}
+              </div>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>No symptoms</span>
+              <span>Moderate</span>
+              <span>Worst possible</span>
+            </div>
+          </div>
+
+          {/* Symptom progression */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-gray-700">
+              How have your symptoms changed?
+            </Label>
+            <RadioGroup
+              value={symptomProgression}
+              onValueChange={setSymptomProgression}
+              className="flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="getting_better" id="getting_better" />
+                <Label htmlFor="getting_better">Getting better</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="staying_same" id="staying_same" />
+                <Label htmlFor="staying_same">Staying the same</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="getting_worse" id="getting_worse" />
+                <Label htmlFor="getting_worse">Getting worse</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="comes_and_goes" id="comes_and_goes" />
+                <Label htmlFor="comes_and_goes">Comes and goes</Label>
+              </div>
+            </RadioGroup>
+          </div>
+        </div>
+
+        {/* Symptom Checklist */}
+        <div className="space-y-6">
+          <div className="border-b border-gray-200 pb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Symptom Checklist</h2>
+            <p className="text-sm text-gray-600 mt-1">
+              Check all symptoms you are currently experiencing:
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {Object.entries(symptomsBySystem).map(([systemName, symptoms]) => (
+              <div key={systemName} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {symptoms.map((symptom) => (
+                    <div key={symptom} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={symptom}
+                        checked={selectedSymptoms.includes(symptom)}
+                        onCheckedChange={(checked) =>
+                          handleSymptomChange(symptom, checked as boolean)
+                        }
+                      />
+                      <Label htmlFor={symptom} className="text-sm text-gray-700 cursor-pointer">
+                        {symptom}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Treatment History */}
+        <div className="space-y-6">
+          <div className="border-b border-gray-200 pb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Treatment History</h2>
+          </div>
+
+          {/* Treatments attempted */}
+          <div className="space-y-3">
+            <Label htmlFor="treatmentsAttempted" className="text-sm font-medium text-gray-700">
+              What treatments have you tried?
+            </Label>
+            <Textarea
+              id="treatmentsAttempted"
+              value={treatmentsAttempted}
+              onChange={(e) => setTreatmentsAttempted(e.target.value)}
+              placeholder="List any treatments, medications, or home remedies you have tried..."
+              rows={3}
+            />
+          </div>
+
+          {/* Treatment effectiveness */}
+          <div className="space-y-3">
+            <Label htmlFor="treatmentEffectiveness" className="text-sm font-medium text-gray-700">
+              How effective were these treatments?
+            </Label>
+            <Textarea
+              id="treatmentEffectiveness"
+              value={treatmentEffectiveness}
+              onChange={(e) => setTreatmentEffectiveness(e.target.value)}
+              placeholder="Describe how well the treatments worked..."
+              rows={2}
+            />
+          </div>
+
+          {/* Chronic conditions */}
+          <div className="space-y-3">
+            <Label htmlFor="chronicConditions" className="text-sm font-medium text-gray-700">
+              Do you have any chronic conditions or ongoing health problems?
+            </Label>
+            <Textarea
+              id="chronicConditions"
+              value={chronicConditions}
+              onChange={(e) => setChronicConditions(e.target.value)}
+              placeholder="e.g., diabetes, high blood pressure, asthma..."
+              rows={2}
+            />
+          </div>
+
+          {/* Medication allergies */}
+          <div className="space-y-3">
+            <Label htmlFor="medicationAllergies" className="text-sm font-medium text-gray-700">
+              Do you have any medication allergies?
+            </Label>
+            <Textarea
+              id="medicationAllergies"
+              value={medicationAllergies}
+              onChange={(e) => setMedicationAllergies(e.target.value)}
+              placeholder="List any medications you are allergic to and the reaction..."
+              rows={2}
+            />
+          </div>
+
+          {/* Pregnancy status */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-gray-700">
+              Are you currently pregnant or breastfeeding?
+            </Label>
+            <RadioGroup
+              value={pregnancyStatus}
+              onValueChange={setPregnancyStatus}
+              className="flex flex-col space-y-2"
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="not_applicable" id="not_applicable" />
+                <Label htmlFor="not_applicable">Not applicable</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="pregnant" id="pregnant" />
+                <Label htmlFor="pregnant">Pregnant</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="breastfeeding" id="breastfeeding" />
+                <Label htmlFor="breastfeeding">Breastfeeding</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="neither" id="neither" />
+                <Label htmlFor="neither">Neither</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {/* Additional notes */}
+          <div className="space-y-3">
+            <Label htmlFor="additionalNotes" className="text-sm font-medium text-gray-700">
+              Additional notes or concerns
+            </Label>
+            <Textarea
+              id="additionalNotes"
+              value={additionalNotes}
+              onChange={(e) => setAdditionalNotes(e.target.value)}
+              placeholder="Anything else you would like the doctor to know..."
+              rows={3}
+            />
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <div className="pt-6 border-t border-gray-200">
+          <Button
+            type="submit"
+            disabled={loading || !deIdentifiedId}
+            className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? "Submitting..." : "Submit Consultation Request"}
+          </Button>
+
+          {!deIdentifiedId && (
+            <p className="text-sm text-amber-600 text-center mt-3">
+              Please generate a De-Identified ID before submitting
+            </p>
+          )}
+        </div>
+      </form>
+    </div>
+  );
+}

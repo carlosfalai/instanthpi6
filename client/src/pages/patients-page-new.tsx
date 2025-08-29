@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, User, Search, RefreshCw, List, Grid, ChevronDown } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from '@/hooks/use-toast';
-import { useDebounce } from '@/hooks/use-debounce';
-import { Badge } from '@/components/ui/badge';
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loader2, User, Search, RefreshCw, List, Grid, ChevronDown } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { useDebounce } from "@/hooks/use-debounce";
+import { Badge } from "@/components/ui/badge";
 
 interface Patient {
   id: number;
@@ -15,118 +21,129 @@ interface Patient {
   phone: string;
   dateOfBirth: string;
   gender: string;
-  language: 'english' | 'french' | null;
+  language: "english" | "french" | null;
   spruceId?: string | null;
 }
 
 export default function PatientsPage() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
-  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'unread'>('newest');
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
+  const [sortOrder, setSortOrder] = useState<"newest" | "oldest" | "unread">("newest");
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
-  
+
   // Refresh patients data mutation
   const refreshPatientsMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/spruce/refresh-patients', {
-        method: 'POST',
+      const response = await fetch("/api/spruce/refresh-patients", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
-      
+
       if (!response.ok) {
-        throw new Error('Failed to refresh patient data');
+        throw new Error("Failed to refresh patient data");
       }
-      
+
       return response.json();
     },
     onSuccess: (data) => {
       // Invalidate queries to force a refetch
-      queryClient.invalidateQueries({ queryKey: ['/api/spruce/search-patients'] });
-      
+      queryClient.invalidateQueries({ queryKey: ["/api/spruce/search-patients"] });
+
       toast({
-        title: 'Patient data refreshed',
+        title: "Patient data refreshed",
         description: `Successfully refreshed ${data.count} patients from Spruce API.`,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: 'Refresh failed',
+        title: "Refresh failed",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
-    }
+    },
   });
-  
+
   // Using the Spruce API for patient data
-  const { 
-    data: patientsResponse = { patients: [], source: 'spruce' }, 
+  const {
+    data: patientsResponse = { patients: [], source: "spruce" },
     isLoading,
-    error
+    error,
   } = useQuery({
-    queryKey: ['/api/spruce/search-patients', debouncedSearchTerm],
+    queryKey: ["/api/spruce/search-patients", debouncedSearchTerm],
     queryFn: async () => {
-      let url = '/api/spruce/search-patients';
-      
+      let url = "/api/spruce/search-patients";
+
       // Add query parameter if available
       if (debouncedSearchTerm) {
         url += `?query=${encodeURIComponent(debouncedSearchTerm)}`;
       }
-      
+
       const res = await fetch(url);
-      
+
       if (!res.ok) {
-        throw new Error('Failed to fetch patients');
+        throw new Error("Failed to fetch patients");
       }
-      
+
       return res.json();
-    }
+    },
   });
-  
+
   // Show error toast if patient fetching fails
   React.useEffect(() => {
     if (error) {
       toast({
         title: "Error loading patients",
         description: "Please try again later",
-        variant: "destructive"
+        variant: "destructive",
       });
     }
   }, [error, toast]);
-  
+
   // Extract patients array from response
   const filteredPatients = patientsResponse.patients || [];
 
   // Generate initials for patient avatars
   const getInitials = (name: string) => {
-    if (!name || name === 'Unknown Name') return '??';
+    if (!name || name === "Unknown Name") return "??";
     return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
       .toUpperCase();
   };
-  
+
   // Get random color for patient avatars
   const getAvatarColor = (patientId: number) => {
-    const colors = ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500', 'bg-red-500'];
+    const colors = [
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-pink-500",
+      "bg-indigo-500",
+      "bg-red-500",
+    ];
     return colors[patientId % colors.length];
   };
 
   // Format date for display in the list view
   const formatDate = (date: string | null) => {
-    if (!date) return '';
+    if (!date) return "";
     const today = new Date().toDateString();
     const messageDate = new Date(date);
-    
+
     if (messageDate.toDateString() === today) {
-      return messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return messageDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     } else {
-      return messageDate.toLocaleDateString([], { month: 'numeric', day: 'numeric', year: 'numeric' });
+      return messageDate.toLocaleDateString([], {
+        month: "numeric",
+        day: "numeric",
+        year: "numeric",
+      });
     }
   };
 
@@ -142,16 +159,16 @@ export default function PatientsPage() {
         {/* Patient List Header */}
         <div className="p-3 border-b border-[#333] flex items-center justify-between">
           <div className="flex items-center space-x-1">
-            <Select
-              value={sortOrder}
-              onValueChange={(value) => setSortOrder(value as any)}
-            >
+            <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as any)}>
               <SelectTrigger className="bg-[#252525] border-[#444] text-white w-44 h-8">
                 <div className="flex items-center">
                   <ChevronDown className="h-4 w-4 mr-1" />
                   <SelectValue>
-                    {sortOrder === 'newest' ? 'All, Newest First' : 
-                     sortOrder === 'oldest' ? 'Oldest First' : 'Unread Only'}
+                    {sortOrder === "newest"
+                      ? "All, Newest First"
+                      : sortOrder === "oldest"
+                        ? "Oldest First"
+                        : "Unread Only"}
                   </SelectValue>
                 </div>
               </SelectTrigger>
@@ -163,39 +180,39 @@ export default function PatientsPage() {
             </Select>
           </div>
           <div className="flex items-center space-x-2">
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className={`p-2 ${viewMode === 'list' ? 'bg-[#333]' : ''}`}
-              onClick={() => setViewMode('list')}
+            <Button
+              size="sm"
+              variant="ghost"
+              className={`p-2 ${viewMode === "list" ? "bg-[#333]" : ""}`}
+              onClick={() => setViewMode("list")}
             >
               <List className="h-4 w-4" />
             </Button>
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className={`p-2 ${viewMode === 'grid' ? 'bg-[#333]' : ''}`}
-              onClick={() => setViewMode('grid')}
+            <Button
+              size="sm"
+              variant="ghost"
+              className={`p-2 ${viewMode === "grid" ? "bg-[#333]" : ""}`}
+              onClick={() => setViewMode("grid")}
             >
               <Grid className="h-4 w-4" />
             </Button>
           </div>
         </div>
-        
+
         {/* Search Box */}
         <div className="p-3 border-b border-[#333]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
-            <Input 
+            <Input
               type="text"
-              placeholder="Search patients..." 
+              placeholder="Search patients..."
               className="pl-10 bg-[#252525] border-[#444] text-white w-full"
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
-        
+
         {/* Patient List */}
         <div className="overflow-y-auto flex-grow">
           {isLoading ? (
@@ -203,21 +220,23 @@ export default function PatientsPage() {
               <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
             </div>
           ) : filteredPatients.length > 0 ? (
-            viewMode === 'list' ? (
+            viewMode === "list" ? (
               <div>
                 {filteredPatients.map((patient: Patient) => (
-                  <div 
+                  <div
                     key={patient.id}
                     className={`border-b border-[#333] hover:bg-[#252525] cursor-pointer transition-colors
-                      ${selectedPatient?.id === patient.id ? 'bg-[#2a2a2a]' : ''}`}
+                      ${selectedPatient?.id === patient.id ? "bg-[#2a2a2a]" : ""}`}
                     onClick={() => handlePatientSelect(patient)}
                   >
                     <div className="p-3 flex items-start">
                       {/* Patient Avatar */}
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-full ${getAvatarColor(patient.id)} flex items-center justify-center mr-3`}>
+                      <div
+                        className={`flex-shrink-0 w-10 h-10 rounded-full ${getAvatarColor(patient.id)} flex items-center justify-center mr-3`}
+                      >
                         <span className="font-medium text-white">{getInitials(patient.name)}</span>
                       </div>
-                      
+
                       {/* Patient Info */}
                       <div className="flex-grow min-w-0">
                         <div className="flex items-center justify-between">
@@ -227,9 +246,12 @@ export default function PatientsPage() {
                           </span>
                         </div>
                         <p className="text-sm text-gray-400 truncate">
-                          {patient.gender === 'male' ? 'Male' : 
-                           patient.gender === 'female' ? 'Female' : 'Unknown gender'}
-                           {patient.phone ? ` • ${patient.phone}` : ''}
+                          {patient.gender === "male"
+                            ? "Male"
+                            : patient.gender === "female"
+                              ? "Female"
+                              : "Unknown gender"}
+                          {patient.phone ? ` • ${patient.phone}` : ""}
                         </p>
                       </div>
                     </div>
@@ -239,14 +261,16 @@ export default function PatientsPage() {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4">
                 {filteredPatients.map((patient: Patient) => (
-                  <div 
-                    key={patient.id} 
+                  <div
+                    key={patient.id}
                     className={`p-4 rounded-md bg-[#252525] hover:bg-[#2a2a2a] cursor-pointer border border-[#333] transition-colors
-                      ${selectedPatient?.id === patient.id ? 'border-blue-500' : 'border-[#333]'}`}
+                      ${selectedPatient?.id === patient.id ? "border-blue-500" : "border-[#333]"}`}
                     onClick={() => handlePatientSelect(patient)}
                   >
                     <div className="flex items-center mb-2">
-                      <div className={`w-10 h-10 rounded-full ${getAvatarColor(patient.id)} flex items-center justify-center mr-3`}>
+                      <div
+                        className={`w-10 h-10 rounded-full ${getAvatarColor(patient.id)} flex items-center justify-center mr-3`}
+                      >
                         <span className="font-medium text-white">{getInitials(patient.name)}</span>
                       </div>
                       <div>
@@ -254,54 +278,68 @@ export default function PatientsPage() {
                         <span className="text-xs text-gray-400">{patient.gender}</span>
                       </div>
                     </div>
-                    {patient.phone && <p className="text-sm text-gray-400"><span className="text-gray-500">Phone:</span> {patient.phone}</p>}
-                    {patient.email && <p className="text-sm text-gray-400"><span className="text-gray-500">Email:</span> {patient.email}</p>}
+                    {patient.phone && (
+                      <p className="text-sm text-gray-400">
+                        <span className="text-gray-500">Phone:</span> {patient.phone}
+                      </p>
+                    )}
+                    {patient.email && (
+                      <p className="text-sm text-gray-400">
+                        <span className="text-gray-500">Email:</span> {patient.email}
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
             )
           ) : (
-            <div className="p-4 text-center text-gray-500">
-              No patients found
-            </div>
+            <div className="p-4 text-center text-gray-500">No patients found</div>
           )}
         </div>
-        
+
         {/* Patient List Footer */}
         <div className="p-3 border-t border-[#333] flex justify-between">
-          <Button 
+          <Button
             variant="outline"
             size="sm"
             onClick={() => refreshPatientsMutation.mutate()}
             disabled={refreshPatientsMutation.isPending}
             className="text-xs"
           >
-            <RefreshCw className={`h-3 w-3 mr-1 ${refreshPatientsMutation.isPending ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`h-3 w-3 mr-1 ${refreshPatientsMutation.isPending ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
-          <Button 
-            size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white text-xs"
-          >
+          <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white text-xs">
             Add Patient
           </Button>
         </div>
       </div>
-      
+
       {/* Middle column - Patient Details */}
       <div className="hidden md:block md:w-1/3 border-r border-[#333] bg-[#1a1a1a] overflow-y-auto">
         {selectedPatient ? (
           <div>
             <div className="p-4 border-b border-[#333] flex items-center">
-              <div className={`w-12 h-12 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-4`}>
-                <span className="font-medium text-white text-lg">{getInitials(selectedPatient.name)}</span>
+              <div
+                className={`w-12 h-12 rounded-full ${getAvatarColor(selectedPatient.id)} flex items-center justify-center mr-4`}
+              >
+                <span className="font-medium text-white text-lg">
+                  {getInitials(selectedPatient.name)}
+                </span>
               </div>
               <div>
                 <h2 className="text-xl font-bold text-white">{selectedPatient.name}</h2>
                 <p className="text-sm text-gray-400">
-                  {selectedPatient.gender === 'male' ? 'Male' : 
-                   selectedPatient.gender === 'female' ? 'Female' : 'Unknown gender'} 
-                  {selectedPatient.dateOfBirth ? ` • ${formatDate(selectedPatient.dateOfBirth)}` : ''}
+                  {selectedPatient.gender === "male"
+                    ? "Male"
+                    : selectedPatient.gender === "female"
+                      ? "Female"
+                      : "Unknown gender"}
+                  {selectedPatient.dateOfBirth
+                    ? ` • ${formatDate(selectedPatient.dateOfBirth)}`
+                    : ""}
                 </p>
               </div>
             </div>
@@ -310,24 +348,30 @@ export default function PatientsPage() {
                 <h3 className="text-md font-semibold mb-2 text-white">Contact Information</h3>
                 <div className="space-y-2 text-sm text-gray-400">
                   {selectedPatient.phone && (
-                    <p><span className="text-gray-500">Phone:</span> {selectedPatient.phone}</p>
+                    <p>
+                      <span className="text-gray-500">Phone:</span> {selectedPatient.phone}
+                    </p>
                   )}
                   {selectedPatient.email && (
-                    <p><span className="text-gray-500">Email:</span> {selectedPatient.email}</p>
+                    <p>
+                      <span className="text-gray-500">Email:</span> {selectedPatient.email}
+                    </p>
                   )}
                   {selectedPatient.language && (
-                    <p><span className="text-gray-500">Language:</span> {selectedPatient.language}</p>
+                    <p>
+                      <span className="text-gray-500">Language:</span> {selectedPatient.language}
+                    </p>
                   )}
                 </div>
               </div>
-              
+
               <div className="mb-6">
                 <h3 className="text-md font-semibold mb-2 text-white">Recent Communications</h3>
                 <div className="bg-[#252525] rounded-md p-3 text-sm text-gray-400">
                   <p>No recent communications</p>
                 </div>
               </div>
-              
+
               <div>
                 <h3 className="text-md font-semibold mb-2 text-white">Medical Information</h3>
                 <div className="bg-[#252525] rounded-md p-3 text-sm text-gray-400">
@@ -346,7 +390,7 @@ export default function PatientsPage() {
           </div>
         )}
       </div>
-      
+
       {/* Right column - AI Recommendations */}
       <div className="hidden md:block md:w-1/3 bg-[#1a1a1a] overflow-y-auto">
         <div className="p-4 border-b border-[#333]">
@@ -370,12 +414,12 @@ export default function PatientsPage() {
                   </li>
                 </ul>
               </div>
-              
+
               <div className="bg-[#252525] rounded-md p-4">
                 <h3 className="text-md font-semibold mb-2 text-white">Patient Insights</h3>
                 <p className="text-sm text-gray-400">
-                  AI analysis of this patient's data is not available. Select "Generate Insights" 
-                  to analyze patient history and receive personalized recommendations.
+                  AI analysis of this patient's data is not available. Select "Generate Insights" to
+                  analyze patient history and receive personalized recommendations.
                 </p>
                 <Button className="mt-3 w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                   Generate Insights
@@ -388,7 +432,9 @@ export default function PatientsPage() {
             <div className="text-center p-6">
               <BrainIcon className="h-12 w-12 text-gray-500 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-white mb-2">AI Assistant Ready</h3>
-              <p className="text-gray-400">Select a patient to receive personalized AI recommendations</p>
+              <p className="text-gray-400">
+                Select a patient to receive personalized AI recommendations
+              </p>
             </div>
           </div>
         )}

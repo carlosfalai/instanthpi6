@@ -2,6 +2,133 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Print-specific styles for patient preparation document - 1 page */
+@media print {
+  @page {
+    size: letter;
+    margin: 0.3in;
+  }
+
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    font-size: 11px !important;
+  }
+
+  /* Hide non-essential elements */
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Ensure good print layout */
+  .print\:break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Compact spacing for print */
+  .print\:p-0 {
+    padding: 0 !important;
+  }
+  .print\:p-1 {
+    padding: 0.125rem !important;
+  }
+  .print\:p-2 {
+    padding: 0.25rem !important;
+  }
+  .print\:p-3 {
+    padding: 0.375rem !important;
+  }
+  .print\:p-4 {
+    padding: 0.5rem !important;
+  }
+  .print\:mb-1 {
+    margin-bottom: 0.125rem !important;
+  }
+  .print\:mb-2 {
+    margin-bottom: 0.25rem !important;
+  }
+  .print\:mb-3 {
+    margin-bottom: 0.375rem !important;
+  }
+  .print\:mt-2 {
+    margin-top: 0.25rem !important;
+  }
+  .print\:space-y-1 > * + * {
+    margin-top: 0.125rem !important;
+  }
+
+  /* Text sizing for print */
+  .print\:text-xs {
+    font-size: 10px !important;
+    line-height: 1.2 !important;
+  }
+  .print\:text-sm {
+    font-size: 11px !important;
+    line-height: 1.3 !important;
+  }
+  .print\:leading-tight {
+    line-height: 1.1 !important;
+  }
+
+  /* Make checkboxes and lines more visible */
+  input[type="checkbox"] {
+    border: 1px solid black !important;
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .print\:w-4 {
+    width: 12px !important;
+  }
+  .print\:h-4 {
+    height: 12px !important;
+  }
+  .print\:h-5 {
+    height: 14px !important;
+  }
+  .print\:h-8 {
+    height: 20px !important;
+  }
+
+  /* Ensure writing lines are visible */
+  .print\:border-b {
+    border-bottom: 1px solid #666 !important;
+  }
+
+  /* Ensure sections don't break across pages */
+  .print\:block {
+    display: block !important;
+  }
+
+  /* Better contrast for printed text */
+  .text-gray-600,
+  .text-gray-700,
+  .text-gray-800 {
+    color: #000 !important;
+  }
+
+  /* Minimal backgrounds for print */
+  .print\:bg-white {
+    background-color: white !important;
+  }
+
+  /* Make borders visible but compact */
+  .print\:border {
+    border: 1px solid #666 !important;
+  }
+
+  .print\:border-0 {
+    border: 0 !important;
+  }
+
+  /* Limit question answer spaces to 1 line */
+  .print\:h-5 {
+    height: 14px !important;
+    border-bottom: 1px solid #666 !important;
+  }
+}
+
 :root {
   --color-1: 0 100% 63%;
   --color-2: 270 100% 63%;
@@ -11,7 +138,9 @@
 }
 
 @keyframes tilt {
-  0%, 50%, 100% {
+  0%,
+  50%,
+  100% {
     transform: rotate(0deg);
   }
   25% {
@@ -73,7 +202,7 @@
 
   /* Hide scrollbar for IE, Edge and Firefox */
   .hide-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
   }
 }

@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import Anthropic from "@anthropic-ai/sdk";
 
 // Initialize the Anthropic client
 const anthropic = new Anthropic({
@@ -6,7 +6,7 @@ const anthropic = new Anthropic({
 });
 
 // The newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
-const DEFAULT_MODEL = 'claude-3-7-sonnet-20250219';
+const DEFAULT_MODEL = "claude-3-7-sonnet-20250219";
 
 // Example protocol to use as a template
 const PROTOCOL_TEMPLATE = `🩺 Chronic Abdominal Pain
@@ -62,16 +62,16 @@ export async function generateText(
     const response = await anthropic.messages.create({
       max_tokens: maxTokens,
       model: model,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: "user", content: prompt }],
     });
 
     // Extract and return the content from the first message part
-    if (response.content.length > 0 && response.content[0].type === 'text') {
+    if (response.content.length > 0 && response.content[0].type === "text") {
       return response.content[0].text;
     }
-    return 'No text content returned from Claude AI.';
+    return "No text content returned from Claude AI.";
   } catch (error: any) {
-    console.error('Error generating text with Claude:', error);
+    console.error("Error generating text with Claude:", error);
     throw new Error(`Failed to generate text with Claude: ${error.message}`);
   }
 }
@@ -90,19 +90,19 @@ export async function summarizeText(
 ): Promise<string> {
   try {
     const prompt = `Please summarize the following text in about ${wordLimit} words:\n\n${text}`;
-    
+
     const response = await anthropic.messages.create({
       max_tokens: 1024,
       model: model,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: "user", content: prompt }],
     });
 
-    if (response.content.length > 0 && response.content[0].type === 'text') {
+    if (response.content.length > 0 && response.content[0].type === "text") {
       return response.content[0].text;
     }
-    return 'No text content returned from Claude AI.';
+    return "No text content returned from Claude AI.";
   } catch (error: any) {
-    console.error('Error summarizing text with Claude:', error);
+    console.error("Error summarizing text with Claude:", error);
     throw new Error(`Failed to summarize text with Claude: ${error.message}`);
   }
 }
@@ -122,17 +122,17 @@ export async function analyzeSentiment(
       model: model,
       system: `You're a Customer Insights AI. Analyze this feedback and output in JSON format with keys: "sentiment" (positive/negative/neutral) and "confidence" (number between 0 and 1).`,
       max_tokens: 1024,
-      messages: [{ role: 'user', content: text }],
+      messages: [{ role: "user", content: text }],
     });
 
     let jsonString = '{"sentiment": "neutral", "confidence": 0.5}';
-    if (response.content.length > 0 && response.content[0].type === 'text') {
+    if (response.content.length > 0 && response.content[0].type === "text") {
       const jsonMatch = response.content[0].text.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         jsonString = jsonMatch[0];
       }
     }
-    
+
     try {
       const result = JSON.parse(jsonString);
       return {
@@ -140,11 +140,11 @@ export async function analyzeSentiment(
         confidence: Math.max(0, Math.min(1, result.confidence)),
       };
     } catch (jsonError) {
-      console.error('Error parsing sentiment JSON response:', jsonError);
-      return { sentiment: 'neutral', confidence: 0.5 };
+      console.error("Error parsing sentiment JSON response:", jsonError);
+      return { sentiment: "neutral", confidence: 0.5 };
     }
   } catch (error: any) {
-    console.error('Error analyzing sentiment with Claude:', error);
+    console.error("Error analyzing sentiment with Claude:", error);
     throw new Error(`Failed to analyze sentiment with Claude: ${error.message}`);
   }
 }
@@ -165,31 +165,35 @@ export async function analyzeImage(
     const response = await anthropic.messages.create({
       model: model,
       max_tokens: 1024,
-      messages: [{
-        role: 'user',
-        content: [
-          {
-            type: 'text',
-            text: prompt || 'Analyze this image in detail and describe its key elements, context, and any notable aspects.'
-          },
-          {
-            type: 'image',
-            source: {
-              type: 'base64',
-              media_type: 'image/jpeg',
-              data: imageBase64
-            }
-          }
-        ]
-      }]
+      messages: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text:
+                prompt ||
+                "Analyze this image in detail and describe its key elements, context, and any notable aspects.",
+            },
+            {
+              type: "image",
+              source: {
+                type: "base64",
+                media_type: "image/jpeg",
+                data: imageBase64,
+              },
+            },
+          ],
+        },
+      ],
     });
 
-    if (response.content.length > 0 && response.content[0].type === 'text') {
+    if (response.content.length > 0 && response.content[0].type === "text") {
       return response.content[0].text;
     }
-    return 'No text content returned from Claude AI.';
+    return "No text content returned from Claude AI.";
   } catch (error: any) {
-    console.error('Error analyzing image with Claude:', error);
+    console.error("Error analyzing image with Claude:", error);
     throw new Error(`Failed to analyze image with Claude: ${error.message}`);
   }
 }
@@ -203,50 +207,50 @@ export async function analyzeImage(
  */
 export async function generateMedicalDocumentation(
   patientData: any,
-  options: any = { documentType: 'soap' },
+  options: any = { documentType: "soap" },
   model: string = DEFAULT_MODEL
 ): Promise<string> {
   try {
     let prompt = `Please create a ${options.documentType.toUpperCase()} note for a patient with the following information:\n\n`;
-    
+
     if (patientData.chiefComplaint) {
       prompt += `Chief Complaint: ${patientData.chiefComplaint}\n`;
     }
-    
+
     if (patientData.symptoms) {
       prompt += `Symptoms: ${patientData.symptoms}\n`;
     }
-    
+
     if (patientData.medicalHistory) {
       prompt += `Medical History: ${patientData.medicalHistory}\n`;
     }
-    
+
     if (patientData.medications) {
       prompt += `Current Medications: ${patientData.medications}\n`;
     }
-    
+
     if (patientData.allergies) {
       prompt += `Allergies: ${patientData.allergies}\n`;
     }
-    
+
     if (patientData.vitals) {
       prompt += `Vitals: ${patientData.vitals}\n`;
     }
-    
+
     prompt += `\nPlease format the note professionally and include all relevant sections for a ${options.documentType.toUpperCase()} note.`;
-    
+
     const response = await anthropic.messages.create({
       max_tokens: 2048,
       model: model,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: "user", content: prompt }],
     });
 
-    if (response.content.length > 0 && response.content[0].type === 'text') {
+    if (response.content.length > 0 && response.content[0].type === "text") {
       return response.content[0].text;
     }
-    return 'No text content returned from Claude AI.';
+    return "No text content returned from Claude AI.";
   } catch (error: any) {
-    console.error('Error generating medical documentation with Claude:', error);
+    console.error("Error generating medical documentation with Claude:", error);
     throw new Error(`Failed to generate medical documentation with Claude: ${error.message}`);
   }
 }
@@ -265,27 +269,27 @@ export async function generateTreatmentPlan(
 ): Promise<string> {
   try {
     let prompt = `Please create a comprehensive treatment plan for a patient with the following diagnosis: ${diagnosis}\n\n`;
-    
+
     if (patientDetails.age) {
       prompt += `Patient Age: ${patientDetails.age}\n`;
     }
-    
+
     if (patientDetails.sex) {
       prompt += `Patient Sex: ${patientDetails.sex}\n`;
     }
-    
+
     if (patientDetails.medicalHistory) {
       prompt += `Medical History: ${patientDetails.medicalHistory}\n`;
     }
-    
+
     if (patientDetails.medications) {
       prompt += `Current Medications: ${patientDetails.medications}\n`;
     }
-    
+
     if (patientDetails.allergies) {
       prompt += `Allergies: ${patientDetails.allergies}\n`;
     }
-    
+
     prompt += `\nPlease include the following in the treatment plan:
 1. Medication recommendations (with dosages if appropriate)
 2. Lifestyle modifications
@@ -293,19 +297,19 @@ export async function generateTreatmentPlan(
 4. Potential referrals to specialists if needed
 5. Patient education points
 6. Warning signs that would require immediate medical attention`;
-    
+
     const response = await anthropic.messages.create({
       max_tokens: 2048,
       model: model,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: "user", content: prompt }],
     });
 
-    if (response.content.length > 0 && response.content[0].type === 'text') {
+    if (response.content.length > 0 && response.content[0].type === "text") {
       return response.content[0].text;
     }
-    return 'No text content returned from Claude AI.';
+    return "No text content returned from Claude AI.";
   } catch (error: any) {
-    console.error('Error generating treatment plan with Claude:', error);
+    console.error("Error generating treatment plan with Claude:", error);
     throw new Error(`Failed to generate treatment plan with Claude: ${error.message}`);
   }
 }
@@ -321,34 +325,34 @@ export async function generateTreatmentPlan(
 export async function generateStandardProtocol(
   diagnosisName: string,
   diagnosisCategory: string,
-  existingTreatments: Array<{name: string, category: string}> = [],
+  existingTreatments: Array<{ name: string; category: string }> = [],
   model: string = DEFAULT_MODEL
 ): Promise<string> {
   try {
     // Create a string with existing treatment options
-    let treatmentsText = '';
+    let treatmentsText = "";
     if (existingTreatments.length > 0) {
-      treatmentsText = 'Existing treatment options for this diagnosis include:\n';
-      
+      treatmentsText = "Existing treatment options for this diagnosis include:\n";
+
       // Group treatments by category
-      const treatmentsByCategory: {[key: string]: string[]} = {};
-      
-      existingTreatments.forEach(treatment => {
+      const treatmentsByCategory: { [key: string]: string[] } = {};
+
+      existingTreatments.forEach((treatment) => {
         if (!treatmentsByCategory[treatment.category]) {
           treatmentsByCategory[treatment.category] = [];
         }
         treatmentsByCategory[treatment.category].push(treatment.name);
       });
-      
+
       // Add treatments by category
       for (const [category, treatments] of Object.entries(treatmentsByCategory)) {
         treatmentsText += `- ${category.charAt(0).toUpperCase() + category.slice(1)}:\n`;
-        treatments.forEach(treatment => {
+        treatments.forEach((treatment) => {
           treatmentsText += `  - ${treatment}\n`;
         });
       }
     }
-    
+
     const prompt = `I need you to create a detailed standard medical protocol for treating patients with ${diagnosisName}. 
 This is a ${diagnosisCategory} condition.
 
@@ -376,15 +380,15 @@ Be comprehensive and medically accurate. Include checkbox (☐) symbols before e
     const response = await anthropic.messages.create({
       max_tokens: 3000,
       model: model,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: "user", content: prompt }],
     });
 
-    if (response.content.length > 0 && response.content[0].type === 'text') {
+    if (response.content.length > 0 && response.content[0].type === "text") {
       return response.content[0].text;
     }
-    return 'No text content returned from Claude AI.';
+    return "No text content returned from Claude AI.";
   } catch (error: any) {
-    console.error('Error generating standard protocol with Claude:', error);
+    console.error("Error generating standard protocol with Claude:", error);
     throw new Error(`Failed to generate standard protocol with Claude: ${error.message}`);
   }
 }
@@ -403,7 +407,7 @@ export async function processFormSubmission(
 ): Promise<string> {
   try {
     console.log(`[DEBUG] Processing FormSite submission with Claude ${model}`);
-    
+
     // Get the medical transcription template HTML
     const templateHTML = `<!-- Medical Transcription Output Template in HTML (Multilingual, Gmail-Safe) -->
 
@@ -433,7 +437,7 @@ Just to verify this with you beforehand, you are a {{Age}}-year-old {{Gender}} e
 
 <p><strong>Patient Language ({{PatientLanguage}}):</strong><br>
 Vamos a confirmar su información médica. Usted tiene {{Age}} años y presenta {{Description}} en {{Location}} desde {{Symptom}}{{Onset}}. El dolor es de {{Severity}} sobre 10, empeora con {{Aggravating}}{{Factors}} y mejora con {{Relieving}}{{Factors}}. También tiene {{Associated}}{{Symptoms}}. Hasta ahora no ha probado tratamientos. Tiene antecedentes de {{Chronic}}{{Conditions}}. No reporta alergias a medicamentos. ¿Es correcta esta información?</p>`;
-    
+
     // Generate system prompt
     const systemPrompt = `You are an expert medical transcription AI assistant. You'll help doctors convert form submissions from patients into structured, professional medical documentation that follows a specific template format.
 
@@ -442,7 +446,9 @@ Use the patient's submitted information to generate a comprehensive medical docu
 The template contains placeholders like {{Age}}, {{Gender}}, etc. Replace these with the appropriate information from the form data. If information is missing, use "not reported" or similar appropriate text. Be thorough and professional.`;
 
     // Create the user prompt with form data - use customPrompt if provided
-    const userPrompt = customPrompt || `Here is a FormSite submission with patient data. Please process this and create a complete medical documentation following the HTML template structure.
+    const userPrompt =
+      customPrompt ||
+      `Here is a FormSite submission with patient data. Please process this and create a complete medical documentation following the HTML template structure.
 
 Form Data:
 ${JSON.stringify(formData, null, 2)}
@@ -457,16 +463,16 @@ Please fill in all placeholders with information from the form data. Generate al
       model: model,
       system: systemPrompt,
       max_tokens: 4000,
-      messages: [{ role: 'user', content: userPrompt }],
+      messages: [{ role: "user", content: userPrompt }],
     });
 
     // Extract and return the content
-    if (response.content.length > 0 && response.content[0].type === 'text') {
+    if (response.content.length > 0 && response.content[0].type === "text") {
       return response.content[0].text;
     }
-    return 'No text content returned from Claude AI.';
+    return "No text content returned from Claude AI.";
   } catch (error: any) {
-    console.error('Error processing FormSite submission with Claude:', error);
+    console.error("Error processing FormSite submission with Claude:", error);
     throw new Error(`Failed to process FormSite submission with Claude: ${error.message}`);
   }
 }

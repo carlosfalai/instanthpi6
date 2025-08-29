@@ -13,13 +13,13 @@ interface SignaturePinModalProps {
   isProcessing: boolean;
 }
 
-const SignaturePinModal: React.FC<SignaturePinModalProps> = ({ 
-  isOpen, 
-  isVerifying, 
-  onClose, 
-  onCreatePin, 
-  onVerifyPin, 
-  isProcessing 
+const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
+  isOpen,
+  isVerifying,
+  onClose,
+  onCreatePin,
+  onVerifyPin,
+  isProcessing,
 }) => {
   const [pin, setPin] = useState<string>("");
   const [confirmPin, setConfirmPin] = useState<string>("");
@@ -36,14 +36,14 @@ const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (isVerifying) {
       // PIN verification mode
       if (pin.length !== 4 || !/^\d+$/.test(pin)) {
         setError("PIN must be 4 digits");
         return;
       }
-      
+
       onVerifyPin(pin);
     } else {
       // PIN creation mode
@@ -51,12 +51,12 @@ const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
         setError("PIN must be 4 digits");
         return;
       }
-      
+
       if (pin !== confirmPin) {
         setError("PINs do not match");
         return;
       }
-      
+
       onCreatePin(pin);
     }
   };
@@ -74,7 +74,7 @@ const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
             ? "Enter your 4-digit PIN to verify your signature"
             : "Create a secure 4-digit PIN to protect your signature"}
         </p>
-        
+
         <form onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="space-y-2">
@@ -93,14 +93,14 @@ const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
                   const val = e.target.value;
                   if (/^\d*$/.test(val) && val.length <= 4) {
                     setPin(val);
-                    setError(""); 
+                    setError("");
                   }
                 }}
                 className="bg-[#262626] border-gray-700"
                 placeholder="Enter 4-digit PIN"
               />
             </div>
-            
+
             {!isVerifying && (
               <div className="space-y-2">
                 <Label htmlFor="confirmPin" className="text-sm font-medium text-gray-300">
@@ -126,28 +126,19 @@ const SignaturePinModal: React.FC<SignaturePinModalProps> = ({
                 />
               </div>
             )}
-            
-            {error && (
-              <div className="text-red-500 text-sm font-medium">{error}</div>
-            )}
+
+            {error && <div className="text-red-500 text-sm font-medium">{error}</div>}
           </div>
-          
+
           <div className="flex justify-end space-x-3 mt-6">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              disabled={isProcessing}
-            >
+            <Button type="button" variant="outline" onClick={onClose} disabled={isProcessing}>
               Cancel
             </Button>
-            <Button 
+            <Button
               type="submit"
               className="bg-blue-600 hover:bg-blue-700"
               disabled={
-                isProcessing ||
-                pin.length !== 4 ||
-                (!isVerifying && confirmPin.length !== 4)
+                isProcessing || pin.length !== 4 || (!isVerifying && confirmPin.length !== 4)
               }
             >
               {isProcessing ? (

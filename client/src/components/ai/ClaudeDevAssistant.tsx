@@ -1,38 +1,44 @@
-import React, { useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { Loader2, Copy, Check, Code, RefreshCw } from 'lucide-react';
-import { apiRequest } from '@/lib/queryClient';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { Loader2, Copy, Check, Code, RefreshCw } from "lucide-react";
+import { apiRequest } from "@/lib/queryClient";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const ClaudeDevAssistant = () => {
-  const [prompt, setPrompt] = useState('');
-  const [codeInput, setCodeInput] = useState('');
-  const [language, setLanguage] = useState('typescript');
-  const [activeTab, setActiveTab] = useState('generate');
+  const [prompt, setPrompt] = useState("");
+  const [codeInput, setCodeInput] = useState("");
+  const [language, setLanguage] = useState("typescript");
+  const [activeTab, setActiveTab] = useState("generate");
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
 
   // Map of programming languages to their file extensions
   const languageExtensions = {
-    typescript: 'ts',
-    javascript: 'js',
-    python: 'py',
-    html: 'html',
-    css: 'css',
-    sql: 'sql',
+    typescript: "ts",
+    javascript: "js",
+    python: "py",
+    html: "html",
+    css: "css",
+    sql: "sql",
   };
 
   // Code generation mutation
   const generateCodeMutation = useMutation({
     mutationFn: async (prompt: string) => {
-      const res = await apiRequest('POST', '/api/anthropic/generate-text', {
+      const res = await apiRequest("POST", "/api/anthropic/generate-text", {
         prompt: `You are an expert TypeScript and React developer specialized in medical software. Generate production-quality ${language} code for the following request. Only provide the code without explanations, comments or markdown formatting:
 
 ${prompt}`,
@@ -41,15 +47,15 @@ ${prompt}`,
     },
     onSuccess: () => {
       toast({
-        title: 'Code Generated',
-        description: 'Claude has generated code based on your request',
+        title: "Code Generated",
+        description: "Claude has generated code based on your request",
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
+        title: "Error",
         description: `Failed to generate code: ${error.message}`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
@@ -57,7 +63,7 @@ ${prompt}`,
   // Code explanation mutation
   const explainCodeMutation = useMutation({
     mutationFn: async (code: string) => {
-      const res = await apiRequest('POST', '/api/anthropic/generate-text', {
+      const res = await apiRequest("POST", "/api/anthropic/generate-text", {
         prompt: `You are an expert ${language} developer. Explain this code in detail:
 
 \`\`\`${language}
@@ -74,15 +80,15 @@ Provide a clear and thorough explanation covering:
     },
     onSuccess: () => {
       toast({
-        title: 'Explanation Generated',
-        description: 'Claude has explained the code',
+        title: "Explanation Generated",
+        description: "Claude has explained the code",
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
+        title: "Error",
         description: `Failed to explain code: ${error.message}`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
@@ -90,7 +96,7 @@ Provide a clear and thorough explanation covering:
   // Code refactor/improvement mutation
   const refactorCodeMutation = useMutation({
     mutationFn: async (code: string) => {
-      const res = await apiRequest('POST', '/api/anthropic/generate-text', {
+      const res = await apiRequest("POST", "/api/anthropic/generate-text", {
         prompt: `You are an expert ${language} developer. Refactor this code to improve it:
 
 \`\`\`${language}
@@ -107,15 +113,15 @@ Return only the refactored code without explanations or markdown formatting. Foc
     },
     onSuccess: () => {
       toast({
-        title: 'Code Refactored',
-        description: 'Claude has improved your code',
+        title: "Code Refactored",
+        description: "Claude has improved your code",
       });
     },
     onError: (error: any) => {
       toast({
-        title: 'Error',
+        title: "Error",
         description: `Failed to refactor code: ${error.message}`,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
@@ -126,8 +132,8 @@ Return only the refactored code without explanations or markdown formatting. Foc
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
     toast({
-      title: 'Copied',
-      description: 'Code copied to clipboard',
+      title: "Copied",
+      description: "Code copied to clipboard",
     });
   };
 
@@ -143,7 +149,7 @@ Return only the refactored code without explanations or markdown formatting. Foc
             <TabsTrigger value="explain">Explain Code</TabsTrigger>
             <TabsTrigger value="refactor">Refactor Code</TabsTrigger>
           </TabsList>
-          
+
           <div className="mt-4 mb-4">
             <Label htmlFor="language">Programming Language</Label>
             <Select value={language} onValueChange={setLanguage}>
@@ -160,7 +166,7 @@ Return only the refactored code without explanations or markdown formatting. Foc
               </SelectContent>
             </Select>
           </div>
-          
+
           <TabsContent value="generate" className="space-y-4">
             <div>
               <Label htmlFor="prompt">What code do you need?</Label>
@@ -172,7 +178,7 @@ Return only the refactored code without explanations or markdown formatting. Foc
                 className="min-h-32"
               />
             </div>
-            <Button 
+            <Button
               onClick={() => generateCodeMutation.mutate(prompt)}
               disabled={generateCodeMutation.isPending || !prompt.trim()}
               className="w-full"
@@ -184,11 +190,15 @@ Return only the refactored code without explanations or markdown formatting. Foc
               )}
               Generate Code
             </Button>
-            
+
             {generateCodeMutation.data && (
               <div className="mt-4 relative">
                 <div className="absolute top-2 right-2">
-                  <Button size="sm" variant="ghost" onClick={() => copyToClipboard(generateCodeMutation.data.result)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => copyToClipboard(generateCodeMutation.data.result)}
+                  >
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </Button>
                 </div>
@@ -198,7 +208,7 @@ Return only the refactored code without explanations or markdown formatting. Foc
               </div>
             )}
           </TabsContent>
-          
+
           <TabsContent value="explain" className="space-y-4">
             <div>
               <Label htmlFor="code-to-explain">Code to Explain</Label>
@@ -210,7 +220,7 @@ Return only the refactored code without explanations or markdown formatting. Foc
                 className="min-h-32 font-mono text-sm"
               />
             </div>
-            <Button 
+            <Button
               onClick={() => explainCodeMutation.mutate(codeInput)}
               disabled={explainCodeMutation.isPending || !codeInput.trim()}
               className="w-full"
@@ -222,7 +232,7 @@ Return only the refactored code without explanations or markdown formatting. Foc
               )}
               Explain Code
             </Button>
-            
+
             {explainCodeMutation.data && (
               <div className="mt-4 p-4 border rounded-lg bg-muted">
                 <Label>Explanation:</Label>
@@ -230,7 +240,7 @@ Return only the refactored code without explanations or markdown formatting. Foc
               </div>
             )}
           </TabsContent>
-          
+
           <TabsContent value="refactor" className="space-y-4">
             <div>
               <Label htmlFor="code-to-refactor">Code to Refactor</Label>
@@ -242,7 +252,7 @@ Return only the refactored code without explanations or markdown formatting. Foc
                 className="min-h-32 font-mono text-sm"
               />
             </div>
-            <Button 
+            <Button
               onClick={() => refactorCodeMutation.mutate(codeInput)}
               disabled={refactorCodeMutation.isPending || !codeInput.trim()}
               className="w-full"
@@ -254,11 +264,15 @@ Return only the refactored code without explanations or markdown formatting. Foc
               )}
               Refactor Code
             </Button>
-            
+
             {refactorCodeMutation.data && (
               <div className="mt-4 relative">
                 <div className="absolute top-2 right-2">
-                  <Button size="sm" variant="ghost" onClick={() => copyToClipboard(refactorCodeMutation.data.result)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => copyToClipboard(refactorCodeMutation.data.result)}
+                  >
                     {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                   </Button>
                 </div>

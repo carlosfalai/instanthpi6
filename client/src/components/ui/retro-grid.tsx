@@ -1,13 +1,13 @@
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 interface RetroGridProps {
-  angle?: number
-  cellSize?: number
-  opacity?: number
-  lightLineColor?: string
-  darkLineColor?: string
-  className?: string
+  angle?: number;
+  cellSize?: number;
+  opacity?: number;
+  lightLineColor?: string;
+  darkLineColor?: string;
+  className?: string;
 }
 
 const RetroGrid = ({
@@ -24,7 +24,7 @@ const RetroGrid = ({
     "--opacity": opacity,
     "--light-line": lightLineColor,
     "--dark-line": darkLineColor,
-  } as React.CSSProperties
+  } as React.CSSProperties;
 
   return (
     <div
@@ -40,7 +40,7 @@ const RetroGrid = ({
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent to-90% dark:from-black" />
     </div>
-  )
-}
+  );
+};
 
-export { RetroGrid }
+export { RetroGrid };

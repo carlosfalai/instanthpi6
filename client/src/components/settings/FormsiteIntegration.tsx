@@ -40,11 +40,11 @@ export default function FormsiteIntegration() {
   useEffect(() => {
     if (credentials) {
       // Set API key (masked)
-      const maskedKey = credentials.apiKey 
+      const maskedKey = credentials.apiKey
         ? `${credentials.apiKey.substring(0, 4)}...${credentials.apiKey.substring(credentials.apiKey.length - 4)}`
         : "";
       setApiKey(maskedKey);
-      
+
       // Set selected forms
       if (credentials.forms) {
         const formSelection: Record<string, boolean> = {};
@@ -59,23 +59,23 @@ export default function FormsiteIntegration() {
   // Save API key mutation
   const saveApiKeyMutation = useMutation({
     mutationFn: async (newApiKey: string) => {
-      const response = await fetch('/api/integrations/formsite/credentials', {
-        method: 'POST',
+      const response = await fetch("/api/integrations/formsite/credentials", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ apiKey: newApiKey }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save API key');
+        throw new Error(errorData.message || "Failed to save API key");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/integrations/formsite'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/integrations/formsite"] });
       toast({
         title: "API Key Saved",
         description: "Your FormSite API key has been saved successfully.",
@@ -93,22 +93,22 @@ export default function FormsiteIntegration() {
   // Verify API key mutation
   const verifyApiKeyMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/integrations/formsite/verify', {
-        method: 'POST',
+      const response = await fetch("/api/integrations/formsite/verify", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to verify API key');
+        throw new Error(errorData.message || "Failed to verify API key");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/integrations/formsite'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/integrations/formsite"] });
       toast({
         title: "API Key Verified",
         description: "Your FormSite API key has been verified successfully.",
@@ -126,23 +126,23 @@ export default function FormsiteIntegration() {
   // Update form settings mutation
   const updateFormSettingsMutation = useMutation({
     mutationFn: async (formSettings: Record<string, boolean>) => {
-      const response = await fetch('/api/integrations/formsite/forms', {
-        method: 'POST',
+      const response = await fetch("/api/integrations/formsite/forms", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ forms: formSettings }),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update form settings');
+        throw new Error(errorData.message || "Failed to update form settings");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/integrations/formsite'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/integrations/formsite"] });
       toast({
         title: "Form Settings Updated",
         description: "Your FormSite form settings have been updated successfully.",
@@ -160,22 +160,22 @@ export default function FormsiteIntegration() {
   // Sync forms mutation
   const syncFormsMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch('/api/integrations/formsite/sync', {
-        method: 'POST',
+      const response = await fetch("/api/integrations/formsite/sync", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to sync forms');
+        throw new Error(errorData.message || "Failed to sync forms");
       }
-      
+
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/integrations/formsite'] });
+      queryClient.invalidateQueries({ queryKey: ["/api/integrations/formsite"] });
       toast({
         title: "Forms Synced",
         description: "Your FormSite forms have been synced successfully.",
@@ -214,8 +214,8 @@ export default function FormsiteIntegration() {
   };
 
   const isApiKeyConfigured = credentials?.isConfigured;
-  const lastVerified = credentials?.lastVerified 
-    ? new Date(credentials.lastVerified).toLocaleString() 
+  const lastVerified = credentials?.lastVerified
+    ? new Date(credentials.lastVerified).toLocaleString()
     : "Never";
 
   return (
@@ -232,8 +232,8 @@ export default function FormsiteIntegration() {
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-medium">API Credentials</h3>
             {isApiKeyConfigured && (
-              <Badge 
-                variant="outline" 
+              <Badge
+                variant="outline"
                 className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1"
               >
                 <CheckCircle className="h-3.5 w-3.5" />
@@ -241,7 +241,7 @@ export default function FormsiteIntegration() {
               </Badge>
             )}
           </div>
-          
+
           <div className="grid gap-3">
             <div className="space-y-2">
               <Label htmlFor="api-key">FormSite API Key</Label>
@@ -281,12 +281,13 @@ export default function FormsiteIntegration() {
                     onClick={handleVerifyApiKey}
                     disabled={verifyApiKeyMutation.isPending}
                   >
-                    {verifyApiKeyMutation.isPending ? 
-                      "Verifying..." : 
+                    {verifyApiKeyMutation.isPending ? (
+                      "Verifying..."
+                    ) : (
                       <span className="flex items-center gap-1">
                         <RefreshCw className="h-3 w-3" /> Verify
                       </span>
-                    }
+                    )}
                   </Button>
                 </p>
               )}
@@ -303,7 +304,9 @@ export default function FormsiteIntegration() {
               <Info className="h-5 w-5 text-blue-400" />
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-blue-800">How to find your FormSite API Key</h3>
+              <h3 className="text-sm font-medium text-blue-800">
+                How to find your FormSite API Key
+              </h3>
               <div className="mt-2 text-sm text-blue-700">
                 <ol className="list-decimal pl-5 space-y-1">
                   <li>Log in to your FormSite account</li>
@@ -319,12 +322,12 @@ export default function FormsiteIntegration() {
         {isApiKeyConfigured && (
           <>
             <Separator />
-            
+
             {/* Form Settings Section */}
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-medium">Form Settings</h3>
-                <Button 
+                <Button
                   variant="outline"
                   size="sm"
                   onClick={handleSyncForms}
@@ -335,23 +338,24 @@ export default function FormsiteIntegration() {
                   {syncFormsMutation.isPending ? "Syncing..." : "Sync Forms"}
                 </Button>
               </div>
-              
+
               {credentials?.forms && credentials.forms.length > 0 ? (
                 <div className="space-y-4">
                   <p className="text-sm text-gray-500">
                     Select which forms should be used for patient data retrieval:
                   </p>
-                  
+
                   <div className="space-y-3">
                     {credentials.forms.map((form: FormsiteForm) => (
-                      <div 
-                        key={form.id} 
+                      <div
+                        key={form.id}
                         className="flex items-center justify-between p-3 border rounded-md hover:bg-gray-50"
                       >
                         <div>
                           <h4 className="font-medium">{form.name}</h4>
                           <p className="text-xs text-gray-500">
-                            ID: {form.id} • Last updated: {new Date(form.lastUpdated).toLocaleDateString()}
+                            ID: {form.id} • Last updated:{" "}
+                            {new Date(form.lastUpdated).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -367,8 +371,8 @@ export default function FormsiteIntegration() {
                       </div>
                     ))}
                   </div>
-                  
-                  <Button 
+
+                  <Button
                     onClick={handleSaveFormSettings}
                     disabled={updateFormSettingsMutation.isPending}
                     className="ml-auto block"
@@ -381,11 +385,12 @@ export default function FormsiteIntegration() {
                   <KeyRound className="h-10 w-10 text-gray-400 mx-auto mb-2" />
                   <h3 className="text-base font-medium text-gray-600">No Forms Found</h3>
                   <p className="text-sm text-gray-500 max-w-md mx-auto mt-1">
-                    We couldn't find any forms in your FormSite account. Make sure you have created forms and that your API key has permissions to access them.
+                    We couldn't find any forms in your FormSite account. Make sure you have created
+                    forms and that your API key has permissions to access them.
                   </p>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="mt-4"
                     onClick={handleSyncForms}
                     disabled={syncFormsMutation.isPending}

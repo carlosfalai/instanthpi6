@@ -4,13 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { 
-  Eye, 
-  Save, 
-  Upload, 
-  Trash2, 
-  Image
-} from "lucide-react";
+import { Eye, Save, Upload, Trash2, Image } from "lucide-react";
 
 export interface DocumentTemplate {
   id?: string;
@@ -32,10 +26,10 @@ interface DocumentTemplateEditorProps {
   onSave: (template: DocumentTemplate) => void;
 }
 
-const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({ 
-  templateId, 
-  initialData, 
-  onSave 
+const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
+  templateId,
+  initialData,
+  onSave,
 }) => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -54,13 +48,9 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
     }
   );
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [logoPreview, setLogoPreview] = useState<string | undefined>(
-    initialData?.logoUrl
-  );
+  const [logoPreview, setLogoPreview] = useState<string | undefined>(initialData?.logoUrl);
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setTemplate({
       ...template,
@@ -71,7 +61,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      
+
       // Check file size (limit to 2MB)
       if (file.size > 2 * 1024 * 1024) {
         toast({
@@ -81,9 +71,9 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
         });
         return;
       }
-      
+
       // Check file type
-      if (!file.type.startsWith('image/')) {
+      if (!file.type.startsWith("image/")) {
         toast({
           variant: "destructive",
           title: "Invalid file type",
@@ -91,7 +81,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
         });
         return;
       }
-      
+
       setLogoFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -116,10 +106,10 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
         ...template,
         logoUrl: logoPreview,
       };
-      
+
       // Call the save function
       onSave(templateToSave);
-      
+
       toast({
         title: "Template saved",
         description: "Your document template has been saved successfully",
@@ -160,7 +150,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
             <p>{template.clinicEmail || "Email"}</p>
           </div>
         </div>
-        
+
         {/* Content Area (Sample) */}
         <div className="p-6 min-h-[300px] border-l border-r border-gray-300">
           <div className="mb-6">
@@ -177,15 +167,17 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
                 <p>Rx #: 12345678</p>
               </div>
             </div>
-            
+
             <div className="border-t border-gray-300 pt-4 mt-4">
               <h3 className="font-bold mb-2">Medication:</h3>
-              <p>Medication Name: <span className="font-semibold">Amoxicillin 500mg</span></p>
+              <p>
+                Medication Name: <span className="font-semibold">Amoxicillin 500mg</span>
+              </p>
               <p>Sig: 1 capsule by mouth three times daily for 10 days</p>
               <p>Quantity: 30</p>
               <p>Refills: 0</p>
             </div>
-            
+
             <div className="border-t border-gray-300 pt-4 mt-4">
               <h3 className="font-bold mb-2">Prescriber:</h3>
               <p>Dr. Jane Smith, MD</p>
@@ -199,7 +191,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
             </div>
           </div>
         </div>
-        
+
         {/* Footer */}
         <div
           className="p-3 text-center text-white text-sm rounded-b-md"
@@ -222,7 +214,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
           <Eye className="mr-2 h-4 w-4" />
           {previewMode ? "Edit Template" : "Preview Template"}
         </Button>
-        
+
         <Button
           className="bg-blue-600 hover:bg-blue-700 flex items-center"
           onClick={handleSaveTemplate}
@@ -231,7 +223,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
           Save Template
         </Button>
       </div>
-      
+
       {previewMode ? (
         renderPreview()
       ) : (
@@ -248,7 +240,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
                 placeholder="Template Name"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label>Clinic Logo</Label>
               <div className="flex items-center space-x-4">
@@ -262,12 +254,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
                   Upload Logo
                 </Button>
                 {logoPreview && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleRemoveLogo}
-                  >
+                  <Button type="button" variant="destructive" size="sm" onClick={handleRemoveLogo}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
@@ -291,14 +278,12 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
               {!logoPreview && (
                 <div className="mt-2 border border-dashed border-gray-700 p-4 rounded-md bg-[#262626] flex flex-col items-center justify-center">
                   <Image className="h-8 w-8 text-gray-500 mb-2" />
-                  <p className="text-gray-500 text-sm text-center">
-                    No logo uploaded
-                  </p>
+                  <p className="text-gray-500 text-sm text-center">No logo uploaded</p>
                 </div>
               )}
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="clinicName">Clinic Name</Label>
             <Input
@@ -310,7 +295,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
               placeholder="Enter your clinic name"
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="clinicAddress">Clinic Address</Label>
             <Textarea
@@ -323,7 +308,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
               rows={2}
             />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="space-y-2">
               <Label htmlFor="clinicPhone">Phone Number</Label>
@@ -336,7 +321,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
                 placeholder="Phone number"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="clinicFax">Fax Number</Label>
               <Input
@@ -348,7 +333,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
                 placeholder="Fax number"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="clinicEmail">Email</Label>
               <Input
@@ -361,7 +346,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
               />
             </div>
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="footerText">Footer Text</Label>
             <Input
@@ -373,7 +358,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
               placeholder="Footer text"
             />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="headerColor">Header Color</Label>
@@ -394,7 +379,7 @@ const DocumentTemplateEditor: React.FC<DocumentTemplateEditorProps> = ({
                 />
               </div>
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="footerColor">Footer Color</Label>
               <div className="flex">

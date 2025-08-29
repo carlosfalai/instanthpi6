@@ -1,22 +1,25 @@
-import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { openaiService, AIDocumentation } from '@/services/openaiService';
-import { useToast } from '@/hooks/use-toast';
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { openaiService, AIDocumentation } from "@/services/openaiService";
+import { useToast } from "@/hooks/use-toast";
 
 export const useAIDocumentation = (patientId: number) => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [isGenerating, setIsGenerating] = useState(false);
-  
+
   // Query for getting existing documentation
   const { data: documentation, isLoading } = useQuery({
     queryKey: [`/api/patients/${patientId}/documentation`],
     enabled: !isNaN(patientId),
   });
-  
+
   // Mutation for generating documentation
   const generateDocumentation = useMutation({
-    mutationFn: async ({ formData, patientMessages }: { 
+    mutationFn: async ({
+      formData,
+      patientMessages,
+    }: {
       formData: Record<string, any>;
       patientMessages?: any[];
     }) => {
@@ -42,10 +45,12 @@ export const useAIDocumentation = (patientId: number) => {
       });
     },
   });
-  
+
   // Mutation for updating documentation
   const updateDocumentation = useMutation({
-    mutationFn: async (updates: Partial<Omit<AIDocumentation, 'id' | 'patientId' | 'createdAt'>>) => {
+    mutationFn: async (
+      updates: Partial<Omit<AIDocumentation, "id" | "patientId" | "createdAt">>
+    ) => {
       if (!documentation) throw new Error("No documentation to update");
       return await openaiService.updateDocumentation(documentation.id, updates);
     },
@@ -64,7 +69,7 @@ export const useAIDocumentation = (patientId: number) => {
       });
     },
   });
-  
+
   return {
     documentation,
     isLoading: isLoading || isGenerating,

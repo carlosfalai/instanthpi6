@@ -1,4 +1,7 @@
+import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
+import path from "path";
+import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { seedDatabase } from "./seed";
@@ -44,7 +47,11 @@ app.use((req, res, next) => {
   } catch (error) {
     console.error("Error seeding database:", error);
   }
-  
+
+  // Serve project images from attached_assets at /assets in all environments
+  // This lets the client reference built-in images without moving binaries
+  app.use("/assets", express.static(path.resolve(import.meta.dirname, "..", "attached_assets")));
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -64,15 +71,22 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
+  // Use PORT from environment or default to 3000 for local development
+  const port = process.env.PORT || 3000;
+  server.listen(port, () => {
+    log(`Server is running at http://localhost:${port}`);
   });
+
+  // Optional secondary listener dedicated for simple webhook posting (e.g., Google Apps Script)
+  const webhookPort = process.env.WEBHOOK_PORT || 3003;
+  if (Number(webhookPort) !== Number(port)) {
+    try {
+      const webhookServer = createServer(app);
+      webhookServer.listen(webhookPort, () => {
+        log(`Webhook server is listening at http://localhost:${webhookPort}`);
+      });
+    } catch (e) {
+      console.error("Failed to start webhook listener:", e);
+    }
+  }
 })();

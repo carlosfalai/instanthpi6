@@ -1,6 +1,6 @@
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest } from "@/lib/queryClient";
 
-const SPRUCE_API_KEY = process.env.SPRUCE_API_KEY || process.env.VITE_SPRUCE_API_KEY || '';
+const SPRUCE_API_KEY = process.env.SPRUCE_API_KEY || process.env.VITE_SPRUCE_API_KEY || "";
 
 export interface SpruceMessage {
   id: string;
@@ -20,10 +20,10 @@ export const spruceApi = {
    */
   async getPatientMessages(patientId: number): Promise<SpruceMessage[]> {
     try {
-      const response = await apiRequest('GET', `/api/patients/${patientId}/messages`);
+      const response = await apiRequest("GET", `/api/patients/${patientId}/messages`);
       return await response.json();
     } catch (error) {
-      console.error('Error fetching patient messages:', error);
+      console.error("Error fetching patient messages:", error);
       throw error;
     }
   },
@@ -31,18 +31,22 @@ export const spruceApi = {
   /**
    * Send a message to a patient
    */
-  async sendMessage(patientId: number, content: string, messageType: string): Promise<SpruceMessage> {
+  async sendMessage(
+    patientId: number,
+    content: string,
+    messageType: string
+  ): Promise<SpruceMessage> {
     try {
-      const response = await apiRequest('POST', '/api/spruce/messages', {
+      const response = await apiRequest("POST", "/api/spruce/messages", {
         patientId,
         message: content,
-        messageType
+        messageType,
       });
-      
+
       return await response.json();
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
       throw error;
     }
-  }
+  },
 };

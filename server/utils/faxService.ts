@@ -1,8 +1,8 @@
-import { createWriteStream, readFileSync } from 'fs';
-import { resolve } from 'path';
-import Phaxio from 'phaxio';
-import InterFAX from 'interfax';
-import phone from 'phone';
+import { createWriteStream, readFileSync } from "fs";
+import { resolve } from "path";
+import Phaxio from "phaxio";
+import InterFAX from "interfax";
+import phone from "phone";
 
 // Define the interface for our fax service
 export interface FaxService {
@@ -18,7 +18,7 @@ export interface SendFaxOptions {
   filePath?: string;
   fileContent?: Buffer;
   fileName?: string;
-  quality?: 'normal' | 'high';
+  quality?: "normal" | "high";
   coverPage?: boolean;
   coverPageText?: string;
   callerId?: string;
@@ -31,18 +31,12 @@ export interface SendFaxResult {
   message: string;
 }
 
-export type FaxStatus = 
-  | 'queued'
-  | 'in_progress'
-  | 'success'
-  | 'failure'
-  | 'canceled'
-  | 'unknown';
+export type FaxStatus = "queued" | "in_progress" | "success" | "failure" | "canceled" | "unknown";
 
 export interface FaxMetadata {
   id: string;
   status: FaxStatus;
-  direction: 'sent' | 'received';
+  direction: "sent" | "received";
   from: string;
   to: string;
   completedAt?: Date;
@@ -58,7 +52,7 @@ export interface ListFaxOptions {
   startDate?: Date;
   endDate?: Date;
   limit?: number;
-  direction?: 'sent' | 'received';
+  direction?: "sent" | "received";
 }
 
 export interface ListFaxResult {
@@ -73,7 +67,7 @@ export class PhaxioFaxService implements FaxService {
 
   constructor(apiKey: string, apiSecret: string) {
     if (!apiKey || !apiSecret) {
-      throw new Error('Phaxio API key and secret are required');
+      throw new Error("Phaxio API key and secret are required");
     }
     this.client = new Phaxio(apiKey, apiSecret);
   }
@@ -97,33 +91,33 @@ export class PhaxioFaxService implements FaxService {
       } else if (options.fileContent && options.fileName) {
         faxParams.file = {
           buffer: options.fileContent,
-          filename: options.fileName
+          filename: options.fileName,
         };
       } else {
-        throw new Error('Either filePath or fileContent+fileName must be provided');
+        throw new Error("Either filePath or fileContent+fileName must be provided");
       }
 
       // Add optional parameters
       if (options.coverPage && options.coverPageText) {
         faxParams.content_url = options.coverPageText;
       }
-      
+
       if (options.metadata) {
         faxParams.tags = options.metadata;
       }
 
       const response = await this.client.faxes.create(faxParams);
-      
+
       return {
         success: true,
         faxId: response.id.toString(),
-        message: 'Fax queued successfully',
+        message: "Fax queued successfully",
       };
     } catch (error) {
-      console.error('Error sending fax with Phaxio:', error);
+      console.error("Error sending fax with Phaxio:", error);
       return {
         success: false,
-        faxId: '',
+        faxId: "",
         message: `Failed to send fax: ${(error as Error).message}`,
       };
     }
@@ -134,41 +128,41 @@ export class PhaxioFaxService implements FaxService {
       const fax = await this.client.faxes.retrieve(faxId);
       return this.mapPhaxioStatus(fax.status);
     } catch (error) {
-      console.error('Error getting fax status from Phaxio:', error);
-      return 'unknown';
+      console.error("Error getting fax status from Phaxio:", error);
+      return "unknown";
     }
   }
 
   async listFaxes(options: ListFaxOptions = {}): Promise<ListFaxResult> {
     try {
       const params: any = {};
-      
+
       if (options.status) {
         params.status = this.mapStatusToPhaxio(options.status);
       }
-      
+
       if (options.phoneNumber) {
         params.phone_number = options.phoneNumber;
       }
-      
+
       if (options.startDate) {
         params.created_after = Math.floor(options.startDate.getTime() / 1000);
       }
-      
+
       if (options.endDate) {
         params.created_before = Math.floor(options.endDate.getTime() / 1000);
       }
-      
+
       if (options.limit) {
         params.per_page = options.limit;
       }
-      
+
       if (options.direction) {
         params.direction = options.direction;
       }
-      
+
       const response = await this.client.faxes.list(params);
-      
+
       const faxes = response.data.map((fax: any) => ({
         id: fax.id.toString(),
         status: this.mapPhaxioStatus(fax.status),
@@ -181,16 +175,17 @@ export class PhaxioFaxService implements FaxService {
         errorType: fax.error_type,
         errorMessage: fax.error_message,
       }));
-      
+
       return {
         faxes,
         hasMore: response.paging.total_pages > response.paging.page,
-        nextCursor: response.paging.page < response.paging.total_pages 
-          ? (response.paging.page + 1).toString() 
-          : undefined,
+        nextCursor:
+          response.paging.page < response.paging.total_pages
+            ? (response.paging.page + 1).toString()
+            : undefined,
       };
     } catch (error) {
-      console.error('Error listing faxes from Phaxio:', error);
+      console.error("Error listing faxes from Phaxio:", error);
       return {
         faxes: [],
         hasMore: false,
@@ -202,57 +197,58 @@ export class PhaxioFaxService implements FaxService {
     try {
       const absolutePath = resolve(filePath);
       const writeStream = createWriteStream(absolutePath);
-      
+
       await new Promise<void>((resolve, reject) => {
-        this.client.faxes.file(faxId)
+        this.client.faxes
+          .file(faxId)
           .then((fileStream: any) => {
             fileStream.pipe(writeStream);
-            writeStream.on('finish', resolve);
-            writeStream.on('error', reject);
+            writeStream.on("finish", resolve);
+            writeStream.on("error", reject);
           })
           .catch(reject);
       });
-      
+
       return absolutePath;
     } catch (error) {
-      console.error('Error downloading fax from Phaxio:', error);
+      console.error("Error downloading fax from Phaxio:", error);
       throw error;
     }
   }
 
   private mapPhaxioStatus(status: string): FaxStatus {
     switch (status) {
-      case 'queued':
-        return 'queued';
-      case 'in_progress':
-      case 'sending':
-        return 'in_progress';
-      case 'success':
-      case 'completed':
-        return 'success';
-      case 'failed':
-        return 'failure';
-      case 'canceled':
-        return 'canceled';
+      case "queued":
+        return "queued";
+      case "in_progress":
+      case "sending":
+        return "in_progress";
+      case "success":
+      case "completed":
+        return "success";
+      case "failed":
+        return "failure";
+      case "canceled":
+        return "canceled";
       default:
-        return 'unknown';
+        return "unknown";
     }
   }
 
   private mapStatusToPhaxio(status: FaxStatus): string {
     switch (status) {
-      case 'queued':
-        return 'queued';
-      case 'in_progress':
-        return 'in_progress';
-      case 'success':
-        return 'success';
-      case 'failure':
-        return 'failed';
-      case 'canceled':
-        return 'canceled';
+      case "queued":
+        return "queued";
+      case "in_progress":
+        return "in_progress";
+      case "success":
+        return "success";
+      case "failure":
+        return "failed";
+      case "canceled":
+        return "canceled";
       default:
-        return '';
+        return "";
     }
   }
 }
@@ -263,11 +259,11 @@ export class InterFaxService implements FaxService {
 
   constructor(username: string, password: string) {
     if (!username || !password) {
-      throw new Error('InterFAX username and password are required');
+      throw new Error("InterFAX username and password are required");
     }
     this.client = new InterFAX({
       username,
-      password
+      password,
     });
   }
 
@@ -284,44 +280,44 @@ export class InterFaxService implements FaxService {
 
       if (options.filePath) {
         fileData = readFileSync(options.filePath);
-        fileName = options.filePath.split('/').pop() || 'fax.pdf';
+        fileName = options.filePath.split("/").pop() || "fax.pdf";
       } else if (options.fileContent && options.fileName) {
         fileData = options.fileContent;
         fileName = options.fileName;
       } else {
-        throw new Error('Either filePath or fileContent+fileName must be provided');
+        throw new Error("Either filePath or fileContent+fileName must be provided");
       }
 
       const faxParams: any = {
         faxNumber: normalizedPhone.phoneNumber,
         file: fileData,
-        fileType: this.determineFileType(fileName)
+        fileType: this.determineFileType(fileName),
       };
 
-      if (options.quality === 'high') {
+      if (options.quality === "high") {
         faxParams.highResolution = true;
       }
 
       if (options.coverPage && options.coverPageText) {
         faxParams.coverPage = {
           enabled: true,
-          subject: 'Fax Cover Page',
-          content: options.coverPageText
+          subject: "Fax Cover Page",
+          content: options.coverPageText,
         };
       }
 
       const faxId = await this.client.delivery.send(faxParams);
-      
+
       return {
         success: true,
         faxId: faxId.toString(),
-        message: 'Fax queued successfully',
+        message: "Fax queued successfully",
       };
     } catch (error) {
-      console.error('Error sending fax with InterFAX:', error);
+      console.error("Error sending fax with InterFAX:", error);
       return {
         success: false,
-        faxId: '',
+        faxId: "",
         message: `Failed to send fax: ${(error as Error).message}`,
       };
     }
@@ -332,49 +328,49 @@ export class InterFaxService implements FaxService {
       const fax = await this.client.outbound.find(faxId);
       return this.mapInterFaxStatus(fax.status);
     } catch (error) {
-      console.error('Error getting fax status from InterFAX:', error);
-      return 'unknown';
+      console.error("Error getting fax status from InterFAX:", error);
+      return "unknown";
     }
   }
 
   async listFaxes(options: ListFaxOptions = {}): Promise<ListFaxResult> {
     try {
       const params: any = {};
-      
+
       if (options.startDate) {
         params.lastModifiedSince = options.startDate;
       }
-      
+
       if (options.limit) {
         params.limit = options.limit;
       }
-      
+
       if (options.status) {
         params.status = this.mapStatusToInterFax(options.status);
       }
-      
+
       // InterFAX only supports listing outbound faxes
       const response = await this.client.outbound.completed(params);
-      
+
       const faxes = response.map((fax: any) => ({
         id: fax.id.toString(),
         status: this.mapInterFaxStatus(fax.status),
-        direction: 'sent' as const,
-        from: '',  // InterFAX doesn't provide sender number in listing
-        to: fax.destination || '',
+        direction: "sent" as const,
+        from: "", // InterFAX doesn't provide sender number in listing
+        to: fax.destination || "",
         completedAt: fax.completionTime ? new Date(fax.completionTime) : undefined,
         numPages: fax.pages,
-        cost: 0,  // InterFAX doesn't provide cost in API
-        errorType: fax.status !== 'Success' ? fax.status : undefined,
-        errorMessage: fax.status !== 'Success' ? fax.result : undefined,
+        cost: 0, // InterFAX doesn't provide cost in API
+        errorType: fax.status !== "Success" ? fax.status : undefined,
+        errorMessage: fax.status !== "Success" ? fax.result : undefined,
       }));
-      
+
       return {
         faxes,
-        hasMore: false,  // InterFAX doesn't provide pagination info
+        hasMore: false, // InterFAX doesn't provide pagination info
       };
     } catch (error) {
-      console.error('Error listing faxes from InterFAX:', error);
+      console.error("Error listing faxes from InterFAX:", error);
       return {
         faxes: [],
         hasMore: false,
@@ -388,68 +384,68 @@ export class InterFaxService implements FaxService {
       await this.client.outbound.image(faxId, absolutePath);
       return absolutePath;
     } catch (error) {
-      console.error('Error downloading fax from InterFAX:', error);
+      console.error("Error downloading fax from InterFAX:", error);
       throw error;
     }
   }
 
   private mapInterFaxStatus(status: string): FaxStatus {
     switch (status) {
-      case 'Pending':
-      case 'Rendering':
-        return 'queued';
-      case 'In Progress':
-      case 'Sending':
-        return 'in_progress';
-      case 'Success':
-      case 'OK':
-        return 'success';
-      case 'Failed':
-      case 'Error':
-        return 'failure';
-      case 'Canceled':
-        return 'canceled';
+      case "Pending":
+      case "Rendering":
+        return "queued";
+      case "In Progress":
+      case "Sending":
+        return "in_progress";
+      case "Success":
+      case "OK":
+        return "success";
+      case "Failed":
+      case "Error":
+        return "failure";
+      case "Canceled":
+        return "canceled";
       default:
-        return 'unknown';
+        return "unknown";
     }
   }
 
   private mapStatusToInterFax(status: FaxStatus): string {
     switch (status) {
-      case 'queued':
-        return 'Pending';
-      case 'in_progress':
-        return 'In Progress';
-      case 'success':
-        return 'Success';
-      case 'failure':
-        return 'Failed';
-      case 'canceled':
-        return 'Canceled';
+      case "queued":
+        return "Pending";
+      case "in_progress":
+        return "In Progress";
+      case "success":
+        return "Success";
+      case "failure":
+        return "Failed";
+      case "canceled":
+        return "Canceled";
       default:
-        return '';
+        return "";
     }
   }
 
   private determineFileType(fileName: string): string {
-    const extension = fileName.split('.').pop()?.toLowerCase();
+    const extension = fileName.split(".").pop()?.toLowerCase();
     switch (extension) {
-      case 'pdf':
-        return 'application/pdf';
-      case 'doc':
-        return 'application/msword';
-      case 'docx':
-        return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-      case 'tif':
-      case 'tiff':
-        return 'image/tiff';
-      case 'jpg':
-      case 'jpeg':
-        return 'image/jpeg';
-      case 'png':
-        return 'image/png';
+      case "pdf":
+        return "application/pdf";
+      case "doc":
+        return "application/msword";
+      case "docx":
+        return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      case "tif":
+      case "tiff":
+        return "image/tiff";
+      case "jpg":
+      case "jpeg":
+        return "image/jpeg";
+      case "png":
+        return "image/png";
       default:
-        return 'application/pdf';
+        return "application/pdf";
     }
   }
 }
@@ -461,23 +457,23 @@ export function createFaxService(): FaxService | null {
   // Check for environment variables to decide which service to use
   const phaxioApiKey = process.env.PHAXIO_API_KEY;
   const phaxioApiSecret = process.env.PHAXIO_API_SECRET;
-  
+
   const interfaxUsername = process.env.INTERFAX_USERNAME;
   const interfaxPassword = process.env.INTERFAX_PASSWORD;
-  
+
   // Prefer Phaxio if credentials are available
   if (phaxioApiKey && phaxioApiSecret) {
-    console.log('Using Phaxio fax service');
+    console.log("Using Phaxio fax service");
     return new PhaxioFaxService(phaxioApiKey, phaxioApiSecret);
   }
-  
+
   // Fall back to InterFAX if credentials are available
   if (interfaxUsername && interfaxPassword) {
-    console.log('Using InterFAX fax service');
+    console.log("Using InterFAX fax service");
     return new InterFaxService(interfaxUsername, interfaxPassword);
   }
-  
+
   // No authentic fax service credentials found - fax functionality disabled
-  console.log('No authentic fax credentials provided - fax functionality will be disabled');
+  console.log("No authentic fax credentials provided - fax functionality will be disabled");
   return null;
 }

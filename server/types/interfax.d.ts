@@ -1,11 +1,11 @@
-declare module 'interfax' {
+declare module "interfax" {
   export default class InterFAX {
-    constructor(options: { username: string, password: string });
-    
+    constructor(options: { username: string; password: string });
+
     delivery: {
       send(params: any): Promise<string>;
     };
-    
+
     outbound: {
       find(id: string): Promise<any>;
       completed(params: any): Promise<any[]>;

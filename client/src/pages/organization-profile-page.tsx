@@ -1,33 +1,145 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Building, MapPin, Phone, Mail, Globe, Image } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import React from "react";
+import { useForm } from "react-hook-form";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Building, MapPin, Phone, Mail, Globe, Image } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
+type AIPrefs = {
+  enableTriage: boolean;
+  enableConfirmation: boolean;
+  enableSOAP: boolean;
+  enablePlan: boolean;
+  enableTelemedicine: boolean;
+  enableQuestions: boolean;
+  autoGenerateOnSelect: boolean;
+};
+
+const PREFS_KEY = "doctor_ai_prefs";
+
+function getDefaultPrefs(): AIPrefs {
+  return {
+    enableTriage: true,
+    enableConfirmation: true,
+    enableSOAP: true,
+    enablePlan: true,
+    enableTelemedicine: true,
+    enableQuestions: true,
+    autoGenerateOnSelect: true,
+  };
+}
+
+function AIPreferences() {
+  const [prefs, setPrefs] = React.useState<AIPrefs>(() => {
+    try {
+      const raw = localStorage.getItem(PREFS_KEY);
+      return raw ? { ...getDefaultPrefs(), ...JSON.parse(raw) } : getDefaultPrefs();
+    } catch {
+      return getDefaultPrefs();
+    }
+  });
+  const [saved, setSaved] = React.useState<string>("");
+
+  const toggle = (k: keyof AIPrefs) => setPrefs((p) => ({ ...p, [k]: !p[k] }));
+
+  const save = () => {
+    localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+    setSaved("Préférences enregistrées ✓");
+    setTimeout(() => setSaved(""), 1500);
+  };
+
+  return (
+    <div className="space-y-3 text-sm">
+      <div className="flex items-center justify-between">
+        <label className="text-gray-200">Générer Triage (P1–P5)</label>
+        <input
+          type="checkbox"
+          checked={prefs.enableTriage}
+          onChange={() => toggle("enableTriage")}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <label className="text-gray-200">1) Confirmation Patient</label>
+        <input
+          type="checkbox"
+          checked={prefs.enableConfirmation}
+          onChange={() => toggle("enableConfirmation")}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <label className="text-gray-200">2) Note SOAP</label>
+        <input type="checkbox" checked={prefs.enableSOAP} onChange={() => toggle("enableSOAP")} />
+      </div>
+      <div className="flex items-center justify-between">
+        <label className="text-gray-200">3) Plan – Points</label>
+        <input type="checkbox" checked={prefs.enablePlan} onChange={() => toggle("enablePlan")} />
+      </div>
+      <div className="flex items-center justify-between">
+        <label className="text-gray-200">4) Télémédecine</label>
+        <input
+          type="checkbox"
+          checked={prefs.enableTelemedicine}
+          onChange={() => toggle("enableTelemedicine")}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <label className="text-gray-200">5) Questions de suivi (x10)</label>
+        <input
+          type="checkbox"
+          checked={prefs.enableQuestions}
+          onChange={() => toggle("enableQuestions")}
+        />
+      </div>
+      <div className="flex items-center justify-between pt-2">
+        <label className="text-gray-200">Auto-générer à la sélection du patient</label>
+        <input
+          type="checkbox"
+          checked={prefs.autoGenerateOnSelect}
+          onChange={() => toggle("autoGenerateOnSelect")}
+        />
+      </div>
+      <Button className="mt-3 w-full bg-blue-600 hover:bg-blue-700" onClick={save}>
+        Enregistrer
+      </Button>
+      {saved && <div className="text-green-500 text-xs mt-1">{saved}</div>}
+    </div>
+  );
+}
 
 export default function OrganizationProfilePage() {
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
-      name: 'Centre Médical Font',
-      email: 'info@centremfont.com',
-      phone: '+1 (450) 444-1234',
-      address: '123 Rue Principale',
-      city: 'La Prairie',
-      state: 'Québec',
-      postalCode: 'J5R 1A1',
-      country: 'Canada',
-      website: 'https://centremfont.com',
-      description: 'Family medicine practice specializing in comprehensive care for all ages.',
-    }
+      name: "Centre Médical Font",
+      email: "info@centremfont.com",
+      phone: "+1 (450) 444-1234",
+      address: "123 Rue Principale",
+      city: "La Prairie",
+      state: "Québec",
+      postalCode: "J5R 1A1",
+      country: "Canada",
+      website: "https://centremfont.com",
+      description: "Family medicine practice specializing in comprehensive care for all ages.",
+    },
   });
 
   const onSubmit = (data: any) => {
-    console.log('Form submitted:', data);
+    console.log("Form submitted:", data);
     // Here you would save the form data to your backend
   };
 
@@ -37,9 +149,7 @@ export default function OrganizationProfilePage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold">Organization Profile</h1>
-            <p className="text-gray-400 mt-1">
-              Update your organization's basic information
-            </p>
+            <p className="text-gray-400 mt-1">Update your organization's basic information</p>
           </div>
           <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
             Save Changes
@@ -66,7 +176,7 @@ export default function OrganizationProfilePage() {
                       <Input
                         id="name"
                         className="bg-[#252525] border-[#444]"
-                        {...register('name', { required: 'Name is required' })}
+                        {...register("name", { required: "Name is required" })}
                       />
                       {errors.name && (
                         <p className="text-red-500 text-sm mt-1">{errors.name.message as string}</p>
@@ -78,7 +188,7 @@ export default function OrganizationProfilePage() {
                       <Textarea
                         id="description"
                         className="bg-[#252525] border-[#444] min-h-[100px]"
-                        {...register('description')}
+                        {...register("description")}
                       />
                     </div>
 
@@ -93,10 +203,12 @@ export default function OrganizationProfilePage() {
                           id="email"
                           type="email"
                           className="bg-[#252525] border-[#444]"
-                          {...register('email', { required: 'Email is required' })}
+                          {...register("email", { required: "Email is required" })}
                         />
                         {errors.email && (
-                          <p className="text-red-500 text-sm mt-1">{errors.email.message as string}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.email.message as string}
+                          </p>
                         )}
                       </div>
 
@@ -107,10 +219,12 @@ export default function OrganizationProfilePage() {
                         <Input
                           id="phone"
                           className="bg-[#252525] border-[#444]"
-                          {...register('phone', { required: 'Phone is required' })}
+                          {...register("phone", { required: "Phone is required" })}
                         />
                         {errors.phone && (
-                          <p className="text-red-500 text-sm mt-1">{errors.phone.message as string}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.phone.message as string}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -122,7 +236,7 @@ export default function OrganizationProfilePage() {
                       <Input
                         id="website"
                         className="bg-[#252525] border-[#444]"
-                        {...register('website')}
+                        {...register("website")}
                       />
                     </div>
 
@@ -138,10 +252,12 @@ export default function OrganizationProfilePage() {
                         <Input
                           id="address"
                           className="bg-[#252525] border-[#444]"
-                          {...register('address', { required: 'Address is required' })}
+                          {...register("address", { required: "Address is required" })}
                         />
                         {errors.address && (
-                          <p className="text-red-500 text-sm mt-1">{errors.address.message as string}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.address.message as string}
+                          </p>
                         )}
                       </div>
 
@@ -150,10 +266,12 @@ export default function OrganizationProfilePage() {
                         <Input
                           id="city"
                           className="bg-[#252525] border-[#444]"
-                          {...register('city', { required: 'City is required' })}
+                          {...register("city", { required: "City is required" })}
                         />
                         {errors.city && (
-                          <p className="text-red-500 text-sm mt-1">{errors.city.message as string}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.city.message as string}
+                          </p>
                         )}
                       </div>
 
@@ -162,10 +280,12 @@ export default function OrganizationProfilePage() {
                         <Input
                           id="state"
                           className="bg-[#252525] border-[#444]"
-                          {...register('state', { required: 'State/Province is required' })}
+                          {...register("state", { required: "State/Province is required" })}
                         />
                         {errors.state && (
-                          <p className="text-red-500 text-sm mt-1">{errors.state.message as string}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.state.message as string}
+                          </p>
                         )}
                       </div>
 
@@ -174,10 +294,12 @@ export default function OrganizationProfilePage() {
                         <Input
                           id="postalCode"
                           className="bg-[#252525] border-[#444]"
-                          {...register('postalCode', { required: 'Postal/Zip Code is required' })}
+                          {...register("postalCode", { required: "Postal/Zip Code is required" })}
                         />
                         {errors.postalCode && (
-                          <p className="text-red-500 text-sm mt-1">{errors.postalCode.message as string}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.postalCode.message as string}
+                          </p>
                         )}
                       </div>
 
@@ -186,10 +308,12 @@ export default function OrganizationProfilePage() {
                         <Input
                           id="country"
                           className="bg-[#252525] border-[#444]"
-                          {...register('country', { required: 'Country is required' })}
+                          {...register("country", { required: "Country is required" })}
                         />
                         {errors.country && (
-                          <p className="text-red-500 text-sm mt-1">{errors.country.message as string}</p>
+                          <p className="text-red-500 text-sm mt-1">
+                            {errors.country.message as string}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -231,17 +355,27 @@ export default function OrganizationProfilePage() {
               </CardContent>
             </Card>
 
+            {/* AI Preferences Panel - right column sticky style */}
+            <Card className="bg-[#1e1e1e] border-[#333] mb-6">
+              <CardHeader>
+                <CardTitle className="text-xl">Préférences IA (Docteur)</CardTitle>
+                <CardDescription>Activer/désactiver les sections générées</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AIPreferences />
+              </CardContent>
+            </Card>
+
             <Card className="bg-[#1e1e1e] border-[#333]">
               <CardHeader>
-                <CardTitle className="flex items-center text-xl">
-                  About This Page
-                </CardTitle>
+                <CardTitle className="flex items-center text-xl">About This Page</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-400 text-sm">
-                  This page demonstrates the Organization Profile settings using the Spruce-like layout. 
-                  Notice how the middle panel shows contextual navigation for "Settings" when you select Settings 
-                  from the left sidebar, and the main content area displays the form.
+                  This page demonstrates the Organization Profile settings using the Spruce-like
+                  layout. Notice how the middle panel shows contextual navigation for "Settings"
+                  when you select Settings from the left sidebar, and the main content area displays
+                  the form.
                 </p>
               </CardContent>
             </Card>

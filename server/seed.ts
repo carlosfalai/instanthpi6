@@ -25,10 +25,10 @@ export async function seedDatabase() {
         chronicConditions: ["hypertension"],
         allergies: ["penicillin"],
         currentMedications: ["lisinopril 10mg"],
-        emergencyContact: "Jean Dubois - 514-555-0102"
+        emergencyContact: "Jean Dubois - 514-555-0102",
       },
       {
-        name: "Jean Tremblay", 
+        name: "Jean Tremblay",
         email: "jean.tremblay@email.com",
         phone: "514-555-0103",
         dateOfBirth: "1978-11-22",
@@ -39,11 +39,11 @@ export async function seedDatabase() {
         chronicConditions: ["diabetes"],
         allergies: [],
         currentMedications: ["metformin 500mg"],
-        emergencyContact: "Sophie Tremblay - 514-555-0104"
+        emergencyContact: "Sophie Tremblay - 514-555-0104",
       },
       {
         name: "Sarah Johnson",
-        email: "sarah.johnson@email.com", 
+        email: "sarah.johnson@email.com",
         phone: "514-555-0105",
         dateOfBirth: "1990-07-08",
         gender: "female",
@@ -53,12 +53,12 @@ export async function seedDatabase() {
         chronicConditions: [],
         allergies: ["shellfish"],
         currentMedications: [],
-        emergencyContact: "Mike Johnson - 514-555-0106"
+        emergencyContact: "Mike Johnson - 514-555-0106",
       },
       {
         name: "Robert Chen",
         email: "robert.chen@email.com",
-        phone: "514-555-0107", 
+        phone: "514-555-0107",
         dateOfBirth: "1982-12-03",
         gender: "male",
         language: "english" as const,
@@ -67,8 +67,8 @@ export async function seedDatabase() {
         chronicConditions: ["asthma"],
         allergies: ["pollen"],
         currentMedications: ["salbutamol inhaler"],
-        emergencyContact: "Linda Chen - 514-555-0108"
-      }
+        emergencyContact: "Linda Chen - 514-555-0108",
+      },
     ];
 
     // Create patients
@@ -80,21 +80,22 @@ export async function seedDatabase() {
       await storage.createMessage({
         patientId: patient.id,
         senderId: 1, // Doctor's ID
-        content: patient.language === 'french' 
-          ? "Bonjour docteur, j'ai des questions concernant mes médicaments."
-          : "Hello doctor, I have some questions about my medications.",
+        content:
+          patient.language === "french"
+            ? "Bonjour docteur, j'ai des questions concernant mes médicaments."
+            : "Hello doctor, I have some questions about my medications.",
         isFromPatient: true,
-        spruceMessageId: `msg_${patient.id}_001`
+        spruceMessageId: `msg_${patient.id}_001`,
       });
 
-      // Create sample pending items  
+      // Create sample pending items
       if (patientData.chronicConditions && patientData.chronicConditions.length > 0) {
         await storage.createPendingItem({
           patientId: patient.id,
           type: "bloodwork",
           description: "Annual bloodwork for chronic condition monitoring",
           priority: "medium",
-          status: "pending"
+          status: "pending",
         });
       }
     }

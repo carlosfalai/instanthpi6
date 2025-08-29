@@ -1,13 +1,13 @@
-import axios from 'axios';
+import axios from "axios";
 
 /**
  * Service for interacting with the Spruce Health API
  */
 const spruceClient = axios.create({
-  baseURL: '/api/spruce',
+  baseURL: "/api/spruce",
   headers: {
-    'Content-Type': 'application/json',
-  }
+    "Content-Type": "application/json",
+  },
 });
 
 export interface SpruceMessage {
@@ -47,7 +47,7 @@ export interface SpruceConversation {
  * Fetch conversations from Spruce API
  */
 export async function fetchSpruceConversations(): Promise<SpruceConversation[]> {
-  const response = await spruceClient.get('/conversations');
+  const response = await spruceClient.get("/conversations");
   return response.data;
 }
 
@@ -62,10 +62,14 @@ export async function fetchSpruceMessages(patientId: number): Promise<SpruceMess
 /**
  * Send a message to a patient via Spruce API
  */
-export async function sendSpruceMessage(patientId: number, content: string, attachmentUrl?: string): Promise<SpruceMessage> {
+export async function sendSpruceMessage(
+  patientId: number,
+  content: string,
+  attachmentUrl?: string
+): Promise<SpruceMessage> {
   const response = await spruceClient.post(`/patients/${patientId}/messages`, {
     content,
-    attachmentUrl
+    attachmentUrl,
   });
   return response.data;
 }
@@ -89,5 +93,5 @@ export default {
   fetchSpruceMessages,
   sendSpruceMessage,
   markSpruceConversationAsRead,
-  archiveSpruceConversation
+  archiveSpruceConversation,
 };

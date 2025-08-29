@@ -13,7 +13,8 @@ let schedulerSettings = [
     ageRangeMax: 110,
     gender: "all",
     frequency: "yearly",
-    messageTemplate: "It's time for your annual flu shot. This helps protect you against seasonal influenza strains."
+    messageTemplate:
+      "It's time for your annual flu shot. This helps protect you against seasonal influenza strains.",
   },
   {
     id: "vacc-tdap",
@@ -25,7 +26,8 @@ let schedulerSettings = [
     ageRangeMax: 110,
     gender: "all",
     frequency: "every 10 years",
-    messageTemplate: "Your Tdap booster is due. This vaccination protects against tetanus, diphtheria, and pertussis (whooping cough)."
+    messageTemplate:
+      "Your Tdap booster is due. This vaccination protects against tetanus, diphtheria, and pertussis (whooping cough).",
   },
   {
     id: "screening-mammo",
@@ -37,7 +39,7 @@ let schedulerSettings = [
     ageRangeMax: 75,
     gender: "female",
     frequency: "every 1-2 years",
-    messageTemplate: "It's time to schedule your mammogram for breast cancer screening."
+    messageTemplate: "It's time to schedule your mammogram for breast cancer screening.",
   },
   {
     id: "screening-colon",
@@ -49,7 +51,8 @@ let schedulerSettings = [
     ageRangeMax: 75,
     gender: "all",
     frequency: "every 10 years",
-    messageTemplate: "You're due for a colonoscopy screening. This preventative measure helps detect colorectal cancer early."
+    messageTemplate:
+      "You're due for a colonoscopy screening. This preventative measure helps detect colorectal cancer early.",
   },
   {
     id: "followup-diabetes",
@@ -58,7 +61,8 @@ let schedulerSettings = [
     description: "Regular follow-up for diabetes management",
     enabled: true,
     frequency: "every 3 months",
-    messageTemplate: "It's time for your quarterly diabetes check-up to monitor your condition and adjust treatment if needed."
+    messageTemplate:
+      "It's time for your quarterly diabetes check-up to monitor your condition and adjust treatment if needed.",
   },
   {
     id: "followup-hypertension",
@@ -67,7 +71,8 @@ let schedulerSettings = [
     description: "Blood pressure monitoring for hypertension patients",
     enabled: true,
     frequency: "every 6 months",
-    messageTemplate: "Your hypertension follow-up appointment is due. Regular monitoring helps manage your blood pressure effectively."
+    messageTemplate:
+      "Your hypertension follow-up appointment is due. Regular monitoring helps manage your blood pressure effectively.",
   },
   {
     id: "other-annual",
@@ -79,8 +84,9 @@ let schedulerSettings = [
     ageRangeMax: 110,
     gender: "all",
     frequency: "yearly",
-    messageTemplate: "It's time for your annual physical examination to assess your overall health status."
-  }
+    messageTemplate:
+      "It's time for your annual physical examination to assess your overall health status.",
+  },
 ];
 
 let schedulerRecommendations = [
@@ -91,10 +97,11 @@ let schedulerRecommendations = [
     type: "vaccination",
     title: "Annual Flu Vaccination",
     description: "Due for yearly influenza vaccination",
-    messageTemplate: "It's time for your annual flu shot. This helps protect you against seasonal influenza strains.",
+    messageTemplate:
+      "It's time for your annual flu shot. This helps protect you against seasonal influenza strains.",
     dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
     priority: "medium",
-    status: "pending"
+    status: "pending",
   },
   {
     id: crypto.randomUUID(),
@@ -106,7 +113,7 @@ let schedulerRecommendations = [
     messageTemplate: "It's time to schedule your mammogram for breast cancer screening.",
     dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 14 days from now
     priority: "high",
-    status: "pending"
+    status: "pending",
   },
   {
     id: crypto.randomUUID(),
@@ -115,11 +122,12 @@ let schedulerRecommendations = [
     type: "followup",
     title: "Diabetes Follow-up",
     description: "Quarterly diabetes management check-up",
-    messageTemplate: "It's time for your quarterly diabetes check-up to monitor your condition and adjust treatment if needed.",
+    messageTemplate:
+      "It's time for your quarterly diabetes check-up to monitor your condition and adjust treatment if needed.",
     dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days from now
     priority: "high",
-    status: "scheduled"
-  }
+    status: "scheduled",
+  },
 ];
 
 let upcomingEvents = [
@@ -131,8 +139,8 @@ let upcomingEvents = [
     description: "Quarterly diabetes management check-up",
     scheduledDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days from now
     status: "confirmed",
-    messageStatus: "sent"
-  }
+    messageStatus: "sent",
+  },
 ];
 
 export const schedulerRouter = Router();
@@ -146,18 +154,18 @@ schedulerRouter.get("/settings", (req, res) => {
 schedulerRouter.patch("/settings/:id", (req, res) => {
   const { id } = req.params;
   const { enabled } = req.body;
-  
-  const settingIndex = schedulerSettings.findIndex(setting => setting.id === id);
-  
+
+  const settingIndex = schedulerSettings.findIndex((setting) => setting.id === id);
+
   if (settingIndex === -1) {
     return res.status(404).json({ error: "Setting not found" });
   }
-  
+
   schedulerSettings[settingIndex] = {
     ...schedulerSettings[settingIndex],
-    enabled
+    enabled,
   };
-  
+
   res.json(schedulerSettings[settingIndex]);
 });
 
@@ -169,19 +177,19 @@ schedulerRouter.get("/recommendations", (req, res) => {
 // Schedule a recommendation
 schedulerRouter.post("/recommendations/:id/schedule", (req, res) => {
   const { id } = req.params;
-  
-  const recIndex = schedulerRecommendations.findIndex(rec => rec.id === id);
-  
+
+  const recIndex = schedulerRecommendations.findIndex((rec) => rec.id === id);
+
   if (recIndex === -1) {
     return res.status(404).json({ error: "Recommendation not found" });
   }
-  
+
   // Update the recommendation status
   schedulerRecommendations[recIndex] = {
     ...schedulerRecommendations[recIndex],
-    status: "scheduled"
+    status: "scheduled",
   };
-  
+
   // Add to upcoming events
   const newEvent = {
     id: crypto.randomUUID(),
@@ -191,29 +199,29 @@ schedulerRouter.post("/recommendations/:id/schedule", (req, res) => {
     description: schedulerRecommendations[recIndex].description,
     scheduledDate: schedulerRecommendations[recIndex].dueDate,
     status: "scheduled",
-    messageStatus: "pending"
+    messageStatus: "pending",
   };
-  
+
   upcomingEvents.push(newEvent);
-  
+
   res.json(schedulerRecommendations[recIndex]);
 });
 
 // Dismiss a recommendation
 schedulerRouter.post("/recommendations/:id/dismiss", (req, res) => {
   const { id } = req.params;
-  
-  const recIndex = schedulerRecommendations.findIndex(rec => rec.id === id);
-  
+
+  const recIndex = schedulerRecommendations.findIndex((rec) => rec.id === id);
+
   if (recIndex === -1) {
     return res.status(404).json({ error: "Recommendation not found" });
   }
-  
+
   schedulerRecommendations[recIndex] = {
     ...schedulerRecommendations[recIndex],
-    status: "dismissed"
+    status: "dismissed",
   };
-  
+
   res.json(schedulerRecommendations[recIndex]);
 });
 

@@ -68,7 +68,7 @@ router.patch("/modules/:id", async (req, res) => {
     // Validate request body
     const validatedData = insertEducationModuleSchema.partial().parse(req.body);
     const updatedModule = await storage.updateEducationModule(moduleId, validatedData);
-    
+
     if (!updatedModule) {
       return res.status(404).json({ error: "Module not found" });
     }
@@ -123,46 +123,49 @@ router.post("/progress", async (req, res) => {
     // For now we'll use the first user (doctor) as our default user
     // In a real app, this would come from authentication
     const userId = 1; // Doctor user ID
-    
+
     const schema = z.object({
       moduleId: z.number(),
       status: z.enum(["not_started", "in_progress", "completed"]),
       quizScore: z.number().optional(),
-      notes: z.string().optional()
+      notes: z.string().optional(),
     });
 
     const { moduleId, status, quizScore, notes } = schema.parse(req.body);
-    
+
     // Check if progress already exists
     const existingProgress = await dbEducationStorage.getModuleProgress(userId, moduleId);
-    
+
     if (existingProgress) {
       // Update existing progress
       const now = new Date();
       const completedAt = status === "completed" ? now : null;
-      
-      const updatedProgress = await dbEducationStorage.updateUserEducationProgress(existingProgress.id, {
-        status,
-        completedAt,
-        quizScore,
-        notes
-      });
-      
+
+      const updatedProgress = await dbEducationStorage.updateUserEducationProgress(
+        existingProgress.id,
+        {
+          status,
+          completedAt,
+          quizScore,
+          notes,
+        }
+      );
+
       return res.json(updatedProgress);
     } else {
       // Create new progress
       const now = new Date();
       const completedAt = status === "completed" ? now : null;
-      
+
       const newProgress = await dbEducationStorage.createUserEducationProgress({
         userId,
         moduleId,
         status,
         completedAt,
         quizScore,
-        notes
+        notes,
       });
-      
+
       return res.status(201).json(newProgress);
     }
   } catch (error) {

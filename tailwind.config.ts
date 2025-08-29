@@ -102,26 +102,26 @@ export default {
     },
   },
   plugins: [
-    require("tailwindcss-animate"), 
+    require("tailwindcss-animate"),
     require("@tailwindcss/typography"),
-    function({ addUtilities }) {
+    function ({ addUtilities }) {
       const newUtilities = {
-        '.scrollbar-thin': {
-          scrollbarWidth: 'thin',
-          '&::-webkit-scrollbar': {
-            width: '6px',
-            height: '6px',
+        ".scrollbar-thin": {
+          scrollbarWidth: "thin",
+          "&::-webkit-scrollbar": {
+            width: "6px",
+            height: "6px",
           },
         },
-        '.scrollbar-thumb-gray-600': {
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#4B5563',
-            borderRadius: '3px',
+        ".scrollbar-thumb-gray-600": {
+          "&::-webkit-scrollbar-thumb": {
+            backgroundColor: "#4B5563",
+            borderRadius: "3px",
           },
         },
-        '.scrollbar-track-transparent': {
-          '&::-webkit-scrollbar-track': {
-            backgroundColor: 'transparent',
+        ".scrollbar-track-transparent": {
+          "&::-webkit-scrollbar-track": {
+            backgroundColor: "transparent",
           },
         },
       };

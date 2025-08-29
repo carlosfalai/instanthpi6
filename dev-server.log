@@ -1,0 +1,87 @@
+
+> rest-express@1.0.0 dev
+> NODE_ENV=development tsx server/index.ts
+
+🔑 Spruce Health API Configuration:
+📋 Access ID: aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I=
+🔐 Bearer Token: Configured
+No authentic fax credentials provided - fax functionality will be disabled
+Using Gmail SMTP configuration with direct settings
+No authentic fax credentials provided - fax functionality will be disabled
+Seeding database with sample data...
+Created patient: Marie Dubois
+Created patient: Jean Tremblay
+Created patient: Sarah Johnson
+Created patient: Robert Chen
+Database seeding completed successfully
+2:48:39 PM [express] Server is running at http://localhost:3000
+2:48:39 PM [express] Webhook server is listening at http://localhost:3003
+📥 Received InstantHPI Webhook: {
+  timestamp: '2025-08-26T18:46:00Z',
+  trigger: 'sheet_change',
+  changeType: 'INSERT_ROW',
+  lastRow: 42,
+  sheetName: 'Intake',
+  spreadsheetId: 'test-spreadsheet-id'
+}
+SMTP connection established successfully
+Email service is ready to send messages
+📥 Received InstantHPI Webhook: {
+  timestamp: '2025-08-26T18:46:00Z',
+  trigger: 'sheet_change',
+  changeType: 'EDIT',
+  lastRow: 99,
+  sheetName: 'Intake',
+  spreadsheetId: 'test-spreadsheet-id-2'
+}
+2:49:26 PM [express] GET /api/ollama/status 200 in 18ms :: {"status":"online","url":"http://localhos…
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+3:48:36 PM [express] GET /api/assets/images 304 in 4ms :: {"files":[{"name":"Screenshot 2025-06-07 a…
+🏥 Processing triage for patient: Y6P5N2H9U7
+🤖 Trying Ollama: http://localhost:11434
+⚠️ Ollama at http://localhost:11434 failed: timeout of 30000ms exceeded
+🤖 Trying Ollama: http://localhost:11434
+🤖 Ollama response received: **Triage Level:** URGENT (Emergent)
+**Urgency Score:** 9/10
+**Reasoning:** The patient's symptoms suggest an acute coronary syndrome, potentially a myocardial i…
+✅ Triage completed: { patient: 'Y6P5N2H9U7', level: 'URGENT', score: 9 }
+3:49:39 PM [express] POST /api/ollama/triage 200 in 58453ms :: {"triage_level":"URGENT","urgency_sco…
+3:49:51 PM [express] GET /api/assets/images 304 in 5ms :: {"files":[{"name":"Screenshot 2025-06-07 a…
+3:49:53 PM [express] GET /api/assets/images 304 in 6ms :: {"files":[{"name":"Screenshot 2025-06-07 a…
+3:49:56 PM [express] GET /api/assets/images 304 in 6ms :: {"files":[{"name":"Screenshot 2025-06-07 a…
+🏥 Processing triage for patient: S1G8G9M3J1
+🤖 Trying Ollama: http://localhost:11434
+🤖 Ollama response received: **Triage Level:** URGENT (Emergent)
+**Urgency Score:** 9/10
+**Reasoning:** The patient's symptoms suggest an acute coronary syndrome, potentially a myocardial i…
+✅ Triage completed: { patient: 'S1G8G9M3J1', level: 'URGENT', score: 9 }
+3:50:28 PM [express] POST /api/ollama/triage 200 in 25674ms :: {"triage_level":"URGENT","urgency_sco…
+3:53:44 p.m. [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+4:29:06 PM [express] GET /api/assets/images 304 in 8ms :: {"files":[{"name":"Screenshot 2025-06-07 a…
+4:51:03 p.m. [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+5:25:37 p.m. [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+7:54:23 PM [express] GET /api/assets/images 304 in 12ms :: {"files":[{"name":"Screenshot 2025-06-07 …
+9:26:07 PM [express] GET /api/assets/images 304 in 10ms :: {"files":[{"name":"Screenshot 2025-06-07 …
+11:49:27 PM [express] GET /api/assets/images 304 in 11ms :: {"files":[{"name":"Screenshot 2025-06-07 …
+🏥 Processing triage for patient: N8S9I1G9F6
+🤖 Trying Ollama: http://localhost:11434
+⚠️ Ollama at http://localhost:11434 failed: timeout of 30000ms exceeded
+🤖 Trying Ollama: http://localhost:11434
+🤖 Ollama response received: **Triage Level:** URGENT (Emergent)
+**Urgency Score:** 9/10
+**Reasoning:** The patient's symptoms suggest an acute coronary syndrome, potentially a myocardial i…
+✅ Triage completed: { patient: 'N8S9I1G9F6', level: 'URGENT', score: 9 }
+1:51:17 AM [express] POST /api/ollama/triage 200 in 58159ms :: {"triage_level":"URGENT","urgency_sco…
+1:53:23 a.m. [vite] hmr update /src/pages/doctor-dashboard.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+2:25:55 a.m. [vite] page reload src/pages/organization-profile-page.tsx
+2:27:51 a.m. [vite] hmr update /src/pages/doctor-dashboard.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+2:28:30 a.m. [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+2:36:43 a.m. [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+2:37:14 a.m. [vite] hmr update /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+2:54:06 a.m. [vite] hmr update /src/pages/doctor-dashboard.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+3:00:38 a.m. [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+3:01:36 a.m. [vite] hmr update /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+3:16:25 a.m. [vite] hmr update /src/pages/doctor-dashboard.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ
+3:17:08 a.m. [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css?v=ntw-R3qK0Bwa3x_rEnqDJ

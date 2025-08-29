@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
-import { Loader2 } from 'lucide-react';
-import PendingItemsPanel from './PendingItemsPanel';
-import AiAssistantPanel from '@/components/ai/AiAssistantPanel';
-import PatientSearchPanel from '@/components/patients/PatientSearchPanel';
-import SpruceConversation from '@/components/conversation/SpruceConversation';
+import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { Loader2 } from "lucide-react";
+import PendingItemsPanel from "./PendingItemsPanel";
+import AiAssistantPanel from "@/components/ai/AiAssistantPanel";
+import PatientSearchPanel from "@/components/patients/PatientSearchPanel";
+import SpruceConversation from "@/components/conversation/SpruceConversation";
 // NavigationBar now provided by AppLayoutSpruce
 
 // Interfaces
@@ -16,7 +16,7 @@ interface Patient {
   phone: string;
   dateOfBirth: string;
   gender: string;
-  language: 'english' | 'french' | null;
+  language: "english" | "french" | null;
   spruceId: string | null;
 }
 
@@ -32,48 +32,42 @@ interface Message {
 
 export default function ThreePanelLayout() {
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
-  
+
   // Query for selected patient
-  const { 
-    data: selectedPatient,
-    isLoading: patientLoading
-  } = useQuery<Patient>({
+  const { data: selectedPatient, isLoading: patientLoading } = useQuery<Patient>({
     queryKey: [`/api/patients/${selectedPatientId}`],
     enabled: !!selectedPatientId,
   });
-  
+
   // Query for patient messages
-  const {
-    data: messages = [],
-    isLoading: messagesLoading,
-  } = useQuery<Message[]>({
+  const { data: messages = [], isLoading: messagesLoading } = useQuery<Message[]>({
     queryKey: [`/api/patients/${selectedPatientId}/messages`],
     enabled: !!selectedPatientId,
   });
-  
+
   // Handler for sending a message
   const handleSendMessage = async (content: string) => {
     if (!selectedPatientId) return;
-    
+
     try {
-      await fetch('/api/spruce/messages', {
-        method: 'POST',
+      await fetch("/api/spruce/messages", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           patientId: selectedPatientId,
           message: content,
         }),
       });
-      
+
       // Invalidate messages cache to refresh the conversation
       // This will be handled by react-query
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
     }
   };
-  
+
   return (
     <div className="h-full flex flex-col bg-[#121212] text-white">
       {/* Main Content */}
@@ -83,15 +77,15 @@ export default function ThreePanelLayout() {
           <ResizablePanel defaultSize={20} minSize={15} className="px-1">
             <PendingItemsPanel patientId={selectedPatientId || 0} />
           </ResizablePanel>
-          
+
           <ResizableHandle withHandle />
-          
+
           {/* Middle Panel - AI Assistant */}
           <ResizablePanel defaultSize={30} minSize={20}>
             {selectedPatientId ? (
-              <AiAssistantPanel 
-                patientId={selectedPatientId} 
-                language={selectedPatient?.language || 'english'}
+              <AiAssistantPanel
+                patientId={selectedPatientId}
+                language={selectedPatient?.language || "english"}
                 onSendMessage={handleSendMessage}
               />
             ) : (
@@ -100,20 +94,20 @@ export default function ThreePanelLayout() {
               </div>
             )}
           </ResizablePanel>
-          
+
           <ResizableHandle withHandle />
-          
+
           {/* Right Panel - Patient Search & Conversation */}
           <ResizablePanel defaultSize={50} minSize={30}>
             <div className="flex flex-col h-full">
               {/* Patient Search */}
               <div className="h-64 border-b border-gray-800">
-                <PatientSearchPanel 
+                <PatientSearchPanel
                   onSelectPatient={(patient) => setSelectedPatientId(patient.id)}
                   selectedPatientId={selectedPatientId}
                 />
               </div>
-              
+
               {/* Conversation Area */}
               <div className="flex-1 overflow-hidden">
                 {selectedPatientId ? (
@@ -122,12 +116,12 @@ export default function ThreePanelLayout() {
                       <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
                     </div>
                   ) : (
-                    <SpruceConversation 
+                    <SpruceConversation
                       patientId={selectedPatientId}
                       doctorName="Dr. Font"
                       messages={messages}
                       onSendMessage={handleSendMessage}
-                      patientName={selectedPatient?.name || 'Patient'}
+                      patientName={selectedPatient?.name || "Patient"}
                     />
                   )
                 ) : (

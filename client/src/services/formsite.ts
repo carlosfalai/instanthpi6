@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { apiRequest } from '@/lib/queryClient';
+import axios from "axios";
+import { apiRequest } from "@/lib/queryClient";
 
 export interface FormSiteSubmission {
   id: string;
@@ -27,10 +27,10 @@ export const formsiteService = {
    */
   async getFormSubmissions(): Promise<FormSiteSubmission[]> {
     try {
-      const response = await apiRequest('GET', '/api/formsite/submissions');
+      const response = await apiRequest("GET", "/api/formsite/submissions");
       return await response.json();
     } catch (error) {
-      console.error('Error fetching form submissions:', error);
+      console.error("Error fetching form submissions:", error);
       throw error;
     }
   },
@@ -40,7 +40,7 @@ export const formsiteService = {
    */
   async getFormSubmission(id: string): Promise<FormSiteSubmission> {
     try {
-      const response = await apiRequest('GET', `/api/formsite/submissions/${id}`);
+      const response = await apiRequest("GET", `/api/formsite/submissions/${id}`);
       return await response.json();
     } catch (error) {
       console.error(`Error fetching form submission ${id}:`, error);
@@ -53,10 +53,17 @@ export const formsiteService = {
    * @param params Object containing submissionId and modelType
    * @returns Object with processed status and AI-generated content
    */
-  async processFormSubmission(params: { submissionId: string, modelType: 'both' | 'gpt' | 'claude' }): Promise<{ processed: boolean, aiContent: string, claudeContent: string }> {
+  async processFormSubmission(params: {
+    submissionId: string;
+    modelType: "both" | "gpt" | "claude";
+  }): Promise<{ processed: boolean; aiContent: string; claudeContent: string }> {
     try {
       const { submissionId, modelType } = params;
-      const response = await apiRequest('POST', `/api/formsite/submissions/${submissionId}/process`, { modelType });
+      const response = await apiRequest(
+        "POST",
+        `/api/formsite/submissions/${submissionId}/process`,
+        { modelType }
+      );
       return await response.json();
     } catch (error) {
       console.error(`Error processing form submission ${params.submissionId}:`, error);
@@ -70,17 +77,22 @@ export const formsiteService = {
    */
   async searchFormSubmissions(query: string): Promise<FormSiteSubmission[] | SearchResults> {
     try {
-      const response = await apiRequest('GET', `/api/formsite/submissions/search?q=${encodeURIComponent(query)}`);
+      const response = await apiRequest(
+        "GET",
+        `/api/formsite/submissions/search?q=${encodeURIComponent(query)}`
+      );
       const data = await response.json();
-      
+
       // Server should always return an array, but just in case
-      return Array.isArray(data) ? data : { id: 'search', results: Array.isArray(data.results) ? data.results : [] };
+      return Array.isArray(data)
+        ? data
+        : { id: "search", results: Array.isArray(data.results) ? data.results : [] };
     } catch (error) {
-      console.error('Error searching form submissions:', error);
+      console.error("Error searching form submissions:", error);
       // Even on error, return an empty array to maintain consistent response format
       return [];
     }
-  }
+  },
 };
 
 export default formsiteService;

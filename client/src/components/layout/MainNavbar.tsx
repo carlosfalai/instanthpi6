@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { useState } from "react";
+import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { 
-  MessageSquare, 
-  Users, 
-  BarChart, 
-  FileText, 
-  Clipboard, 
-  Settings, 
+import {
+  MessageSquare,
+  Users,
+  BarChart,
+  FileText,
+  Clipboard,
+  Settings,
   Calendar,
-  ChevronDown
+  ChevronDown,
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
@@ -27,63 +27,61 @@ const DOCTOR_INITIALS = "CF";
 
 export default function MainNavbar() {
   const [location, navigate] = useLocation();
-  
+
   // Get current active section
-  const currentSection = location === '/' 
-    ? 'messages' 
-    : location.split('/')[1] || 'messages';
-  
+  const currentSection = location === "/" ? "messages" : location.split("/")[1] || "messages";
+
   return (
     <div className="w-full bg-[#121212] px-4 py-2 border-b border-gray-800 flex items-center justify-between h-16">
       {/* Left side - Logo/Brand */}
       <div className="flex items-center">
         <h1 className="text-white font-semibold text-xl mr-8">MediConnect</h1>
-        
+
         {/* Main Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
-          <NavButton 
-            href="/" 
+          <NavButton
+            href="/"
             icon={<MessageSquare className="h-5 w-5" />}
             label="Messages"
-            isActive={currentSection === 'messages'}
+            isActive={currentSection === "messages"}
           />
-          
-          <NavButton 
-            href="/patients" 
+
+          <NavButton
+            href="/patients"
             icon={<Users className="h-5 w-5" />}
             label="Patients"
-            isActive={currentSection === 'patients'}
+            isActive={currentSection === "patients"}
           />
-          
-          <NavButton 
-            href="/calendar" 
+
+          <NavButton
+            href="/calendar"
             icon={<Calendar className="h-5 w-5" />}
             label="Calendar"
-            isActive={currentSection === 'calendar'}
+            isActive={currentSection === "calendar"}
           />
-          
-          <NavButton 
-            href="/dashboard" 
+
+          <NavButton
+            href="/dashboard"
             icon={<BarChart className="h-5 w-5" />}
             label="Dashboard"
-            isActive={currentSection === 'dashboard'}
+            isActive={currentSection === "dashboard"}
           />
-          
-          <NavButton 
-            href="/documents" 
+
+          <NavButton
+            href="/documents"
             icon={<FileText className="h-5 w-5" />}
             label="Documents"
-            isActive={currentSection === 'documents'}
+            isActive={currentSection === "documents"}
           />
-          
-          <NavButton 
-            href="/billing" 
+
+          <NavButton
+            href="/billing"
             icon={<Clipboard className="h-5 w-5" />}
             label="Billing"
-            isActive={currentSection === 'billing'}
+            isActive={currentSection === "billing"}
           />
         </nav>
-        
+
         {/* Mobile dropdown menu */}
         <div className="md:hidden">
           <DropdownMenu>
@@ -94,52 +92,52 @@ export default function MainNavbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="bg-[#1a1a1a] border-gray-800 text-white">
-              <NavMenuItem 
-                href="/" 
+              <NavMenuItem
+                href="/"
                 icon={<MessageSquare className="h-5 w-5" />}
                 label="Messages"
-                isActive={currentSection === 'messages'}
+                isActive={currentSection === "messages"}
               />
-              
-              <NavMenuItem 
-                href="/patients" 
+
+              <NavMenuItem
+                href="/patients"
                 icon={<Users className="h-5 w-5" />}
                 label="Patients"
-                isActive={currentSection === 'patients'}
+                isActive={currentSection === "patients"}
               />
-              
-              <NavMenuItem 
-                href="/calendar" 
+
+              <NavMenuItem
+                href="/calendar"
                 icon={<Calendar className="h-5 w-5" />}
                 label="Calendar"
-                isActive={currentSection === 'calendar'}
+                isActive={currentSection === "calendar"}
               />
-              
-              <NavMenuItem 
-                href="/dashboard" 
+
+              <NavMenuItem
+                href="/dashboard"
                 icon={<BarChart className="h-5 w-5" />}
                 label="Dashboard"
-                isActive={currentSection === 'dashboard'}
+                isActive={currentSection === "dashboard"}
               />
-              
-              <NavMenuItem 
-                href="/documents" 
+
+              <NavMenuItem
+                href="/documents"
                 icon={<FileText className="h-5 w-5" />}
                 label="Documents"
-                isActive={currentSection === 'documents'}
+                isActive={currentSection === "documents"}
               />
-              
-              <NavMenuItem 
-                href="/billing" 
+
+              <NavMenuItem
+                href="/billing"
                 icon={<Clipboard className="h-5 w-5" />}
                 label="Billing"
-                isActive={currentSection === 'billing'}
+                isActive={currentSection === "billing"}
               />
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </div>
-      
+
       {/* Right side - User menu */}
       <div className="flex items-center">
         <TooltipProvider>
@@ -154,7 +152,7 @@ export default function MainNavbar() {
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="flex items-center gap-2 text-white">
@@ -182,28 +180,40 @@ export default function MainNavbar() {
 // Helper function to get section label based on path
 function getSectionLabel(section: string): string {
   switch (section) {
-    case 'messages': return 'Messages';
-    case 'patients': return 'Patients';
-    case 'calendar': return 'Calendar';
-    case 'dashboard': return 'Dashboard';
-    case 'documents': return 'Documents';
-    case 'billing': return 'Billing';
-    default: return 'Messages';
+    case "messages":
+      return "Messages";
+    case "patients":
+      return "Patients";
+    case "calendar":
+      return "Calendar";
+    case "dashboard":
+      return "Dashboard";
+    case "documents":
+      return "Documents";
+    case "billing":
+      return "Billing";
+    default:
+      return "Messages";
   }
 }
 
 // Navigation button for desktop view
-function NavButton({ href, icon, label, isActive }: { 
-  href: string; 
-  icon: React.ReactNode; 
-  label: string; 
+function NavButton({
+  href,
+  icon,
+  label,
+  isActive,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
   isActive: boolean;
 }) {
   return (
     <Link href={href}>
-      <Button 
-        variant={isActive ? "default" : "ghost"} 
-        className={`flex items-center gap-1 py-2 ${isActive ? 'bg-blue-600 text-white' : 'text-gray-400 hover:text-white'}`}
+      <Button
+        variant={isActive ? "default" : "ghost"}
+        className={`flex items-center gap-1 py-2 ${isActive ? "bg-blue-600 text-white" : "text-gray-400 hover:text-white"}`}
       >
         {icon}
         <span>{label}</span>
@@ -213,15 +223,22 @@ function NavButton({ href, icon, label, isActive }: {
 }
 
 // Navigation menu item for mobile dropdown
-function NavMenuItem({ href, icon, label, isActive }: { 
-  href: string; 
-  icon: React.ReactNode; 
-  label: string; 
+function NavMenuItem({
+  href,
+  icon,
+  label,
+  isActive,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  label: string;
   isActive: boolean;
 }) {
   return (
     <Link href={href}>
-      <DropdownMenuItem className={`flex items-center gap-2 ${isActive ? 'bg-blue-600/20 text-blue-400' : ''}`}>
+      <DropdownMenuItem
+        className={`flex items-center gap-2 ${isActive ? "bg-blue-600/20 text-blue-400" : ""}`}
+      >
         {icon}
         <span>{label}</span>
       </DropdownMenuItem>

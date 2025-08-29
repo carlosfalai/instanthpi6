@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2, MessageSquare, Clock, User, Send } from 'lucide-react';
-import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
-import { GlowingBox, GlowingCard } from '@/components/ui/glowing-box';
+import React, { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Loader2, MessageSquare, Clock, User, Send } from "lucide-react";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 
 interface SpruceConversation {
   id: string;
@@ -25,31 +24,52 @@ interface SpruceConversation {
 
 export default function InboxPage() {
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
-  const [messageText, setMessageText] = useState('');
+  const [messageText, setMessageText] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Fetch conversations from Spruce API
-  const { data: conversations, isLoading, error } = useQuery({
-    queryKey: ['/api/spruce/conversations'],
+  const {
+    data: conversations,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["/api/spruce/conversations"],
     queryFn: async () => {
-      const response = await fetch('/api/spruce/conversations');
+      const response = await fetch("http://localhost:3002/api/spruce/conversations/all");
       if (!response.ok) {
-        throw new Error('Failed to fetch conversations');
+        throw new Error("Failed to fetch conversations");
       }
-      return response.json();
+      const data = await response.json();
+      // Transform Spruce API format to expected format
+      return data.map((conv: any) => ({
+        id: conv.id,
+        entityId: conv.id, // Use conversation ID
+        displayName: conv.title || conv.externalParticipants?.[0]?.displayName || "Unknown",
+        lastActivity: conv.lastMessageAt || conv.createdAt,
+        unreadCount: 0, // Spruce API doesn't provide this
+        lastMessage: conv.subtitle
+          ? {
+              content: conv.subtitle,
+              timestamp: conv.lastMessageAt,
+              isFromPatient: true,
+            }
+          : undefined,
+      }));
     },
     refetchInterval: 30000, // Refresh every 30 seconds
   });
 
   // Fetch messages for selected conversation
   const { data: messages, isLoading: isLoadingMessages } = useQuery({
-    queryKey: ['/api/spruce/patients', selectedConversation, 'messages'],
+    queryKey: ["/api/spruce/patients", selectedConversation, "messages"],
     queryFn: async () => {
       if (!selectedConversation) return [];
-      const response = await fetch(`/api/spruce/patients/${selectedConversation}/messages`);
+      const response = await fetch(
+        `http://localhost:3002/api/spruce/conversation/history/${selectedConversation}`
+      );
       if (!response.ok) {
-        throw new Error('Failed to fetch messages');
+        throw new Error("Failed to fetch messages");
       }
       const data = await response.json();
       return data.messages || [];
@@ -59,24 +79,30 @@ export default function InboxPage() {
 
   // Send message mutation
   const sendMessageMutation = useMutation({
-    mutationFn: async ({ conversationId, message }: { conversationId: string; message: string }) => {
+    mutationFn: async ({
+      conversationId,
+      message,
+    }: {
+      conversationId: string;
+      message: string;
+    }) => {
       const response = await fetch(`/api/spruce/patients/${conversationId}/messages`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ content: message }),
       });
       if (!response.ok) {
-        throw new Error('Failed to send message');
+        throw new Error("Failed to send message");
       }
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['/api/spruce/patients', selectedConversation, 'messages'],
+        queryKey: ["/api/spruce/patients", selectedConversation, "messages"],
       });
-      setMessageText('');
+      setMessageText("");
       toast({
         title: "Message sent",
         description: "Your message has been sent successfully.",
@@ -94,7 +120,7 @@ export default function InboxPage() {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!messageText.trim() || !selectedConversation) return;
-    
+
     sendMessageMutation.mutate({
       conversationId: selectedConversation,
       message: messageText.trim(),
@@ -103,9 +129,9 @@ export default function InboxPage() {
 
   const getInitials = (name: string) => {
     return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };
@@ -115,7 +141,7 @@ export default function InboxPage() {
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffMinutes = Math.ceil(diffTime / (1000 * 60));
-    
+
     if (diffMinutes < 60) {
       return `${diffMinutes}m ago`;
     } else if (diffMinutes < 1440) {
@@ -128,12 +154,12 @@ export default function InboxPage() {
 
   return (
     <AppLayoutSpruce>
-      <div className="h-screen flex bg-background">
+      <div className="h-screen flex bg-white dark:bg-gray-900">
         {/* Conversation List */}
-        <div className="w-80 border-r border-border flex flex-col">
-          <div className="p-4 border-b border-border">
-            <h1 className="text-xl font-semibold text-foreground">Inbox</h1>
-            <p className="text-sm text-muted-foreground mt-1">
+        <div className="w-80 border-r border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-800">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">Inbox</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {conversations?.length || 0} conversations
             </p>
           </div>
@@ -146,9 +172,9 @@ export default function InboxPage() {
             ) : error ? (
               <div className="p-4 text-center">
                 <p className="text-sm text-destructive">Failed to load conversations</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="mt-2"
                   onClick={() => window.location.reload()}
                 >
@@ -167,8 +193,8 @@ export default function InboxPage() {
                     key={conversation.id}
                     className={`p-3 mb-2 cursor-pointer rounded-lg border transition-all duration-200 ${
                       selectedConversation === conversation.entityId
-                        ? 'border-border/50 bg-muted/20 shadow-lg'
-                        : 'border-border/20 bg-card/20 hover:bg-muted/30 hover:border-border/40'
+                        ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-lg"
+                        : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
                     }`}
                     onClick={() => setSelectedConversation(conversation.entityId)}
                   >
@@ -178,10 +204,10 @@ export default function InboxPage() {
                           {getInitials(conversation.displayName)}
                         </AvatarFallback>
                       </Avatar>
-                      
+
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <h3 className="font-medium text-foreground truncate">
+                          <h3 className="font-medium text-gray-900 dark:text-white truncate">
                             {conversation.displayName}
                           </h3>
                           {conversation.unreadCount > 0 && (
@@ -190,15 +216,15 @@ export default function InboxPage() {
                             </Badge>
                           )}
                         </div>
-                        
+
                         {conversation.lastMessage && (
-                          <p className="text-sm text-muted-foreground truncate mt-1">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 truncate mt-1">
                             {conversation.lastMessage.content}
                           </p>
                         )}
-                        
+
                         <div className="flex items-center justify-between mt-2">
-                          <span className="text-xs text-muted-foreground/70 flex items-center">
+                          <span className="text-xs text-gray-400 dark:text-gray-500 flex items-center">
                             <Clock className="h-3 w-3 mr-1" />
                             {formatTimestamp(conversation.lastActivity)}
                           </span>
@@ -213,15 +239,15 @@ export default function InboxPage() {
         </div>
 
         {/* Message Detail */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
           {!selectedConversation ? (
             <div className="flex-1 flex items-center justify-center">
               <div className="text-center">
                 <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
                   Select a conversation
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   Choose a conversation from the list to view messages
                 </p>
               </div>
@@ -229,23 +255,27 @@ export default function InboxPage() {
           ) : (
             <>
               {/* Message Header */}
-              <GlowingBox className="p-4 border-b border-border/50">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-blue-600 text-white">
                       {getInitials(
-                        conversations?.find((c: SpruceConversation) => c.entityId === selectedConversation)?.displayName || 'Patient'
+                        conversations?.find(
+                          (c: SpruceConversation) => c.entityId === selectedConversation
+                        )?.displayName || "Patient"
                       )}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h2 className="font-semibold text-white">
-                      {conversations?.find((c: SpruceConversation) => c.entityId === selectedConversation)?.displayName || 'Patient'}
+                    <h2 className="font-semibold text-gray-900 dark:text-white">
+                      {conversations?.find(
+                        (c: SpruceConversation) => c.entityId === selectedConversation
+                      )?.displayName || "Patient"}
                     </h2>
-                    <p className="text-sm text-gray-300">Active conversation</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Active conversation</p>
                   </div>
                 </div>
-              </GlowingBox>
+              </div>
 
               {/* Messages */}
               <ScrollArea className="flex-1 p-4">
@@ -262,19 +292,21 @@ export default function InboxPage() {
                     {messages?.map((message: any) => (
                       <div
                         key={message.id}
-                        className={`flex ${message.isFromPatient ? 'justify-start' : 'justify-end'}`}
+                        className={`flex ${message.isFromPatient ? "justify-start" : "justify-end"}`}
                       >
-                        <div className={`max-w-[70%] ${message.isFromPatient ? 'order-1' : 'order-2'}`}>
-                          <GlowingBox
-                            className={`p-3 ${
+                        <div
+                          className={`max-w-[70%] ${message.isFromPatient ? "order-1" : "order-2"}`}
+                        >
+                          <div
+                            className={`p-3 rounded-lg ${
                               message.isFromPatient
-                                ? 'bg-muted/80 text-foreground'
-                                : 'bg-primary text-primary-foreground'
+                                ? "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white"
+                                : "bg-blue-600 text-white"
                             }`}
                           >
                             <p className="text-sm">{message.content}</p>
-                          </GlowingBox>
-                          <p className="text-xs text-muted-foreground mt-1 px-1">
+                          </div>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 px-1">
                             {formatTimestamp(message.timestamp)}
                           </p>
                         </div>
@@ -285,33 +317,29 @@ export default function InboxPage() {
               </ScrollArea>
 
               {/* Message Input */}
-              <GlowingBox className="p-4 border-t border-border/50">
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                 <form onSubmit={handleSendMessage} className="flex space-x-2">
-                  <GlowingBox className="flex-1">
-                    <Input
-                      value={messageText}
-                      onChange={(e) => setMessageText(e.target.value)}
-                      placeholder="Type a message..."
-                      className="border-0 bg-transparent focus:ring-0 focus:border-0 text-white placeholder:text-gray-400"
-                      disabled={sendMessageMutation.isPending}
-                    />
-                  </GlowingBox>
-                  <GlowingBox>
-                    <Button 
-                      type="submit" 
-                      disabled={!messageText.trim() || sendMessageMutation.isPending}
-                      size="icon"
-                      className="border-0 bg-blue-600 hover:bg-blue-700"
-                    >
-                      {sendMessageMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Send className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </GlowingBox>
+                  <Input
+                    value={messageText}
+                    onChange={(e) => setMessageText(e.target.value)}
+                    placeholder="Type a message..."
+                    className="flex-1 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                    disabled={sendMessageMutation.isPending}
+                  />
+                  <Button
+                    type="submit"
+                    disabled={!messageText.trim() || sendMessageMutation.isPending}
+                    size="icon"
+                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {sendMessageMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
+                  </Button>
                 </form>
-              </GlowingBox>
+              </div>
             </>
           )}
         </div>

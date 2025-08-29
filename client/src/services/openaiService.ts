@@ -1,4 +1,4 @@
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest } from "@/lib/queryClient";
 
 export interface AIDocumentation {
   id: number;
@@ -33,15 +33,15 @@ export const openaiService = {
     patientMessages?: any[]
   ): Promise<AIDocumentation> {
     try {
-      const response = await apiRequest('POST', '/api/generate-documentation', {
+      const response = await apiRequest("POST", "/api/generate-documentation", {
         patientId,
         formData,
-        patientMessages
+        patientMessages,
       });
-      
+
       return await response.json();
     } catch (error) {
-      console.error('Error generating documentation:', error);
+      console.error("Error generating documentation:", error);
       throw error;
     }
   },
@@ -51,10 +51,10 @@ export const openaiService = {
    */
   async getDocumentation(patientId: number): Promise<AIDocumentation> {
     try {
-      const response = await apiRequest('GET', `/api/patients/${patientId}/documentation`);
+      const response = await apiRequest("GET", `/api/patients/${patientId}/documentation`);
       return await response.json();
     } catch (error) {
-      console.error('Error fetching documentation:', error);
+      console.error("Error fetching documentation:", error);
       throw error;
     }
   },
@@ -64,14 +64,14 @@ export const openaiService = {
    */
   async updateDocumentation(
     id: number,
-    updates: Partial<Omit<AIDocumentation, 'id' | 'patientId' | 'createdAt'>>
+    updates: Partial<Omit<AIDocumentation, "id" | "patientId" | "createdAt">>
   ): Promise<AIDocumentation> {
     try {
-      const response = await apiRequest('PATCH', `/api/documentation/${id}`, updates);
+      const response = await apiRequest("PATCH", `/api/documentation/${id}`, updates);
       return await response.json();
     } catch (error) {
-      console.error('Error updating documentation:', error);
+      console.error("Error updating documentation:", error);
       throw error;
     }
-  }
+  },
 };

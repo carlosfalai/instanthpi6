@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import AppLayoutSpruce from '@/components/layout/AppLayoutSpruce';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Loader2, Search, Send } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { format } from 'date-fns';
+import React, { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Loader2, Search, Send } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
 
 // Define message interface
 interface Message {
@@ -27,71 +27,63 @@ interface Patient {
   phone: string;
   dateOfBirth: string;
   gender: string;
-  language: 'english' | 'french' | null;
+  language: "english" | "french" | null;
   spruceId: string | null;
 }
 
 export default function MessagesPage() {
   const [selectedPatientId, setSelectedPatientId] = useState<number | null>(null);
-  const [messageText, setMessageText] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
+  const [messageText, setMessageText] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Query for all patients
-  const {
-    data: patients = [],
-    isLoading: patientsLoading
-  } = useQuery<Patient[]>({
-    queryKey: ['/api/patients'],
+  const { data: patients = [], isLoading: patientsLoading } = useQuery<Patient[]>({
+    queryKey: ["/api/patients"],
   });
 
   // Query for selected patient
-  const { 
-    data: selectedPatient,
-    isLoading: patientLoading
-  } = useQuery<Patient>({
+  const { data: selectedPatient, isLoading: patientLoading } = useQuery<Patient>({
     queryKey: [`/api/patients/${selectedPatientId}`],
     enabled: !!selectedPatientId,
   });
-  
+
   // Query for patient messages
-  const {
-    data: messages = [],
-    isLoading: messagesLoading,
-  } = useQuery<Message[]>({
+  const { data: messages = [], isLoading: messagesLoading } = useQuery<Message[]>({
     queryKey: [`/api/patients/${selectedPatientId}/messages`],
     enabled: !!selectedPatientId,
   });
 
   // Filter patients based on search term
   const filteredPatients = searchTerm
-    ? patients.filter(patient => 
-        patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        patient.email.toLowerCase().includes(searchTerm.toLowerCase())
+    ? patients.filter(
+        (patient) =>
+          patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          patient.email.toLowerCase().includes(searchTerm.toLowerCase())
       )
     : patients;
 
   // Handle sending a message
   const handleSendMessage = async () => {
     if (!selectedPatientId || !messageText.trim()) return;
-    
+
     try {
-      await fetch('/api/spruce/messages', {
-        method: 'POST',
+      await fetch("/api/spruce/messages", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           patientId: selectedPatientId,
           message: messageText,
         }),
       });
-      
+
       // Clear the message input
-      setMessageText('');
-      
+      setMessageText("");
+
       // Refresh messages (this would be handled better with React Query invalidation)
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error("Error sending message:", error);
     }
   };
 
@@ -100,19 +92,19 @@ export default function MessagesPage() {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
-    
+
     if (date.toDateString() === today.toDateString()) {
-      return 'Today';
+      return "Today";
     } else if (date.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
+      return "Yesterday";
     } else {
-      return date.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+      return date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
     }
   };
 
   // Group messages by date
   const messagesByDate: Record<string, Message[]> = {};
-  messages.forEach(message => {
+  messages.forEach((message) => {
     const dateKey = formatMessageDate(new Date(message.timestamp));
     if (!messagesByDate[dateKey]) {
       messagesByDate[dateKey] = [];
@@ -122,12 +114,16 @@ export default function MessagesPage() {
 
   // Format timestamp for messages
   const formatTime = (timestamp: string) => {
-    return format(new Date(timestamp), 'h:mm a');
+    return format(new Date(timestamp), "h:mm a");
   };
 
   // Get initials from name
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
   return (
@@ -146,7 +142,7 @@ export default function MessagesPage() {
               />
             </div>
           </div>
-          
+
           <ScrollArea className="flex-1">
             {patientsLoading ? (
               <div className="flex justify-center items-center h-32">
@@ -159,8 +155,8 @@ export default function MessagesPage() {
                     key={patient.id}
                     className={`w-full text-left p-2 rounded-md transition-colors ${
                       selectedPatientId === patient.id
-                        ? 'bg-blue-900/30 text-blue-100'
-                        : 'hover:bg-gray-800'
+                        ? "bg-blue-900/30 text-blue-100"
+                        : "hover:bg-gray-800"
                     }`}
                     onClick={() => setSelectedPatientId(patient.id)}
                   >
@@ -172,7 +168,9 @@ export default function MessagesPage() {
                       </Avatar>
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium">{patient.name}</p>
-                        <p className="text-sm text-gray-400 truncate">{patient.email || patient.phone}</p>
+                        <p className="text-sm text-gray-400 truncate">
+                          {patient.email || patient.phone}
+                        </p>
                       </div>
                     </div>
                   </button>
@@ -181,7 +179,7 @@ export default function MessagesPage() {
             )}
           </ScrollArea>
         </div>
-        
+
         {/* Right area - Conversation */}
         <div className="flex-1 flex flex-col">
           {selectedPatientId ? (
@@ -191,18 +189,19 @@ export default function MessagesPage() {
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
                     <AvatarFallback className="bg-blue-700 text-white">
-                      {selectedPatient ? getInitials(selectedPatient.name) : ''}
+                      {selectedPatient ? getInitials(selectedPatient.name) : ""}
                     </AvatarFallback>
                   </Avatar>
                   <div>
                     <h2 className="font-semibold">{selectedPatient?.name}</h2>
                     <p className="text-sm text-gray-400">
-                      {selectedPatient?.language === 'french' ? 'French' : 'English'} • {selectedPatient?.email}
+                      {selectedPatient?.language === "french" ? "French" : "English"} •{" "}
+                      {selectedPatient?.email}
                     </p>
                   </div>
                 </div>
               </div>
-              
+
               {/* Messages area */}
               <ScrollArea className="flex-1 p-4">
                 {messagesLoading ? (
@@ -222,13 +221,13 @@ export default function MessagesPage() {
                           {dateMessages.map((message) => (
                             <div
                               key={message.id}
-                              className={`flex ${message.isFromPatient ? 'justify-start' : 'justify-end'}`}
+                              className={`flex ${message.isFromPatient ? "justify-start" : "justify-end"}`}
                             >
                               <div
                                 className={`max-w-[80%] rounded-lg p-3 ${
                                   message.isFromPatient
-                                    ? 'bg-gray-800 text-gray-100'
-                                    : 'bg-blue-600 text-white'
+                                    ? "bg-gray-800 text-gray-100"
+                                    : "bg-blue-600 text-white"
                                 }`}
                               >
                                 <div className="mb-1">
@@ -249,11 +248,13 @@ export default function MessagesPage() {
                 ) : (
                   <div className="flex flex-col items-center justify-center h-full text-gray-500">
                     <p>No messages yet</p>
-                    <p className="text-sm mt-1">Start a conversation with {selectedPatient?.name}</p>
+                    <p className="text-sm mt-1">
+                      Start a conversation with {selectedPatient?.name}
+                    </p>
                   </div>
                 )}
               </ScrollArea>
-              
+
               {/* Message input */}
               <div className="p-4 border-t border-gray-800">
                 <div className="flex space-x-2">
@@ -263,7 +264,7 @@ export default function MessagesPage() {
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter' && !e.shiftKey) {
+                      if (e.key === "Enter" && !e.shiftKey) {
                         e.preventDefault();
                         handleSendMessage();
                       }
