@@ -7,6 +7,11 @@ vite.config.ts.*
 # Local Netlify folder
 .netlify
 
+# Environment files with secrets
+.env
+.env.*
+!.env.example
+
 # Large media files
 *.mp4
 *.avi
@@ -18,3 +23,13 @@ vite.config.ts.*
 # Large image directories
 images for the website instanthpi/
 dist/public/images for the website instanthpi/
+
+# Logs
+*.log
+backend.log
+frontend.log
+vite-output.log
+dev-output.log
+
+# Local state
+.local/
