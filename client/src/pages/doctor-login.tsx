@@ -87,6 +87,7 @@ export default function DoctorLogin() {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }

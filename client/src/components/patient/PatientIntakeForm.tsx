@@ -340,15 +340,16 @@ export function PatientIntakeForm() {
       P5: "bg-blue-600 text-white",
     };
 
-    // Generate HPI confirmation summary
-    const hpiSummary = `Patient ${gender === "female" ? "de sexe féminin" : gender === "male" ? "de sexe masculin" : ""} âgé(e) de ${age} ans présente:
-• Plainte principale: ${reasonForVisit}
+    // Generate HPI confirmation summary (strict template)
+    const genderLabel = gender === "female" ? "Femme" : gender === "male" ? "Homme" : "Non précisé";
+    const hpiSummary = `Patient: ${genderLabel}, ${age ? `${age} ans` : "Âge non précisé"}
+• Plainte principale: ${reasonForVisit || "Non spécifié"}
 • Début: ${problemStartDate || "Non spécifié"}
 • Localisation: ${symptomLocation || "Non spécifié"}
-• Sévérité: ${severity}/10
+• Sévérité: ${severity ? `${severity}/10` : "Non spécifié"}
 • Facteurs aggravants: ${symptomAggravators || "Aucun"}
 • Facteurs soulageants: ${symptomRelievers || "Aucun"}
-• Symptômes associés: ${selectedSymptoms.join(", ") || "Aucun"}
+• Symptômes associés: ${selectedSymptoms.length ? selectedSymptoms.join(", ") : "Aucun"}
 • Conditions chroniques: ${chronicConditions || "Aucune"}
 • Allergies: ${medicationAllergies || "Aucune"}`;
 

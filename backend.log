@@ -1,0 +1,25 @@
+🔑 Spruce Health API Configuration:
+📋 Access ID: aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I=
+🔐 Bearer Token: Configured
+No authentic fax credentials provided - fax functionality will be disabled
+Using Gmail SMTP configuration with direct settings
+No authentic fax credentials provided - fax functionality will be disabled
+Seeding database with sample data...
+Created patient: Marie Dubois
+Created patient: Jean Tremblay
+Created patient: Sarah Johnson
+Created patient: Robert Chen
+Database seeding completed successfully
+1:16:18 AM [express] Server is running at http://localhost:3000
+1:16:18 AM [express] Webhook server is listening at http://localhost:3003
+SMTP connection established successfully
+Email service is ready to send messages
+1:16:44 AM [express] GET /api/health 200 in 27ms
+Browserslist: browsers data (caniuse-lite) is 10 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+1:16:57 AM [express] GET /api/patients 302 in 1ms
+1:17:14 AM [express] GET /api/test 200 in 5ms
+1:17:27 AM [express] GET /api/ollama/health 200 in 3ms
+1:17:42 AM [express] POST /api/anthropic/test 200 in 3ms
+1:17:50 AM [express] POST /api/anthropic/test 200 in 3ms

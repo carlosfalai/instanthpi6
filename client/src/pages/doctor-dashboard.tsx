@@ -619,42 +619,19 @@ export default function DoctorDashboard() {
 
 // Hero banner (fixed: Butler image)
 function HeroBanner() {
-  const [url, setUrl] = React.useState<string>("/images/butler.jpg");
-
-  React.useEffect(() => {
-    // Try to locate a file containing "butler" in the manifest
-    (async () => {
-      try {
-        const res = await fetch("/api/assets/images", { headers: { "Cache-Control": "no-cache" } });
-        const data = await res.json();
-        const files: any[] = Array.isArray(data?.files) ? data.files : [];
-        const candidate = files.find((f: any) => {
-          const n = String(f?.name || "");
-          const u = String(f?.url || "");
-          const fromImages =
-            u.startsWith("/images/") || u.startsWith("/images%20for%20the%20website%20instanthpi/");
-          return fromImages && /butler/i.test(n);
-        });
-        if (candidate?.url) setUrl(String(candidate.url));
-      } catch {}
-    })();
-  }, []);
+  // Use the butler/concierge image directly
+  const butlerImagePath = "/images for the website instanthpi/3L8EyD88IwLJg1Kwc13D2.png";
 
   return (
-    <div className="mb-8 rounded-xl overflow-hidden border">
+    <div className="mb-8 bg-white rounded-xl overflow-hidden border shadow-sm">
       <img
-        src={url}
-        alt="InstantHPI"
-        className="w-full h-24 sm:h-28 md:h-32 lg:h-36 object-cover"
+        src={butlerImagePath}
+        alt="InstantHPI Medical Concierge"
+        className="w-full h-auto max-h-[300px] object-contain"
         onError={(e) => {
+          // Fallback to placeholder if image doesn't load
           const t = e.currentTarget as HTMLImageElement;
-          if (!t.dataset.fallback1) {
-            t.dataset.fallback1 = "1";
-            t.src = "/instanthpi-hero.jpg";
-          } else if (!t.dataset.fallback2) {
-            t.dataset.fallback2 = "1";
-            t.src = "/instanthpi-beach.jpg";
-          }
+          t.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect fill='%23f3f4f6' width='400' height='200'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-family='sans-serif' font-size='20'%3EInstantHPI%3C/text%3E%3C/svg%3E";
         }}
       />
     </div>
