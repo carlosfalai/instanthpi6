@@ -6,3 +6,15 @@ vite.config.ts.*
 *.tar.gz
 # Local Netlify folder
 .netlify
+
+# Large media files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+*.gif
+
+# Large image directories
+images for the website instanthpi/
+dist/public/images for the website instanthpi/
