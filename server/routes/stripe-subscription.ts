@@ -4,9 +4,9 @@ import { createClient } from "@supabase/supabase-js";
 
 const router = express.Router();
 
-// Initialize Stripe with your LIVE keys
+// Initialize Stripe with environment variable
 const stripe = new Stripe(
-  "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",
+  process.env.STRIPE_SECRET_KEY || "",
   {
     apiVersion: "2025-03-31.basil" as any,
   }
