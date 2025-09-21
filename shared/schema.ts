@@ -236,6 +236,12 @@ export const aiSettings = pgTable("ai_settings", {
   pendingItemsTrackingEnabled: boolean("pending_items_tracking_enabled").default(true),
   billingOptimizationEnabled: boolean("billing_optimization_enabled").default(true),
   functionalMedicineEnabled: boolean("functional_medicine_enabled").default(false), // New field for functional medicine
+  // AI Model Configuration
+  preferredAiProvider: text("preferred_ai_provider").default("openai"), // 'openai' or 'claude'
+  openaiApiKey: text("openai_api_key"), // Doctor's OpenAI API key
+  claudeApiKey: text("claude_api_key"), // Doctor's Claude API key
+  openaiModel: text("openai_model").default("gpt-4o"), // OpenAI model to use
+  claudeModel: text("claude_model").default("claude-3-5-sonnet-20241022"), // Claude model to use
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
@@ -252,6 +258,11 @@ export const insertAiSettingsSchema = createInsertSchema(aiSettings).pick({
   pendingItemsTrackingEnabled: true,
   billingOptimizationEnabled: true,
   functionalMedicineEnabled: true,
+  preferredAiProvider: true,
+  openaiApiKey: true,
+  claudeApiKey: true,
+  openaiModel: true,
+  claudeModel: true,
 });
 
 export type AiSettings = typeof aiSettings.$inferSelect;

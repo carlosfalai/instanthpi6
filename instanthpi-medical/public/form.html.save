@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>InstantHPI - Formulaire Patient</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        #google_translate_element {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .form-group { 
+            margin-bottom: 20px; 
+        }
+        label { 
+            display: block; 
+            font-weight: bold; 
+            margin-bottom: 5px;
+            color: #34495e;
+        }
+        .required {
+            color: #e74c3c;
+        }
+        input[type="text"], input[type="number"], input[type="date"], select, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        input[type="date"] {
+            position: relative;
+            padding-right: 30px;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+        }
+        textarea {
+            min-height: 80px;
+            resize: verticalæ«        }
+        button { 
+            background: #3498db; 
+            color: white; 
+            padding: 12px 20px; 
+            border: none; 
+            border-radius: 4px;
+            cursor: pointer; 
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .patient-id-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        #randomNameButton {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007BFF; 
+            color: white;
+            font-weight: bold;        
+            cursor: pointer;
+            width: auto;
+        }
+        #randomNameButton:hover {
+            background-color: #0056b3;
+        }
+        #patientIdField {
+            font-size: 18px !important;
+            padding: 15px !important;
+            text-align: center;
+            background-color: #f8f9fa;
+            border: 2px solid #007BFF;
+            font-weight: bold;
+            color: #2c3e50;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.2);
+            width: 100%;
+        }
+        #patientIdField:focus {
+            outline: none;
+            border-color: #0056b3;
+            box-shadow: 0 2px 12px rgba(0,123,255,0.3);
+        }
+        .success-container {
+            display: none;
+            width: auto;
+            max-width: 500px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 2px solid #bbb;
+            border-radius: 4px;
+            background-color: #fff;
+            text-align: center;
+        }
+        .success-title {
+            font-size: 24px;
+            color: #4CAF50;
+        }
+        .success-message {
+            font-size: 16px;
+            color: #333;
+            margin-top: 10px;
+        }
+        .success-image {
+            margin-top: 20px;
+            width: 100%;
+            border-radius: 4px;
+        }
+        .range-value {
+            text-align: center;
+            font-weight: bold;
+            color: #3498db;
+            margin-top: 5px;
+        }
+        .info-text {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        .symptom-section {
+            grid-column: 1 / -1;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .symptom-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .symptom-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+        .checkbox-item input[type="checkbox"] {
+            margin-right: 8px;
+            width: auto;
+        }
+        .checkbox-item label {
+            font-weight: normal;
+            margin-bottom: 0;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .other-symptom {
+            grid-column: 1 / -1;
+            margin-top: 15px;
+            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+        }
+        .other-symptom input[type="text"] {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="google_translate_element"></div>
+    
+    <div class="form-container" id="formContainer">
+        <h1>InstantHPI - Formulaire Patient</h1>
+        
+        <form id="patientForm">
+            <div class="form-group">
+                <label>ID Patient:</label>
+                <div class="patient-id-container">
+                    <input type="button" id="randomNameButton" value="Generate Patient ID" onclick="generateRandomName()">
+                    <input name="patientId" id="patientIdField" required readonly placeholder="L'ID du patient apparaîtra ici">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Sexe:</label>
+                <select name="gender" required>
+                    <option value="">Sélectionner</option>
+                    <option value="Homme">Homme</option>
+                    <option value="Femme">Femme</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Âge:</label>
+                <input type="number" name="age" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Qu'est-ce qui vous amène à la clinique aujourd'hui?</label>
+                <textarea name="chiefComplaint" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Quand ce problème a-t-il commencé? <span class="required">*</span></label>
+                <input type="date" name="startDate" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Y a-t-il eu un déclencheur spécifique?</label>
+                <input type="text" name="trigger" placeholder="Ex: effort physique, repas, stress...">
+            </div>
+            
+            <div class="form-group">
+                <label>Où le symptôme est-il localisé?</label>
+                <input type="text" name="location" placeholder="Ex: poitrine, tête, abdomen..." required>
+            </div>
+            
+            <div class="form-group">
+                <label>Comment décririez-vous votre symptôme?</label>
+                <textarea name="description" placeholder="Décrivez la nature du symptôme (douleur, brûlure, pression, etc.)" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Qu'est-ce qui aggrave le symptôme?</label>
+                <input type="text" name="worsening" placeholder="Ex: mouvement, respiration, alimentation...">
+            </div>
+            
+            <div class="form-group">
+                <label>Qu'est-ce qui soulage le symptôme?</label>
+                <input type="text" name="relief" placeholder="Ex: repos, médicaments, position...">
+            </div>
+            
+            <div class="form-group">
+                <label>Sur une échelle de 0 à 10, quelle est la gravité de votre symptôme?</label>
+                <input type="range" id="severity" name="severity" min="0" max="10" value="5" required>
+                <div class="range-value" id="severityValue">5</div>
+            </div>
+            
+            <div class="form-group">
+                <label>Comment le symptôme a-t-il évolué au fil du temps?</label>
+                <select name="evolution">
+                    <option value="">Sélectionner</option>
+                    <option value="Stable">Stable</option>
+                    <option value="S'améliore">S'améliore</option>
+                    <option value="S'aggrave">S'aggrave</option>
+                    <option value="Variable">Variable</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Ressentez-vous l'un des symptômes suivants?</label>
+                <div class="checkbox-group">
+                    <div class="symptom-section">
+                        <div class="symptom-items">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom19" name="associatedSymptoms" value="Difficulté à respirer">
+                                <label for="symptom19">Difficulté à respirer</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom20" name="associatedSymptoms" value="Toux">
+                                <label for="symptom20">Toux</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom21" name="associatedSymptoms" value="Oppression thoracique ou respiration sifflante">
+                                <label for="symptom21">Oppression thoracique ou respiration sifflante</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom22" name="associatedSymptoms" value="Toux avec sang">
+                                <label for="symptom22">Toux avec sang</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="symptom-section">
+                        <div class="symptom-items">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom23" name="associatedSymptoms" value="Douleur thoracique">
+                                <label for="symptom23">Douleur thoracique</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom24" name="associatedSymptoms" value="Palpitations">
+                                <label for="symptom24">Palpitations</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom25" name="associatedSymptoms" value="Gonflement des jambes ou des pieds">
+                                <label for="symptom25">Gonflement des jambes ou des pieds</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom26" name="associatedSymptoms" value="Étourdissements">
+                                <label for="symptom26">Étourdissements</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="symptom-section">
+                        <div class="symptom-items">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom6" name="associatedSymptoms" value="Nausée ou vomissement">
+                                <label for="symptom6">Nausée ou vomissement</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom7" name="associatedSymptoms" value="Diarrhée">
+                                <label for="symptom7">Diarrhée</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom8" name="associatedSymptoms" value="Douleur abdominale">
+                                <label for="symptom8">Douleur abdominale</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom9" name="associatedSymptoms" value="Constipation">
+                                <label for="symptom9">Constipation</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom10" name="associatedSymptoms" value="Sang dans les selles">
+                                <label for="symptom10">Sang dans les selles</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom11" name="associatedSymptoms" value="Brûlures d'estomac ou reflux acide">
+                                <label for="symptom11">Brûlures d'estomac ou reflux acide</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom12" name="associatedSymptoms" value="Saignement digestif">
+                                <label for="symptom12">Saignement digestif</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom5" name="associatedSymptoms" value="Perte d'appétit">
+                                <label for="symptom5">Perte d'appétit</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="symptom-section">
+                        <div class="symptom-items">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom13" name="associatedSymptoms" value="Douleur en urinant">
+                                <label for="symptom13">Douleur en urinant</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom14" name="associatedSymptoms" value="Sang dans l'urine">
+                                <label for="symptom14">Sang dans l'urine</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom15" name="associatedSymptoms" value="Augmentation de la fréquence urinaire">
+                                <label for="symptom15">Augmentation de la fréquence urinaire</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom16" name="associatedSymptoms" value="Difficulté à commencer ou arrêter d'uriner">
+                                <label for="symptom16">Difficulté à commencer ou arrêter d'uriner</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom17" name="associatedSymptoms" value="Écoulement vaginal">
+                                <label for="symptom17">Écoulement vaginal</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom18" name="associatedSymptoms" value="Douleur testiculaire">
+                                <label for="symptom18">Douleur testiculaire</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="symptom-section">
+                        <div class="symptom-items">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom27" name="associatedSymptoms" value="Maux de tête">
+                                <label for="symptom27">Maux de tête</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom28" name="associatedSymptoms" value="Faiblesse ou engourdissement">
+                                <label for="symptom28">Faiblesse ou engourdissement</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom29" name="associatedSymptoms" value="Confusion ou perte de mémoire">
+                                <label for="symptom29">Confusion ou perte de mémoire</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="symptom-section">
+                        <div class="symptom-items">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom30" name="associatedSymptoms" value="Éruptions cutanées ou rougeurs">
+                                <label for="symptom30">Éruptions cutanées ou rougeurs</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom31" name="associatedSymptoms" value="Démangeaisons">
+                                <label for="symptom31">Démangeaisons</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom32" name="associatedSymptoms" value="Lésions cutanées ou plaies">
+                                <label for="symptom32">Lésions cutanées ou plaies</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom33" name="associatedSymptoms" value="Perte de cheveux">
+                                <label for="symptom33">Perte de cheveux</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="symptom-section">
+                        <div class="symptom-items">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom34" name="associatedSymptoms" value="Douleur ou raideur articulaire">
+                                <label for="symptom34">Douleur ou raideur articulaire</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom35" name="associatedSymptoms" value="Faiblesse musculaire">
+                                <label for="symptom35">Faiblesse musculaire</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom36" name="associatedSymptoms" value="Mal de dos">
+                                <label for="symptom36">Mal de dos</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="symptom-section">
+                        <div class="symptom-items">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom1" name="associatedSymptoms" value="Fièvre ou frissons">
+                                <label for="symptom1">Fièvre ou frissons</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom2" name="associatedSymptoms" value="Fatigue">
+                                <label for="symptom2">Fatigue</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom3" name="associatedSymptoms" value="Perte ou gain de poids">
+                                <label for="symptom3">Perte ou gain de poids</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom4" name="associatedSymptoms" value="Sueurs nocturnes">
+                                <label for="symptom4">Sueurs nocturnes</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="symptom-section">
+                        <div class="symptom-items">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom37" name="associatedSymptoms" value="Anxiété ou nervosité">
+                                <label for="symptom37">Anxiété ou nervosité</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom38" name="associatedSymptoms" value="Humeur dépressive">
+                                <label for="symptom38">Humeur dépressive</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="symptom39" name="associatedSymptoms" value="Difficulté à s'endormir ou à rester endormi">
+                                <label for="symptom39">Difficulté à s'endormir ou à rester endormi</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="other-symptom">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="symptomOther" name="associatedSymptoms" value="Autre">
+                            <label for="symptomOther">Autre (préciser):</label>
+                        </div>
+                        <input type="text" id="otherSymptom" name="otherSymptomText" placeholder="Veuillez préciser d'autres symptômes">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Avez-vous essayé des traitements ou des remèdes pour ce problème?</label>
+                <textarea name="treatments" placeholder="Listez tous les traitements essayés (médicaments, repos, etc.)"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Les traitements ont-ils été efficaces?</label>
+                <select name="treatmentEffectiveness">
+                    <option value="">Sélectionner</option>
+                    <option value="Oui">Oui</option>
+                    <option value="Non">Non</option>
+                    <option value="Partiellement">Partiellement</option>
+                    <option value="N/A">N/A</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Avez-vous des conditions chroniques?</label>
+                <textarea name="chronicConditions" placeholder="Ex: diabète, hypertension, asthme, eczéma, tabagisme..."></textarea>
+                <div class="info-text">Exemples: diabète, tabagisme, hypertension artérielle, eczéma</div>
+            </div>
+            
+            <div class="form-group">
+                <label>Avez-vous des allergies médicamenteuses connues?</label>
+                <input type="text" name="allergies" placeholder="Listez toutes les allergies médicamenteuses">
+            </div>
+            
+            <div class="form-group">
+                <label>Êtes-vous enceinte ou allaitez-vous?</label>
+                <select name="pregnantBreastfeeding">
+                    <option value="Non">Non</option>
+                    <option value="Enceinte">Enceinte</option>
+                    <option value="Allaitement">Allaitement</option>
+                    <option value="Les deux">Les deux</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Y a-t-il autre chose que nous devrions savoir sur votre état actuel?</label>
+                <textarea name="additionalInfo" placeholder="Toute information supplémentaire pertinente"></textarea>
+            </div>
+            
+            <button type="submit">Soumettre le formulaire</button>
+        </form>
+    </div>
+    
+    <div class="success-container" id="successContainer">
+        <div class="success-title">Succès</div>
+        <div class="success-message">
+            Merci d'avoir rempli le formulaire. Lors de votre rendez-vous, veuillez informer le médecin de votre identifiant <strong id="patientIdDisplay"></strong> afin qu'il puisse retrouver vos informations. Vous pouvez également prendre une photo de cette page.
+        </div>
+        <img class="success-image" src="https://cdn.leonardo.ai/users/3a852f1b-7346-4afa-b984-27d26fbf4eb6/generations/d7fd23ce-26ff-4cc4-ae6c-79968cc77228/408af8e3-d6f6-4cf4-8de5-04d8972e45a1.jpg?w=512" alt="Succès">
+    </div>
+    
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({pageLanguage: 'fr'}, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+    
+    <script>
+        function generateRandomName() {
+            const nouns = [
+                'Nuage', 'Vent', 'Pierre', 'Forêt', 'Prairie', 'Rivière', 'Montagne', 'Océan', 'Étoile', 'Lune',
+                'Fleur', 'Plume', 'Feuille', 'Vallée', 'Ombre', 'Soleil', 'Vague', 'Papillon', 'Flocon', 'Écho',
+                'Crépuscule', 'Pétale', 'Saule', 'Aurore', 'Cascade'
+            ];
+            const randomNum = Math.floor(Math.random() * 1000) + 1;
+            const noun1 = nouns[Math.floor(Math.random() * nouns.length)];
+            const noun2 = nouns[Math.floor(Math.random() * nouns.length)];
+            const randomName = `${randomNum} ${noun1} ${noun2}`;
+            const targetField = document.getElementById('patientIdField');
+            if (targetField) {
+                targetField.value = randomName;
+            }
+        }
+        
+        // Update severity value display
+        document.getElementById('severity').addEventListener('input', function(e) {
+            document.getElementById('severityValue').textContent = e.target.value;
+        });
+        
+        // Enable/disable other symptom text field
+        document.getElementById('symptomOther').addEventListener('change', function(e) {
+            document.getElementById('otherSymptom').disabled = !e.target.checked;
+            if (!e.target.checked) {
+                document.getElementById('otherSymptom').value = '';
+            }
+        });
+        
+        // Generate initial patient ID on page load
+        window.onload = function() {
+            generateRandomName();
+            document.getElementById('otherSymptom').disabled = true;
+        };
+        
+        document.getElementById('patientForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            
+            // Convert date to dd/mm/yyyy format
+            const dateInput = formData.get('startDate');
+            if (dateInput) {
+                const date = new Date(dateInput);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                formData.set('startDate', `${day}/${month}/${year}`);
+            }
+            
+            // Handle checkbox values for associated symptoms
+            const symptoms = [];
+            const checkboxes = document.querySelectorAll('input[name="associatedSymptoms"]:checked');
+            checkboxes.forEach(cb => {
+                if (cb.value === 'Autre' && document.getElementById('otherSymptom').value) {
+                    symptoms.push('Autre: ' + document.getElementById('otherSymptom').value);
+                } else if (cb.value !== 'Autre') {
+                    symptoms.push(cb.value);
+                }
+            });
+            
+            // Create final data object
+            const data = Object.fromEntries(formData);
+            data.associatedSymptoms = symptoms.join(', ');
+            delete data.otherSymptomText; // Remove the separate other symptom field
+            
+            const patientId = data.patientId;
+            
+            try {
+                const response = await fetch('/submit-form', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Hide form and show success message
+                    document.getElementById('formContainer').style.display = 'none';
+                    document.getElementById('successContainer').style.display = 'block';
+                    document.getElementById('patientIdDisplay').textContent = patientId;
+                    
+                    // Open report in new tab after delay
+                    if (result.reportFile) {
+                        setTimeout(() => {
+                            window.open('/reports/' + result.reportFile, '_blank');
+                        }, 2000);
+                    }
+                } else {
+                    alert('Erreur: ' + (result.error || 'Une erreur est survenue'));
+                }
+            } catch (error) {
+                alert('Erreur de connexion au serveur');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -42,11 +42,12 @@ import priorityAIRouter from "./routes/priority-ai-routes";
 import documentsRouter from "./routes/documents";
 import interconsultationRouter from "./routes/interconsultation";
 import assetsRouter from "./routes/assets";
-import { router as medicalTranscriptionRouter } from "./routes/medical-transcription";
+import medicalTranscriptionRouter from "./routes/medical-transcription";
 import { router as triageGenerationRouter } from "./routes/triage-generation";
 import { router as twilioAuthRouter } from "./routes/twilio-auth";
 import consultationsSearchRouter from "./routes/consultations-search";
 import unifiedMedicalProcessingRouter from "./routes/unified-medical-processing";
+import aiSettingsRouter from "./routes/ai-settings";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -54,15 +55,32 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Setup Spruce Health API
-const spruceApi = axios.create({
-  baseURL: "https://api.sprucehealth.com/v1",
-  headers: {
-    Authorization: `Bearer ${process.env.SPRUCE_API_KEY || "YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0="}`,
-    "Content-Type": "application/json",
-    "s-access-id": process.env.SPRUCE_ACCESS_ID || "aid_LxXFZ5pBbKpMMJn07kHGSd4wE+I=",
-  },
-});
+// Setup Spruce Health API - USER-SPECIFIC (NO SHARED CREDENTIALS)
+// Each doctor must provide their own Spruce credentials
+const createSpruceApi = (apiKey: string, accessId: string) => {
+  return axios.create({
+    baseURL: "https://api.sprucehealth.com/v1",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "s-access-id": accessId,
+    },
+  });
+};
+
+// Helper function to get user-specific Spruce API client
+const getUserSpruceApi = () => {
+  // TODO: Get from authenticated user's profile instead of environment
+  // For now, using environment variables as fallback
+  const apiKey = process.env.SPRUCE_API_KEY || "";
+  const accessId = process.env.SPRUCE_ACCESS_ID || "";
+  
+  if (!apiKey || !accessId) {
+    throw new Error("Spruce API credentials not configured for this user");
+  }
+  
+  return createSpruceApi(apiKey, accessId);
+};
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Register our API routers
@@ -226,8 +244,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const today = new Date().toISOString().split("T")[0];
 
       try {
+        // Get user's Spruce credentials from their profile
+        const userSpruceApi = getUserSpruceApi();
+        
         // Call the Spruce Health API to get today's messages for this patient
-        const response = await spruceApi.get(`/patients/${patientId}/messages`, {
+        const response = await userSpruceApi.get(`/patients/${patientId}/messages`, {
           params: {
             date_from: `${today}T00:00:00Z`,
             date_to: `${today}T23:59:59Z`,
@@ -570,8 +591,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       try {
+        // Get user's Spruce credentials from their profile
+        const userSpruceApi = getUserSpruceApi();
+        
         // Send the message through Spruce API
-        const spruceResponse = await spruceApi.post(`/messages`, {
+        const spruceResponse = await userSpruceApi.post(`/messages`, {
           patient_id: patientId,
           content: message,
           message_type: messageType || "GENERAL",
@@ -752,7 +776,8 @@ ${hpiSummary}
 Is this information correct? If not, please let us know what needs to be corrected.`;
 
         // Send the message through Spruce API
-        const spruceResponse = await spruceApi.post(`/messages`, {
+        const userSpruceApi = getUserSpruceApi();
+        const spruceResponse = await userSpruceApi.post(`/messages`, {
           patient_id: patientId,
           content: welcomeMessage,
           message_type: "MEDICAL",
@@ -853,7 +878,8 @@ ${hpiSummary}
 Is this information correct? If not, please let us know what needs to be corrected.`;
 
         // Send the message through Spruce API
-        const spruceResponse = await spruceApi.post(`/messages`, {
+        const userSpruceApi = getUserSpruceApi();
+        const spruceResponse = await userSpruceApi.post(`/messages`, {
           patient_id: patientId,
           content: welcomeMessage,
           message_type: "MEDICAL",
@@ -923,6 +949,7 @@ Is this information correct? If not, please let us know what needs to be correct
   app.use("/api/priority-ai", priorityAIRouter);
   app.use("/api/documents", documentsRouter);
   app.use("/api/interconsultation", interconsultationRouter);
+  app.use("/api/ai-settings", aiSettingsRouter);
 
   const httpServer = createServer(app);
   return httpServer;

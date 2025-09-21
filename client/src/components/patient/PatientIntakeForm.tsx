@@ -113,42 +113,238 @@ export function PatientIntakeForm() {
 
   const [triageResult, setTriageResult] = useState<any>(null);
 
-  // Fill test data for quick testing
+  // Fill test data for quick testing - 10 different random patients
   const fillTestData = () => {
     // Generate test ID
     const testId = generateDeIdentifiedId();
 
-    // Fill all form fields with realistic test data
-    setGender("male");
-    setAge("45");
-    setReasonForVisit("Sharp chest pain that started this morning, feeling short of breath");
-    setProblemStartDate("This morning around 8 AM");
-    setSpecificTrigger("Started after climbing stairs to my office");
-    setSymptomLocation("Left side of chest, radiating to left arm");
-    setSymptomDescription(
-      "Sharp, stabbing pain that comes in waves. Gets worse when I take deep breaths. Also feeling lightheaded and nauseous."
-    );
-    setSymptomAggravators("Deep breathing, movement, lying flat");
-    setSymptomRelievers("Sitting upright, staying still");
-    setSeverity("8");
-    setSymptomProgression("getting_worse");
-    setSelectedSymptoms([
-      "Chest pain",
-      "Shortness of breath",
-      "Nausea",
-      "Dizziness",
-      "Heart palpitations",
-    ]);
-    setTreatmentsAttempted("Took 2 Tylenol about an hour ago, tried resting");
-    setTreatmentEffectiveness(
-      "Tylenol didn't help much, resting helped a little but pain persists"
-    );
-    setChronicConditions("High blood pressure, family history of heart disease");
-    setMedicationAllergies("Penicillin - causes rash");
-    setPregnancyStatus("not_applicable");
-    setAdditionalNotes(
-      "I'm worried this might be a heart attack. My father had one at age 50. I've been under a lot of stress at work lately."
-    );
+    // Array of 10 different patient scenarios
+    const testPatients = [
+      {
+        gender: "male",
+        age: "45",
+        reasonForVisit: "Sharp chest pain that started this morning, feeling short of breath",
+        problemStartDate: "This morning around 8 AM",
+        specificTrigger: "Started after climbing stairs to my office",
+        symptomLocation: "Left side of chest, radiating to left arm",
+        symptomDescription: "Sharp, stabbing pain that comes in waves. Gets worse when I take deep breaths. Also feeling lightheaded and nauseous.",
+        symptomAggravators: "Deep breathing, movement, lying flat",
+        symptomRelievers: "Sitting upright, staying still",
+        severity: "8",
+        symptomProgression: "getting_worse",
+        selectedSymptoms: ["Chest pain", "Shortness of breath", "Nausea", "Dizziness", "Heart palpitations"],
+        treatmentsAttempted: "Took 2 Tylenol about an hour ago, tried resting",
+        treatmentEffectiveness: "Tylenol didn't help much, resting helped a little but pain persists",
+        chronicConditions: "High blood pressure, family history of heart disease",
+        medicationAllergies: "Penicillin - causes rash",
+        pregnancyStatus: "not_applicable",
+        additionalNotes: "I'm worried this might be a heart attack. My father had one at age 50. I've been under a lot of stress at work lately."
+      },
+      {
+        gender: "female",
+        age: "32",
+        reasonForVisit: "Severe headache with visual disturbances",
+        problemStartDate: "Started yesterday evening",
+        specificTrigger: "After working on computer for 8 hours",
+        symptomLocation: "Frontal and temporal regions, both sides",
+        symptomDescription: "Throbbing pain with flashing lights and blind spots in vision",
+        symptomAggravators: "Bright lights, noise, movement",
+        symptomRelievers: "Dark room, cold compress, lying down",
+        severity: "7",
+        symptomProgression: "getting_worse",
+        selectedSymptoms: ["Headache", "Visual disturbances", "Nausea", "Light sensitivity", "Neck stiffness"],
+        treatmentsAttempted: "Ibuprofen, caffeine, rest in dark room",
+        treatmentEffectiveness: "Ibuprofen helped slightly, but symptoms persist",
+        chronicConditions: "Migraine history, anxiety",
+        medicationAllergies: "None known",
+        pregnancyStatus: "not_pregnant",
+        additionalNotes: "I get migraines monthly but this one is different - the visual symptoms are new and more severe."
+      },
+      {
+        gender: "male",
+        age: "67",
+        reasonForVisit: "Difficulty breathing and chest tightness",
+        problemStartDate: "Started 3 days ago",
+        specificTrigger: "Worsened after walking up hill",
+        symptomLocation: "Chest, both sides",
+        symptomDescription: "Feeling like I can't get enough air, chest feels heavy and tight",
+        symptomAggravators: "Physical exertion, lying flat, cold air",
+        symptomRelievers: "Sitting up, warm environment, rest",
+        severity: "6",
+        symptomProgression: "getting_worse",
+        selectedSymptoms: ["Shortness of breath", "Chest tightness", "Cough", "Fatigue", "Swollen ankles"],
+        treatmentsAttempted: "Inhaler, rest, elevated head while sleeping",
+        treatmentEffectiveness: "Inhaler helps temporarily but symptoms return",
+        chronicConditions: "COPD, hypertension, diabetes",
+        medicationAllergies: "Sulfa drugs - causes rash",
+        pregnancyStatus: "not_applicable",
+        additionalNotes: "I've been using my inhaler more frequently. My ankles have been swollen for the past week."
+      },
+      {
+        gender: "female",
+        age: "28",
+        reasonForVisit: "Severe abdominal pain and nausea",
+        problemStartDate: "Started 6 hours ago",
+        specificTrigger: "After eating spicy food",
+        symptomLocation: "Right lower abdomen",
+        symptomDescription: "Sharp, cramping pain that comes and goes, getting more constant",
+        symptomAggravators: "Movement, deep breathing, pressure on abdomen",
+        symptomRelievers: "Lying still, heat pack",
+        severity: "8",
+        symptomProgression: "getting_worse",
+        selectedSymptoms: ["Abdominal pain", "Nausea", "Vomiting", "Fever", "Loss of appetite"],
+        treatmentsAttempted: "Pepto-Bismol, heating pad, rest",
+        treatmentEffectiveness: "Nothing has helped, pain is getting worse",
+        chronicConditions: "None",
+        medicationAllergies: "None known",
+        pregnancyStatus: "not_pregnant",
+        additionalNotes: "I've been vomiting and can't keep food down. The pain started around my belly button and moved to the right side."
+      },
+      {
+        gender: "male",
+        age: "54",
+        reasonForVisit: "Back pain with leg numbness",
+        problemStartDate: "Started 2 weeks ago",
+        specificTrigger: "After lifting heavy boxes at work",
+        symptomLocation: "Lower back, radiating to right leg",
+        symptomDescription: "Sharp pain in lower back with tingling and numbness down right leg",
+        symptomAggravators: "Sitting, standing, walking, bending",
+        symptomRelievers: "Lying down, heat, gentle stretching",
+        severity: "7",
+        symptomProgression: "staying_same",
+        selectedSymptoms: ["Back pain", "Leg numbness", "Leg weakness", "Difficulty walking", "Muscle spasms"],
+        treatmentsAttempted: "Ibuprofen, heat therapy, rest, chiropractor",
+        treatmentEffectiveness: "Temporary relief with heat and rest, but pain returns",
+        chronicConditions: "Previous back injury, arthritis",
+        medicationAllergies: "Codeine - causes nausea",
+        pregnancyStatus: "not_applicable",
+        additionalNotes: "I can't work because of the pain. The numbness in my leg is getting worse and I'm having trouble walking."
+      },
+      {
+        gender: "female",
+        age: "41",
+        reasonForVisit: "Dizziness and balance problems",
+        problemStartDate: "Started this morning",
+        specificTrigger: "When getting out of bed",
+        symptomLocation: "Head, general feeling",
+        symptomDescription: "Feeling like the room is spinning, unsteady on my feet",
+        symptomAggravators: "Moving head, standing up, walking",
+        symptomRelievers: "Sitting still, closing eyes",
+        severity: "6",
+        symptomProgression: "getting_worse",
+        selectedSymptoms: ["Dizziness", "Balance problems", "Nausea", "Headache", "Ear ringing"],
+        treatmentsAttempted: "Rest, staying hydrated, avoiding sudden movements",
+        treatmentEffectiveness: "Rest helps temporarily but symptoms return with movement",
+        chronicConditions: "Meniere's disease, anxiety",
+        medicationAllergies: "None known",
+        pregnancyStatus: "not_pregnant",
+        additionalNotes: "I have a history of Meniere's disease but this episode is more severe than usual. I'm having trouble walking without holding onto things."
+      },
+      {
+        gender: "male",
+        age: "39",
+        reasonForVisit: "Skin rash with itching",
+        problemStartDate: "Started 4 days ago",
+        specificTrigger: "After using new laundry detergent",
+        symptomLocation: "Arms, chest, and back",
+        symptomDescription: "Red, raised bumps that are very itchy, some areas are oozing",
+        symptomAggravators: "Heat, sweating, scratching",
+        symptomRelievers: "Cool water, antihistamine cream",
+        severity: "5",
+        symptomProgression: "getting_worse",
+        selectedSymptoms: ["Skin rash", "Itching", "Redness", "Swelling", "Blisters"],
+        treatmentsAttempted: "Hydrocortisone cream, antihistamines, oatmeal bath",
+        treatmentEffectiveness: "Cream helps with itching temporarily but rash is spreading",
+        chronicConditions: "Eczema, seasonal allergies",
+        medicationAllergies: "None known",
+        pregnancyStatus: "not_applicable",
+        additionalNotes: "I switched to a new laundry detergent and the rash appeared a few days later. It's spreading to new areas."
+      },
+      {
+        gender: "female",
+        age: "35",
+        reasonForVisit: "Severe fatigue and joint pain",
+        problemStartDate: "Started 1 week ago",
+        specificTrigger: "After viral infection",
+        symptomLocation: "Multiple joints, whole body",
+        symptomDescription: "Extreme tiredness with pain in wrists, knees, and shoulders",
+        symptomAggravators: "Movement, cold weather, stress",
+        symptomRelievers: "Rest, warm baths, gentle massage",
+        severity: "6",
+        symptomProgression: "getting_worse",
+        selectedSymptoms: ["Fatigue", "Joint pain", "Muscle aches", "Fever", "Swollen lymph nodes"],
+        treatmentsAttempted: "Rest, ibuprofen, warm baths",
+        treatmentEffectiveness: "Rest helps but pain and fatigue persist",
+        chronicConditions: "None",
+        medicationAllergies: "None known",
+        pregnancyStatus: "not_pregnant",
+        additionalNotes: "I had a cold last week and these symptoms started after I thought I was getting better. I can barely get out of bed."
+      },
+      {
+        gender: "male",
+        age: "61",
+        reasonForVisit: "Memory problems and confusion",
+        problemStartDate: "Started 2 weeks ago",
+        specificTrigger: "Noticed by family members",
+        symptomLocation: "Mental/cognitive",
+        symptomDescription: "Forgetting recent events, getting lost in familiar places, difficulty finding words",
+        symptomAggravators: "Stress, fatigue, unfamiliar situations",
+        symptomRelievers: "Routine, familiar environment, rest",
+        severity: "7",
+        symptomProgression: "getting_worse",
+        selectedSymptoms: ["Memory problems", "Confusion", "Difficulty concentrating", "Mood changes", "Sleep problems"],
+        treatmentsAttempted: "Memory exercises, maintaining routine, family support",
+        treatmentEffectiveness: "Routine helps but symptoms are worsening",
+        chronicConditions: "Hypertension, diabetes, family history of dementia",
+        medicationAllergies: "None known",
+        pregnancyStatus: "not_applicable",
+        additionalNotes: "My family is concerned about my memory. I've been getting lost driving to familiar places and forgetting conversations we just had."
+      },
+      {
+        gender: "female",
+        age: "26",
+        reasonForVisit: "Anxiety and panic attacks",
+        problemStartDate: "Started 3 weeks ago",
+        specificTrigger: "Work stress and upcoming presentation",
+        symptomLocation: "Chest, whole body",
+        symptomDescription: "Feeling of impending doom, rapid heartbeat, sweating, trembling",
+        symptomAggravators: "Stress, crowds, public speaking",
+        symptomRelievers: "Deep breathing, quiet environment, distraction",
+        severity: "7",
+        symptomProgression: "getting_worse",
+        selectedSymptoms: ["Anxiety", "Panic attacks", "Rapid heartbeat", "Sweating", "Trembling"],
+        treatmentsAttempted: "Deep breathing exercises, meditation, avoiding triggers",
+        treatmentEffectiveness: "Breathing helps during attacks but they're becoming more frequent",
+        chronicConditions: "None",
+        medicationAllergies: "None known",
+        pregnancyStatus: "not_pregnant",
+        additionalNotes: "I have a big presentation at work next week and I'm having panic attacks daily. I can't sleep and I'm afraid to leave the house."
+      }
+    ];
+
+    // Randomly select one of the 10 patients
+    const randomIndex = Math.floor(Math.random() * testPatients.length);
+    const selectedPatient = testPatients[randomIndex];
+
+    // Fill form with selected patient data
+    setGender(selectedPatient.gender);
+    setAge(selectedPatient.age);
+    setReasonForVisit(selectedPatient.reasonForVisit);
+    setProblemStartDate(selectedPatient.problemStartDate);
+    setSpecificTrigger(selectedPatient.specificTrigger);
+    setSymptomLocation(selectedPatient.symptomLocation);
+    setSymptomDescription(selectedPatient.symptomDescription);
+    setSymptomAggravators(selectedPatient.symptomAggravators);
+    setSymptomRelievers(selectedPatient.symptomRelievers);
+    setSeverity(selectedPatient.severity);
+    setSymptomProgression(selectedPatient.symptomProgression);
+    setSelectedSymptoms(selectedPatient.selectedSymptoms);
+    setTreatmentsAttempted(selectedPatient.treatmentsAttempted);
+    setTreatmentEffectiveness(selectedPatient.treatmentEffectiveness);
+    setChronicConditions(selectedPatient.chronicConditions);
+    setMedicationAllergies(selectedPatient.medicationAllergies);
+    setPregnancyStatus(selectedPatient.pregnancyStatus);
+    setAdditionalNotes(selectedPatient.additionalNotes);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -247,34 +443,41 @@ export function PatientIntakeForm() {
           const timer = setTimeout(() => ctrl.abort(), 4000); // 4s safety timeout
 
           // Ensure patient_id is uppercase and properly formatted
+          // Map form data to existing database schema
           const consultationData = {
             patient_id: patientId.toUpperCase(), // Ensure uppercase
-            gender: triageData.gender,
-            age: triageData.age,
-            chief_complaint: triageData.chief_complaint,
-            problem_start_date: triageData.problem_start_date,
-            specific_trigger: triageData.specific_trigger,
-            symptom_location: triageData.symptom_location,
-            symptom_description: triageData.symptom_description,
-            symptom_aggravators: triageData.symptom_aggravators,
-            symptom_relievers: triageData.symptom_relievers,
-            severity: triageData.severity,
-            symptom_progression: triageData.symptom_progression,
-            selected_symptoms: triageData.selected_symptoms,
-            treatments_attempted: triageData.treatments_attempted,
-            treatment_effectiveness: triageData.treatment_effectiveness,
-            chronic_conditions: triageData.chronic_conditions,
-            medication_allergies: triageData.medication_allergies,
-            pregnancy_status: triageData.pregnancy_status,
-            additional_notes: triageData.additional_notes,
-            triage_level: triageResult.triage_level,
-            triage_reasoning: triageResult.reasoning,
-            recommended_action: triageResult.recommended_action,
-            urgency_score: triageResult.urgency_score,
-            ai_analysis: triageResult.full_analysis,
+            chief_complaint: triageData.chief_complaint || "Patient consultation",
             symptoms: triageData.selected_symptoms?.join(", ") || "",
-            status: "triaged",
-            created_at: new Date().toISOString(),
+            duration: triageData.problem_start_date || "Unknown",
+            severity: triageData.severity || 5,
+            current_medications: triageData.treatments_attempted || "",
+            allergies: triageData.medication_allergies || "",
+            status: "pending", // Use 'pending' instead of 'triaged' to match schema
+            // Map to existing database fields
+            location: triageData.symptom_location || "",
+            trigger: triageData.specific_trigger || "",
+            aggravating_factors: triageData.symptom_aggravators || "",
+            relieving_factors: triageData.symptom_relievers || "",
+            evolution: triageData.symptom_progression || "",
+            associated_symptoms: triageData.symptom_description || "",
+            treatments_tried: triageData.treatments_attempted || "",
+            treatment_response: triageData.treatment_effectiveness || "",
+            chronic_conditions: triageData.chronic_conditions || "",
+            pregnancy_breastfeeding: triageData.pregnancy_status || "",
+            other_notes: triageData.additional_notes || "",
+            // Store AI analysis in form_data as JSON
+            form_data: {
+              triage_level: triageResult.triage_level,
+              triage_reasoning: triageResult.reasoning,
+              recommended_action: triageResult.recommended_action,
+              urgency_score: triageResult.urgency_score,
+              ai_analysis: triageResult.full_analysis,
+              gender: triageData.gender,
+              age: triageData.age,
+              problem_start_date: triageData.problem_start_date,
+              symptom_description: triageData.symptom_description,
+              selected_symptoms: triageData.selected_symptoms
+            }
           };
 
           console.log("Saving consultation with patient_id:", consultationData.patient_id);
@@ -340,18 +543,8 @@ export function PatientIntakeForm() {
       P5: "bg-blue-600 text-white",
     };
 
-    // Generate HPI confirmation summary (strict template)
-    const genderLabel = gender === "female" ? "Femme" : gender === "male" ? "Homme" : "Non précisé";
-    const hpiSummary = `Patient: ${genderLabel}, ${age ? `${age} ans` : "Âge non précisé"}
-• Plainte principale: ${reasonForVisit || "Non spécifié"}
-• Début: ${problemStartDate || "Non spécifié"}
-• Localisation: ${symptomLocation || "Non spécifié"}
-• Sévérité: ${severity ? `${severity}/10` : "Non spécifié"}
-• Facteurs aggravants: ${symptomAggravators || "Aucun"}
-• Facteurs soulageants: ${symptomRelievers || "Aucun"}
-• Symptômes associés: ${selectedSymptoms.length ? selectedSymptoms.join(", ") : "Aucun"}
-• Conditions chroniques: ${chronicConditions || "Aucune"}
-• Allergies: ${medicationAllergies || "Aucune"}`;
+    // Use HPI summary from triage result or fallback
+    const hpiSummary = triageResult?.hpi_summary || "Résumé de consultation généré par l'IA";
 
     // Generate 10 follow-up questions based on symptoms
     const followUpQuestions = triageResult?.follow_up_questions || [

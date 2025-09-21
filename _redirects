@@ -1,0 +1,13 @@
+# API redirects to Netlify Functions
+/api/inbox/conversations /.netlify/functions/api-inbox-conversations 200
+/api/spruce/conversations/all /.netlify/functions/api-spruce-conversations-all 200
+/api/spruce/conversations /.netlify/functions/api-spruce-conversations 200
+/api/spruce/conversations/*/history /.netlify/functions/api-spruce-conversation-history 200
+/api/spruce/conversations/* /.netlify/functions/api-spruce-conversations-messages 200
+/api/spruce/webhook /.netlify/functions/spruce-webhook 200
+/api/assets/images /assets/images.json 200
+/api/ollama/triage /.netlify/functions/ollama-triage 200
+/api/ollama/status /.netlify/functions/ollama-status 200
+
+# Redirect all routes to index.html for client-side routing (must be last)
+/* /index.html 200

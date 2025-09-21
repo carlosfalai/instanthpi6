@@ -1,16 +1,9 @@
 import { Router } from "express";
-import axios from "axios";
+import { createUserAIClient } from "../utils/aiClient";
 
 const router = Router();
 
-// Ollama server configuration
-// Build a list of candidate endpoints to try in order of preference
-function getOllamaCandidates() {
-  const fromEnv = process.env.OLLAMA_URL ? [process.env.OLLAMA_URL] : [];
-  // Prefer env, then localhost (developer laptop), then Cloudflare tunnel
-  return [...fromEnv, "http://localhost:11434", "https://ollama.instanthpi.ca"];
-}
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || "llama3.1:8b";
+// AI client will be created per user based on their configuration
 
 // Medical triage prompt based on Canadian Triage Acuity Scale (CTAS)
 const TRIAGE_PROMPT = `You are an expert emergency medicine physician performing medical triage. Based on the patient information provided, determine the appropriate triage level and urgency.
@@ -28,6 +21,12 @@ Analyze the patient's symptoms and provide:
 3. Reasoning (brief medical reasoning for the triage decision)
 4. Recommended Action (specific next steps for the patient)
 5. Full Analysis (detailed medical assessment considering all symptoms)
+6. HPI Summary (French medical confirmation summary for patient)
+7. Follow-up Questions (10 specific French medical questions based on the patient's condition)
+
+For the HPI Summary, generate a natural French paragraph that starts with "Juste pour confirmer avec vous avant de continuer; vous êtes un(e) [gender] de [age] ans" and ends with "; Est-ce que ce résumé est exact ?". Use proper French medical terminology and translate all English terms to French.
+
+For the Follow-up Questions, generate exactly 10 specific French medical questions that a doctor would ask based on the patient's symptoms and condition. Each question should be on a separate line, numbered 1-10.
 
 Patient Information:`;
 
@@ -99,6 +98,8 @@ function parseTriageResponse(response: string) {
   let reasoning = "";
   let recommendedAction = "";
   let fullAnalysis = response;
+  let hpiSummary = "";
+  let followUpQuestions: string[] = [];
 
   // Extract triage level
   const triageLine = lines.find(
@@ -149,6 +150,17 @@ function parseTriageResponse(response: string) {
       .trim();
   }
 
+  // Extract HPI Summary
+  const hpiStart = lines.findIndex((line) => line.toLowerCase().includes("hpi summary"));
+  if (hpiStart !== -1) {
+    const analysisStart = lines.findIndex((line) => line.toLowerCase().includes("full analysis"));
+    const endIndex = analysisStart !== -1 ? analysisStart : hpiStart + 5;
+    hpiSummary = lines
+      .slice(hpiStart + 1, endIndex)
+      .join(" ")
+      .trim();
+  }
+
   return {
     triage_level: triageLevel,
     urgency_score: urgencyScore,
@@ -156,6 +168,7 @@ function parseTriageResponse(response: string) {
     recommended_action:
       recommendedAction || "Please consult with a healthcare provider for proper evaluation.",
     full_analysis: fullAnalysis,
+    hpi_summary: hpiSummary || "Résumé de consultation généré par l'IA",
   };
 }
 
@@ -231,6 +244,11 @@ function ruleBasedTriage(data: TriageRequest) {
             ? "Schedule a primary care visit within 1–2 days."
             : "Self-care measures may be appropriate; monitor symptoms and seek care if worsening.";
 
+  // Generate basic HPI summary for rule-based fallback
+  const genderLabel = data.gender === "female" ? "femme" : data.gender === "male" ? "homme" : "personne";
+  const ageText = data.age ? `${data.age} ans` : "âge non précisé";
+  const fallbackHpiSummary = `Juste pour confirmer avec vous avant de continuer; vous êtes un(e) ${genderLabel} de ${ageText}, présentant ${data.chief_complaint || "des symptômes"} depuis ${data.problem_start_date || "un moment"}; Est-ce que ce résumé est exact ?`;
+
   return {
     triage_level: level,
     urgency_score: score,
@@ -238,6 +256,7 @@ function ruleBasedTriage(data: TriageRequest) {
     recommended_action: recommended,
     full_analysis:
       "AI service unavailable; provided rule-based triage using CTAS-inspired thresholds based on symptoms and severity.",
+    hpi_summary: fallbackHpiSummary,
   };
 }
 
@@ -245,6 +264,10 @@ function ruleBasedTriage(data: TriageRequest) {
 router.post("/triage", async (req, res) => {
   try {
     const patientData: TriageRequest = req.body;
+    
+    // Get user ID from request (you may need to implement authentication middleware)
+    // For now, we'll use a default user ID or get it from the request
+    const userId = req.body.userId || 1; // Default to user 1, should be replaced with actual auth
 
     // Validate required fields
     if (!patientData.patient_id || !patientData.chief_complaint) {
@@ -261,45 +284,33 @@ router.post("/triage", async (req, res) => {
 
     let triageResult: ReturnType<typeof parseTriageResponse> | ReturnType<typeof ruleBasedTriage>;
 
-    // Try multiple candidates in order
-    const candidates = getOllamaCandidates();
-    let aiSucceeded = false;
-    for (const base of candidates) {
-      try {
-        console.log("🤖 Trying Ollama:", base);
-        const ollamaResponse = await axios.post(
-          `${base}/api/generate`,
-          {
-            model: OLLAMA_MODEL,
-            prompt: fullPrompt,
-            stream: false,
-            options: {
-              temperature: 0.1,
-              top_p: 0.9,
-              max_tokens: 1000,
-            },
-          },
-          {
-            timeout: 30000,
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        const aiResponse =
-          ollamaResponse.data?.response || ollamaResponse.data?.message?.content || "";
-        if (typeof aiResponse === "string" && aiResponse.trim().length > 0) {
-          console.log("🤖 Ollama response received:", aiResponse.substring(0, 160) + "…");
-          triageResult = parseTriageResponse(aiResponse);
-          aiSucceeded = true;
-          break;
-        }
-      } catch (err: any) {
-        console.warn(`⚠️ Ollama at ${base} failed:`, err?.message || err);
-        continue;
+    // Use user-specific AI client for triage analysis
+    try {
+      console.log("🤖 Using user-specific AI client for triage analysis");
+      const aiClient = await createUserAIClient(userId);
+      
+      if (!aiClient) {
+        throw new Error("No AI client available for user");
       }
-    }
 
-    if (!aiSucceeded) {
-      console.warn("⚠️ All Ollama endpoints failed. Using rule-based triage.");
+      const systemPrompt = "You are an expert emergency medicine physician performing medical triage using the Canadian Triage and Acuity Scale (CTAS). Provide structured responses for triage level, urgency score, reasoning, recommended action, full analysis, HPI summary, and follow-up questions.";
+      
+      const aiResponse = await aiClient.generateCompletion([
+        {
+          role: "user",
+          content: fullPrompt
+        }
+      ], systemPrompt);
+
+      if (aiResponse.trim().length > 0) {
+        console.log(`🤖 ${aiClient.provider} response received:`, aiResponse.substring(0, 160) + "…");
+        triageResult = parseTriageResponse(aiResponse);
+      } else {
+        throw new Error("Empty response from AI");
+      }
+    } catch (err: any) {
+      console.warn("⚠️ AI client failed:", err?.message || err);
+      console.warn("⚠️ Using rule-based triage fallback.");
       triageResult = ruleBasedTriage(patientData);
     }
 
@@ -321,25 +332,36 @@ router.post("/triage", async (req, res) => {
   }
 });
 
-// GET /api/ollama/status - Check Ollama server status
-router.get("/status", async (_req, res) => {
-  const candidates = getOllamaCandidates();
-  for (const base of candidates) {
-    try {
-      const response = await axios.get(`${base}/api/tags`, { timeout: 5000 });
-      const models = response.data.models || [];
-      return res.json({
-        status: "online",
-        url: base,
-        available_models: models.map((m: any) => m.name),
-        current_model: OLLAMA_MODEL,
-        model_available: models.some((m: any) => m.name === OLLAMA_MODEL),
+// GET /api/ollama/status - Check AI API status for user
+router.get("/status", async (req, res) => {
+  try {
+    const userId = parseInt(req.query.userId as string) || 1; // Default to user 1
+    
+    const aiClient = await createUserAIClient(userId);
+    
+    if (!aiClient) {
+      return res.status(200).json({ 
+        status: "offline", 
+        error: "No AI configuration found for user"
       });
-    } catch (e) {
-      continue;
     }
+
+    // Test the AI client with a simple request
+    await aiClient.generateCompletion([
+      { role: "user", content: "test" }
+    ], "You are a helpful assistant. Respond with 'OK' to confirm the connection.");
+    
+    return res.json({
+      status: "online",
+      provider: aiClient.provider,
+      model: aiClient.model,
+    });
+  } catch (error: any) {
+    return res.status(200).json({ 
+      status: "offline", 
+      error: error?.message || "API unavailable"
+    });
   }
-  return res.status(200).json({ status: "offline", url: candidates[candidates.length - 1] });
 });
 
 export default router;

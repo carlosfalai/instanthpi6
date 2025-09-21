@@ -4,7 +4,7 @@ import path from "path";
 import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { seedDatabase } from "./seed";
+// import { seedDatabase } from "./seed"; // DISABLED - Using real Supabase data instead of fake seed data
 
 const app = express();
 app.use(express.json());
@@ -41,12 +41,13 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Seed the database with initial data
-  try {
-    await seedDatabase();
-  } catch (error) {
-    console.error("Error seeding database:", error);
-  }
+  // DISABLED: Seed the database with initial data
+  // Using real Supabase data instead of fake test data
+  // try {
+  //   await seedDatabase();
+  // } catch (error) {
+  //   console.error("Error seeding database:", error);
+  // }
 
   // Serve project images from attached_assets at /assets in all environments
   // This lets the client reference built-in images without moving binaries

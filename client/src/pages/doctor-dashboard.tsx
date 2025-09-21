@@ -16,6 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 
 interface PatientConsultation {
   id: string;
@@ -64,26 +65,50 @@ export default function DoctorDashboard() {
     completedToday: 0,
   });
 
+  const [docHeader, setDocHeader] = useState<{ name: string; specialty: string; avatarUrl?: string }>({
+    name: "Doctor",
+    specialty: "",
+    avatarUrl: "",
+  });
+
   // French Medical Transcription state for the right panel
   const [generating, setGenerating] = useState(false);
   const [frenchDoc, setFrenchDoc] = useState<{
-    confirmation?: string;
-    soap?: string;
-    plan?: string;
-    telemedicine?: string;
-    followup?: string;
+    hpiConfirmationSummary?: string;
+    followUpQuestions?: string;
+    superSpartanSAP?: string;
+    medicationsReadyToUse?: string;
+    labWorks?: string;
+    imagerieMedicale?: string;
+    referenceSpecialistes?: string;
+    workLeaveCertificate?: string;
+    workplaceModifications?: string;
+    insuranceDocumentation?: string;
+    telemedicineNeedsInPerson?: string;
+    patientMessage?: string;
   }>({});
   const [triageHtml, setTriageHtml] = useState<string>("");
   const [copyToast, setCopyToast] = useState<string | null>(null);
+  const [showRawData, setShowRawData] = useState<boolean>(false);
+  const [customRequest, setCustomRequest] = useState<string>("");
+  const [customResponse, setCustomResponse] = useState<string>("");
+  const [generatingCustom, setGeneratingCustom] = useState<boolean>(false);
 
   // Load doctor AI preferences from localStorage
   type AIPrefs = {
     enableTriage: boolean;
-    enableConfirmation: boolean;
-    enableSOAP: boolean;
-    enablePlan: boolean;
-    enableTelemedicine: boolean;
-    enableQuestions: boolean;
+    enableHpiConfirmationSummary: boolean;
+    enableFollowUpQuestions: boolean;
+    enableSuperSpartanSAP: boolean;
+    enableMedicationsReadyToUse: boolean;
+    enableLabWorks: boolean;
+    enableImagerieMedicale: boolean;
+    enableReferenceSpecialistes: boolean;
+    enableWorkLeaveCertificate: boolean;
+    enableWorkplaceModifications: boolean;
+    enableInsuranceDocumentation: boolean;
+    enableTelemedicineNeedsInPerson: boolean;
+    enablePatientMessage: boolean;
     autoGenerateOnSelect: boolean;
   };
   const PREFS_KEY = "doctor_ai_prefs";
@@ -93,31 +118,52 @@ export default function DoctorDashboard() {
       return raw
         ? {
             enableTriage: true,
-            enableConfirmation: true,
-            enableSOAP: true,
-            enablePlan: true,
-            enableTelemedicine: true,
-            enableQuestions: true,
+            enableHpiConfirmationSummary: true,
+            enableFollowUpQuestions: true,
+            enableSuperSpartanSAP: true,
+            enableMedicationsReadyToUse: true,
+            enableLabWorks: true,
+            enableImagerieMedicale: true,
+            enableReferenceSpecialistes: true,
+            enableWorkLeaveCertificate: true,
+            enableWorkplaceModifications: true,
+            enableInsuranceDocumentation: true,
+            enableTelemedicineNeedsInPerson: true,
+            enablePatientMessage: true,
             autoGenerateOnSelect: true,
             ...JSON.parse(raw),
           }
         : {
             enableTriage: true,
-            enableConfirmation: true,
-            enableSOAP: true,
-            enablePlan: true,
-            enableTelemedicine: true,
-            enableQuestions: true,
+            enableHpiConfirmationSummary: true,
+            enableFollowUpQuestions: true,
+            enableSuperSpartanSAP: true,
+            enableMedicationsReadyToUse: true,
+            enableLabWorks: true,
+            enableImagerieMedicale: true,
+            enableReferenceSpecialistes: true,
+            enableWorkLeaveCertificate: true,
+            enableWorkplaceModifications: true,
+            enableInsuranceDocumentation: true,
+            enableTelemedicineNeedsInPerson: true,
+            enablePatientMessage: true,
             autoGenerateOnSelect: true,
           };
     } catch {
       return {
         enableTriage: true,
-        enableConfirmation: true,
-        enableSOAP: true,
-        enablePlan: true,
-        enableTelemedicine: true,
-        enableQuestions: true,
+        enableHpiConfirmationSummary: true,
+        enableFollowUpQuestions: true,
+        enableSuperSpartanSAP: true,
+        enableMedicationsReadyToUse: true,
+        enableLabWorks: true,
+        enableImagerieMedicale: true,
+        enableReferenceSpecialistes: true,
+        enableWorkLeaveCertificate: true,
+        enableWorkplaceModifications: true,
+        enableInsuranceDocumentation: true,
+        enableTelemedicineNeedsInPerson: true,
+        enablePatientMessage: true,
         autoGenerateOnSelect: true,
       };
     }
@@ -130,6 +176,7 @@ export default function DoctorDashboard() {
   useEffect(() => {
     checkAuth();
     loadDashboardData();
+    loadPhysicianHeader();
   }, []);
 
   const checkAuth = async () => {
@@ -183,6 +230,70 @@ export default function DoctorDashboard() {
     }
   };
 
+  const loadPhysicianHeader = async () => {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      
+      // Try to get name from user metadata first
+      let name = "Doctor";
+      const given = (user as any)?.user_metadata?.given_name || "";
+      const family = (user as any)?.user_metadata?.family_name || "";
+      const email = user.email || "";
+      
+      // Extract name from email if no metadata
+      if (!given && !family && email) {
+        const emailName = email.split('@')[0];
+        if (emailName.includes('.')) {
+          const parts = emailName.split('.');
+          name = parts.map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+        } else if (emailName.includes('_')) {
+          const parts = emailName.split('_');
+          name = parts.map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+        } else {
+          name = emailName.charAt(0).toUpperCase() + emailName.slice(1);
+        }
+      } else if (given || family) {
+        name = `${given} ${family}`.trim();
+      }
+      
+      // Special case for your email: cff@centremedicalfont.ca -> Carlos Faviel Font
+      if (email === 'cff@centremedicalfont.ca') {
+        name = 'Carlos Faviel Font';
+      }
+
+      // Try to get profile data from database
+      const { data, error } = await supabase
+        .from("physician_profiles")
+        .select("specialty, profile_image_url, profile_data")
+        .eq("physician_id", user.id)
+        .limit(1);
+        
+      if (!error && Array.isArray(data) && data.length > 0) {
+        const row = data[0] as any;
+        const pd = row.profile_data || {};
+        const profileName = `${pd.firstName || given || ""} ${pd.lastName || family || ""}`.trim();
+        if (profileName) name = profileName;
+        
+        setDocHeader({
+          name,
+          specialty: row.specialty || pd.specialty || "",
+          avatarUrl: row.profile_image_url || pd.profileImageUrl || "",
+        });
+        return;
+      }
+      
+      // Fallback: use extracted name or email-based name
+      setDocHeader({ name, specialty: "", avatarUrl: "" });
+    } catch (error) {
+      console.error("Error loading physician header:", error);
+      // Set a fallback name
+      setDocHeader({ name: "Doctor", specialty: "", avatarUrl: "" });
+    }
+  };
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
 
@@ -225,8 +336,14 @@ export default function DoctorDashboard() {
   };
 
   const openPatientDetails = (consultation: PatientConsultation) => {
-    // Navigate to patient details page
-    navigate(`/consultation/${consultation.id}`);
+    // Load patient data in the medical transcription panel instead of navigating
+    setSearchQuery(consultation.patient_id);
+    setSearchResults([consultation]);
+    
+    // Always auto-generate medical transcription when clicking on patient
+    setTimeout(() => {
+      generateFrenchTranscription();
+    }, 100);
   };
 
   // Build a minimal formData payload from a consultation
@@ -255,12 +372,79 @@ export default function DoctorDashboard() {
 
   const copyAll = () => {
     const parts: string[] = [];
-    if (prefs.enableConfirmation && frenchDoc.confirmation) parts.push(frenchDoc.confirmation);
-    if (prefs.enableSOAP && frenchDoc.soap) parts.push(frenchDoc.soap);
-    if (prefs.enablePlan && frenchDoc.plan) parts.push(frenchDoc.plan);
-    if (prefs.enableTelemedicine && frenchDoc.telemedicine) parts.push(frenchDoc.telemedicine);
-    if (prefs.enableQuestions && frenchDoc.followup) parts.push(frenchDoc.followup);
+    if (prefs.enableHpiConfirmationSummary && frenchDoc.hpiConfirmationSummary) parts.push(frenchDoc.hpiConfirmationSummary);
+    if (prefs.enableFollowUpQuestions && frenchDoc.followUpQuestions) parts.push(frenchDoc.followUpQuestions);
+    if (prefs.enableSuperSpartanSAP && frenchDoc.superSpartanSAP) parts.push(frenchDoc.superSpartanSAP);
+    if (prefs.enableMedicationsReadyToUse && frenchDoc.medicationsReadyToUse) parts.push(frenchDoc.medicationsReadyToUse);
+    if (prefs.enableLabWorks && frenchDoc.labWorks) parts.push(frenchDoc.labWorks);
+    if (prefs.enableImagerieMedicale && frenchDoc.imagerieMedicale) parts.push(frenchDoc.imagerieMedicale);
+    if (prefs.enableReferenceSpecialistes && frenchDoc.referenceSpecialistes) parts.push(frenchDoc.referenceSpecialistes);
+    if (prefs.enableWorkLeaveCertificate && frenchDoc.workLeaveCertificate) parts.push(frenchDoc.workLeaveCertificate);
+    if (prefs.enableWorkplaceModifications && frenchDoc.workplaceModifications) parts.push(frenchDoc.workplaceModifications);
+    if (prefs.enableInsuranceDocumentation && frenchDoc.insuranceDocumentation) parts.push(frenchDoc.insuranceDocumentation);
+    if (prefs.enableTelemedicineNeedsInPerson && frenchDoc.telemedicineNeedsInPerson) parts.push(frenchDoc.telemedicineNeedsInPerson);
+    if (prefs.enablePatientMessage && frenchDoc.patientMessage) parts.push(frenchDoc.patientMessage);
     copyText(parts.join("\n\n"));
+  };
+
+  // Generate custom AI request based on doctor's specific request
+  const generateCustomRequest = async () => {
+    if (!customRequest.trim()) {
+      alert("Veuillez entrer une demande spécifique pour l'IA.");
+      return;
+    }
+
+    const latest = searchResults[0] || recentPatients[0] || null;
+    const patientId = (latest?.patient_id || searchQuery || "").toString().toUpperCase();
+
+    if (!patientId) {
+      alert("Veuillez d'abord sélectionner un patient.");
+      return;
+    }
+
+    setGeneratingCustom(true);
+    try {
+      // Extract variables from consultation data
+      const variables = {
+        Gender: (latest as any)?.gender || "Non spécifié",
+        Age: (latest as any)?.age || "Non spécifié",
+        ChiefComplaint: latest?.chief_complaint || "Non spécifié",
+        SymptomOnset: (latest as any)?.problem_start_date || "Non spécifié",
+        Trigger: (latest as any)?.specific_trigger || "Non spécifié",
+        Location: (latest as any)?.symptom_location || "Non spécifié",
+        Description: (latest as any)?.symptom_description || "Non spécifié",
+        AggravatingFactors: (latest as any)?.symptom_aggravators || "Non spécifié",
+        RelievingFactors: (latest as any)?.symptom_relievers || "Non spécifié",
+        Severity: latest?.severity || "Non spécifié",
+        Evolution: (latest as any)?.symptom_progression || "Non spécifié",
+        AssociatedSymptoms: (latest as any)?.selected_symptoms?.join(", ") || "Non spécifié",
+        TreatmentsTried: (latest as any)?.treatments_attempted || "Non spécifié",
+        TreatmentResponse: (latest as any)?.treatment_effectiveness || "Non spécifié",
+        ChronicConditions: (latest as any)?.chronic_conditions || "Non spécifié",
+        MedicationAllergies: (latest as any)?.medication_allergies || "Non spécifié",
+        PregnancyBreastfeeding: (latest as any)?.pregnancy_status || "Non spécifié",
+        OtherNotes: (latest as any)?.additional_notes || "Non spécifié",
+      };
+
+      const res = await fetch("/api/medical-transcription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          patientId, 
+          variables, 
+          customRequest: customRequest.trim() 
+        }),
+      });
+      
+      if (!res.ok) throw new Error("Failed to generate custom response");
+      const data = await res.json();
+      setCustomResponse(data.customResponse || "Réponse générée par l'IA");
+    } catch (e) {
+      console.error(e);
+      alert("Erreur lors de la génération de la demande personnalisée. Veuillez réessayer.");
+    } finally {
+      setGeneratingCustom(false);
+    }
   };
 
   // Generate French medical transcription using exact variables from your system
@@ -305,11 +489,18 @@ export default function DoctorDashboard() {
       if (!res.ok) throw new Error("Failed to generate French transcription");
       const data = await res.json();
       setFrenchDoc({
-        confirmation: data.confirmation || "",
-        soap: data.soap || "",
-        plan: data.plan || "",
-        telemedicine: data.telemedicine || "",
-        followup: data.followup || "",
+        hpiConfirmationSummary: data.hpiConfirmationSummary || "",
+        followUpQuestions: data.followUpQuestions || "",
+        superSpartanSAP: data.superSpartanSAP || "",
+        medicationsReadyToUse: data.medicationsReadyToUse || "",
+        labWorks: data.labWorks || "",
+        imagerieMedicale: data.imagerieMedicale || "",
+        referenceSpecialistes: data.referenceSpecialistes || "",
+        workLeaveCertificate: data.workLeaveCertificate || "",
+        workplaceModifications: data.workplaceModifications || "",
+        insuranceDocumentation: data.insuranceDocumentation || "",
+        telemedicineNeedsInPerson: data.telemedicineNeedsInPerson || "",
+        patientMessage: data.patientMessage || "",
       });
     } catch (e) {
       console.error(e);
@@ -396,7 +587,8 @@ export default function DoctorDashboard() {
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    navigate("/login");
+    localStorage.removeItem("doctor_authenticated");
+    navigate("/doctor-login");
   };
 
   return (
@@ -409,22 +601,43 @@ export default function DoctorDashboard() {
               <h1 className="text-xl font-semibold text-gray-900">InstantHPI</h1>
               <span className="ml-2 text-sm text-gray-500">Doctor Dashboard</span>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLogout}
-              className="flex items-center gap-2"
-            >
-              <LogOut className="h-4 w-4" />
-              Logout
-            </Button>
+            <div className="flex items-center gap-4">
+              {/* Doctor Profile */}
+              <div
+                className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() => navigate("/doctor-profile")}
+              >
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center">
+                  {docHeader.avatarUrl ? (
+                    <img src={docHeader.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-sm font-medium text-blue-600">
+                      {(docHeader.name?.split(" ").map((s) => s[0]).join("") || "DR").slice(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <div className="text-sm">
+                  <p className="font-medium text-gray-900">{docHeader.name}</p>
+                  <p className="text-gray-500">{docHeader.specialty || "—"}</p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+                className="flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Top Hero Image (always butler) */}
-        <HeroBanner />
+        {/* Top carousel */}
+        <DashboardCarousel />
         {/* 2-column layout: left main content (col-span-2) + right AI panel */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* LEFT MAIN CONTENT */}
@@ -538,7 +751,7 @@ export default function DoctorDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle>Transcription Médicale</CardTitle>
-                  <CardDescription>Générer 5 sections en français prêtes à copier</CardDescription>
+                  <CardDescription>Cliquez sur un patient pour générer automatiquement 12+ sections en français</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center gap-2">
@@ -563,45 +776,162 @@ export default function DoctorDashboard() {
                       variant="outline"
                       size="sm"
                       onClick={copyAll}
-                      disabled={!frenchDoc.confirmation && !frenchDoc.soap}
+                      disabled={!frenchDoc.hpiConfirmationSummary && !frenchDoc.followUpQuestions}
                     >
                       Tout Copier
                     </Button>
                   </div>
 
-                  {prefs.enableConfirmation && (
+                  {/* Raw Patient Data Section - Always shown first */}
+                  {searchResults.length > 0 && (
+                    <div className="border rounded-lg">
+                      <div 
+                        className="flex items-center justify-between p-3 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                        onClick={() => setShowRawData(!showRawData)}
+                      >
+                        <h4 className="font-semibold text-sm">📋 Raw Patient Data (API Input)</h4>
+                        <span className="text-sm text-gray-500">
+                          {showRawData ? '▼' : '▶'}
+                        </span>
+                      </div>
+                      {showRawData && (
+                        <div className="p-3 border-t bg-white">
+                          <div className="text-xs text-gray-800 whitespace-pre-line bg-gray-50 rounded-md border p-2 font-mono max-h-60 overflow-y-auto">
+                            <code className="block">
+                              {JSON.stringify(searchResults[0], null, 2)}
+                            </code>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Custom AI Request Section */}
+                  {searchResults.length > 0 && (
+                    <div className="border rounded-lg">
+                      <div className="p-3 bg-blue-50">
+                        <h4 className="font-semibold text-sm mb-2">🤖 Demande Personnalisée à l'IA</h4>
+                        <div className="space-y-2">
+                          <textarea
+                            value={customRequest}
+                            onChange={(e) => setCustomRequest(e.target.value)}
+                            placeholder="Ex: Fais-moi une demande d'arrêt de travail de 2 mois, ou Rédige une lettre pour l'assurance, ou Crée un plan de traitement spécifique..."
+                            className="w-full p-2 text-sm border rounded-md resize-none"
+                            rows={3}
+                          />
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={generateCustomRequest}
+                              disabled={generatingCustom || !customRequest.trim()}
+                              size="sm"
+                              className="flex-1"
+                            >
+                              {generatingCustom ? "Génération..." : "Générer"}
+                            </Button>
+                            {customResponse && (
+                              <Button
+                                onClick={() => copyText(customResponse)}
+                                variant="outline"
+                                size="sm"
+                              >
+                                Copier
+                              </Button>
+                            )}
+                          </div>
+                          {customResponse && (
+                            <div className="mt-2">
+                              <div className="text-xs text-gray-800 whitespace-pre-line bg-white rounded-md border p-2 font-mono max-h-40 overflow-y-auto">
+                                <code className="block">{customResponse}</code>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {prefs.enableHpiConfirmationSummary && (
                     <FrenchSection
-                      title="1. Confirmation Patient"
-                      text={frenchDoc.confirmation}
-                      onCopy={() => copySection("Confirmation", frenchDoc.confirmation)}
+                      title="1. HPI Confirmation Summary"
+                      text={frenchDoc.hpiConfirmationSummary}
+                      onCopy={() => copySection("HPI Confirmation", frenchDoc.hpiConfirmationSummary)}
                     />
                   )}
-                  {prefs.enableSOAP && (
+                  {prefs.enableFollowUpQuestions && (
                     <FrenchSection
-                      title="2. Note SOAP"
-                      text={frenchDoc.soap}
-                      onCopy={() => copySection("SOAP", frenchDoc.soap)}
+                      title="2. 10 Follow-up Questions"
+                      text={frenchDoc.followUpQuestions}
+                      onCopy={() => copySection("Follow-up Questions", frenchDoc.followUpQuestions)}
                     />
                   )}
-                  {prefs.enablePlan && (
+                  {prefs.enableSuperSpartanSAP && (
                     <FrenchSection
-                      title="3. Plan - Points"
-                      text={frenchDoc.plan}
-                      onCopy={() => copySection("Plan", frenchDoc.plan)}
+                      title="3. Super Spartan SAP Note"
+                      text={frenchDoc.superSpartanSAP}
+                      onCopy={() => copySection("SAP Note", frenchDoc.superSpartanSAP)}
                     />
                   )}
-                  {prefs.enableTelemedicine && (
+                  {prefs.enableMedicationsReadyToUse && (
                     <FrenchSection
-                      title="4. Télémédecine"
-                      text={frenchDoc.telemedicine}
-                      onCopy={() => copySection("Télémédecine", frenchDoc.telemedicine)}
+                      title="4. Medications Ready to Use"
+                      text={frenchDoc.medicationsReadyToUse}
+                      onCopy={() => copySection("Medications", frenchDoc.medicationsReadyToUse)}
                     />
                   )}
-                  {prefs.enableQuestions && (
+                  {prefs.enableLabWorks && (
                     <FrenchSection
-                      title="5. Questions de Suivi"
-                      text={frenchDoc.followup}
-                      onCopy={() => copySection("Questions", frenchDoc.followup)}
+                      title="5. Lab Works"
+                      text={frenchDoc.labWorks}
+                      onCopy={() => copySection("Lab Works", frenchDoc.labWorks)}
+                    />
+                  )}
+                  {prefs.enableImagerieMedicale && (
+                    <FrenchSection
+                      title="6. Imagerie Médicale"
+                      text={frenchDoc.imagerieMedicale}
+                      onCopy={() => copySection("Imagerie", frenchDoc.imagerieMedicale)}
+                    />
+                  )}
+                  {prefs.enableReferenceSpecialistes && (
+                    <FrenchSection
+                      title="7. Référence aux Spécialistes"
+                      text={frenchDoc.referenceSpecialistes}
+                      onCopy={() => copySection("Référence", frenchDoc.referenceSpecialistes)}
+                    />
+                  )}
+                  {prefs.enableWorkLeaveCertificate && (
+                    <FrenchSection
+                      title="8. Work Leave Certificate"
+                      text={frenchDoc.workLeaveCertificate}
+                      onCopy={() => copySection("Work Leave", frenchDoc.workLeaveCertificate)}
+                    />
+                  )}
+                  {prefs.enableWorkplaceModifications && (
+                    <FrenchSection
+                      title="9. Workplace Modifications"
+                      text={frenchDoc.workplaceModifications}
+                      onCopy={() => copySection("Workplace", frenchDoc.workplaceModifications)}
+                    />
+                  )}
+                  {prefs.enableInsuranceDocumentation && (
+                    <FrenchSection
+                      title="10. Insurance Documentation"
+                      text={frenchDoc.insuranceDocumentation}
+                      onCopy={() => copySection("Insurance", frenchDoc.insuranceDocumentation)}
+                    />
+                  )}
+                  {prefs.enableTelemedicineNeedsInPerson && (
+                    <FrenchSection
+                      title="11. Télémédecine Needs In-Person"
+                      text={frenchDoc.telemedicineNeedsInPerson}
+                      onCopy={() => copySection("Télémédecine", frenchDoc.telemedicineNeedsInPerson)}
+                    />
+                  )}
+                  {prefs.enablePatientMessage && (
+                    <FrenchSection
+                      title="12. Patient Message"
+                      text={frenchDoc.patientMessage}
+                      onCopy={() => copySection("Patient Message", frenchDoc.patientMessage)}
                     />
                   )}
                 </CardContent>
@@ -610,86 +940,61 @@ export default function DoctorDashboard() {
           </aside>
         </div>
 
-        {/* Footer rotating gallery */}
-        <FooterRotator />
       </main>
     </div>
   );
 }
 
-// Hero banner (fixed: Butler image)
-function HeroBanner() {
-  // Use the butler/concierge image directly
-  const butlerImagePath = "/images for the website instanthpi/3L8EyD88IwLJg1Kwc13D2.png";
-
-  return (
-    <div className="mb-8 bg-white rounded-xl overflow-hidden border shadow-sm">
-      <img
-        src={butlerImagePath}
-        alt="InstantHPI Medical Concierge"
-        className="w-full h-auto max-h-[300px] object-contain"
-        onError={(e) => {
-          // Fallback to placeholder if image doesn't load
-          const t = e.currentTarget as HTMLImageElement;
-          t.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect fill='%23f3f4f6' width='400' height='200'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%239ca3af' font-family='sans-serif' font-size='20'%3EInstantHPI%3C/text%3E%3C/svg%3E";
-        }}
-      />
-    </div>
-  );
-}
-
-// Footer rotating gallery (excludes butler and screenshots)
-function FooterRotator() {
-  const [url, setUrl] = React.useState<string>("/instanthpi-hero.jpg");
+// Dashboard carousel using Embla/shadcn carousel
+function DashboardCarousel() {
+  const [images, setImages] = React.useState<string[]>([]);
   React.useEffect(() => {
-    const pick = async () => {
+    (async () => {
       try {
         const res = await fetch("/api/assets/images", { headers: { "Cache-Control": "no-cache" } });
         const data = await res.json();
         const files: any[] = Array.isArray(data?.files) ? data.files : [];
-        const list: string[] = files
+        const urls: string[] = files
           .filter((f: any) => {
-            const u = String(f?.url || "");
             const n = String(f?.name || "");
-            const fromImages =
-              u.startsWith("/images/") ||
-              u.startsWith("/images%20for%20the%20website%20instanthpi/");
-            const isScreenshot = /screenshot/i.test(n);
-            const isButler = /butler/i.test(n);
-            return fromImages && !isScreenshot && !isButler;
+            return !/screenshot/i.test(n) && !/butler/i.test(n);
           })
-          .map((f: any) => String(f.url))
-          .sort();
-        if (list.length > 0) {
-          const key = "doctor_footer_idx";
-          const prev = parseInt(localStorage.getItem(key) || "-1", 10);
-          const next = isNaN(prev) ? 0 : (prev + 1) % list.length;
-          localStorage.setItem(key, String(next));
-          setUrl(list[next]);
-          return;
-        }
-      } catch {}
-      setUrl("/instanthpi-hero.jpg");
-    };
-    pick();
+          .map((f: any) => String(f.url));
+        setImages(urls);
+      } catch {
+        setImages([]);
+      }
+    })();
   }, []);
-
+  const slides = images.length ? images : ["/instanthpi-hero.jpg"];
   return (
-    <div className="mt-10 rounded-xl overflow-hidden border">
-      <img
-        src={url}
-        alt="InstantHPI"
-        className="w-full h-24 sm:h-28 md:h-32 lg:h-36 object-cover"
-        onError={(e) => {
-          const t = e.currentTarget as HTMLImageElement;
-          if (t.src.indexOf("instanthpi-beach.jpg") === -1) t.src = "/instanthpi-beach.jpg";
-        }}
-      />
+    <div className="mb-8 bg-white rounded-xl overflow-hidden border shadow-sm">
+      <Carousel className="w-full">
+        <CarouselContent>
+          {slides.map((url, idx) => (
+            <CarouselItem key={idx}>
+              <div className="flex items-center justify-center p-4">
+                <img
+                  src={url}
+                  alt="InstantHPI"
+                  className="max-w-full max-h-[400px] object-contain rounded-lg"
+                  onError={(e) => {
+                    const t = e.currentTarget as HTMLImageElement;
+                    if (!t.src.includes("instanthpi-beach.jpg")) t.src = "/instanthpi-beach.jpg";
+                  }}
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        <CarouselPrevious />
+        <CarouselNext />
+      </Carousel>
     </div>
   );
 }
 
-// French medical transcription section with copy button (clean code blocks)
+// Enhanced French medical transcription section with copy button (inspired by instanthpi-medical)
 function FrenchSection({
   title,
   text,
@@ -699,20 +1004,40 @@ function FrenchSection({
   text?: string;
   onCopy: () => void;
 }) {
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopy = () => {
+    onCopy();
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <h4 className="font-semibold text-sm">{title}</h4>
-        <Button variant="ghost" size="sm" onClick={onCopy} disabled={!text}>
-          Copier
+    <div className="border rounded-lg mb-4">
+      <div className="flex items-center justify-between p-3 bg-gray-50 cursor-pointer hover:bg-gray-100">
+        <h4 className="font-semibold text-sm text-gray-800">{title}</h4>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={handleCopy} 
+          disabled={!text}
+          className={`transition-all duration-200 ${
+            copied 
+              ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+              : 'hover:bg-blue-100 text-blue-800'
+          }`}
+        >
+          {copied ? '✓ Copié!' : '📋 Copier'}
         </Button>
       </div>
-      <div className="text-xs text-gray-800 whitespace-pre-line min-h-[60px] bg-gray-50 rounded-md border p-2 font-mono">
-        {text ? (
-          <code className="block">{text}</code>
-        ) : (
-          <span className="text-gray-400">Pas de contenu</span>
-        )}
+      <div className="p-3 border-t bg-white">
+        <div className="text-xs text-gray-800 whitespace-pre-line min-h-[60px] bg-gray-50 rounded-md border p-3 font-mono max-h-80 overflow-y-auto">
+          {text ? (
+            <code className="block leading-relaxed">{text}</code>
+          ) : (
+            <span className="text-gray-400 italic">Contenu en cours de génération...</span>
+          )}
+        </div>
       </div>
     </div>
   );

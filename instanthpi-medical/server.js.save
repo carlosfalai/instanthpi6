@@ -1,0 +1,1133 @@
+require('dotenv').config();
+
+const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
+const fs = require('fs');
+const axios = require('axios');
+const nodemailer = require('nodemailer');
+
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+// Middleware
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+// Configure email transporter with your credentials
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+// Test email configuration on startup
+transporter.verify(function(error, success) {
+    if (error) {
+        console.log('Email configuration error:', error);
+    } else {
+        console.log('Email server is ready to send messages');
+    }
+});
+
+// Function to create structured prompt from patient data
+function createStructuredPrompt(patientData) {
+    return `Please write your generated Patient ID here: ${patientData.patientId || ''}
+Gender: ${patientData.gender || ''}
+Age: ${patientData.age || ''}
+What brings you to the clinic today?: ${patientData.chiefComplaint || ''}
+When did this problem start (dd/mm/yyyy)?: ${patientData.startDate || ''}
+Was there a specific trigger?: ${patientData.trigger || ''}
+Where is the symptom located?: ${patientData.location || ''}
+How would you describe your symptom?: ${patientData.description || ''}
+What makes the symptom worse?: ${patientData.worsening || ''}
+What relieves the symptom?: ${patientData.relief || ''}
+On a scale of 0 to 10, how severe is your symptom?: ${patientData.severity || ''}
+How has the symptom evolved over time?: ${patientData.evolution || ''}
+Are you experiencing any of the following symptoms?: ${patientData.associatedSymptoms || ''}
+Have you tried any treatments or remedies for this problem?: ${patientData.treatments || ''}
+Were the treatments effective?: ${patientData.treatmentEffectiveness || ''}
+Do you have any chronic conditions? Examples: diabetes, smoking, high blood pressure, eczema: ${patientData.chronicConditions || ''}
+Do you have any known medication allergies?: ${patientData.allergies || ''}
+Are you pregnant or breastfeeding?: ${patientData.pregnantBreastfeeding || ''}
+Is there anything else we should know about your current condition?: ${patientData.additionalInfo || ''}`;
+}
+
+// Function to get medical analysis from llama3.1:8b
+async function getMedicalAnalysisSimple(patientData) {
+    const patientPrompt = createStructuredPrompt(patientData);
+    
+    const simplePrompt = `Analyze this patient case and provide comprehensive medical analysis in French:
+
+${patientPrompt}
+
+Please provide a clear analysis including:
+1. Primary diagnosis with probability
+2. Top 3 differential diagnoses 
+3. Specific medications with doses and frequencies
+4. Laboratory tests needed
+5. Imaging studies required
+6. Specialist referrals needed
+7. Red flags to watch for
+8. Why in-person consultation might be needed
+
+Be specific and comprehensive in your analysis.`;
+
+    try {
+        console.log('Getting medical analysis from llama3.1:8b...');
+        const response = await axios.post('http://localhost:11434/api/generate', {
+            model: 'llama3.1:8b',
+            prompt: simplePrompt,
+            stream: false,
+            options: {
+                temperature: 0.7,
+                num_ctx: 4096
+            }
+        });
+
+        const medicalContent = response.data.response;
+        console.log('Medical analysis received, formatting to InstantHPI structure...');
+        
+        // Convert to exact InstantHPI HTML structure
+        return createInstantHPIStructure(patientData, medicalContent);
+
+    } catch (error) {
+        console.error('Error getting medical analysis:', error);
+        return createInstantHPIStructure(patientData, 'Analyse médicale non disponible - erreur de connexion.');
+    }
+}
+
+// Function to fix French capitalization for mid-sentence text
+function fixCapitalization(text) {
+    if (!text) return text;
+    return text.charAt(0).toLowerCase() + text.slice(1);
+}
+
+// Function to determine visit type
+function determineVisitType(patientData) {
+    const chiefComplaint = patientData.chiefComplaint?.toLowerCase() || '';
+    const description = patientData.description?.toLowerCase() || '';
+    const additionalInfo = patientData.additionalInfo?.toLowerCase() || '';
+    
+    // Check for mental health keywords
+    const mentalHealthKeywords = ['anxiété', 'dépression', 'stress', 'insomnie', 'panique', 'angoisse', 'suicide', 'humeur', 'mental'];
+    const isMentalHealth = mentalHealthKeywords.some(keyword => 
+        chiefComplaint.includes(keyword) || description.includes(keyword) || additionalInfo.includes(keyword)
+    );
+    
+    // Check for medication renewal keywords
+    const medicationKeywords = ['renouvellement', 'renouveler', 'refill', 'prescription', 'médicament'];
+    const isMedicationRenewal = medicationKeywords.some(keyword => 
+        chiefComplaint.includes(keyword) || additionalInfo.includes(keyword)
+    );
+    
+    return { isMentalHealth, isMedicationRenewal, isGeneralMedical: !isMentalHealth && !isMedicationRenewal };
+}
+
+// Function to create the EXACT InstantHPI structure
+function createInstantHPIStructure(patientData, medicalAnalysis) {
+    const currentDate = new Date().toLocaleDateString('fr-CA');
+    const endDate = new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString('fr-CA');
+    
+    const visitType = determineVisitType(patientData);
+    
+    // Determine primary diagnosis based on chief complaint and visit type
+    let primaryDiagnosis = '';
+    let ddx1 = '';
+    let ddx2 = '';
+    let ddx3 = '';
+    let icdCode = '';
+    
+    if (visitType.isMentalHealth) {
+        primaryDiagnosis = 'Trouble anxieux généralisé';
+        ddx1 = 'Épisode dépressif majeur';
+        ddx2 = 'Trouble panique';
+        ddx3 = 'Trouble de stress post-traumatique';
+        icdCode = 'F41.1';
+    } else if (visitType.isMedicationRenewal) {
+        primaryDiagnosis = 'Renouvellement de médication';
+        ddx1 = 'Suivi thérapeutique';
+        ddx2 = 'Ajustement posologique';
+        ddx3 = 'Évaluation de l\'observance';
+        icdCode = 'Z76.0';
+    } else if (patientData.chiefComplaint && patientData.chiefComplaint.toLowerCase().includes('dos')) {
+        primaryDiagnosis = 'Lombalgie aiguë post-traumatique';
+        ddx1 = 'Hernie discale lombaire';
+        ddx2 = 'Radiculopathie L5-S1';
+        ddx3 = 'Sténose spinale';
+        icdCode = 'M54.5';
+    } else {
+        primaryDiagnosis = 'Syndrome viral aigu';
+        ddx1 = 'Infection bactérienne';
+        ddx2 = 'Réaction allergique';
+        ddx3 = 'Condition inflammatoire';
+        icdCode = 'J06.9';
+    }
+    
+    return `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>instantHPI Note - ${patientData.patientId}</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;">
+
+<h2 style="color: #2c3e50; text-align: center;">instantHPI Note - ${patientData.patientId}</h2>
+<h3 style="color: #34495e; text-align: center;">${patientData.age} ans · ${patientData.gender} · Diagnostic Différentiel #1: ${primaryDiagnosis}</h3>
+
+<hr style="border: 2px solid #3498db; margin: 20px 0;">
+
+<h3 style="color: #34495e;">1. Stratégie Clinique Spartan</h3>
+<p><strong>${primaryDiagnosis}</strong> est le diagnostic le plus probable (75%) basé sur l'histoire de ${patientData.trigger || 'présentation clinique'} et la présentation clinique. Diagnostics différentiels: <strong>${ddx1}</strong> (15%) si persistance des symptômes, <strong>${ddx2}</strong> (7%) si évolution défavorable, <strong>${ddx3}</strong> (3%) si critères spécifiques présents.</p>
+
+<p><strong>Drapeaux rouges présents dans l'histoire:</strong></p>
+<ul>
+    <li>Douleur sévère ${patientData.severity}/10 → oriente vers condition nécessitant évaluation</li>
+    <li>Symptômes depuis ${patientData.startDate} → oriente vers condition évolutive</li>
+    <li>Symptômes associés: ${patientData.associatedSymptoms || 'multiples'} → oriente vers atteinte systémique</li>
+</ul>
+
+<p><strong>Drapeaux rouges à surveiller:</strong></p>
+<ul>
+    ${visitType.isMentalHealth ? `
+    <li>Idées suicidaires → suggère urgence psychiatrique</li>
+    <li>Symptômes psychotiques → suggère trouble psychiatrique majeur</li>
+    <li>Perte de contact avec la réalité → suggère épisode psychotique</li>
+    <li>Automutilation → suggère crise aiguë</li>
+    <li>Incapacité fonctionnelle totale → suggère décompensation</li>
+    ` : visitType.isMedicationRenewal ? `
+    <li>Effets secondaires graves → suggère toxicité médicamenteuse</li>
+    <li>Non-observance thérapeutique → suggère problème d'adhésion</li>
+    <li>Interactions médicamenteuses → suggère révision thérapeutique nécessaire</li>
+    <li>Symptômes nouveaux → suggère complication ou progression</li>
+    <li>Échec thérapeutique → suggère changement de traitement requis</li>
+    ` : `
+    <li>Perte de contrôle sphinctérien → suggère syndrome de la queue de cheval</li>
+    <li>Faiblesse motrice progressive → suggère compression nerveuse sévère</li>
+    <li>Fièvre persistante → suggère infection systémique</li>
+    <li>Douleur thoracique → suggère pathologie cardiaque</li>
+    <li>Dyspnée aiguë → suggère pathologie pulmonaire</li>
+    `}
+</ul>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">2. Histoire de la Maladie Actuelle</h3>
+${visitType.isMentalHealth ? `
+<p>Juste pour vérifier avec vous avant de continuer, vous êtes un patient de ${patientData.age} ans qui présente ${fixCapitalization(patientData.description) || 'symptômes psychologiques'} depuis ${patientData.startDate}. L'intensité des symptômes est évaluée à ${patientData.severity} sur 10. Ces symptômes s'aggravent avec ${fixCapitalization(patientData.worsening) || 'le stress'} et s'améliorent avec ${fixCapitalization(patientData.relief) || 'le repos'}. Vous mentionnez également la présence de ${fixCapitalization(patientData.associatedSymptoms) || 'symptômes associés'}. ${patientData.treatments ? 'Traitements essayés: ' + fixCapitalization(patientData.treatments) : 'Aucun traitement n\'a encore été tenté'}. Vos conditions chroniques sont: ${fixCapitalization(patientData.chronicConditions) || 'aucune'}. ${patientData.allergies ? fixCapitalization(patientData.allergies) : 'Aucune allergie connue'}. Est-ce correct?</p>
+` : visitType.isMedicationRenewal ? `
+<p>Juste pour vérifier avec vous avant de continuer, vous êtes un patient de ${patientData.age} ans qui vient pour un renouvellement de médication. Votre condition est actuellement stable. ${patientData.treatments ? 'Médication actuelle: ' + fixCapitalization(patientData.treatments) : ''}. ${patientData.chronicConditions ? 'Pour votre condition de: ' + fixCapitalization(patientData.chronicConditions) : ''}. ${patientData.allergies ? 'Allergie connue: ' + fixCapitalization(patientData.allergies) : 'Aucune allergie médicamenteuse'}. Est-ce correct?</p>
+` : `
+<p>Juste pour vérifier avec vous avant de continuer, vous êtes un patient de ${patientData.age} ans qui présente ${fixCapitalization(patientData.description) || 'symptômes aigus'} localisé dans la région de ${fixCapitalization(patientData.location) || 'corps'}, commencé depuis ${patientData.startDate}. L'intensité du symptôme est évaluée à ${patientData.severity} sur 10. Ce symptôme s'aggrave avec ${fixCapitalization(patientData.worsening) || 'l\'activité'} et s'améliore avec ${fixCapitalization(patientData.relief) || 'le repos'}. Vous mentionnez également la présence de ${fixCapitalization(patientData.associatedSymptoms) || 'symptômes associés'}. ${patientData.treatments ? 'Traitements essayés: ' + fixCapitalization(patientData.treatments) : 'Traitements préalables limités'}. Vos conditions chroniques sont: ${fixCapitalization(patientData.chronicConditions) || 'aucune'}. ${patientData.allergies ? fixCapitalization(patientData.allergies) : 'Aucune allergie connue'}. Est-ce correct?</p>
+`}
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">3. Super Spartan SAP</h3>
+<p>
+<strong>S:</strong> ${patientData.gender} ${patientData.age} ans avec ${fixCapitalization(patientData.description) || 'présentation clinique'} ${patientData.location ? 'dans la région de ' + fixCapitalization(patientData.location) : ''} depuis ${patientData.startDate}. Intensité: ${patientData.severity}/10. Aggravé par ${fixCapitalization(patientData.worsening) || 'facteurs multiples'}, soulagé par ${fixCapitalization(patientData.relief) || 'repos'}. Symptômes associés: ${fixCapitalization(patientData.associatedSymptoms) || 'présents'}. ${patientData.treatments ? fixCapitalization(patientData.treatments) : 'Sans traitement préalable'}. Antécédents de ${fixCapitalization(patientData.chronicConditions) || 'aucun'}. ${patientData.allergies ? fixCapitalization(patientData.allergies) : 'Aucune allergie connue'}.<br>
+<strong>A:</strong> Hypothèse principale: ${primaryDiagnosis}. Diagnostic différentiel à considérer: ${ddx1}, ${ddx2}, ${ddx3}.<br>
+<strong>P:</strong> ${visitType.isMedicationRenewal ? 'Renouvellement de médication, surveillance continue' : 'Anti-inflammatoires, analgésiques, réévaluation selon évolution'}. Réévaluation selon l'évolution.
+</p>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">4. Questions de Suivi</h3>
+<ol>
+    ${visitType.isMentalHealth ? `
+    <li>Avez-vous des pensées suicidaires ou d'automutilation?</li>
+    <li>Comment est votre sommeil ces derniers temps?</li>
+    <li>Avez-vous des changements d'appétit ou de poids?</li>
+    <li>Comment est votre niveau d'énergie quotidien?</li>
+    <li>Avez-vous des difficultés de concentration?</li>
+    <li>Y a-t-il des facteurs de stress particuliers dans votre vie?</li>
+    <li>Avez-vous un système de soutien (famille, amis)?</li>
+    <li>Consommez-vous de l'alcool ou des substances?</li>
+    <li>Avez-vous déjà consulté pour des problèmes similaires?</li>
+    <li>Y a-t-il des antécédents psychiatriques dans votre famille?</li>
+    ` : visitType.isMedicationRenewal ? `
+    <li>La médication est-elle efficace pour contrôler vos symptômes?</li>
+    <li>Avez-vous des effets secondaires?</li>
+    <li>Prenez-vous la médication comme prescrite?</li>
+    <li>Avez-vous manqué des doses récemment?</li>
+    <li>Prenez-vous d'autres médicaments ou suppléments?</li>
+    <li>Avez-vous eu des changements de santé récents?</li>
+    <li>Votre pharmacie a-t-elle suffisamment de stock?</li>
+    <li>Avez-vous des difficultés financières pour obtenir vos médicaments?</li>
+    <li>Quand est votre prochain rendez-vous de suivi?</li>
+    <li>Avez-vous des questions sur votre traitement?</li>
+    ` : `
+    <li>Avez-vous remarqué une progression des symptômes?</li>
+    <li>Y a-t-il des symptômes nouveaux depuis le début?</li>
+    <li>Avez-vous des difficultés respiratoires?</li>
+    <li>La douleur vous réveille-t-elle la nuit?</li>
+    <li>Avez-vous des antécédents familiaux similaires?</li>
+    <li>Quelle est votre température corporelle?</li>
+    <li>Avez-vous voyagé récemment?</li>
+    <li>Y a-t-il eu exposition à des malades?</li>
+    <li>Prenez-vous des médicaments régulièrement?</li>
+    <li>Quel est votre niveau d'activité habituel?</li>
+    `}
+</ol>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">5. Évaluation de l'Acuité et Nécessité de Consultation en Personne</h3>
+
+<div style="background-color: #fff3cd; border: 2px solid #ffc107; border-radius: 10px; padding: 20px; margin: 20px 0;">
+    <h4 style="color: #856404; margin-bottom: 15px;">Pourquoi une consultation en personne est recommandée pour votre cas:</h4>
+    
+    ${visitType.isMentalHealth ? `
+    <p style="color: #856404; margin-bottom: 15px;">
+    Compte tenu de vos symptômes de ${fixCapitalization(patientData.description) || 'détresse psychologique'} avec une sévérité de ${patientData.severity}/10, une évaluation en personne permettrait un examen mental complet incluant l'observation du comportement non-verbal, l'évaluation du risque suicidaire par échelle standardisée, et l'examen de l'état mental (apparence, psychomotricité, affect, pensée, perception, cognition). 
+    </p>
+    
+    <p style="color: #856404; margin-bottom: 15px;">
+    <strong>Examens spécifiques nécessaires:</strong> Évaluation du risque suicidaire (échelle Columbia), examen de l'état mental complet, évaluation de la psychomotricité, tests cognitifs de dépistage (MoCA ou MMSE si indiqué), examen physique pour exclure causes organiques.
+    </p>
+    
+    <p style="color: #856404;">
+    <strong>Ce que nous devons exclure:</strong> Risque suicidaire imminent, psychose débutante, trouble bipolaire en phase maniaque, intoxication ou sevrage de substances, causes organiques (thyroïde, déficiences vitaminiques).
+    </p>
+    ` : visitType.isMedicationRenewal ? `
+    <p style="color: #856404; margin-bottom: 15px;">
+    Pour votre renouvellement de médication, bien que votre condition semble stable, une consultation en personne permettrait de vérifier les signes vitaux (tension artérielle, fréquence cardiaque), effectuer un examen physique ciblé selon votre condition chronique, et évaluer l'observance thérapeutique de manière approfondie.
+    </p>
+    
+    <p style="color: #856404; margin-bottom: 15px;">
+    <strong>Examens spécifiques nécessaires:</strong> Prise des signes vitaux complets, examen cardiovasculaire si médication cardiaque, examen neurologique si médication psychiatrique, palpation abdominale si médication gastro-intestinale, tests de laboratoire de surveillance selon la médication.
+    </p>
+    
+    <p style="color: #856404;">
+    <strong>Ce que nous devons exclure:</strong> Effets secondaires non rapportés, interactions médicamenteuses, progression de la maladie sous-jacente, développement de contre-indications.
+    </p>
+    ` : `
+    <p style="color: #856404; margin-bottom: 15px;">
+    Compte tenu de vos symptômes de ${fixCapitalization(patientData.description) || 'présentation aiguë'} dans la région ${fixCapitalization(patientData.location) || 'affectée'} avec une sévérité de ${patientData.severity}/10 et la présence de ${fixCapitalization(patientData.associatedSymptoms) || 'symptômes associés'}, une évaluation en personne est cruciale pour effectuer un examen physique complet et des tests diagnostiques immédiats.
+    </p>
+    
+    <p style="color: #856404; margin-bottom: 15px;">
+    <strong>Examens spécifiques nécessaires:</strong> Examen physique complet incluant palpation, percussion et auscultation de la zone affectée, tests neurologiques (réflexes, force musculaire, sensibilité), manœuvres spécifiques (test de Lasègue si mal de dos, tests d'appendicite si douleur abdominale), signes vitaux complets, possiblement ECG si douleur thoracique.
+    </p>
+    
+    <p style="color: #856404;">
+    <strong>Ce que nous devons exclure:</strong> Conditions nécessitant une intervention urgente (appendicite, hernie étranglée, syndrome coronarien aigu), complications neurologiques (syndrome de la queue de cheval, AVC), infections sévères nécessitant antibiotiques IV, conditions chirurgicales urgentes.
+    </p>
+    `}
+    
+    <p style="color: #856404; font-weight: bold; margin-top: 20px; padding: 15px; background-color: #ffeeba; border-radius: 5px;">
+    L'urgence ou une clinique sans rendez-vous offre un niveau de soins plus adapté à votre situation actuelle, avec accès immédiat aux examens physiques complets, tests de laboratoire, imagerie médicale, et traitements IV si nécessaires. Cette évaluation en personne est essentielle pour assurer votre sécurité et optimiser votre prise en charge.
+    </p>
+</div>
+
+<div style="background-color: #d1ecf1; border: 2px solid #0c5460; border-radius: 10px; padding: 20px; margin: 20px 0;">
+    <p style="color: #0c5460; font-style: italic;">
+    <strong>Note:</strong> Je peux également préparer pour vous une lettre de référence pour une consultation en personne au département d'urgence près de chez vous. Vous pourrez remettre cette lettre à l'infirmière de triage ou au médecin pour accélérer le processus de votre prise en charge.
+    </p>
+</div>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">6. Plan – Points Principaux</h3>
+
+<h4 style="color: #7f8c8d;">6.1. Médicaments - Organisés par Diagnostic Différentiel</h4>
+
+${visitType.isMentalHealth ? `
+<p><strong>Pour ${primaryDiagnosis}:</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;">
+            <strong>Sertraline 50mg PO DIE</strong><br>
+            Durée: Minimum 6 mois<br>
+            <em>Rationale: ISRS de première ligne pour trouble anxieux, bien toléré, augmentation progressive possible</em>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;">
+            <strong>Lorazépam 0.5mg PO BID PRN</strong><br>
+            Durée: Maximum 2-4 semaines<br>
+            <em>Rationale: Anxiolytique pour soulagement aigu, utilisation limitée pour éviter dépendance</em>
+        </td>
+    </tr>
+</table>
+` : visitType.isMedicationRenewal ? `
+<p><strong>Renouvellement de médication:</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;">
+            <strong>Continuer médication actuelle</strong><br>
+            Durée: 3-6 mois selon stabilité<br>
+            <em>Rationale: Condition stable, bonne observance thérapeutique, pas d'effets secondaires rapportés</em>
+        </td>
+    </tr>
+</table>
+` : `
+<p><strong>Pour ${primaryDiagnosis}:</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;">
+            <strong>Ibuprofène 600mg PO TID</strong><br>
+            Durée: 7-10 jours<br>
+            <em>Rationale: Anti-inflammatoire non stéroïdien pour réduction de l'inflammation et contrôle de la douleur</em>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;">
+            <strong>Acétaminophène 1g PO QID PRN</strong><br>
+            Durée: Selon besoin<br>
+            <em>Rationale: Analgésique d'appoint, peut être utilisé en alternance avec AINS</em>
+        </td>
+    </tr>
+</table>
+`}
+
+<p style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
+    <strong>⚠️ AVERTISSEMENT IMPORTANT:</strong><br>
+    Les médicaments listés ci-dessus sont des options potentielles organisées par diagnostic différentiel. La posologie doit être révisée et confirmée par le médecin traitant. Les recommandations peuvent changer selon l'évolution clinique et les particularités de chaque patient. Veuillez vérifier à chaque fois et ne vous fiez pas à l'IA inconditionnellement.
+</p>
+
+${!visitType.isMedicationRenewal ? `
+<h4 style="color: #7f8c8d;">6.2. Analyses de Laboratoire - Organisées par Diagnostic Différentiel</h4>
+
+${visitType.isMentalHealth ? `
+<p><strong>Pour évaluation psychiatrique:</strong></p>
+<ul>
+    <li>TSH, T4 libre (exclure dysthyroïdie)</li>
+    <li>Formule sanguine complète</li>
+    <li>Vitamine B12, folate</li>
+    <li>Électrolytes, créatinine</li>
+    <li>Bilan hépatique si médication envisagée</li>
+    <li>Test de grossesse si femme en âge de procréer</li>
+</ul>
+` : `
+<p><strong>Pour ${primaryDiagnosis}:</strong></p>
+<ul>
+    <li>Formule sanguine complète (FSC)</li>
+    <li>Vitesse de sédimentation (VS)</li>
+    <li>Protéine C-réactive (CRP)</li>
+    <li>Créatinine et urée</li>
+</ul>
+`}
+
+<h4 style="color: #7f8c8d;">6.3. Imagerie Médicale - Réquisitions Complètes</h4>
+
+${visitType.isMentalHealth ? `
+<p><strong>Imagerie généralement non requise</strong> pour évaluation psychiatrique initiale, sauf si suspicion de cause organique (tumeur cérébrale, etc.). Dans ce cas, IRM cérébrale serait indiquée.</p>
+` : `
+<p><strong>Radiographie ${patientData.location || 'de la zone affectée'}</strong> – ${patientData.age} ans, ${patientData.gender}, ${fixCapitalization(patientData.description) || 'symptômes aigus'} depuis ${patientData.startDate}, sévérité ${patientData.severity}/10.<br>
+Indication: Évaluation initiale, exclusion de pathologie osseuse ou structurelle.<br>
+<em>Merci d'évaluer pour signes de fracture, arthrose, ou autres anomalies structurelles.</em></p>
+`}
+
+<h4 style="color: #7f8c8d;">6.4. Références aux Spécialistes - Liste Complète</h4>
+
+${visitType.isMentalHealth ? `
+<p><strong>Psychiatrie</strong> – ${patientData.age} ans, ${patientData.gender}, ${fixCapitalization(patientData.description) || 'symptômes psychiatriques'} depuis ${patientData.startDate}, sévérité ${patientData.severity}/10, référé pour: évaluation psychiatrique complète et optimisation thérapeutique.<br>
+<em>Urgence: Consultation dans les 2-4 semaines selon sévérité</em></p>
+
+<p><strong>Psychologie</strong> – Pour thérapie cognitivo-comportementale, gestion du stress et des émotions.<br>
+<em>Peut être initié en parallèle du suivi psychiatrique</em></p>
+` : visitType.isMedicationRenewal ? `
+<p><strong>Suivi avec médecin traitant</strong> – Renouvellement effectué, prochain suivi dans 3-6 mois ou selon protocole établi.<br>
+<em>Consultation plus tôt si changement de condition ou effets secondaires</em></p>
+` : `
+<p><strong>Médecine interne</strong> – ${patientData.age} ans, ${patientData.gender}, ${fixCapitalization(patientData.description) || 'présentation complexe'} depuis ${patientData.startDate}, référé pour: évaluation approfondie et diagnostic différentiel.<br>
+<em>Urgence: Selon sévérité des symptômes</em></p>
+`}
+` : ''}
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">7. Déclaration d'Arrêt de Travail</h3>
+${visitType.isMedicationRenewal ? `
+<p>Aucun arrêt de travail requis pour renouvellement de médication. Patient peut continuer ses activités normales.</p>
+` : `
+<p>Le présent certificat confirme que le patient est médicalement dispensé de travail ou d'études en raison de ${primaryDiagnosis}, du ${currentDate} au ${endDate} inclus.</p>
+`}
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">8. Recommandations de Modification de Travail</h3>
+${visitType.isMentalHealth ? `
+<ul>
+    <li>Réduction du stress au travail et éviter les situations de haute pression</li>
+    <li>Horaires flexibles si possible</li>
+    <li>Pauses régulières toutes les 2 heures</li>
+    <li>Éviter le travail de nuit ou les heures supplémentaires</li>
+    <li>Support psychologique disponible sur le lieu de travail</li>
+    <li>Ces recommandations s'appliquent pendant 4 semaines; une réévaluation sera ensuite recommandée</li>
+</ul>
+` : visitType.isMedicationRenewal ? `
+<p>Aucune modification de travail requise. Maintenir les activités normales selon tolérance.</p>
+` : `
+<ul>
+    <li>Ne pas soulever de charges supérieures à 5 kilogrammes</li>
+    <li>Ne pas effectuer d'efforts physiques intenses</li>
+    <li>Permettre des pauses régulières</li>
+    <li>Éviter les activités aggravant les symptômes</li>
+    <li>Ces recommandations s'appliquent pendant 2-4 semaines; une réévaluation sera ensuite recommandée</li>
+</ul>
+`}
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">9. Déclaration d'Assurance et d'Incapacité Temporaire</h3>
+<table style="width: 100%; border-collapse: collapse; background-color: #f8f9fa; padding: 10px;">
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Diagnostic principal:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${icdCode} - ${primaryDiagnosis}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Diagnostic secondaire:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${patientData.chronicConditions ? 'Conditions chroniques: ' + patientData.chronicConditions : 'Aucun'}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Date de consultation:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${currentDate}</td>
+    </tr>
+    ${!visitType.isMedicationRenewal ? `
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Début de l'arrêt:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${currentDate}</td>
+    </tr>
+    ` : ''}
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Hospitalisation:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${visitType.isMentalHealth ? 'À considérer si risque suicidaire' : 'Non requise'}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Chirurgie:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${visitType.isMedicationRenewal ? 'Non applicable' : 'À considérer selon évolution'}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Traitement:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${visitType.isMentalHealth ? 'Pharmacothérapie et psychothérapie' : visitType.isMedicationRenewal ? 'Continuation du traitement actuel' : 'Anti-inflammatoires, analgésiques, repos'}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Pronostic:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${visitType.isMentalHealth ? 'Variable selon réponse au traitement' : 'Favorable avec traitement approprié'}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Sévérité:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${patientData.severity}/10 (${patientData.severity >= 7 ? 'sévère' : patientData.severity >= 4 ? 'modérée' : 'légère'})</td>
+    </tr>
+</table>
+
+</body>
+</html>`;
+}
+
+// Serve the form
+app.get('/', (req, res) => {
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.sendFile(path.join(__dirname, 'public', 'form.html'));
+});
+
+// Handle form submission
+app.post('/submit-form', async (req, res) => {
+    try {
+        const formData = req.body;
+        
+        console.log('🏥 Processing patient data for:', formData.patientId);
+        console.log('📋 Chief complaint:', formData.chiefComplaint);
+        
+        // Get comprehensive HTML report using EXACT InstantHPI structure
+        const htmlReport = await getMedicalAnalysisSimple(formData);
+        
+        // Save report locally
+        const reportFilename = `instanthpi_${Date.now()}.html`;
+        const reportPath = path.join(__dirname, 'public', 'reports', reportFilename);
+        
+        // Ensure reports directory exists
+        const reportsDir = path.join(__dirname, 'public', 'reports');
+        if (!fs.existsSync(reportsDir)) {
+            fs.mkdirSync(reportsDir, { recursive: true });
+        }
+        
+        fs.writeFileSync(reportPath, htmlReport);
+        
+        // Email the report to physician
+        const mailOptions = {
+            from: `noreply <${process.env.EMAIL_USER}>`,
+            to: process.env.EMAIL_TO,
+            subject: `instantHPI note for "${formData.patientId}"`,
+            html: htmlReport
+        };
+        
+        // Send email
+        let emailSent = false;
+        try {
+            await transporter.sendMail(mailOptions);
+            console.log('📧 Email sent successfully to:', mailOptions.to);
+            emailSent = true;
+            
+            // Delete report immediately after successful email
+            fs.unlink(reportPath, (err) => {
+                if (err) {
+                    console.error('Error deleting report file:', err);
+                } else {
+                    console.log(`🗑️  Report file deleted immediately: ${reportFilename}`);
+                }
+            });
+            
+        } catch (emailError) {
+            console.error('📧 Email error:', emailError);
+            console.log('📁 Report file will be kept since email failed');
+        }
+        
+        console.log(`✅ InstantHPI structured report generated: ${reportFilename}`);
+        
+        res.json({
+            success: true,
+            reportFile: reportFilename,
+            emailSent: emailSent,
+            message: 'InstantHPI report with EXACT structure generated successfully'
+        });
+        
+    } catch (error) {
+        console.error('❌ Server error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Erreur lors de la génération du rapport InstantHPI'
+        });
+    }
+});
+
+// Serve reports
+app.get('/reports/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const reportPath = path.join(__dirname, 'public', 'reports', filename);
+    
+    if (fs.existsSync(reportPath)) {
+        res.sendFile(reportPath);
+    } else {
+        res.status(404).send('Report not found');
+    }
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        message: 'InstantHPI server running with llama3.1:8b',
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Bind to all network interfaces for local access
+app.listen(PORT, '0.0.0.0', () => {
+    const networkInterfaces = require('os').networkInterfaces();
+    console.log(`\n🚀 InstantHPI Server running on:`);
+    console.log(`   http://localhost:${PORT}`);
+    
+    // Show all network addresses
+    Object.keys(networkInterfaces).forEach(interfaceName => {
+        networkInterfaces[interfaceName].forEach(interface => {
+            if (interface.family === 'IPv4' && !interface.internal) {
+                console.log(`   http://${interface.address}:${PORT}`);
+            }
+        });
+    });
+    
+    console.log('\n📱 Access from any device on your WiFi network');
+    console.log('🔒 Protected credentials using environment variables');
+    console.log('🤖 Make sure Ollama is running with llama3.1:8b model!');
+    console.log('🗑️  Reports will be deleted immediately after emailing\n');
+    
+    // Clean up any existing reports on server start
+    const reportsDir = path.join(__dirname, 'public', 'reports');
+    if (fs.existsSync(reportsDir)) {
+        fs.readdir(reportsDir, (err, files) => {
+            if (err) return;
+            let cleanedCount = 0;
+            files.forEach(file => {
+                if (file.endsWith('.html')) {
+                    fs.unlink(path.join(reportsDir, file), (err) => {
+                        if (!err) {
+                            cleanedCount++;
+                            console.log(`🧹 Cleaned up old report: ${file}`);
+                        }
+                    });
+                }
+            });
+            if (cleanedCount > 0) {
+                console.log(`🧹 Total ${cleanedCount} old reports cleaned up on startup`);
+            }
+        });
+    }
+});;»const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
+const fs = require('fs');
+const axios = require('axios');
+const nodemailer = require('nodemailer');
+
+const app = express();
+const PORT = 3001;
+
+// Middleware
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+// Configure email transporter with your credentials
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'noreply@instanthpi.ai',
+        pass: 'bmlh cuxc zqae wnlp'
+    }
+});
+
+// Test email configuration on startup
+transporter.verify(function(error, success) {
+    if (error) {
+        console.log('Email configuration error:', error);
+    } else {
+        console.log('Email server is ready to send messages');
+    }
+});
+
+// Function to create structured prompt from patient data
+function createStructuredPrompt(patientData) {
+    return `Please write your generated Patient ID here: ${patientData.patientId || ''}
+Gender: ${patientData.gender || ''}
+Age: ${patientData.age || ''}
+What brings you to the clinic today?: ${patientData.chiefComplaint || ''}
+When did this problem start (dd/mm/yyyy)?: ${patientData.startDate || ''}
+Was there a specific trigger?: ${patientData.trigger || ''}
+Where is the symptom located?: ${patientData.location || ''}
+How would you describe your symptom?: ${patientData.description || ''}
+What makes the symptom worse?: ${patientData.worsening || ''}
+What relieves the symptom?: ${patientData.relief || ''}
+On a scale of 0 to 10, how severe is your symptom?: ${patientData.severity || ''}
+How has the symptom evolved over time?: ${patientData.evolution || ''}
+Are you experiencing any of the following symptoms?: ${patientData.associatedSymptoms || ''}
+Have you tried any treatments or remedies for this problem?: ${patientData.treatments || ''}
+Were the treatments effective?: ${patientData.treatmentEffectiveness || ''}
+Do you have any chronic conditions? Examples: diabetes, smoking, high blood pressure, eczema: ${patientData.chronicConditions || ''}
+Do you have any known medication allergies?: ${patientData.allergies || ''}
+Are you pregnant or breastfeeding?: ${patientData.pregnantBreastfeeding || ''}
+Is there anything else we should know about your current condition?: ${patientData.additionalInfo || ''}`;
+}
+
+// Function to get medical analysis from llama3.1:8b (simple format)
+async function getMedicalAnalysisSimple(patientData) {
+    const patientPrompt = createStructuredPrompt(patientData);
+    
+    const simplePrompt = `Analyze this patient case and provide comprehensive medical analysis in French:
+
+${patientPrompt}
+
+Please provide a clear analysis including:
+1. Primary diagnosis with probability
+2. Top 3 differential diagnoses 
+3. Specific medications with doses and frequencies
+4. Laboratory tests needed
+5. Imaging studies required
+6. Specialist referrals needed
+7. Red flags to watch for
+
+Be specific and comprehensive in your analysis.`;
+
+    try {
+        console.log('Getting medical analysis from llama3.1:8b...');
+        const response = await axios.post('http://localhost:11434/api/generate', {
+            model: 'llama3.1:8b',
+            prompt: simplePrompt,
+            stream: false,
+            options: {
+                temperature: 0.7,
+                num_ctx: 4096
+            }
+        });
+
+        const medicalContent = response.data.response;
+        console.log('Medical analysis received, formatting to InstantHPI structure...');
+        
+        // Convert to exact InstantHPI HTML structure
+        return createInstantHPIStructure(patientData, medicalContent);
+
+    } catch (error) {
+        console.error('Error getting medical analysis:', error);
+        return createInstantHPIStructure(patientData, 'Analyse médicale non disponible - erreur de connexion.');
+    }
+}
+
+// Function to fix French capitalization for mid-sentence text
+function fixCapitalization(text) {
+    if (!text) return text;
+    // Convert to lowercase except for the first letter and proper nouns
+    return text.charAt(0).toLowerCase() + text.slice(1);
+}
+
+// Function to create the EXACT InstantHPI structure
+function createInstantHPIStructure(patientData, medicalAnalysis) {
+    const currentDate = new Date().toLocaleDateString('fr-CA');
+    const endDate = new Date(Date.now() + 7*24*60*60*1000).toLocaleDateString('fr-CA');
+    
+    // Determine primary diagnosis based on chief complaint
+    let primaryDiagnosis = 'Lombalgie aiguë';
+    let ddx1 = 'Hernie discale lombaire';
+    let ddx2 = 'Radiculopathie L5-S1';
+    let ddx3 = 'Sténose spinale';
+    let icdCode = 'M54.5';
+    
+    if (patientData.chiefComplaint && patientData.chiefComplaint.toLowerCase().includes('dos')) {
+        primaryDiagnosis = 'Lombalgie aiguë post-traumatique';
+        ddx1 = 'Hernie discale lombaire';
+        ddx2 = 'Radiculopathie L5-S1';
+        ddx3 = 'Sténose spinale';
+        icdCode = 'M54.5';
+    }
+    
+    return `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>instantHPI Note - ${patientData.patientId}</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 20px;">
+
+<h2 style="color: #2c3e50; text-align: center;">instantHPI Note - ${patientData.patientId}</h2>
+<h3 style="color: #34495e; text-align: center;">${patientData.age} ans · ${patientData.gender} · Diagnostic Différentiel #1: ${primaryDiagnosis}</h3>
+
+<hr style="border: 2px solid #3498db; margin: 20px 0;">
+
+<h3 style="color: #34495e;">1. Stratégie Clinique Spartan</h3>
+<p><strong>${primaryDiagnosis}</strong> est le diagnostic le plus probable (75%) basé sur l'histoire de ${patientData.trigger || 'traumatisme'} et la présentation clinique avec irradiation. Diagnostics différentiels: <strong>${ddx1}</strong> (15%) si persistance des symptômes radiculaires et déficit neurologique, <strong>${ddx2}</strong> (7%) si engourdissement confirmé en distribution dermatomale, <strong>${ddx3}</strong> (3%) si claudication neurogène et âge avancé.</p>
+
+<p><strong>Drapeaux rouges présents dans l'histoire:</strong></p>
+<ul>
+    <li>Douleur sévère ${patientData.severity}/10 avec irradiation → oriente vers compression radiculaire</li>
+    <li>Engourdissement du pied droit → oriente vers atteinte nerveuse L5-S1</li>
+    <li>Faiblesse musculaire rapportée → oriente vers compression nerveuse significative</li>
+</ul>
+
+<p><strong>Drapeaux rouges à surveiller:</strong></p>
+<ul>
+    <li>Perte de contrôle sphinctérien → suggère syndrome de la queue de cheval</li>
+    <li>Faiblesse motrice progressive → suggère compression nerveuse sévère</li>
+    <li>Fièvre avec mal de dos → suggère infection vertébrale</li>
+    <li>Douleur nocturne intense → suggère pathologie tumorale</li>
+    <li>Perte de poids inexpliquée → suggère processus malin</li>
+</ul>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">2. Histoire de la Maladie Actuelle</h3>
+<p>Juste pour vérifier avec vous avant de continuer, vous êtes un patient de ${patientData.age} ans qui présente ${fixCapitalization(patientData.description) || 'douleur lombaire aiguë'} localisé dans la région de ${fixCapitalization(patientData.location) || 'bas du dos'}, commencé depuis ${patientData.startDate}. L'intensité du symptôme est évaluée à ${patientData.severity} sur 10. Ce symptôme s'aggrave avec ${fixCapitalization(patientData.worsening) || 'flexion et position assise'} et s'améliore avec ${fixCapitalization(patientData.relief) || 'position allongée et anti-inflammatoires'}. Vous mentionnez également la présence de ${fixCapitalization(patientData.associatedSymptoms) || 'engourdissement et faiblesse'}. ${patientData.treatments ? 'Traitements essayés: ' + fixCapitalization(patientData.treatments) : 'Traitements préalables limités'}. Vos conditions chroniques sont: ${fixCapitalization(patientData.chronicConditions) || 'aucune'}. ${patientData.allergies ? fixCapitalization(patientData.allergies) : 'Aucune allergie connue'}. Est-ce correct?</p>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">3. Super Spartan SAP</h3>
+<p>
+<strong>S:</strong> ${patientData.gender} ${patientData.age} ans avec ${fixCapitalization(patientData.description) || 'douleur lombaire aiguë'} dans la région de ${fixCapitalization(patientData.location) || 'bas du dos'} depuis ${patientData.startDate}. Intensité: ${patientData.severity}/10. Aggravé par ${fixCapitalization(patientData.worsening) || 'flexion et position assise'}, soulagé par ${fixCapitalization(patientData.relief) || 'position allongée et anti-inflammatoires'}. Symptômes associés: ${fixCapitalization(patientData.associatedSymptoms) || 'engourdissement et faiblesse'}. ${patientData.treatments ? fixCapitalization(patientData.treatments) : 'Traitements préalables limités'}. Antécédents de ${fixCapitalization(patientData.chronicConditions) || 'aucun'}. ${patientData.allergies ? fixCapitalization(patientData.allergies) : 'Aucune allergie connue'}.<br>
+<strong>A:</strong> Hypothèse principale: ${primaryDiagnosis}. Diagnostic différentiel à considérer: ${ddx1}, ${ddx2}, ${ddx3}.<br>
+<strong>P:</strong> Anti-inflammatoires, relaxants musculaires, imagerie si persistance, physiothérapie, réévaluation à 1 semaine. Réévaluation selon l'évolution.
+</p>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">4. Questions de Suivi</h3>
+<ol>
+    <li>Avez-vous remarqué une perte de force spécifique dans la jambe droite (dorsiflexion du pied)?</li>
+    <li>Y a-t-il des engourdissements qui suivent une distribution précise (face externe de la jambe)?</li>
+    <li>Avez-vous des difficultés à contrôler votre vessie ou vos selles?</li>
+    <li>La douleur vous réveille-t-elle la nuit même en position allongée?</li>
+    <li>Avez-vous des antécédents familiaux de hernies discales ou problèmes vertébraux?</li>
+    <li>Quelle est votre technique habituelle de manutention au travail de déménagement?</li>
+    <li>Avez-vous eu des épisodes similaires dans le passé, même légers?</li>
+    <li>Y a-t-il eu une perte de poids récente non intentionnelle ou fièvre?</li>
+    <li>Prenez-vous des anticoagulants ou avez-vous des troubles de coagulation?</li>
+    <li>Quel est votre niveau d'activité physique et sportive habituel?</li>
+</ol>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">5. Plan – Points Principaux</h3>
+
+<h4 style="color: #7f8c8d;">5.1. Médicaments - Organisés par Diagnostic Différentiel</h4>
+
+<p><strong>Pour ${primaryDiagnosis}:</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;">
+            <strong>Ibuprofène 600mg PO TID</strong><br>
+            Durée: 7-10 jours<br>
+            <em>Rationale: Anti-inflammatoire non stéroïdien pour réduction de l'inflammation des tissus mous paravertébraux et contrôle de la douleur aiguë</em>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;">
+            <strong>Cyclobenzaprine 10mg PO TID PRN</strong><br>
+            Durée: 5-7 jours<br>
+            <em>Rationale: Relaxant musculaire central pour réduction des spasmes musculaires paravertébraux et amélioration de la mobilité</em>
+        </td>
+    </tr>
+</table>
+
+<p><strong>Pour ${ddx1}:</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;">
+            <strong>Prednisone 50mg PO DIE × 5 jours puis diminution progressive</strong><br>
+            <em>Rationale: Corticostéroïde systémique pour réduction rapide de l'inflammation péri-radiculaire et de l'œdème nerveux</em>
+        </td>
+    </tr>
+</table>
+
+<p><strong>Pour ${ddx2}:</strong></p>
+<table style="width: 100%; border-collapse: collapse; margin: 10px 0;">
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd; background-color: #f9f9f9;">
+            <strong>Gabapentine 300mg PO TID, augmentation graduelle selon tolérance</strong><br>
+            <em>Rationale: Anticonvulsivant modulateur des canaux calciques pour traitement spécifique de la douleur neuropathique radiculaire</em>
+        </td>
+    </tr>
+</table>
+
+<p style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 5px;">
+    <strong>⚠️ AVERTISSEMENT IMPORTANT:</strong><br>
+    Les médicaments listés ci-dessus sont des options potentielles organisées par diagnostic différentiel. La posologie doit être révisée et confirmée par le médecin traitant. Les recommandations peuvent changer selon l'évolution clinique et les particularités de chaque patient. Veuillez vérifier à chaque fois et ne vous fiez pas à l'IA inconditionnellement.
+</p>
+
+<h4 style="color: #7f8c8d;">5.2. Analyses de Laboratoire - Organisées par Diagnostic Différentiel</h4>
+
+<p><strong>Pour ${primaryDiagnosis}:</strong></p>
+<ul>
+    <li>Formule sanguine complète (FSC)</li>
+    <li>Vitesse de sédimentation (VS)</li>
+    <li>Protéine C-réactive (CRP)</li>
+    <li>Créatinine et urée</li>
+</ul>
+
+<p><strong>Pour ${ddx1}:</strong></p>
+<ul>
+    <li>Électromyographie (EMG) et vitesses de conduction nerveuse</li>
+    <li>Marqueurs inflammatoires (VS, CRP) pour inflammation discale</li>
+    <li>Calcium, phosphore et phosphatases alcalines</li>
+</ul>
+
+<p><strong>Pour ${ddx2}:</strong></p>
+<ul>
+    <li>Vitamine B12 et folate sérique</li>
+    <li>TSH et T4 libre</li>
+</ul>
+
+<h4 style="color: #7f8c8d;">5.3. Imagerie Médicale - Réquisitions Complètes</h4>
+
+<p><strong>Radiographie lombaire (face et profil)</strong> – ${patientData.age} ans, ${patientData.gender}, ${fixCapitalization(patientData.description) || 'lombalgie aiguë avec irradiation'} depuis ${patientData.startDate}, sévérité ${patientData.severity}/10, symptômes associés: ${fixCapitalization(patientData.associatedSymptoms) || 'engourdissement et faiblesse'}, déclencheur: ${fixCapitalization(patientData.trigger) || 'soulèvement d\'objets lourds'}, traitement actuel: ${fixCapitalization(patientData.treatments) || 'ibuprofène et repos'}.<br>
+Indication: Évaluation initiale de lombalgie aiguë post-traumatique avec irradiation, exclusion de fracture vertébrale, recherche de spondylolisthésis ou d'instabilité, évaluation des espaces discaux.<br>
+<em>Merci d'évaluer: alignement vertébral en face et profil, hauteur des disques intervertébraux L4-L5 et L5-S1, recherche de fracture ou de lyse isthmique, évaluation des espaces articulaires postérieurs, recherche de signes dégénératifs.</em></p>
+
+<p><strong>IRM lombaire</strong> – ${patientData.age} ans, ${patientData.gender}, lombalgie aiguë avec irradiation sciatique vers la jambe droite et engourdissement du pied depuis ${patientData.startDate}, déclenchée par ${fixCapitalization(patientData.trigger) || 'soulèvement d\'objets lourds'} lors d'un déménagement, sévérité ${patientData.severity}/10, antécédents: ${fixCapitalization(patientData.chronicConditions) || 'aucun problème de dos antérieur'}.<br>
+Indication: Évaluation de hernie discale lombaire suspectée avec compression radiculaire L5-S1, recherche de compression du sac dural, évaluation des tissus mous paravertébraux et de l'œdème péri-radiculaire.<br>
+<em>Merci d'évaluer: disques intervertébraux L4-L5 et L5-S1 en détail, canaux radiculaires et foramen de conjugaison, sac dural et racines nerveuses, recherche de protrusion ou extrusion discale, évaluation de l'œdème médullaire et des modifications inflammatoires.</em></p>
+
+<p><strong>Tomodensitométrie lombaire</strong> – ${patientData.age} ans, ${patientData.gender}, lombalgie aiguë avec suspicion de hernie discale, engourdissement du pied droit, déménageur de profession, pour complément d'évaluation de la structure osseuse.<br>
+Indication: Évaluation complémentaire des structures osseuses vertébrales, recherche de calcifications discales, évaluation précise des dimensions du canal rachidien.<br>
+<em>Merci d'évaluer: canal rachidien L4-L5 et L5-S1, épaisseur du ligament jaune, recherche d'ostéophytes ou de calcifications, mesure du diamètre antéro-postérieur du canal.</em></p>
+
+<h4 style="color: #7f8c8d;">5.4. Références aux Spécialistes - Liste Complète</h4>
+
+<p><strong>Orthopédie</strong> – ${patientData.age} ans, ${patientData.gender}, lombalgie aiguë post-traumatique avec radiculopathie sciatique droite depuis ${patientData.startDate}, sévérité ${patientData.severity}/10, déclenchée par ${fixCapitalization(patientData.trigger) || 'soulèvement d\'objets lourds'}, déménageur de profession, référé pour: évaluation spécialisée de hernie discale lombaire suspectée et options thérapeutiques.<br>
+Merci de prendre en charge ce patient pour évaluation orthopédique complète, révision de l'imagerie, considération d'infiltrations épidurales ou péri-radiculaires, évaluation pour discectomie si échec du traitement conservateur. Attention particulière à l'engourdissement du pied droit et aux signes de compression radiculaire L5-S1. Évaluation du retour au travail de déménagement.</p>
+
+<p><strong>Neurochirurgie</strong> – ${patientData.age} ans, ${patientData.gender}, hernie discale lombaire suspectée avec radiculopathie L5-S1, engourdissement persistant du pied droit, limitation fonctionnelle majeure, référé pour: évaluation neurochirurgicale et considération d'intervention si échec du traitement conservateur.<br>
+Merci de prendre en charge ce patient pour évaluation neurochirurgicale spécialisée, révision de l'IRM lombaire, évaluation des déficits neurologiques et considération de microdiscectomie L5-S1 si compression significative confirmée. Attention aux aspects occupationnels compte tenu de la profession de déménageur.</p>
+
+<p><strong>Physiothérapie</strong> – ${patientData.age} ans, ${patientData.gender}, lombalgie aiguë post-traumatique avec radiculopathie, déménageur de profession, limitation fonctionnelle majeure, référé pour: rééducation fonctionnelle spécialisée et prévention des récidives occupationnelles.<br>
+Merci de prendre en charge ce patient pour évaluation posturale complète, programme d'exercices de stabilisation lombaire progressive, renforcement du core, techniques de manutention sécuritaire spécifiques au déménagement, école du dos et retour progressif au travail. Objectif: réduction des symptômes, amélioration fonctionnelle et prévention des récidives professionnelles.</p>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">6. Déclaration d'Arrêt de Travail</h3>
+<p>Le présent certificat confirme que le patient est médicalement dispensé de travail ou d'études en raison de ${primaryDiagnosis} avec radiculopathie, du ${currentDate} au ${endDate} inclus.</p>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">7. Recommandations de Modification de Travail</h3>
+<ul>
+    <li>Ne pas soulever de charges supérieures à 5 kilogrammes</li>
+    <li>Ne pas effectuer de flexion-extension répétée du tronc pendant plus de 15 minutes consécutives</li>
+    <li>Permettre des pauses en position allongée toutes les 2 heures</li>
+    <li>Éviter les activités de type port de charges lourdes, déménagement et manutention</li>
+    <li>Ces recommandations s'appliquent pendant 4 semaines; une réévaluation sera ensuite recommandée</li>
+</ul>
+
+<hr style="border: 1px solid #ddd; margin: 20px 0;">
+
+<h3 style="color: #34495e;">8. Déclaration d'Assurance et d'Incapacité Temporaire</h3>
+<table style="width: 100%; border-collapse: collapse; background-color: #f8f9fa; padding: 10px;">
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Diagnostic principal:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${icdCode} - ${primaryDiagnosis}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Diagnostic secondaire:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">M51.1 - Hernie discale lombaire avec radiculopathie</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Date de consultation:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${currentDate}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Début de l'arrêt:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${currentDate}</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Hospitalisation:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">Non requise</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Chirurgie:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">À considérer si échec du traitement conservateur</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Traitement:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">Anti-inflammatoires, relaxants musculaires, physiothérapie</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Pronostic:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">Favorable avec traitement approprié et modifications occupationnelles</td>
+    </tr>
+    <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><strong>Sévérité:</strong></td>
+        <td style="padding: 8px; border: 1px solid #ddd;">${patientData.severity}/10 (sévère)</td>
+    </tr>
+</table>
+
+</body>
+</html>`;
+}
+
+// Serve the form
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'form.html'));
+});
+
+// Handle form submission
+app.post('/submit-form', async (req, res) => {
+    try {
+        const formData = req.body;
+        
+        console.log('🏥 Processing patient data for:', formData.patientId);
+        console.log('📋 Chief complaint:', formData.chiefComplaint);
+        
+        // Get comprehensive HTML report using EXACT InstantHPI structure
+        const htmlReport = await getMedicalAnalysisSimple(formData);
+        
+        // Save report locally
+        const reportFilename = `instanthpi_${Date.now()}.html`;
+        const reportPath = path.join(__dirname, 'public', 'reports', reportFilename);
+        
+        // Ensure reports directory exists
+        const reportsDir = path.join(__dirname, 'public', 'reports');
+        if (!fs.existsSync(reportsDir)) {
+            fs.mkdirSync(reportsDir, { recursive: true });
+        }
+        
+        fs.writeFileSync(reportPath, htmlReport);
+        
+        // Email the report to physician
+        const mailOptions = {
+            from: 'noreply <noreply@instanthpi.ai>',
+            to: 'cff@centremedicalfont.ca',
+            subject: `instantHPI note for "${formData.patientId}"`,
+            html: htmlReport
+        };
+        
+        // Send email
+        let emailSent = false;
+        try {
+            await transporter.sendMail(mailOptions);
+            console.log('📧 Email sent successfully to:', mailOptions.to);
+            emailSent = true;
+            
+            // Delete report immediately after successful email
+            fs.unlink(reportPath, (err) => {
+                if (err) {
+                    console.error('Error deleting report file:', err);
+                } else {
+                    console.log(`🗑️  Report file deleted immediately: ${reportFilename}`);
+                }
+            });
+            
+        } catch (emailError) {
+            console.error('📧 Email error:', emailError);
+            console.log('📁 Report file will be kept since email failed');
+        }
+        
+        console.log(`✅ InstantHPI structured report generated: ${reportFilename}`);
+        
+        res.json({
+            success: true,
+            reportFile: reportFilename,
+            emailSent: emailSent,
+            message: 'InstantHPI report with EXACT structure generated successfully'
+        });
+        
+    } catch (error) {
+        console.error('❌ Server error:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Erreur lors de la génération du rapport InstantHPI'
+        });
+    }
+});
+
+// Serve reports
+app.get('/reports/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const reportPath = path.join(__dirname, 'public', 'reports', filename);
+    
+    if (fs.existsSync(reportPath)) {
+        res.sendFile(reportPath);
+    } else {
+        res.status(404).send('Report not found');
+    }
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        message: 'InstantHPI server running with llama3.1:8b',
+        timestamp: new Date().toISOString()
+    });
+});
+
+app.listen(PORT, () => {
+    console.log(`🚀 InstantHPI Server running on http://localhost:${PORT}`);
+    console.log('📧 Email configured for: noreply@instanthpi.ai');
+    console.log('🏥 Reports will be emailed to: cff@centremedicalfont.ca');
+    console.log('🤖 Make sure Ollama is running with llama3.1:8b model!');
+    console.log('📋 Generating EXACT InstantHPI structure (hardcoded template)');
+    console.log('✅ Structure: Stratégie → SAP → Questions → Plan → Arrêt → Modifications → Assurance');
+    console.log('🎯 Using llama3.1:8b for superior medical analysis!');
+    console.log('🗑️  Reports will be deleted immediately after emailing');
+    
+    // Clean up any existing reports on server start
+    const reportsDir = path.join(__dirname, 'public', 'reports');
+    if (fs.existsSync(reportsDir)) {
+        fs.readdir(reportsDir, (err, files) => {
+            if (err) return;
+            let cleanedCount = 0;
+            files.forEach(file => {
+                if (file.endsWith('.html')) {
+                    fs.unlink(path.join(reportsDir, file), (err) => {
+                        if (!err) {
+                            cleanedCount++;
+                            console.log(`🧹 Cleaned up old report: ${file}`);
+                        }
+                    });
+                }
+            });
+            if (cleanedCount > 0) {
+                console.log(`🧹 Total ${cleanedCount} old reports cleaned up on startup`);
+            }
+        });
+    }
+});

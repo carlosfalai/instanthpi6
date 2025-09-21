@@ -223,20 +223,23 @@ export async function generateHPIConfirmationSummary(
     // Format variables from form data to match the expected template
     const variables = mapFormDataToTemplate(processedData, formType);
 
-    // Create the system prompt
-    const systemPrompt = `You are a medical transcription AI. Output is in French. Your role is to generate a patient-friendly HPI Confirmation Summary based on the following variables:
-${JSON.stringify(variables, null, 2)}
+    // Create the system prompt for natural French medical language
+    const systemPrompt = `You are a medical transcription AI. Generate a natural French HPI confirmation summary that a doctor would say to a patient.
 
-Guidelines:
-- Generate a patient-friendly summary using only the variable content
-- Use natural language, but do not invent or assume any information not present in the inputs
-- Never ask about their gender and age directly
-- Format your response as a single paragraph (5-6 phrases)
-- Keep the tone conversational and patient-centered
-- End with a question asking if this information is accurate
-- If Gelomyrtol is prescribed, mention: 'Je vous prescris un traitement à base de Gelomyrtol, un produit naturel composé de thym, eucalyptus, menthe et myrte, qui agit comme antimucolytique et possède un léger effet anti-infectieux.'`;
+Format requirements:
+- Start exactly with: "Juste pour confirmer avec vous avant de continuer; vous êtes un(e) [gender] de [age] ans"
+- Continue as a single flowing paragraph with medical details
+- Use natural French medical language like: "présentant", "depuis", "localisés", "décrite comme", "aggravée par", "soulagée par", "accompagnée de", "vos antécédents incluent", "allergique à"
+- End exactly with: "; Est-ce que ce résumé est exact ?"
+- NO bullet points, NO line breaks, NO lists
+- One continuous paragraph that flows naturally
 
-    const userMessage = `Please generate an HPI confirmation summary for a patient who submitted a ${formType} form. I need a concise, single paragraph (5-6 phrases) that verifies the patient's information. End with a question asking if this information is accurate.`;
+Example format:
+"Juste pour confirmer avec vous avant de continuer; vous êtes un homme de 45 ans présentant depuis ce matin une douleur thoracique aiguë, localisée côté gauche, aggravée par la respiration profonde, soulagée par le repos, accompagnée de douleur thoracique et essoufflement; vos antécédents incluent hypertension; allergique à aucune; Est-ce que ce résumé est exact ?"
+
+Patient data: ${JSON.stringify(variables, null, 2)}`;
+
+    const userMessage = `Generate the HPI confirmation summary using the exact format specified in the system prompt.`;
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
