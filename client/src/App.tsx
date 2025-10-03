@@ -2,9 +2,12 @@ import React, { useEffect } from "react";
 import { Router, Route, Switch, useLocation } from "wouter";
 import { supabase } from "@/lib/supabase";
 import { LoginPage } from "@/components/auth/LoginPage";
+import Landing from "@/pages/landing";
 import DoctorDashboard from "@/pages/doctor-dashboard";
 import DoctorLogin from "@/pages/doctor-login";
 import DoctorProfileNew from "@/pages/doctor-profile-new";
+import PatientLogin from "@/pages/patient-login";
+import PatientDashboard from "@/pages/patient-dashboard";
 import PublicPatientIntake from "@/pages/public-patient-intake";
 import WebhookSetupPage from "@/pages/webhook-setup-page";
 
@@ -15,12 +18,14 @@ export default function App() {
     // Check auth state on mount
     supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
-        // Redirect to doctor dashboard on successful login
+        // Redirect based on the login page
         if (location === "/login") {
           setLocation("/doctor-dashboard");
+        } else if (location === "/patient-login") {
+          setLocation("/patient-dashboard");
         }
       } else if (event === "SIGNED_OUT") {
-        // Redirect to intake form on logout
+        // Redirect to landing page on logout
         setLocation("/");
       }
     });
@@ -29,7 +34,10 @@ export default function App() {
   return (
     <Router>
       <Switch>
-        <Route path="/" component={PublicPatientIntake} />
+        <Route path="/" component={Landing} />
+        <Route path="/patient-intake" component={PublicPatientIntake} />
+        <Route path="/patient-login" component={PatientLogin} />
+        <Route path="/patient-dashboard" component={PatientDashboard} />
         <Route path="/login" component={LoginPage} />
         <Route path="/doctor-login" component={DoctorLogin} />
         <Route path="/doctor-dashboard" component={DoctorDashboard} />

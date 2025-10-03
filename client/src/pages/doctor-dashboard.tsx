@@ -43,6 +43,14 @@ interface PatientConsultation {
   medication_allergies?: string;
   pregnancy_status?: string;
   additional_notes?: string;
+  completeData?: {
+    patient_answers?: Array<{
+      hpi_confirmed: boolean;
+      hpi_corrections?: string;
+      answers: Record<string, string>;
+    }>;
+    consultations?: any[];
+  };
 }
 
 interface AccessHistory {
@@ -90,6 +98,9 @@ export default function DoctorDashboard() {
   const [triageHtml, setTriageHtml] = useState<string>("");
   const [copyToast, setCopyToast] = useState<string | null>(null);
   const [showRawData, setShowRawData] = useState<boolean>(false);
+  const [showComprehensiveReport, setShowComprehensiveReport] = useState<boolean>(false);
+  const [comprehensiveReport, setComprehensiveReport] = useState<any>(null);
+  const [generatingComprehensive, setGeneratingComprehensive] = useState<boolean>(false);
   const [customRequest, setCustomRequest] = useState<string>("");
   const [customResponse, setCustomResponse] = useState<string>("");
   const [generatingCustom, setGeneratingCustom] = useState<boolean>(false);
@@ -335,10 +346,23 @@ export default function DoctorDashboard() {
     }
   };
 
-  const openPatientDetails = (consultation: PatientConsultation) => {
+  const openPatientDetails = async (consultation: PatientConsultation) => {
     // Load patient data in the medical transcription panel instead of navigating
     setSearchQuery(consultation.patient_id);
     setSearchResults([consultation]);
+    
+    // Fetch complete patient data including answers and enhanced SOAP note
+    try {
+      const response = await fetch(`/api/patient-data?patient_id=${consultation.patient_id}`);
+      if (response.ok) {
+        const patientData = await response.json();
+        console.log('Complete patient data:', patientData);
+        // Store complete patient data for display
+        setSearchResults([{ ...consultation, completeData: patientData }]);
+      }
+    } catch (error) {
+      console.error('Error fetching complete patient data:', error);
+    }
     
     // Always auto-generate medical transcription when clicking on patient
     setTimeout(() => {
@@ -599,7 +623,7 @@ export default function DoctorDashboard() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <h1 className="text-xl font-semibold text-gray-900">InstantHPI</h1>
-              <span className="ml-2 text-sm text-gray-500">Doctor Dashboard</span>
+              <span className="ml-2 text-sm text-gray-500">Doctor's Lounge</span>
             </div>
             <div className="flex items-center gap-4">
               {/* Doctor Profile */}
@@ -782,25 +806,335 @@ export default function DoctorDashboard() {
                     </Button>
                   </div>
 
-                  {/* Raw Patient Data Section - Always shown first */}
+                  {/* Complete Patient Data Section - Always shown first */}
                   {searchResults.length > 0 && (
                     <div className="border rounded-lg">
                       <div 
                         className="flex items-center justify-between p-3 bg-gray-50 cursor-pointer hover:bg-gray-100"
                         onClick={() => setShowRawData(!showRawData)}
                       >
-                        <h4 className="font-semibold text-sm">📋 Raw Patient Data (API Input)</h4>
+                        <h4 className="font-semibold text-sm">📋 Complete Patient Data</h4>
                         <span className="text-sm text-gray-500">
                           {showRawData ? '▼' : '▶'}
                         </span>
                       </div>
                       {showRawData && (
-                        <div className="p-3 border-t bg-white">
+                        <div className="p-3 border-t bg-white space-y-4">
+                          {/* Patient Answers and HPI Confirmation */}
+                          {searchResults[0].completeData?.patient_answers?.[0] && (
+                            <div className="border rounded-lg p-3 bg-blue-50">
+                              <h5 className="font-semibold text-sm mb-2">📝 Patient Q&A Responses</h5>
+                              <div className="text-xs space-y-2">
+                                <p><strong>HPI Confirmed:</strong> {searchResults[0].completeData.patient_answers[0].hpi_confirmed ? 'Yes' : 'No'}</p>
+                                {searchResults[0].completeData.patient_answers[0].hpi_corrections && (
+                                  <p><strong>Corrections:</strong> {searchResults[0].completeData.patient_answers[0].hpi_corrections}</p>
+                                )}
+                                <div>
+                                  <strong>Answers to 10 Questions:</strong>
+                                  <div className="mt-1 space-y-1">
+                                    {Object.entries(searchResults[0].completeData.patient_answers[0].answers || {}).map(([q, a]) => (
+                                      <div key={q} className="pl-2 border-l-2 border-blue-200">
+                                        <span className="font-medium">Q{q}:</span> {a as string}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Raw Data */}
                           <div className="text-xs text-gray-800 whitespace-pre-line bg-gray-50 rounded-md border p-2 font-mono max-h-60 overflow-y-auto">
                             <code className="block">
                               {JSON.stringify(searchResults[0], null, 2)}
                             </code>
                           </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Comprehensive Medical Report Section */}
+                  {searchResults.length > 0 && (
+                    <div className="border rounded-lg">
+                      <div 
+                        className="flex items-center justify-between p-3 bg-green-50 cursor-pointer hover:bg-green-100"
+                        onClick={() => setShowComprehensiveReport(!showComprehensiveReport)}
+                      >
+                        <h4 className="font-semibold text-sm">🏥 Rapport Médical Complet</h4>
+                        <span className="text-sm text-gray-500">
+                          {showComprehensiveReport ? '▼' : '▶'}
+                        </span>
+                      </div>
+                      {showComprehensiveReport && (
+                        <div className="p-3 border-t bg-white space-y-4">
+                          {/* Generate Comprehensive Report Button */}
+                          <div className="flex gap-2 mb-4">
+                            <Button
+                              onClick={generateComprehensiveReport}
+                              disabled={generatingComprehensive}
+                              size="sm"
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              {generatingComprehensive ? "Génération..." : "Générer Rapport Complet"}
+                            </Button>
+                          </div>
+
+                          {/* Comprehensive Report Sections */}
+                          {comprehensiveReport && (
+                            <div className="space-y-4">
+                              {/* 1. HPI Summary */}
+                              {comprehensiveReport.hpi_summary && (
+                                <div className="border rounded-lg p-3 bg-blue-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">1. Résumé de Confirmation HPI</h5>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => copyToClipboard(comprehensiveReport.hpi_summary)}
+                                    >
+                                      Copier
+                                    </Button>
+                                  </div>
+                                  <div className="text-sm whitespace-pre-line">{comprehensiveReport.hpi_summary}</div>
+                                </div>
+                              )}
+
+                              {/* 2. Follow-up Questions */}
+                              {comprehensiveReport.follow_up_questions && (
+                                <div className="border rounded-lg p-3 bg-yellow-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">2. Questions de Suivi (10 questions)</h5>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => copyToClipboard(comprehensiveReport.follow_up_questions.join('\n'))}
+                                    >
+                                      Copier
+                                    </Button>
+                                  </div>
+                                  <div className="text-sm space-y-1">
+                                    {comprehensiveReport.follow_up_questions.map((question, index) => (
+                                      <div key={index} className="pl-2 border-l-2 border-yellow-200">
+                                        {question}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* 3. SAP Note */}
+                              {comprehensiveReport.sap_note && (
+                                <div className="border rounded-lg p-3 bg-purple-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">3. Super Spartan SAP Note</h5>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => copyToClipboard(comprehensiveReport.sap_note)}
+                                    >
+                                      Copier
+                                    </Button>
+                                  </div>
+                                  <div className="text-sm whitespace-pre-line">{comprehensiveReport.sap_note}</div>
+                                </div>
+                              )}
+
+                              {/* 4. Medications */}
+                              {comprehensiveReport.medications && comprehensiveReport.medications.length > 0 && (
+                                <div className="border rounded-lg p-3 bg-green-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">4. Médicaments - Prescriptions Prêtes à Utiliser</h5>
+                                  </div>
+                                  <div className="space-y-3">
+                                    {comprehensiveReport.medications.map((med, index) => (
+                                      <div key={index} className="border rounded p-3 bg-white">
+                                        <div className="flex justify-between items-center mb-2">
+                                          <h6 className="font-semibold text-sm">{med.name}</h6>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => copyToClipboard(`${med.name}\n${med.dosage}\nQuantité: ${med.quantity} | Renouvellement: ${med.renewal}\nInstructions: ${med.instructions}`)}
+                                          >
+                                            Copier
+                                          </Button>
+                                        </div>
+                                        <div className="text-sm space-y-1">
+                                          <div><strong>Dosage:</strong> {med.dosage}</div>
+                                          <div><strong>Quantité:</strong> {med.quantity} | <strong>Renouvellement:</strong> {med.renewal}</div>
+                                          <div><strong>Instructions:</strong> {med.instructions}</div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* 5. Lab Work */}
+                              {comprehensiveReport.lab_work && comprehensiveReport.lab_work.length > 0 && (
+                                <div className="border rounded-lg p-3 bg-orange-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">5. Analyses de Laboratoire</h5>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => copyToClipboard(comprehensiveReport.lab_work.join('\n'))}
+                                    >
+                                      Copier
+                                    </Button>
+                                  </div>
+                                  <div className="text-sm font-mono bg-gray-100 p-2 rounded">
+                                    {comprehensiveReport.lab_work.join('\n')}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* 6. Imaging */}
+                              {comprehensiveReport.imaging && comprehensiveReport.imaging.length > 0 && (
+                                <div className="border rounded-lg p-3 bg-cyan-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">6. Imagerie Médicale</h5>
+                                  </div>
+                                  <div className="space-y-3">
+                                    {comprehensiveReport.imaging.map((img, index) => (
+                                      <div key={index} className="border rounded p-3 bg-white">
+                                        <div className="flex justify-between items-center mb-2">
+                                          <h6 className="font-semibold text-sm">{img.name}</h6>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => copyToClipboard(`${img.name}\n${img.patient_info}\nIndication: ${img.indication}\nDélai recommandé: ${img.timing}`)}
+                                          >
+                                            Copier
+                                          </Button>
+                                        </div>
+                                        <div className="text-sm space-y-1">
+                                          <div>{img.patient_info}</div>
+                                          <div><strong>Indication:</strong> {img.indication}</div>
+                                          <div><strong>Délai recommandé:</strong> {img.timing}</div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* 7. Referrals */}
+                              {comprehensiveReport.referrals && comprehensiveReport.referrals.length > 0 && (
+                                <div className="border rounded-lg p-3 bg-pink-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">7. Références Spécialisées</h5>
+                                  </div>
+                                  <div className="space-y-3">
+                                    {comprehensiveReport.referrals.map((ref, index) => (
+                                      <div key={index} className="border rounded p-3 bg-white">
+                                        <div className="flex justify-between items-center mb-2">
+                                          <h6 className="font-semibold text-sm">{ref.specialty}</h6>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => copyToClipboard(`${ref.specialty}\n${ref.patient_info}\nIndication: ${ref.indication}\nDélai recommandé: ${ref.timing}`)}
+                                          >
+                                            Copier
+                                          </Button>
+                                        </div>
+                                        <div className="text-sm space-y-1">
+                                          <div>{ref.patient_info}</div>
+                                          <div><strong>Indication:</strong> {ref.indication}</div>
+                                          <div><strong>Délai recommandé:</strong> {ref.timing}</div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* 8. Work Leave */}
+                              {comprehensiveReport.work_leave && (
+                                <div className="border rounded-lg p-3 bg-indigo-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">8. Arrêt de Travail et École</h5>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => copyToClipboard(comprehensiveReport.work_leave)}
+                                    >
+                                      Copier
+                                    </Button>
+                                  </div>
+                                  <div className="text-sm whitespace-pre-line">{comprehensiveReport.work_leave}</div>
+                                </div>
+                              )}
+
+                              {/* 9. Workplace Modifications */}
+                              {comprehensiveReport.workplace_modifications && (
+                                <div className="border rounded-lg p-3 bg-teal-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">9. Modifications du Poste de Travail</h5>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => copyToClipboard(comprehensiveReport.workplace_modifications)}
+                                    >
+                                      Copier
+                                    </Button>
+                                  </div>
+                                  <div className="text-sm whitespace-pre-line">{comprehensiveReport.workplace_modifications}</div>
+                                </div>
+                              )}
+
+                              {/* 10. Insurance Documentation */}
+                              {comprehensiveReport.insurance_documentation && (
+                                <div className="border rounded-lg p-3 bg-red-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">10. Documentation d'Assurance</h5>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => copyToClipboard(comprehensiveReport.insurance_documentation)}
+                                    >
+                                      Copier
+                                    </Button>
+                                  </div>
+                                  <div className="text-sm whitespace-pre-line">{comprehensiveReport.insurance_documentation}</div>
+                                </div>
+                              )}
+
+                              {/* 11. Telemedicine Limitations */}
+                              {comprehensiveReport.telemedicine_limitations && (
+                                <div className="border rounded-lg p-3 bg-amber-50">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">11. Télémédecine - Nécessite Évaluation en Personne</h5>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => copyToClipboard(comprehensiveReport.telemedicine_limitations)}
+                                    >
+                                      Copier
+                                    </Button>
+                                  </div>
+                                  <div className="text-sm whitespace-pre-line">{comprehensiveReport.telemedicine_limitations}</div>
+                                </div>
+                              )}
+
+                              {/* 12. Emergency Referral */}
+                              {comprehensiveReport.emergency_referral && (
+                                <div className="border rounded-lg p-3 bg-red-100">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <h5 className="font-semibold text-sm">12. Référence pour l'Équipe d'Urgence</h5>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => copyToClipboard(comprehensiveReport.emergency_referral)}
+                                    >
+                                      Copier
+                                    </Button>
+                                  </div>
+                                  <div className="text-sm whitespace-pre-line">{comprehensiveReport.emergency_referral}</div>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -954,12 +1288,18 @@ function DashboardCarousel() {
         const res = await fetch("/api/assets/images", { headers: { "Cache-Control": "no-cache" } });
         const data = await res.json();
         const files: any[] = Array.isArray(data?.files) ? data.files : [];
-        const urls: string[] = files
+        // Find Butler image first, then other images (excluding screenshots)
+        const butlerImage = files.find((f: any) => /butler/i.test(String(f?.name || "")));
+        const otherImages = files
           .filter((f: any) => {
             const n = String(f?.name || "");
             return !/screenshot/i.test(n) && !/butler/i.test(n);
           })
           .map((f: any) => String(f.url));
+        
+        const urls: string[] = butlerImage 
+          ? [String(butlerImage.url), ...otherImages]
+          : otherImages;
         setImages(urls);
       } catch {
         setImages([]);

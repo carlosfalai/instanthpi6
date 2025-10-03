@@ -58,11 +58,30 @@ export default function DoctorLogin() {
     }
   };
 
+  // Light purple gradient matching the profile page
+  const backgroundImages = [
+    "bg-gradient-to-br from-purple-50 to-violet-100",
+    "bg-gradient-to-br from-purple-50 to-indigo-100",
+    "bg-gradient-to-br from-violet-50 to-purple-100",
+    "bg-gradient-to-br from-indigo-50 to-purple-100",
+    "bg-gradient-to-br from-purple-100 to-violet-200"
+  ];
+  
+  const [currentBg, setCurrentBg] = React.useState(() => 
+    backgroundImages[Math.floor(Math.random() * backgroundImages.length)]
+  );
+
+  // Rotate background on each page load
+  React.useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * backgroundImages.length);
+    setCurrentBg(backgroundImages[randomIndex]);
+  }, []);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className={`min-h-screen flex items-center justify-center ${currentBg}`}>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Doctor Login</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">Doctor's Lounge</CardTitle>
           <CardDescription className="text-center">
             Access the InstantHPI Medical Dashboard
           </CardDescription>
@@ -135,13 +154,6 @@ export default function DoctorLogin() {
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
 
-              <div className="text-center text-sm text-gray-600 mt-4">
-                Demo credentials:
-                <br />
-                Email: doctor@instanthpi.ca
-                <br />
-                Password: medical123
-              </div>
             </form>
 
             {message && (

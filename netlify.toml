@@ -50,7 +50,30 @@
   status = 200
 
 # AI processing via modern API endpoints
-# (Ollama endpoints removed - using OpenAI/Anthropic APIs only)
+[[redirects]]
+  from = "/api/medical-transcription"
+  to = "/.netlify/functions/medical-transcription"
+  status = 200
+
+[[redirects]]
+  from = "/api/generate-triage"
+  to = "/.netlify/functions/ollama-triage"
+  status = 200
+
+[[redirects]]
+  from = "/api/comprehensive-triage"
+  to = "/.netlify/functions/comprehensive-triage"
+  status = 200
+
+[[redirects]]
+  from = "/api/generate-enhanced-soap"
+  to = "/.netlify/functions/generate-enhanced-soap"
+  status = 200
+
+[[redirects]]
+  from = "/api/patient-data"
+  to = "/.netlify/functions/api-patient-data"
+  status = 200
 
 # Redirect all routes to index.html for client-side routing (must be last)
 [[redirects]]
