@@ -49,16 +49,8 @@
   to = "/assets/images.json"
   status = 200
 
-# Ollama triage/status via Netlify Functions
-[[redirects]]
-  from = "/api/ollama/triage"
-  to = "/.netlify/functions/ollama-triage"
-  status = 200
-
-[[redirects]]
-  from = "/api/ollama/status"
-  to = "/.netlify/functions/ollama-status"
-  status = 200
+# AI processing via modern API endpoints
+# (Ollama endpoints removed - using OpenAI/Anthropic APIs only)
 
 # Redirect all routes to index.html for client-side routing (must be last)
 [[redirects]]

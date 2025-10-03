@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { LoginPage } from "@/components/auth/LoginPage";
 import DoctorDashboard from "@/pages/doctor-dashboard";
 import DoctorLogin from "@/pages/doctor-login";
-import DoctorProfile from "@/pages/doctor-profile";
+import DoctorProfileNew from "@/pages/doctor-profile-new";
 import PublicPatientIntake from "@/pages/public-patient-intake";
 import WebhookSetupPage from "@/pages/webhook-setup-page";
 
@@ -33,7 +33,7 @@ export default function App() {
         <Route path="/login" component={LoginPage} />
         <Route path="/doctor-login" component={DoctorLogin} />
         <Route path="/doctor-dashboard" component={DoctorDashboard} />
-        <Route path="/doctor-profile" component={DoctorProfile} />
+        <Route path="/doctor-profile" component={DoctorProfileNew} />
         <Route path="/webhook-setup" component={WebhookSetupPage} />
         <Route>
           <div className="min-h-screen flex items-center justify-center">

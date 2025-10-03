@@ -27,6 +27,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { AISettingsPanel } from "@/components/settings/AISettingsPanel";
 
 interface DoctorProfile {
   id: string;
@@ -323,11 +324,12 @@ export default function DoctorProfile() {
         )}
 
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-white border">
+          <TabsList className="grid w-full grid-cols-5 bg-white border">
             <TabsTrigger value="profile" className="data-[state=active]:bg-blue-50">Profile</TabsTrigger>
             <TabsTrigger value="credentials" className="data-[state=active]:bg-blue-50">Credentials</TabsTrigger>
             <TabsTrigger value="schedule" className="data-[state=active]:bg-blue-50">Schedule</TabsTrigger>
             <TabsTrigger value="preferences" className="data-[state=active]:bg-blue-50">Preferences</TabsTrigger>
+            <TabsTrigger value="ai-settings" className="data-[state=active]:bg-blue-50">AI Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="space-y-6">
@@ -873,6 +875,10 @@ export default function DoctorProfile() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="ai-settings" className="space-y-6">
+            <AISettingsPanel userId={parseInt(profile.id) || 1} />
           </TabsContent>
         </Tabs>
       </div>

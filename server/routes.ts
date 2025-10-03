@@ -25,7 +25,7 @@ import spruceWebhooksRouter from "./routes/spruce-webhooks";
 import { router as educationRouter } from "./routes/education";
 import { router as userRouter } from "./routes/user";
 import { router as anthropicRouter } from "./routes/anthropic";
-import ollamaTriageRouter from "./routes/ollama-triage";
+// import ollamaTriageRouter from "./routes/ollama-triage"; // REMOVED: Using OpenAI/Anthropic APIs only
 import formsRouter from "./routes/forms";
 import { schedulerRouter } from "./routes/scheduler";
 import { messagingRouter } from "./routes/messaging";
@@ -48,6 +48,7 @@ import { router as twilioAuthRouter } from "./routes/twilio-auth";
 import consultationsSearchRouter from "./routes/consultations-search";
 import unifiedMedicalProcessingRouter from "./routes/unified-medical-processing";
 import aiSettingsRouter from "./routes/ai-settings";
+import { router as doctorCredentialsRouter } from "./routes/doctor-credentials";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -86,7 +87,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register our API routers
   app.use("/api/ai", aiRouter);
   app.use("/api/anthropic", anthropicRouter);
-  app.use("/api/ollama", ollamaTriageRouter);
+  // app.use("/api/ollama", ollamaTriageRouter); // REMOVED: Using OpenAI/Anthropic APIs only
   app.use("/api/patients", patientsRouter);
   app.use("/api/spruce", spruceRouter);
   app.use("/api/webhooks/spruce", spruceWebhooksRouter);
@@ -119,6 +120,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/consultations", consultationsSearchRouter);
   // Unified medical processing API for two-stage documentation
   app.use("/api/unified-medical-processing", unifiedMedicalProcessingRouter);
+  // AI settings API for user-specific AI provider configuration
+  app.use("/api/ai-settings", aiSettingsRouter);
+  // Doctor credentials API for managing encrypted API keys
+  app.use("/api/doctor", doctorCredentialsRouter);
 
   // Error handling middleware for Zod validation errors
   const handleZodError = (error: unknown, res: Response) => {
@@ -147,7 +152,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // For now we just acknowledge. A future enhancement can fetch the row via Google Sheets API
-      // and then call our triage processor (/api/ollama/triage) using mapped columns.
+      // and then call our AI triage processor using mapped columns.
       return res.status(200).json({ status: "ok", received: true });
     } catch (err) {
       console.error("Webhook handling error:", err);
@@ -925,31 +930,7 @@ Is this information correct? If not, please let us know what needs to be correct
     }
   });
 
-  // Mount all API routers
-  app.use("/api/ai", aiRouter);
-  app.use("/api/ollama", ollamaTriageRouter);
-  app.use("/api/patients", patientsRouter);
-  app.use("/api/spruce", spruceRouter);
-  app.use("/api/webhooks/spruce", spruceWebhooksRouter);
-  app.use("/api/education", educationRouter);
-  app.use("/api/user", userRouter);
-  app.use("/api/anthropic", anthropicRouter);
-  app.use("/api/forms", formsRouter);
-  app.use("/api/scheduler", schedulerRouter);
-  app.use("/api/messaging", messagingRouter);
-  app.use("/api/formsite", formsiteRouter);
-  app.use("/api/formsite-pseudonym", formsitePseudonymRoutes);
-  app.use("/api/medication-refills", medicationRefillsRouter);
-  app.use("/api/insurance-documents", insuranceDocumentsRouter);
-  app.use("/api/fax", faxRouter);
-  app.use("/api/billing", billingRouter);
-  app.use("/api/pseudonym", pseudonymRouter);
-  app.use("/api/urgent-care", urgentCareRouter);
-  app.use("/api/stripe", stripeRouter);
-  app.use("/api/priority-ai", priorityAIRouter);
-  app.use("/api/documents", documentsRouter);
-  app.use("/api/interconsultation", interconsultationRouter);
-  app.use("/api/ai-settings", aiSettingsRouter);
+  // Note: API routers are already registered above. This section was duplicated and has been cleaned up.
 
   const httpServer = createServer(app);
   return httpServer;
