@@ -733,19 +733,19 @@ export default function DoctorDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-900">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-gray-800 shadow-sm border-b border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-800">InstantHPI</h1>
-              <span className="ml-2 text-sm text-gray-600">Doctor's Dashboard</span>
+              <h1 className="text-xl font-semibold text-white">InstantHPI</h1>
+              <span className="ml-2 text-sm text-gray-300">Doctor's Lounge</span>
             </div>
             <div className="flex items-center gap-4">
               {/* Doctor Profile */}
               <div
-                className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors border border-gray-200"
+                className="flex items-center gap-3 px-3 py-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors border border-gray-600"
                 onClick={() => navigate("/doctor-profile")}
               >
                 <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center">
@@ -758,15 +758,15 @@ export default function DoctorDashboard() {
                   )}
                 </div>
                 <div className="text-sm">
-                  <p className="font-medium text-gray-800">{docHeader.name}</p>
-                  <p className="text-gray-600">{docHeader.specialty || "—"}</p>
+                  <p className="font-medium text-white">{docHeader.name}</p>
+                  <p className="text-gray-300">{docHeader.specialty || "—"}</p>
                 </div>
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleLogout}
-                className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50"
+                className="flex items-center gap-2 border-gray-500 text-gray-300 hover:bg-gray-700"
               >
                 <LogOut className="h-4 w-4" />
                 Logout
@@ -776,7 +776,7 @@ export default function DoctorDashboard() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-900">
         {/* Top carousel */}
         <DashboardCarousel />
         {/* Full width layout for medical sections */}
@@ -855,13 +855,13 @@ export default function DoctorDashboard() {
           <div className="lg:col-span-2">
             {/* Search Section */}
             <Card className="mb-8 bg-gray-800 border-gray-700 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-white">Patient Search</CardTitle>
-                <CardDescription className="text-gray-300">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-white text-xl">Patient Search</CardTitle>
+                <CardDescription className="text-gray-300 text-base">
                   Enter the 10-character patient identifier (e.g., A1B2C3D4E5)
                 </CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-2">
                 <div className="flex gap-4">
                   <div className="flex-1">
                     <Input
@@ -870,44 +870,44 @@ export default function DoctorDashboard() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
                       onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                      className="uppercase font-mono border-gray-300 focus:border-blue-500"
+                      className="uppercase font-mono border-gray-600 bg-gray-700 text-white focus:border-blue-500 h-12 text-lg"
                     />
                   </div>
                   <Button
                     onClick={handleSearch}
                     disabled={loading || !searchQuery.trim()}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white h-12 px-6 text-lg"
                   >
-                    <Search className="h-4 w-4" />
+                    <Search className="h-5 w-5" />
                     Search
                   </Button>
                 </div>
 
                 {/* Search Results */}
                 {searchResults.length > 0 && (
-                  <div className="mt-6 space-y-3">
-                    <h3 className="font-medium text-gray-800">Search Results</h3>
+                  <div className="mt-6 space-y-4">
+                    <h3 className="font-medium text-white text-lg">Search Results</h3>
                     {searchResults.map((consultation) => (
                       <div
                         key={consultation.id}
-                        className="p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                        className="p-6 bg-gray-700 border border-gray-600 rounded-lg hover:bg-gray-600 cursor-pointer transition-colors"
                         onClick={() => openPatientDetails(consultation)}
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <span className="font-mono font-bold text-lg text-gray-800">
+                            <div className="flex items-center gap-3 mb-3">
+                              <span className="font-mono font-bold text-xl text-white">
                                 {consultation.patient_id}
                               </span>
                               <Badge className={getTriageColor(consultation.triage_level)}>
                                 {consultation.triage_level}
                               </Badge>
-                              <Badge variant="outline" className="border-gray-300 text-gray-700">{consultation.status}</Badge>
+                              <Badge variant="outline" className="border-gray-400 text-gray-300">{consultation.status}</Badge>
                             </div>
-                            <p className="text-sm text-gray-700 mb-1">
+                            <p className="text-base text-gray-200 mb-2">
                               <strong>Chief Complaint:</strong> {consultation.chief_complaint}
                             </p>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-sm text-gray-400">
                               {format(new Date(consultation.created_at), "PPpp")}
                             </p>
                           </div>
@@ -922,23 +922,23 @@ export default function DoctorDashboard() {
 
             {/* Recent Consultations */}
             <Card className="mb-8 bg-gray-800 border-gray-700 shadow-sm">
-              <CardHeader>
-                <CardTitle className="text-white">Recent Consultations</CardTitle>
-                <CardDescription className="text-gray-300">Latest patient submissions</CardDescription>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-white text-xl">Recent Consultations</CardTitle>
+                <CardDescription className="text-gray-300 text-base">Latest patient submissions</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-2">
                 {recentPatients.length === 0 ? (
-                  <p className="text-sm text-gray-400">No recent consultations</p>
+                  <p className="text-base text-gray-400">No recent consultations</p>
                 ) : (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {recentPatients.map((consultation) => (
                       <div
                         key={consultation.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors border border-gray-200"
+                        className="flex items-center justify-between p-4 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer transition-colors border border-gray-600"
                         onClick={() => openPatientDetails(consultation)}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="font-mono font-semibold text-gray-800">{consultation.patient_id}</span>
+                          <span className="font-mono font-semibold text-white text-lg">{consultation.patient_id}</span>
                           <Badge
                             className={getTriageColor(consultation.triage_level)}
                             variant="secondary"
@@ -946,7 +946,7 @@ export default function DoctorDashboard() {
                             {consultation.triage_level}
                           </Badge>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-gray-500" />
+                        <ChevronRight className="h-5 w-5 text-gray-400" />
                       </div>
                     ))}
                   </div>
@@ -959,29 +959,29 @@ export default function DoctorDashboard() {
           <aside className="lg:col-span-1">
             <div className="lg:sticky lg:top-6 space-y-4">
               {/* TRANSCRIPTION (only sections) */}
-              <Card className="bg-white border-gray-200 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-gray-800">Transcription Médicale</CardTitle>
-                  <CardDescription className="text-gray-600">Cliquez sur un patient pour générer automatiquement 12+ sections en français</CardDescription>
+              <Card className="bg-gray-800 border-gray-700 shadow-sm">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-white text-xl">Transcription Médicale</CardTitle>
+                  <CardDescription className="text-gray-300 text-base">Cliquez sur un patient pour générer automatiquement 12+ sections en français</CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 pt-2">
                   <div className="flex items-center gap-2">
                     <Input
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
                       placeholder="ID Patient (A1B2C3D4E5)"
-                      className="uppercase font-mono border-gray-300 focus:border-blue-500"
+                      className="uppercase font-mono border-gray-600 bg-gray-700 text-white focus:border-blue-500 h-10"
                     />
                     <Button
                       onClick={generateFrenchTranscription}
                       disabled={generating || !searchQuery}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-blue-600 hover:bg-blue-700 text-white h-10 px-4"
                     >
                       {generating ? "Génération…" : "Générer"}
                     </Button>
                   </div>
 
-                  {copyToast && <div className="text-xs text-green-700">{copyToast}</div>}
+                  {copyToast && <div className="text-sm text-green-400">{copyToast}</div>}
 
                   <div className="flex justify-end">
                     <Button
@@ -989,7 +989,7 @@ export default function DoctorDashboard() {
                       size="sm"
                       onClick={copyAll}
                       disabled={!frenchDoc.hpiConfirmationSummary && !frenchDoc.followUpQuestions}
-                      className="border-gray-300 text-gray-700 hover:bg-gray-50"
+                      className="border-gray-600 text-gray-300 hover:bg-gray-700"
                     >
                       Tout Copier
                     </Button>
@@ -1482,15 +1482,23 @@ function DashboardCarousel() {
         const res = await fetch("/api/assets/images", { headers: { "Cache-Control": "no-cache" } });
         const data = await res.json();
         const files: any[] = Array.isArray(data?.files) ? data.files : [];
-        // Find Butler image specifically - look for the professional butler image
+        // Find Butler image specifically - prioritize butler images
         const butler = files.find((f: any) => {
           const name = String(f?.name || "").toLowerCase();
-          return /butler/i.test(name) || /hm8kcbkko/i.test(name) || /professional/i.test(name) || /doctor/i.test(name) || /medical/i.test(name);
+          return /butler/i.test(name) || /hm8kcbkko/i.test(name);
         });
+        
+        // If no butler found, look for professional/medical images
+        const professionalImage = !butler ? files.find((f: any) => {
+          const name = String(f?.name || "").toLowerCase();
+          return /professional/i.test(name) || /doctor/i.test(name) || /medical/i.test(name) || /suit/i.test(name) || /business/i.test(name);
+        }) : null;
         if (butler) {
           setButlerImage(String(butler.url));
+        } else if (professionalImage) {
+          setButlerImage(String(professionalImage.url));
         } else {
-          // If no butler found, use the largest high-quality image as hero
+          // If no butler or professional found, use the largest high-quality image as hero
           const highQualityImages = files
             .filter((f: any) => f.size > 100000) // Larger than 100KB
             .sort((a: any, b: any) => b.size - a.size);
@@ -1505,7 +1513,7 @@ function DashboardCarousel() {
   }, []);
   
   return (
-    <div className="mb-8 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+    <div className="mb-8 bg-gray-800 rounded-lg overflow-hidden border border-gray-700 shadow-sm">
       <div className="flex items-center justify-center p-6">
         <img
           src={butlerImage}
@@ -1587,11 +1595,11 @@ function FrenchSection({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg mb-6 shadow-sm">
+    <div className="bg-gray-800 border border-gray-700 rounded-lg mb-6 shadow-sm">
       {/* Professional medical header */}
-      <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+      <div className="bg-gray-700 border-b border-gray-600 px-6 py-4">
         <div className="flex items-center justify-between">
-          <h4 className="text-lg font-semibold text-gray-800">{title}</h4>
+          <h4 className="text-lg font-semibold text-white">{title}</h4>
           <button
             onClick={handleCopy}
             disabled={!text}
@@ -1612,14 +1620,14 @@ function FrenchSection({
       <div className="p-6">
         {text ? (
           <div className="prose max-w-none">
-            <div className="text-gray-800 leading-relaxed whitespace-pre-wrap font-mono text-sm bg-gray-50 p-4 rounded-md border border-gray-200 min-h-[100px] w-full">
+            <div className="text-gray-200 leading-relaxed whitespace-pre-wrap font-mono text-sm bg-gray-700 p-6 rounded-md border border-gray-600 min-h-[150px] w-full">
               {text}
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-center py-8">
+          <div className="flex items-center justify-center py-12">
             <div className="text-center">
-              <div className="text-gray-600 text-sm">
+              <div className="text-gray-400 text-sm">
                 Click "Generate" to create medical transcription
               </div>
             </div>
