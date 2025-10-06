@@ -35,17 +35,20 @@ export default function DoctorDashboard() {
   }, []);
 
   const checkAuthAndLoadProfile = async () => {
-    // Check the actual authentication method used in this project
-    const isAuthenticated = localStorage.getItem("doctor_authenticated") === "true";
-    const doctorInfo = localStorage.getItem("doctor_info");
+    // Check both localStorage auth and Supabase auth
+    const isLocalAuth = localStorage.getItem("doctor_authenticated") === "true";
+    
+    // Check Supabase auth
+    const { data: { session } } = await supabase.auth.getSession();
+    const isSupabaseAuth = !!session;
     
     console.log("Doctor Dashboard - Auth Check:", {
-      isAuthenticated,
-      doctorInfo,
-      localStorage: localStorage.getItem("doctor_authenticated")
+      isLocalAuth,
+      isSupabaseAuth,
+      session: session?.user?.email
     });
     
-    if (!isAuthenticated) {
+    if (!isLocalAuth && !isSupabaseAuth) {
       console.log("User not authenticated, redirecting to login");
       navigate("/doctor-login");
       return;
@@ -57,44 +60,50 @@ export default function DoctorDashboard() {
 
   const loadDoctorProfile = async () => {
     try {
-      // This project uses localStorage-based auth, not Supabase auth
-      // Get doctor info from localStorage or make API call to get real doctor data
-      const storedDoctorInfo = localStorage.getItem("doctor_info");
+      // Check if we have Supabase session first
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (storedDoctorInfo) {
-        const doctorInfo = JSON.parse(storedDoctorInfo);
-        setDocHeader({
-          name: doctorInfo.name || "",
-          specialty: doctorInfo.specialty || "",
-          avatarUrl: doctorInfo.avatarUrl || null
-        });
-      } else {
-        // If no stored info, try to get from API
-        const response = await fetch("/api/doctor-profile");
-        if (response.ok) {
-          const doctorData = await response.json();
+      if (session?.user) {
+        // Use Supabase auth
+        const email = session.user.email;
+        console.log("Loading profile for Supabase user:", email);
+        
+        // Try to get doctor info from database
+        const { data, error } = await supabase
+          .from("physicians")
+          .select("*")
+          .eq("email", email)
+          .single();
+          
+        if (data) {
           setDocHeader({
-            name: doctorData.name || "",
-            specialty: doctorData.specialty || "",
-            avatarUrl: doctorData.avatarUrl || null
+            name: data.name || "Doctor",
+            specialty: data.specialty || "",
+            avatarUrl: ""
           });
         } else {
-          // No real data available - show empty state
-          setDocHeader({
-            name: "",
-            specialty: "",
-            avatarUrl: null
-          });
+          // Fallback to email-based name
+          const name = email === 'cff@centremedicalfont.ca' ? 'Carlos Faviel Font' : 'Doctor';
+          setDocHeader({ name, specialty: "", avatarUrl: "" });
         }
+        return;
+      }
+      
+      // Fallback to localStorage auth
+      const doctorInfo = localStorage.getItem("doctor_info");
+      if (doctorInfo) {
+        const info = JSON.parse(doctorInfo);
+        setDocHeader({
+          name: info.name || "Doctor",
+          specialty: info.specialty || "",
+          avatarUrl: ""
+        });
+      } else {
+        setDocHeader({ name: "Doctor", specialty: "", avatarUrl: "" });
       }
     } catch (error) {
       console.error("Error loading doctor profile:", error);
-      // Show empty state - no fake data
-      setDocHeader({
-        name: "",
-        specialty: "",
-        avatarUrl: null
-      });
+      setDocHeader({ name: "Doctor", specialty: "", avatarUrl: "" });
     }
   };
 
