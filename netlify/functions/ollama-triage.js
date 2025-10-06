@@ -35,77 +35,7 @@ Return JSON with these exact fields:
 
 Patient Information:`;
 
-// Generate symptom-specific questions based on patient data
-function generateSymptomSpecificQuestions(data) {
-  const complaint = (data.chief_complaint || '').toLowerCase();
-  const symptoms = (data.symptom_description || '').toLowerCase();
-  const location = (data.symptom_location || '').toLowerCase();
-  
-  // Base questions that apply to most cases
-  const baseQuestions = [
-    "Avez-vous de la fièvre?",
-    "Vos symptômes vous réveillent-ils la nuit?",
-    "Avez-vous perdu l'appétit?",
-    "Avez-vous des nausées ou des vomissements?",
-    "Prenez-vous des médicaments actuellement?",
-    "Avez-vous des antécédents familiaux pertinents?",
-    "Vos symptômes s'aggravent-ils avec le mouvement?",
-    "Avez-vous d'autres préoccupations médicales?"
-  ];
-  
-  // Symptom-specific questions
-  let specificQuestions = [];
-  
-  if (complaint.includes('chest') || complaint.includes('thoracique') || complaint.includes('cœur')) {
-    specificQuestions = [
-      "Avez-vous des difficultés respiratoires?",
-      "La douleur irradie-t-elle vers le bras gauche?",
-      "Avez-vous des palpitations?",
-      "Avez-vous des sueurs froides?",
-      "La douleur s'aggrave-t-elle avec l'effort?",
-      "Avez-vous des antécédents de problèmes cardiaques?",
-      "Prenez-vous des médicaments pour le cœur?",
-      "Avez-vous des facteurs de risque cardiovasculaire?"
-    ];
-  } else if (complaint.includes('abdominal') || complaint.includes('ventre') || complaint.includes('estomac')) {
-    specificQuestions = [
-      "Avez-vous des nausées ou des vomissements?",
-      "Avez-vous de la diarrhée ou de la constipation?",
-      "La douleur est-elle constante ou intermittente?",
-      "Avez-vous des ballonnements?",
-      "Avez-vous des antécédents de problèmes digestifs?",
-      "Avez-vous mangé quelque chose d'inhabituel récemment?",
-      "La douleur s'améliore-t-elle avec la défécation?",
-      "Avez-vous des saignements rectaux?"
-    ];
-  } else if (complaint.includes('head') || complaint.includes('tête') || complaint.includes('céphalée')) {
-    specificQuestions = [
-      "Avez-vous des troubles visuels?",
-      "Avez-vous des nausées ou des vomissements?",
-      "La douleur est-elle pulsatile?",
-      "Avez-vous des antécédents de migraines?",
-      "La douleur s'aggrave-t-elle avec la lumière?",
-      "Avez-vous des troubles de l'équilibre?",
-      "Avez-vous des troubles de la parole?",
-      "Avez-vous des antécédents de traumatisme crânien?"
-    ];
-  } else {
-    // Generic questions for other symptoms
-    specificQuestions = [
-      "Avez-vous des difficultés respiratoires?",
-      "Avez-vous de la fièvre?",
-      "La douleur s'aggrave-t-elle avec le mouvement?",
-      "Avez-vous des antécédents de ce type de problème?",
-      "Avez-vous des allergies connues?",
-      "Prenez-vous des médicaments régulièrement?",
-      "Avez-vous des antécédents familiaux de problèmes similaires?",
-      "Y a-t-il eu un événement déclencheur récent?"
-    ];
-  }
-  
-  // Combine and return 10 questions
-  return [...specificQuestions.slice(0, 8), ...baseQuestions.slice(0, 2)].slice(0, 10);
-}
+// AI should generate all questions - no hardcoded fallbacks
 
 function ruleBasedTriage(data) {
   const text = [
@@ -173,54 +103,9 @@ function ruleBasedTriage(data) {
             ? "Schedule a primary care visit within 1–2 days."
             : "Self-care measures may be appropriate; monitor symptoms and seek care if worsening.";
 
-  // Generate HPI Summary using the exact template format provided
-  const genderText = data.gender === 'Male' ? 'homme' : data.gender === 'Female' ? 'femme' : 'patient';
-  const ageText = data.age ? `${data.age} ans` : 'âge non spécifié';
-  
-  // Translate English medical terms to French
-  const translateToFrench = (text) => {
-    if (!text) return '';
-    return text
-      .replace(/severe abdominal pain/gi, 'douleur abdominale sévère')
-      .replace(/sharp, cramping pain/gi, 'douleur aiguë et crampes')
-      .replace(/right lower abdomen/gi, 'abdomen inférieur droit')
-      .replace(/chest pain/gi, 'douleur thoracique')
-      .replace(/shortness of breath/gi, 'difficulté respiratoire')
-      .replace(/nausea/gi, 'nausées')
-      .replace(/vomiting/gi, 'vomissements')
-      .replace(/fever/gi, 'fièvre')
-      .replace(/headache/gi, 'mal de tête')
-      .replace(/dizziness/gi, 'étourdissements')
-      .replace(/fatigue/gi, 'fatigue')
-      .replace(/weakness/gi, 'faiblesse')
-      .replace(/numbness/gi, 'engourdissement')
-      .replace(/tingling/gi, 'picotements')
-      .replace(/swelling/gi, 'gonflement')
-      .replace(/bleeding/gi, 'saignement')
-      .replace(/bruising/gi, 'ecchymoses')
-      .replace(/rash/gi, 'éruption cutanée')
-      .replace(/itching/gi, 'démangeaisons')
-      .replace(/burning/gi, 'sensation de brûlure')
-      .replace(/stabbing/gi, 'douleur lancinante')
-      .replace(/throbbing/gi, 'douleur pulsatile')
-      .replace(/dull/gi, 'douleur sourde')
-      .replace(/constant/gi, 'constante')
-      .replace(/intermittent/gi, 'intermittente')
-      .replace(/comes and goes/gi, 'va et vient')
-      .replace(/getting worse/gi, 's\'aggrave')
-      .replace(/getting better/gi, 's\'améliore')
-      .replace(/none/gi, 'aucun')
-      .replace(/none known/gi, 'aucune connue')
-      .replace(/not applicable/gi, 'non applicable')
-      .replace(/not pregnant/gi, 'pas enceinte')
-      .replace(/pregnant/gi, 'enceinte')
-      .replace(/breastfeeding/gi, 'allaitement');
-  };
-
-  const hpiSummary = `Juste pour confirmer avec vous avant de continuer; vous êtes ${genderText === 'patient' ? 'un patient' : genderText} de ${ageText} qui présente ${translateToFrench(data.chief_complaint)}. ${data.symptom_description ? `Vous décrivez ${translateToFrench(data.symptom_description)}. ` : ''}${data.symptom_location ? `La douleur est localisée ${translateToFrench(data.symptom_location)}. ` : ''}${data.severity ? `Vous évaluez l'intensité à ${data.severity}/10. ` : ''}${data.chronic_conditions ? `Vous mentionnez des antécédents de ${translateToFrench(data.chronic_conditions)}. ` : ''}${data.medication_allergies ? `Vous avez des allergies médicamenteuses: ${translateToFrench(data.medication_allergies)}. ` : ''}Est-ce que ce résumé est exact ?`;
-
-  // Generate 10 follow-up questions based on symptoms (FALLBACK ONLY - AI should generate these)
-  const followUpQuestions = generateSymptomSpecificQuestions(data);
+  // AI should generate all content - no hardcoded fallbacks
+  const hpiSummary = "AI service unavailable - please try again";
+  const followUpQuestions = ["AI service unavailable - please try again"];
 
   return {
     triage_level: level,

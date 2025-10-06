@@ -390,6 +390,14 @@ export default function DoctorDashboard() {
     } catch {}
   };
 
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text || "");
+      setCopyToast("Copied to clipboard");
+      setTimeout(() => setCopyToast(null), 1500);
+    } catch {}
+  };
+
   const copySection = (label: string, text?: string) => {
     copyText(text || "");
   };
@@ -471,13 +479,33 @@ export default function DoctorDashboard() {
     }
   };
 
-  // Generate French medical transcription using exact variables from your system
+  // Generate French medical transcription - SINGLE API CALL ONLY
   const generateFrenchTranscription = async () => {
     const latest = searchResults[0] || recentPatients[0] || null;
     const patientId = (latest?.patient_id || searchQuery || "").toString().toUpperCase();
 
     if (!patientId) {
       alert("Enter a patient ID in the search box first.");
+      return;
+    }
+
+    // Check if we already have cached transcription for this patient
+    const cacheKey = `french_transcription_${patientId}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const cachedData = JSON.parse(cached);
+        setFrenchDoc(cachedData);
+        console.log("Using cached French transcription for patient:", patientId);
+        return;
+      } catch (e) {
+        console.warn("Failed to parse cached transcription, generating new one");
+      }
+    }
+
+    // Prevent multiple API calls
+    if (generating) {
+      console.log("API call already in progress, ignoring duplicate request");
       return;
     }
 
@@ -505,6 +533,7 @@ export default function DoctorDashboard() {
         OtherNotes: (latest as any)?.additional_notes || "Non spécifié",
       };
 
+      console.log("Making SINGLE API call for patient:", patientId);
       const res = await fetch("/api/medical-transcription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -512,7 +541,8 @@ export default function DoctorDashboard() {
       });
       if (!res.ok) throw new Error("Failed to generate French transcription");
       const data = await res.json();
-      setFrenchDoc({
+      
+      const transcriptionData = {
         hpiConfirmationSummary: data.hpiConfirmationSummary || "",
         followUpQuestions: data.followUpQuestions || "",
         superSpartanSAP: data.superSpartanSAP || "",
@@ -525,7 +555,14 @@ export default function DoctorDashboard() {
         insuranceDocumentation: data.insuranceDocumentation || "",
         telemedicineNeedsInPerson: data.telemedicineNeedsInPerson || "",
         patientMessage: data.patientMessage || "",
-      });
+      };
+      
+      setFrenchDoc(transcriptionData);
+      
+      // PERMANENTLY store the transcription for this patient - NOT CHANGEABLE
+      localStorage.setItem(cacheKey, JSON.stringify(transcriptionData));
+      console.log("PERMANENTLY stored French transcription for patient:", patientId);
+      
     } catch (e) {
       console.error(e);
       alert("Transcription française échouée. Veuillez réessayer.");
@@ -539,6 +576,20 @@ export default function DoctorDashboard() {
     const latest = searchResults[0] || recentPatients[0] || null;
     const patientId = (latest?.patient_id || searchQuery || "").toString().toUpperCase();
     if (!patientId) return;
+
+    // Check if we already have cached triage document for this patient
+    const cacheKey = `triage_document_${patientId}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const cachedData = JSON.parse(cached);
+        setTriageHtml(cachedData);
+        console.log("Using cached triage document for patient:", patientId);
+        return;
+      } catch (e) {
+        console.warn("Failed to parse cached triage document, generating new one");
+      }
+    }
 
     const body = {
       patientId,
@@ -573,26 +624,92 @@ export default function DoctorDashboard() {
       });
       if (!res.ok) throw new Error("Failed to generate triage document");
       const data = await res.json();
-      setTriageHtml(data.htmlContent || "");
+      const htmlContent = data.htmlContent || "";
+      setTriageHtml(htmlContent);
+      
+      // Cache the triage document for this patient
+      localStorage.setItem(cacheKey, JSON.stringify(htmlContent));
+      console.log("Cached triage document for patient:", patientId);
+      
     } catch (e) {
       console.error(e);
       setTriageHtml("");
     }
   };
 
+  // Generate comprehensive report
+  const generateComprehensiveReport = async () => {
+    const latest = searchResults[0] || recentPatients[0] || null;
+    const patientId = (latest?.patient_id || searchQuery || "").toString().toUpperCase();
+    if (!patientId) return;
+
+    // Check if we already have cached comprehensive report for this patient
+    const cacheKey = `comprehensive_report_${patientId}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const cachedData = JSON.parse(cached);
+        setComprehensiveReport(cachedData);
+        console.log("Using cached comprehensive report for patient:", patientId);
+        return;
+      } catch (e) {
+        console.warn("Failed to parse cached comprehensive report, generating new one");
+      }
+    }
+
+    setGeneratingComprehensive(true);
+    try {
+      const res = await fetch("/api/comprehensive-triage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(latest),
+      });
+      if (!res.ok) throw new Error("Failed to generate comprehensive report");
+      const data = await res.json();
+      setComprehensiveReport(data);
+      
+      // Cache the comprehensive report for this patient
+      localStorage.setItem(cacheKey, JSON.stringify(data));
+      console.log("Cached comprehensive report for patient:", patientId);
+      
+    } catch (e) {
+      console.error(e);
+      alert("Rapport complet échoué. Veuillez réessayer.");
+    } finally {
+      setGeneratingComprehensive(false);
+    }
+  };
+
   const quickAccessPatient = (patientId: string) => {
     setSearchQuery(patientId);
     handleSearch();
+    
+    // Load cached transcription if available (NO API CALL)
+    const cacheKey = `french_transcription_${patientId}`;
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      try {
+        const cachedData = JSON.parse(cached);
+        setFrenchDoc(cachedData);
+        console.log("Loaded cached transcription for patient:", patientId);
+      } catch (e) {
+        console.warn("Failed to parse cached transcription");
+      }
+    } else {
+      // Clear French doc if no cached data
+      setFrenchDoc({});
+    }
   };
 
-  // Auto-generate when a patient is selected (according to prefs)
-  useEffect(() => {
-    if (prefs.autoGenerateOnSelect && (searchResults[0] || recentPatients[0])) {
-      if (prefs.enableTriage) generateTriageDocument();
-      generateFrenchTranscription();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchResults.length]);
+  // DISABLED: Auto-generate when a patient is selected - DOCTOR MUST CLICK GENERATE
+  // This prevents multiple API calls and gives doctor control
+  // useEffect(() => {
+  //   if (prefs.autoGenerateOnSelect && (searchResults[0] || recentPatients[0])) {
+  //     if (prefs.enableTriage) generateTriageDocument();
+  //     generateFrenchTranscription();
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [searchResults.length]);
 
   const getTriageColor = (level: string) => {
     switch (level?.toUpperCase()) {
@@ -616,40 +733,40 @@ export default function DoctorDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">InstantHPI</h1>
-              <span className="ml-2 text-sm text-gray-500">Doctor's Lounge</span>
+              <h1 className="text-xl font-semibold text-gray-800">InstantHPI</h1>
+              <span className="ml-2 text-sm text-gray-600">Doctor's Dashboard</span>
             </div>
             <div className="flex items-center gap-4">
               {/* Doctor Profile */}
               <div
-                className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors border border-gray-200"
                 onClick={() => navigate("/doctor-profile")}
               >
-                <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center">
                   {docHeader.avatarUrl ? (
                     <img src={docHeader.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <span className="text-sm font-medium text-blue-600">
+                    <span className="text-sm font-medium text-white">
                       {(docHeader.name?.split(" ").map((s) => s[0]).join("") || "DR").slice(0, 2).toUpperCase()}
                     </span>
                   )}
                 </div>
                 <div className="text-sm">
-                  <p className="font-medium text-gray-900">{docHeader.name}</p>
-                  <p className="text-gray-500">{docHeader.specialty || "—"}</p>
+                  <p className="font-medium text-gray-800">{docHeader.name}</p>
+                  <p className="text-gray-600">{docHeader.specialty || "—"}</p>
                 </div>
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleLogout}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-50"
               >
                 <LogOut className="h-4 w-4" />
                 Logout
@@ -662,15 +779,85 @@ export default function DoctorDashboard() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Top carousel */}
         <DashboardCarousel />
-        {/* 2-column layout: left main content (col-span-2) + right AI panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Full width layout for medical sections */}
+        <div className="space-y-8">
+          {/* Medical Sections - Full Width Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <FrenchSection
+              title="1. HPI Confirmation Summary"
+              text={frenchDoc?.hpiConfirmationSummary}
+              onCopy={() => copyToClipboard(frenchDoc?.hpiConfirmationSummary || "")}
+            />
+            <FrenchSection
+              title="2. Follow-up Questions"
+              text={frenchDoc?.followUpQuestions}
+              onCopy={() => copyToClipboard(frenchDoc?.followUpQuestions || "")}
+            />
+            <FrenchSection
+              title="3. Super Spartan SAP Note"
+              text={frenchDoc?.superSpartanSAP}
+              onCopy={() => copyToClipboard(frenchDoc?.superSpartanSAP || "")}
+            />
+            <FrenchSection
+              title="4. Medications Ready to Use"
+              text={frenchDoc?.medicationsReadyToUse}
+              onCopy={() => copyToClipboard(frenchDoc?.medicationsReadyToUse || "")}
+            />
+            <FrenchSection
+              title="5. Lab Works"
+              text={frenchDoc?.labWorks}
+              onCopy={() => copyToClipboard(frenchDoc?.labWorks || "")}
+            />
+            <FrenchSection
+              title="6. Imagerie Médicale"
+              text={frenchDoc?.imagerieMedicale}
+              onCopy={() => copyToClipboard(frenchDoc?.imagerieMedicale || "")}
+            />
+            <FrenchSection
+              title="7. Référence Spécialistes"
+              text={frenchDoc?.referenceSpecialistes}
+              onCopy={() => copyToClipboard(frenchDoc?.referenceSpecialistes || "")}
+            />
+            <FrenchSection
+              title="8. Work Leave Certificate"
+              text={frenchDoc?.workLeaveCertificate}
+              onCopy={() => copyToClipboard(frenchDoc?.workLeaveCertificate || "")}
+            />
+            <FrenchSection
+              title="9. Workplace Modifications"
+              text={frenchDoc?.workplaceModifications}
+              onCopy={() => copyToClipboard(frenchDoc?.workplaceModifications || "")}
+            />
+            <FrenchSection
+              title="10. Insurance Documentation"
+              text={frenchDoc?.insuranceDocumentation}
+              onCopy={() => copyToClipboard(frenchDoc?.insuranceDocumentation || "")}
+            />
+            <FrenchSection
+              title="11. Telemedicine Needs In Person"
+              text={frenchDoc?.telemedicineNeedsInPerson}
+              onCopy={() => copyToClipboard(frenchDoc?.telemedicineNeedsInPerson || "")}
+            />
+            <FrenchSection
+              title="12. Patient Message"
+              text={frenchDoc?.patientMessage}
+              onCopy={() => copyToClipboard(frenchDoc?.patientMessage || "")}
+            />
+          </div>
+
+          {/* Footer Image */}
+          <FooterImageRotator />
+        </div>
+
+        {/* Original 2-column layout for search and recent consultations */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           {/* LEFT MAIN CONTENT */}
           <div className="lg:col-span-2">
             {/* Search Section */}
-            <Card className="mb-8">
+            <Card className="mb-8 bg-gray-800 border-gray-700 shadow-sm">
               <CardHeader>
-                <CardTitle>Patient Search</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-white">Patient Search</CardTitle>
+                <CardDescription className="text-gray-300">
                   Enter the 10-character patient identifier (e.g., A1B2C3D4E5)
                 </CardDescription>
               </CardHeader>
@@ -683,13 +870,13 @@ export default function DoctorDashboard() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
                       onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-                      className="uppercase font-mono"
+                      className="uppercase font-mono border-gray-300 focus:border-blue-500"
                     />
                   </div>
                   <Button
                     onClick={handleSearch}
                     disabled={loading || !searchQuery.trim()}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     <Search className="h-4 w-4" />
                     Search
@@ -699,32 +886,32 @@ export default function DoctorDashboard() {
                 {/* Search Results */}
                 {searchResults.length > 0 && (
                   <div className="mt-6 space-y-3">
-                    <h3 className="font-medium text-gray-700">Search Results</h3>
+                    <h3 className="font-medium text-gray-800">Search Results</h3>
                     {searchResults.map((consultation) => (
                       <div
                         key={consultation.id}
-                        className="p-4 bg-white border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                        className="p-4 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
                         onClick={() => openPatientDetails(consultation)}
                       >
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <span className="font-mono font-bold text-lg">
+                              <span className="font-mono font-bold text-lg text-gray-800">
                                 {consultation.patient_id}
                               </span>
                               <Badge className={getTriageColor(consultation.triage_level)}>
                                 {consultation.triage_level}
                               </Badge>
-                              <Badge variant="outline">{consultation.status}</Badge>
+                              <Badge variant="outline" className="border-gray-300 text-gray-700">{consultation.status}</Badge>
                             </div>
-                            <p className="text-sm text-gray-600 mb-1">
+                            <p className="text-sm text-gray-700 mb-1">
                               <strong>Chief Complaint:</strong> {consultation.chief_complaint}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-600">
                               {format(new Date(consultation.created_at), "PPpp")}
                             </p>
                           </div>
-                          <ChevronRight className="h-5 w-5 text-gray-400" />
+                          <ChevronRight className="h-5 w-5 text-gray-500" />
                         </div>
                       </div>
                     ))}
@@ -734,24 +921,24 @@ export default function DoctorDashboard() {
             </Card>
 
             {/* Recent Consultations */}
-            <Card className="mb-8">
+            <Card className="mb-8 bg-gray-800 border-gray-700 shadow-sm">
               <CardHeader>
-                <CardTitle>Recent Consultations</CardTitle>
-                <CardDescription>Latest patient submissions</CardDescription>
+                <CardTitle className="text-white">Recent Consultations</CardTitle>
+                <CardDescription className="text-gray-300">Latest patient submissions</CardDescription>
               </CardHeader>
               <CardContent>
                 {recentPatients.length === 0 ? (
-                  <p className="text-sm text-gray-500">No recent consultations</p>
+                  <p className="text-sm text-gray-400">No recent consultations</p>
                 ) : (
                   <div className="space-y-2">
                     {recentPatients.map((consultation) => (
                       <div
                         key={consultation.id}
-                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors border border-gray-200"
                         onClick={() => openPatientDetails(consultation)}
                       >
                         <div className="flex items-center gap-3">
-                          <span className="font-mono font-semibold">{consultation.patient_id}</span>
+                          <span className="font-mono font-semibold text-gray-800">{consultation.patient_id}</span>
                           <Badge
                             className={getTriageColor(consultation.triage_level)}
                             variant="secondary"
@@ -759,7 +946,7 @@ export default function DoctorDashboard() {
                             {consultation.triage_level}
                           </Badge>
                         </div>
-                        <ChevronRight className="h-4 w-4 text-gray-400" />
+                        <ChevronRight className="h-4 w-4 text-gray-500" />
                       </div>
                     ))}
                   </div>
@@ -772,10 +959,10 @@ export default function DoctorDashboard() {
           <aside className="lg:col-span-1">
             <div className="lg:sticky lg:top-6 space-y-4">
               {/* TRANSCRIPTION (only sections) */}
-              <Card>
+              <Card className="bg-white border-gray-200 shadow-sm">
                 <CardHeader>
-                  <CardTitle>Transcription Médicale</CardTitle>
-                  <CardDescription>Cliquez sur un patient pour générer automatiquement 12+ sections en français</CardDescription>
+                  <CardTitle className="text-gray-800">Transcription Médicale</CardTitle>
+                  <CardDescription className="text-gray-600">Cliquez sur un patient pour générer automatiquement 12+ sections en français</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center gap-2">
@@ -783,11 +970,12 @@ export default function DoctorDashboard() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value.toUpperCase())}
                       placeholder="ID Patient (A1B2C3D4E5)"
-                      className="uppercase font-mono"
+                      className="uppercase font-mono border-gray-300 focus:border-blue-500"
                     />
                     <Button
                       onClick={generateFrenchTranscription}
                       disabled={generating || !searchQuery}
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
                     >
                       {generating ? "Génération…" : "Générer"}
                     </Button>
@@ -801,6 +989,7 @@ export default function DoctorDashboard() {
                       size="sm"
                       onClick={copyAll}
                       disabled={!frenchDoc.hpiConfirmationSummary && !frenchDoc.followUpQuestions}
+                      className="border-gray-300 text-gray-700 hover:bg-gray-50"
                     >
                       Tout Copier
                     </Button>
@@ -808,18 +997,18 @@ export default function DoctorDashboard() {
 
                   {/* Complete Patient Data Section - Always shown first */}
                   {searchResults.length > 0 && (
-                    <div className="border rounded-lg">
+                    <div className="border border-gray-200 rounded-lg bg-gray-50">
                       <div 
-                        className="flex items-center justify-between p-3 bg-gray-50 cursor-pointer hover:bg-gray-100"
+                        className="flex items-center justify-between p-3 bg-gray-100 cursor-pointer hover:bg-gray-200 border-b border-gray-200"
                         onClick={() => setShowRawData(!showRawData)}
                       >
-                        <h4 className="font-semibold text-sm">📋 Complete Patient Data</h4>
-                        <span className="text-sm text-gray-500">
+                        <h4 className="font-semibold text-sm text-gray-800">📋 Complete Patient Data</h4>
+                        <span className="text-sm text-gray-600">
                           {showRawData ? '▼' : '▶'}
                         </span>
                       </div>
                       {showRawData && (
-                        <div className="p-3 border-t bg-white space-y-4">
+                        <div className="p-3 bg-white space-y-4">
                           {/* Patient Answers and HPI Confirmation */}
                           {searchResults[0].completeData?.patient_answers?.[0] && (
                             <div className="border rounded-lg p-3 bg-blue-50">
@@ -1274,22 +1463,76 @@ export default function DoctorDashboard() {
           </aside>
         </div>
 
+        {/* Footer Image Rotator */}
+        <FooterImageRotator />
+
       </main>
     </div>
   );
 }
 
-// Dashboard carousel using Embla/shadcn carousel
+// Professional Butler hero image at the top
 function DashboardCarousel() {
-  const [images, setImages] = React.useState<string[]>([]);
+  const [butlerImage, setButlerImage] = React.useState<string>("/instanthpi-hero.jpg");
+  const [imageError, setImageError] = React.useState(false);
+
   React.useEffect(() => {
     (async () => {
       try {
         const res = await fetch("/api/assets/images", { headers: { "Cache-Control": "no-cache" } });
         const data = await res.json();
         const files: any[] = Array.isArray(data?.files) ? data.files : [];
-        // Find Butler image first, then other images (excluding screenshots)
-        const butlerImage = files.find((f: any) => /butler/i.test(String(f?.name || "")));
+        // Find Butler image specifically - look for the professional butler image
+        const butler = files.find((f: any) => {
+          const name = String(f?.name || "").toLowerCase();
+          return /butler/i.test(name) || /hm8kcbkko/i.test(name) || /professional/i.test(name) || /doctor/i.test(name) || /medical/i.test(name);
+        });
+        if (butler) {
+          setButlerImage(String(butler.url));
+        } else {
+          // If no butler found, use the largest high-quality image as hero
+          const highQualityImages = files
+            .filter((f: any) => f.size > 100000) // Larger than 100KB
+            .sort((a: any, b: any) => b.size - a.size);
+          if (highQualityImages.length > 0) {
+            setButlerImage(String(highQualityImages[0].url));
+          }
+        }
+      } catch {
+        // Keep default fallback
+      }
+    })();
+  }, []);
+  
+  return (
+    <div className="mb-8 bg-white rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+      <div className="flex items-center justify-center p-6">
+        <img
+          src={butlerImage}
+          alt="InstantHPI Butler"
+          className="max-w-full max-h-[400px] object-contain"
+          onError={(e) => {
+            setImageError(true);
+            const t = e.currentTarget as HTMLImageElement;
+            if (!t.src.includes("instanthpi-hero.jpg")) t.src = "/instanthpi-hero.jpg";
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// Random footer image (changes on page reload)
+function FooterImageRotator() {
+  const [randomImage, setRandomImage] = React.useState<string>("/instanthpi-beach.jpg");
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/assets/images", { headers: { "Cache-Control": "no-cache" } });
+        const data = await res.json();
+        const files: any[] = Array.isArray(data?.files) ? data.files : [];
+        // Get all images except Butler and screenshots
         const otherImages = files
           .filter((f: any) => {
             const n = String(f?.name || "");
@@ -1297,39 +1540,30 @@ function DashboardCarousel() {
           })
           .map((f: any) => String(f.url));
         
-        const urls: string[] = butlerImage 
-          ? [String(butlerImage.url), ...otherImages]
-          : otherImages;
-        setImages(urls);
+        if (otherImages.length > 0) {
+          // Pick a random image on page load
+          const randomIndex = Math.floor(Math.random() * otherImages.length);
+          setRandomImage(otherImages[randomIndex]);
+        }
       } catch {
-        setImages([]);
+        setRandomImage("/instanthpi-beach.jpg");
       }
     })();
   }, []);
-  const slides = images.length ? images : ["/instanthpi-hero.jpg"];
+
   return (
-    <div className="mb-8 bg-white rounded-xl overflow-hidden border shadow-sm">
-      <Carousel className="w-full">
-        <CarouselContent>
-          {slides.map((url, idx) => (
-            <CarouselItem key={idx}>
-              <div className="flex items-center justify-center p-4">
-                <img
-                  src={url}
-                  alt="InstantHPI"
-                  className="max-w-full max-h-[400px] object-contain rounded-lg"
-                  onError={(e) => {
-                    const t = e.currentTarget as HTMLImageElement;
-                    if (!t.src.includes("instanthpi-beach.jpg")) t.src = "/instanthpi-beach.jpg";
-                  }}
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
-      </Carousel>
+    <div className="mt-8 bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-sm">
+      <div className="flex items-center justify-center p-4">
+        <img
+          src={randomImage}
+          alt="InstantHPI"
+          className="max-w-full max-h-[300px] object-contain rounded-lg"
+          onError={(e) => {
+            const t = e.currentTarget as HTMLImageElement;
+            if (!t.src.includes("instanthpi-beach.jpg")) t.src = "/instanthpi-beach.jpg";
+          }}
+        />
+      </div>
     </div>
   );
 }
@@ -1353,31 +1587,44 @@ function FrenchSection({
   };
 
   return (
-    <div className="border rounded-lg mb-4">
-      <div className="flex items-center justify-between p-3 bg-gray-50 cursor-pointer hover:bg-gray-100">
-        <h4 className="font-semibold text-sm text-gray-800">{title}</h4>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={handleCopy} 
-          disabled={!text}
-          className={`transition-all duration-200 ${
-            copied 
-              ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-              : 'hover:bg-blue-100 text-blue-800'
-          }`}
-        >
-          {copied ? '✓ Copié!' : '📋 Copier'}
-        </Button>
-      </div>
-      <div className="p-3 border-t bg-white">
-        <div className="text-xs text-gray-800 whitespace-pre-line min-h-[60px] bg-gray-50 rounded-md border p-3 font-mono max-h-80 overflow-y-auto">
-          {text ? (
-            <code className="block leading-relaxed">{text}</code>
-          ) : (
-            <span className="text-gray-400 italic">Contenu en cours de génération...</span>
-          )}
+    <div className="bg-white border border-gray-200 rounded-lg mb-6 shadow-sm">
+      {/* Professional medical header */}
+      <div className="bg-gray-50 border-b border-gray-200 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-lg font-semibold text-gray-800">{title}</h4>
+          <button
+            onClick={handleCopy}
+            disabled={!text}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              copied 
+                ? 'bg-green-600 text-white border border-green-500' 
+                : text 
+                  ? 'bg-blue-600 text-white border border-blue-500 hover:bg-blue-700' 
+                  : 'bg-gray-300 text-gray-500 border border-gray-400 cursor-not-allowed'
+            }`}
+          >
+            {copied ? '✓ Copied' : 'Copy'}
+          </button>
         </div>
+      </div>
+      
+      {/* Main content area - ADAPTIVE SIZING, NO FIXED HEIGHTS */}
+      <div className="p-6">
+        {text ? (
+          <div className="prose max-w-none">
+            <div className="text-gray-800 leading-relaxed whitespace-pre-wrap font-mono text-sm bg-gray-50 p-4 rounded-md border border-gray-200 min-h-[100px] w-full">
+              {text}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="text-gray-600 text-sm">
+                Click "Generate" to create medical transcription
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

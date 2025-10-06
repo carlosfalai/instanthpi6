@@ -1,0 +1,661 @@
+{
+  "pageTitle": "Doctor's Lounge - InstantHPI",
+  "theme": {
+    "type": "dark",
+    "primaryColor": "#1f2937",
+    "secondaryColor": "#374151",
+    "accentColor": "#3b82f6",
+    "backgroundColor": "#111827",
+    "textColor": "#f9fafb",
+    "borderColor": "#374151"
+  },
+  "layout": {
+    "type": "responsive",
+    "breakpoints": {
+      "mobile": "768px",
+      "tablet": "1024px",
+      "desktop": "1280px"
+    }
+  },
+  "header": {
+    "height": "80px",
+    "backgroundColor": "#1f2937",
+    "borderBottom": "1px solid #374151",
+    "elements": [
+      {
+        "type": "logo",
+        "text": "InstantHPI",
+        "position": "left",
+        "fontSize": "24px",
+        "fontWeight": "bold",
+        "color": "#f9fafb"
+      },
+      {
+        "type": "subtitle",
+        "text": "Doctor's Lounge",
+        "position": "left",
+        "marginLeft": "16px",
+        "fontSize": "16px",
+        "color": "#9ca3af"
+      },
+      {
+        "type": "doctorProfile",
+        "position": "right",
+        "elements": [
+          {
+            "type": "avatar",
+            "size": "40px",
+            "backgroundColor": "#3b82f6",
+            "borderRadius": "50%",
+            "fallbackText": "DR"
+          },
+          {
+            "type": "doctorInfo",
+            "elements": [
+              {
+                "type": "name",
+                "fontSize": "16px",
+                "fontWeight": "medium",
+                "color": "#f9fafb"
+              },
+              {
+                "type": "specialty",
+                "fontSize": "14px",
+                "color": "#9ca3af"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "logoutButton",
+        "position": "right",
+        "text": "Logout",
+        "icon": "LogOut",
+        "variant": "outline",
+        "color": "#6b7280"
+      }
+    ]
+  },
+  "mainContent": {
+    "maxWidth": "1400px",
+    "margin": "0 auto",
+    "padding": "32px 16px",
+    "backgroundColor": "#111827"
+  },
+  "heroSection": {
+    "type": "carousel",
+    "height": "400px",
+    "backgroundColor": "#1f2937",
+    "borderRadius": "12px",
+    "border": "1px solid #374151",
+    "marginBottom": "32px",
+    "elements": [
+      {
+        "type": "butlerImage",
+        "priority": "high",
+        "altText": "InstantHPI Butler",
+        "maxHeight": "400px",
+        "objectFit": "contain"
+      }
+    ]
+  },
+  "medicalSections": {
+    "title": "Medical Transcription Sections",
+    "layout": "grid",
+    "columns": {
+      "mobile": 1,
+      "tablet": 2,
+      "desktop": 3
+    },
+    "gap": "24px",
+    "sections": [
+      {
+        "id": "hpi-confirmation",
+        "title": "1. HPI Confirmation Summary",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "follow-up-questions",
+        "title": "2. Follow-up Questions",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "super-spartan-sap",
+        "title": "3. Super Spartan SAP Note",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "medications",
+        "title": "4. Medications Ready to Use",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "lab-works",
+        "title": "5. Lab Works",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "imaging",
+        "title": "6. Imagerie Médicale",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "referrals",
+        "title": "7. Référence Spécialistes",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "work-leave",
+        "title": "8. Work Leave Certificate",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "workplace-modifications",
+        "title": "9. Workplace Modifications",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "insurance",
+        "title": "10. Insurance Documentation",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "telemedicine",
+        "title": "11. Telemedicine Needs In Person",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      },
+      {
+        "id": "patient-message",
+        "title": "12. Patient Message",
+        "backgroundColor": "#1f2937",
+        "borderColor": "#374151",
+        "textColor": "#f9fafb",
+        "copyButton": {
+          "text": "Copy",
+          "backgroundColor": "#3b82f6",
+          "hoverColor": "#2563eb",
+          "copiedColor": "#10b981"
+        }
+      }
+    ]
+  },
+  "searchSection": {
+    "title": "Patient Search",
+    "description": "Enter the 10-character patient identifier (e.g., A1B2C3D4E5)",
+    "backgroundColor": "#1f2937",
+    "borderColor": "#374151",
+    "borderRadius": "12px",
+    "padding": "24px",
+    "marginBottom": "32px",
+    "elements": [
+      {
+        "type": "searchInput",
+        "placeholder": "Enter Patient ID (e.g., A1B2C3D4E5)",
+        "backgroundColor": "#374151",
+        "borderColor": "#4b5563",
+        "textColor": "#f9fafb",
+        "fontFamily": "monospace",
+        "textTransform": "uppercase"
+      },
+      {
+        "type": "searchButton",
+        "text": "Search",
+        "icon": "Search",
+        "backgroundColor": "#3b82f6",
+        "hoverColor": "#2563eb",
+        "disabledColor": "#6b7280"
+      }
+    ]
+  },
+  "searchResults": {
+    "title": "Search Results",
+    "backgroundColor": "#1f2937",
+    "borderColor": "#374151",
+    "borderRadius": "12px",
+    "padding": "24px",
+    "marginBottom": "32px",
+    "elements": [
+      {
+        "type": "patientCard",
+        "backgroundColor": "#374151",
+        "borderColor": "#4b5563",
+        "borderRadius": "8px",
+        "padding": "16px",
+        "hoverColor": "#4b5563",
+        "elements": [
+          {
+            "type": "patientId",
+            "fontFamily": "monospace",
+            "fontSize": "18px",
+            "fontWeight": "bold",
+            "color": "#f9fafb"
+          },
+          {
+            "type": "triageBadge",
+            "colors": {
+              "EMERGENCY": "#dc2626",
+              "URGENT": "#ea580c",
+              "SEMI-URGENT": "#d97706",
+              "NON-URGENT": "#16a34a"
+            }
+          },
+          {
+            "type": "statusBadge",
+            "backgroundColor": "#6b7280",
+            "textColor": "#f9fafb"
+          },
+          {
+            "type": "chiefComplaint",
+            "fontSize": "14px",
+            "color": "#d1d5db"
+          },
+          {
+            "type": "timestamp",
+            "fontSize": "12px",
+            "color": "#9ca3af"
+          },
+          {
+            "type": "chevronIcon",
+            "color": "#6b7280"
+          }
+        ]
+      }
+    ]
+  },
+  "recentConsultations": {
+    "title": "Recent Consultations",
+    "description": "Latest patient submissions",
+    "backgroundColor": "#1f2937",
+    "borderColor": "#374151",
+    "borderRadius": "12px",
+    "padding": "24px",
+    "marginBottom": "32px",
+    "elements": [
+      {
+        "type": "consultationCard",
+        "backgroundColor": "#374151",
+        "borderColor": "#4b5563",
+        "borderRadius": "8px",
+        "padding": "12px",
+        "hoverColor": "#4b5563",
+        "elements": [
+          {
+            "type": "patientId",
+            "fontFamily": "monospace",
+            "fontWeight": "semibold",
+            "color": "#f9fafb"
+          },
+          {
+            "type": "triageBadge",
+            "variant": "secondary"
+          },
+          {
+            "type": "chevronIcon",
+            "color": "#6b7280"
+          }
+        ]
+      }
+    ]
+  },
+  "aiPanel": {
+    "title": "Transcription Médicale",
+    "description": "Cliquez sur un patient pour générer automatiquement 12+ sections en français",
+    "backgroundColor": "#1f2937",
+    "borderColor": "#374151",
+    "borderRadius": "12px",
+    "padding": "24px",
+    "position": "sticky",
+    "top": "24px",
+    "elements": [
+      {
+        "type": "generateButton",
+        "text": "Générer",
+        "backgroundColor": "#3b82f6",
+        "hoverColor": "#2563eb",
+        "disabledColor": "#6b7280"
+      },
+      {
+        "type": "copyAllButton",
+        "text": "Tout Copier",
+        "variant": "outline",
+        "borderColor": "#4b5563",
+        "textColor": "#d1d5db",
+        "hoverColor": "#374151"
+      },
+      {
+        "type": "completePatientData",
+        "title": "📋 Complete Patient Data",
+        "backgroundColor": "#374151",
+        "borderColor": "#4b5563",
+        "elements": [
+          {
+            "type": "patientAnswers",
+            "title": "📝 Patient Q&A Responses",
+            "backgroundColor": "#1e40af",
+            "elements": [
+              {
+                "type": "hpiConfirmed",
+                "label": "HPI Confirmed:",
+                "fontSize": "12px"
+              },
+              {
+                "type": "corrections",
+                "label": "Corrections:",
+                "fontSize": "12px"
+              },
+              {
+                "type": "answersList",
+                "label": "Answers to 10 Questions:",
+                "fontSize": "12px",
+                "borderColor": "#3b82f6"
+              }
+            ]
+          },
+          {
+            "type": "rawData",
+            "backgroundColor": "#374151",
+            "borderColor": "#4b5563",
+            "fontFamily": "monospace",
+            "fontSize": "12px",
+            "maxHeight": "240px",
+            "overflow": "auto"
+          }
+        ]
+      },
+      {
+        "type": "comprehensiveReport",
+        "title": "🏥 Rapport Médical Complet",
+        "backgroundColor": "#065f46",
+        "borderColor": "#10b981",
+        "elements": [
+          {
+            "type": "generateButton",
+            "text": "Générer Rapport Complet",
+            "backgroundColor": "#10b981",
+            "hoverColor": "#059669"
+          },
+          {
+            "type": "reportSections",
+            "sections": [
+              {
+                "id": "hpi-summary",
+                "title": "1. Résumé de Confirmation HPI",
+                "backgroundColor": "#dbeafe",
+                "borderColor": "#3b82f6"
+              },
+              {
+                "id": "follow-up-questions",
+                "title": "2. Questions de Suivi (10 questions)",
+                "backgroundColor": "#fef3c7",
+                "borderColor": "#f59e0b"
+              },
+              {
+                "id": "sap-note",
+                "title": "3. Super Spartan SAP Note",
+                "backgroundColor": "#e9d5ff",
+                "borderColor": "#8b5cf6"
+              },
+              {
+                "id": "medications",
+                "title": "4. Médicaments - Prescriptions Prêtes à Utiliser",
+                "backgroundColor": "#dcfce7",
+                "borderColor": "#22c55e"
+              },
+              {
+                "id": "lab-work",
+                "title": "5. Analyses de Laboratoire",
+                "backgroundColor": "#fed7aa",
+                "borderColor": "#f97316"
+              },
+              {
+                "id": "imaging",
+                "title": "6. Imagerie Médicale",
+                "backgroundColor": "#cffafe",
+                "borderColor": "#06b6d4"
+              },
+              {
+                "id": "referrals",
+                "title": "7. Références Spécialisées",
+                "backgroundColor": "#fce7f3",
+                "borderColor": "#ec4899"
+              },
+              {
+                "id": "work-leave",
+                "title": "8. Arrêt de Travail et École",
+                "backgroundColor": "#e0e7ff",
+                "borderColor": "#6366f1"
+              },
+              {
+                "id": "workplace-modifications",
+                "title": "9. Modifications du Poste de Travail",
+                "backgroundColor": "#ccfbf1",
+                "borderColor": "#14b8a6"
+              },
+              {
+                "id": "insurance-documentation",
+                "title": "10. Documentation d'Assurance",
+                "backgroundColor": "#fee2e2",
+                "borderColor": "#ef4444"
+              },
+              {
+                "id": "telemedicine-limitations",
+                "title": "11. Télémédecine - Nécessite Évaluation en Personne",
+                "backgroundColor": "#fef3c7",
+                "borderColor": "#f59e0b"
+              },
+              {
+                "id": "emergency-referral",
+                "title": "12. Référence pour l'Équipe d'Urgence",
+                "backgroundColor": "#fecaca",
+                "borderColor": "#f87171"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "customAIRequest",
+        "title": "🤖 Demande Personnalisée à l'IA",
+        "backgroundColor": "#1e40af",
+        "borderColor": "#3b82f6",
+        "elements": [
+          {
+            "type": "textarea",
+            "placeholder": "Ex: Fais-moi une demande d'arrêt de travail de 2 mois, ou Rédige une lettre pour l'assurance, ou Crée un plan de traitement spécifique...",
+            "backgroundColor": "#374151",
+            "borderColor": "#4b5563",
+            "textColor": "#f9fafb",
+            "rows": 3
+          },
+          {
+            "type": "generateButton",
+            "text": "Générer",
+            "backgroundColor": "#3b82f6",
+            "hoverColor": "#2563eb"
+          },
+          {
+            "type": "copyButton",
+            "text": "Copier",
+            "variant": "outline",
+            "borderColor": "#4b5563",
+            "textColor": "#d1d5db"
+          },
+          {
+            "type": "responseDisplay",
+            "backgroundColor": "#374151",
+            "borderColor": "#4b5563",
+            "fontFamily": "monospace",
+            "fontSize": "12px",
+            "maxHeight": "160px",
+            "overflow": "auto"
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "type": "imageRotator",
+    "backgroundColor": "#1f2937",
+    "borderColor": "#374151",
+    "borderRadius": "12px",
+    "padding": "16px",
+    "marginTop": "32px",
+    "elements": [
+      {
+        "type": "randomImage",
+        "maxHeight": "300px",
+        "objectFit": "contain",
+        "borderRadius": "8px"
+      }
+    ]
+  },
+  "interactions": {
+    "hoverEffects": {
+      "cards": "transform scale-105 transition-transform duration-200",
+      "buttons": "opacity-80 transition-opacity duration-200"
+    },
+    "loadingStates": {
+      "generateButton": "Génération...",
+      "comprehensiveButton": "Génération...",
+      "customButton": "Génération..."
+    },
+    "copyFeedback": {
+      "duration": "2000ms",
+      "text": "✓ Copied",
+      "backgroundColor": "#10b981"
+    }
+  },
+  "responsive": {
+    "mobile": {
+      "medicalSections": {
+        "columns": 1,
+        "gap": "16px"
+      },
+      "mainLayout": {
+        "padding": "16px 8px"
+      },
+      "header": {
+        "height": "64px",
+        "padding": "0 16px"
+      }
+    },
+    "tablet": {
+      "medicalSections": {
+        "columns": 2,
+        "gap": "20px"
+      },
+      "mainLayout": {
+        "padding": "24px 16px"
+      }
+    },
+    "desktop": {
+      "medicalSections": {
+        "columns": 3,
+        "gap": "24px"
+      },
+      "mainLayout": {
+        "padding": "32px 16px"
+      }
+    }
+  },
+  "accessibility": {
+    "focusStates": {
+      "outline": "2px solid #3b82f6",
+      "outlineOffset": "2px"
+    },
+    "ariaLabels": {
+      "searchButton": "Search for patient",
+      "copyButton": "Copy to clipboard",
+      "generateButton": "Generate medical transcription"
+    }
+  }
+}

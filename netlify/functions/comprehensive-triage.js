@@ -171,43 +171,17 @@ exports.handler = async (event) => {
       }
     }
 
-    // Fallback to basic triage if AI fails
-    console.log("AI failed, using basic fallback");
-    const fallback = {
-      triage_level: "SEMI-URGENT",
-      urgency_score: 5,
-      reasoning: "AI service unavailable",
-      recommended_action: "Consultation médicale recommandée",
-      hpi_summary: `Juste pour confirmer avec vous avant de continuer; vous êtes ${patientData.gender === 'Male' ? 'un homme' : patientData.gender === 'Female' ? 'une femme' : 'un patient'} de ${patientData.age || 'âge non spécifié'} ans qui présente ${patientData.chief_complaint || 'symptômes'}. ${patientData.symptom_description ? `Vous décrivez ${patientData.symptom_description}. ` : ''}${patientData.symptom_location ? `La douleur est localisée ${patientData.symptom_location}. ` : ''}${patientData.severity ? `Vous évaluez l'intensité à ${patientData.severity}/10. ` : ''}Est-ce que ce résumé est exact ?`,
-      follow_up_questions: [
-        "Avez-vous de la fièvre?",
-        "Vos symptômes vous réveillent-ils la nuit?",
-        "Avez-vous perdu l'appétit?",
-        "Avez-vous des nausées ou des vomissements?",
-        "Prenez-vous des médicaments actuellement?",
-        "Avez-vous des antécédents familiaux pertinents?",
-        "Vos symptômes s'aggravent-ils avec le mouvement?",
-        "Avez-vous d'autres préoccupations médicales?",
-        "Avez-vous des allergies connues?",
-        "Y a-t-il eu un événement déclencheur récent?"
-      ],
-      sap_note: "S: Patient avec symptômes nécessitant évaluation. A: Évaluation médicale requise. P: Consultation médicale recommandée.",
-      medications: [],
-      lab_work: [],
-      imaging: [],
-      referrals: [],
-      work_leave: "Évaluation médicale requise pour déterminer l'arrêt de travail.",
-      workplace_modifications: "À déterminer après évaluation médicale.",
-      insurance_documentation: "Diagnostic à confirmer après évaluation médicale.",
-      telemedicine_limitations: "Cette consultation présente des limites et nécessite une évaluation en personne.",
-      emergency_referral: "Évaluation médicale recommandée selon l'urgence des symptômes."
+    // AI service unavailable - return error instead of hardcoded fallback
+    console.log("AI failed - returning error");
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({
+        error: "AI service unavailable",
+        message: "Please try again later or contact support"
+      })
     };
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(fallback),
-    };
 
   } catch (error) {
     console.error('Error in comprehensive triage:', error);

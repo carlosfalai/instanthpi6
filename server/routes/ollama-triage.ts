@@ -244,19 +244,14 @@ function ruleBasedTriage(data: TriageRequest) {
             ? "Schedule a primary care visit within 1–2 days."
             : "Self-care measures may be appropriate; monitor symptoms and seek care if worsening.";
 
-  // Generate basic HPI summary for rule-based fallback
-  const genderLabel = data.gender === "female" ? "femme" : data.gender === "male" ? "homme" : "personne";
-  const ageText = data.age ? `${data.age} ans` : "âge non précisé";
-  const fallbackHpiSummary = `Juste pour confirmer avec vous avant de continuer; vous êtes un(e) ${genderLabel} de ${ageText}, présentant ${data.chief_complaint || "des symptômes"} depuis ${data.problem_start_date || "un moment"}; Est-ce que ce résumé est exact ?`;
-
+  // AI should generate all content - no hardcoded fallbacks
   return {
     triage_level: level,
     urgency_score: score,
     reasoning: reasoningParts.join("; ") || "Rule-based triage assessment.",
     recommended_action: recommended,
-    full_analysis:
-      "AI service unavailable; provided rule-based triage using CTAS-inspired thresholds based on symptoms and severity.",
-    hpi_summary: fallbackHpiSummary,
+    full_analysis: "AI service unavailable - please try again",
+    hpi_summary: "AI service unavailable - please try again",
   };
 }
 
