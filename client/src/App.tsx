@@ -15,20 +15,20 @@ export default function App() {
   const [location, setLocation] = useLocation();
 
   useEffect(() => {
-    // Check auth state on mount
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session) {
-        // Redirect based on the login page
-        if (location === "/login") {
-          setLocation("/doctor-dashboard");
-        } else if (location === "/patient-login") {
-          setLocation("/patient-dashboard");
-        }
-      } else if (event === "SIGNED_OUT") {
-        // Redirect to landing page on logout
-        setLocation("/");
-      }
-    });
+    // Check auth state on mount - DISABLED for localStorage-based auth
+    // supabase.auth.onAuthStateChange((event, session) => {
+    //   if (event === "SIGNED_IN" && session) {
+    //     // Redirect based on the login page
+    //     if (location === "/login") {
+    //       setLocation("/doctor-dashboard");
+    //     } else if (location === "/patient-login") {
+    //       setLocation("/patient-dashboard");
+    //     }
+    //   } else if (event === "SIGNED_OUT") {
+    //     // Redirect to landing page on logout
+    //     setLocation("/");
+    //   }
+    // });
   }, [location, setLocation]);
 
   return (

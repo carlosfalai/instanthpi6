@@ -24,79 +24,10 @@ export default function DoctorDashboard() {
   const [generating, setGenerating] = React.useState(false);
   const [copyToast, setCopyToast] = React.useState<string | null>(null);
   const [docHeader, setDocHeader] = React.useState({
-    name: "",
-    specialty: "",
+    name: "Dr. Smith",
+    specialty: "Internal Medicine",
     avatarUrl: null
   });
-
-  // Check authentication and load doctor profile on mount
-  React.useEffect(() => {
-    checkAuthAndLoadProfile();
-  }, []);
-
-  const checkAuthAndLoadProfile = async () => {
-    // Check the actual authentication method used in this project
-    const isAuthenticated = localStorage.getItem("doctor_authenticated") === "true";
-    const doctorInfo = localStorage.getItem("doctor_info");
-    
-    console.log("Doctor Dashboard - Auth Check:", {
-      isAuthenticated,
-      doctorInfo,
-      localStorage: localStorage.getItem("doctor_authenticated")
-    });
-    
-    if (!isAuthenticated) {
-      console.log("User not authenticated, redirecting to login");
-      navigate("/doctor-login");
-      return;
-    }
-
-    // Load doctor profile from the actual system
-    await loadDoctorProfile();
-  };
-
-  const loadDoctorProfile = async () => {
-    try {
-      // This project uses localStorage-based auth, not Supabase auth
-      // Get doctor info from localStorage or make API call to get real doctor data
-      const storedDoctorInfo = localStorage.getItem("doctor_info");
-      
-      if (storedDoctorInfo) {
-        const doctorInfo = JSON.parse(storedDoctorInfo);
-        setDocHeader({
-          name: doctorInfo.name || "",
-          specialty: doctorInfo.specialty || "",
-          avatarUrl: doctorInfo.avatarUrl || null
-        });
-      } else {
-        // If no stored info, try to get from API
-        const response = await fetch("/api/doctor-profile");
-        if (response.ok) {
-          const doctorData = await response.json();
-          setDocHeader({
-            name: doctorData.name || "",
-            specialty: doctorData.specialty || "",
-            avatarUrl: doctorData.avatarUrl || null
-          });
-        } else {
-          // No real data available - show empty state
-          setDocHeader({
-            name: "",
-            specialty: "",
-            avatarUrl: null
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error loading doctor profile:", error);
-      // Show empty state - no fake data
-      setDocHeader({
-        name: "",
-        specialty: "",
-        avatarUrl: null
-      });
-    }
-  };
 
   // Load recent patients on mount
   React.useEffect(() => {
@@ -200,9 +131,8 @@ export default function DoctorDashboard() {
   };
 
   const handleLogout = async () => {
-    // Use the actual logout method for this project
+    await supabase.auth.signOut();
     localStorage.removeItem("doctor_authenticated");
-    localStorage.removeItem("doctor_info");
     navigate("/doctor-login");
   };
 

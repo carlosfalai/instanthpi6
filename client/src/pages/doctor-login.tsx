@@ -47,7 +47,15 @@ export default function DoctorLogin() {
       if (email === "doctor@instanthpi.ca" && password === "medical123") {
         // Set a session flag
         localStorage.setItem("doctor_authenticated", "true");
-        navigate("/doctor-dashboard");
+        localStorage.setItem("doctor_info", JSON.stringify({
+          email: email,
+          name: "Doctor",
+          specialty: "General Medicine"
+        }));
+        // Add a small delay to ensure localStorage is set
+        setTimeout(() => {
+          navigate("/doctor-dashboard");
+        }, 100);
       } else {
         setMessage("Invalid credentials. Use doctor@instanthpi.ca / medical123");
       }
