@@ -3,7 +3,7 @@ import { Router, Route, Switch, useLocation } from "wouter";
 import { supabase } from "@/lib/supabase";
 import { LoginPage } from "@/components/auth/LoginPage";
 import Landing from "@/pages/landing";
-import DoctorDashboard from "@/pages/doctor-dashboard";
+import DoctorDashboard from "@/pages/doctor-dashboard-new";
 import DoctorLogin from "@/pages/doctor-login";
 import DoctorProfileNew from "@/pages/doctor-profile-new";
 import PatientLogin from "@/pages/patient-login";
