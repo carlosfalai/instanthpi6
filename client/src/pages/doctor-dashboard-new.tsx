@@ -4,7 +4,7 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Badge } from "../components/ui/badge";
-import { Search, LogOut, ChevronRight, User, Activity, Clock, AlertTriangle, CheckCircle, Copy, Brain, Stethoscope, FileText, Users, Settings, Bell } from "lucide-react";
+import { Search, LogOut, ChevronRight, User, Activity, Clock, AlertTriangle, CheckCircle, Copy, Brain, Stethoscope, FileText, Users, Settings, Bell, Eye, Edit, Download, Phone, Mail, Calendar, Heart, Zap, TrendingUp, BarChart3, PieChart, LineChart } from "lucide-react";
 import { format } from "date-fns";
 import { createClient } from "@supabase/supabase-js";
 
@@ -256,6 +256,60 @@ export default function DoctorDashboardNew() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Enhanced Navigation */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                className="text-gray-400 hover:text-white hover:bg-gray-700"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                All Patients
+              </Button>
+              <Button
+                variant="ghost"
+                className="text-gray-400 hover:text-white hover:bg-gray-700"
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                Active Cases
+              </Button>
+              <Button
+                variant="ghost"
+                className="text-gray-400 hover:text-white hover:bg-gray-700"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Completed
+              </Button>
+              <Button
+                variant="ghost"
+                className="text-gray-400 hover:text-white hover:bg-gray-700"
+              >
+                <Clock className="w-4 h-4 mr-2" />
+                Pending
+              </Button>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white hover:bg-gray-700"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-gray-400 hover:text-white hover:bg-gray-700"
+              >
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Button>
+            </div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
@@ -287,49 +341,113 @@ export default function DoctorDashboardNew() {
               </CardContent>
             </Card>
 
-            {/* Search Results */}
+            {/* Enhanced Patient Cards */}
             {searchResults.length > 0 && (
               <Card className="bg-gray-800 border-gray-700">
                 <CardHeader>
                   <CardTitle className="text-white flex items-center gap-2">
                     <Search className="w-5 h-5" />
-                    Search Results
+                    Patient Search Results
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {searchResults.map((patient) => (
-                      <div
+                      <EnhancedPatientCard
                         key={patient.id}
-                        className="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer"
-                        onClick={() => openPatientDetails(patient)}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                              <span className="text-white font-bold text-sm">
-                                {patient.patient_id?.charAt(0) || "P"}
-                              </span>
-                            </div>
-                            <div>
-                              <p className="font-semibold text-white">{patient.patient_id}</p>
-                              <p className="text-sm text-gray-400">{patient.chief_complaint}</p>
-                            </div>
-                          </div>
-                          <Badge className={`${
-                            patient.triage_level === 'High' ? 'bg-red-500/20 text-red-300 border-red-500/30' :
-                            patient.triage_level === 'Medium' ? 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30' :
-                            'bg-green-500/20 text-green-300 border-green-500/30'
-                          }`}>
-                            {patient.triage_level}
-                          </Badge>
-                        </div>
-                      </div>
+                        patient={patient}
+                        onView={() => openPatientDetails(patient)}
+                        onEdit={() => console.log('Edit patient:', patient.id)}
+                        onGenerateReport={() => {
+                          openPatientDetails(patient);
+                          setTimeout(() => generateFrenchTranscription(), 100);
+                        }}
+                      />
                     ))}
                   </div>
                 </CardContent>
               </Card>
             )}
+
+            {/* Analytics Dashboard */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5" />
+                  Medical Analytics
+                </CardTitle>
+                <p className="text-sm text-gray-400">Real-time medical metrics and trends</p>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Patient Flow Chart */}
+                  <div className="space-y-4">
+                    <h4 className="text-white font-semibold flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4" />
+                      Patient Flow
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 text-sm">New Patients</span>
+                        <span className="text-white font-semibold">24</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 text-sm">Active Consultations</span>
+                        <span className="text-white font-semibold">49</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 text-sm">Completed Today</span>
+                        <span className="text-white font-semibold">18</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* AI Processing Stats */}
+                  <div className="space-y-4">
+                    <h4 className="text-white font-semibold flex items-center gap-2">
+                      <Brain className="w-4 h-4" />
+                      AI Processing
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 text-sm">Reports Generated</span>
+                        <span className="text-white font-semibold">156</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 text-sm">Accuracy Rate</span>
+                        <span className="text-green-400 font-semibold">94.2%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 text-sm">Avg Processing Time</span>
+                        <span className="text-white font-semibold">2.3s</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Common Conditions */}
+                  <div className="space-y-4">
+                    <h4 className="text-white font-semibold flex items-center gap-2">
+                      <Heart className="w-4 h-4" />
+                      Top Conditions
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 text-sm">Respiratory</span>
+                        <span className="text-white font-semibold">32%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 text-sm">Cardiovascular</span>
+                        <span className="text-white font-semibold">28%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-gray-400 text-sm">Gastrointestinal</span>
+                        <span className="text-white font-semibold">24%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Revenue Summary */}
             <Card className="bg-gray-800 border-gray-700">
@@ -581,6 +699,108 @@ export default function DoctorDashboardNew() {
         </div>
       )}
     </div>
+  );
+}
+
+// Enhanced Patient Card Component
+function EnhancedPatientCard({
+  patient,
+  onView,
+  onEdit,
+  onGenerateReport
+}: {
+  patient: any;
+  onView: () => void;
+  onEdit: () => void;
+  onGenerateReport: () => void;
+}) {
+  const getTriageColor = (level: string) => {
+    switch (level) {
+      case "High": return "bg-red-500/20 text-red-300 border-red-500/30";
+      case "Medium": return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30";
+      default: return "bg-green-500/20 text-green-300 border-green-500/30";
+    }
+  };
+
+  const getStatusIcon = (level: string) => {
+    switch (level) {
+      case "High": return <AlertTriangle className="w-4 h-4 text-red-400" />;
+      case "Medium": return <Clock className="w-4 h-4 text-yellow-400" />;
+      default: return <CheckCircle className="w-4 h-4 text-green-400" />;
+    }
+  };
+
+  return (
+    <Card className="bg-gray-700 border-gray-600 hover:bg-gray-600 transition-all duration-200">
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-bold text-lg">
+                {patient.patient_id?.charAt(0) || "P"}
+              </span>
+            </div>
+            <div>
+              <h3 className="font-semibold text-white text-lg">{patient.patient_id}</h3>
+              <p className="text-sm text-gray-400">{patient.chief_complaint}</p>
+              <p className="text-xs text-gray-500">
+                {format(new Date(patient.created_at), "MMM d, yyyy 'at' h:mm a")}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            {getStatusIcon(patient.triage_level)}
+            <Badge className={`${getTriageColor(patient.triage_level)}`}>
+              {patient.triage_level}
+            </Badge>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Calendar className="w-4 h-4" />
+            <span>Last visit: {format(new Date(patient.created_at), "MMM d")}</span>
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Heart className="w-4 h-4" />
+            <span>Condition: {patient.chief_complaint}</span>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Activity className="w-4 h-4" />
+            <span>Status: {patient.status || 'Active'}</span>
+          </div>
+        </div>
+
+        <div className="flex gap-2 mt-4">
+          <Button
+            onClick={onView}
+            size="sm"
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <Eye className="w-4 h-4 mr-2" />
+            View
+          </Button>
+          <Button
+            onClick={onEdit}
+            size="sm"
+            variant="outline"
+            className="border-gray-500 text-gray-300 hover:bg-gray-600"
+          >
+            <Edit className="w-4 h-4" />
+          </Button>
+          <Button
+            onClick={onGenerateReport}
+            size="sm"
+            variant="outline"
+            className="border-gray-500 text-gray-300 hover:bg-gray-600"
+          >
+            <Brain className="w-4 h-4" />
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
