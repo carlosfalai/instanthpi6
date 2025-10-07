@@ -1,16 +1,17 @@
 import React from "react";
 import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "../components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Input } from "../components/ui/input";
+import { Badge } from "../components/ui/badge";
 import { Search, LogOut, ChevronRight, User, Activity, Clock, AlertTriangle, CheckCircle, Copy, Brain, Stethoscope, FileText, Users, Settings, Bell } from "lucide-react";
 import { format } from "date-fns";
 import { createClient } from "@supabase/supabase-js";
+import { HeroSection } from "../components/blocks/hero-section-dark";
 
 const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
+  import.meta.env.VITE_SUPABASE_URL || "",
+  import.meta.env.VITE_SUPABASE_ANON_KEY || ""
 );
 
 export default function DoctorDashboardNew() {
@@ -193,7 +194,7 @@ export default function DoctorDashboardNew() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 dark">
       {/* Header */}
       <header className="bg-white/10 backdrop-blur-md shadow-xl border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -265,7 +266,26 @@ export default function DoctorDashboardNew() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Hero Section */}
+      <HeroSection
+        title="Doctor's Lounge"
+        subtitle={{
+          regular: "Intelligent Medical Platform for ",
+          gradient: "Professional Healthcare"
+        }}
+        description="Advanced AI-powered medical documentation and patient management system designed for modern healthcare professionals."
+        ctaText="View Dashboard"
+        ctaHref="#dashboard"
+        gridOptions={{
+          angle: 65,
+          cellSize: 60,
+          opacity: 0.3,
+          lightLineColor: "rgba(59, 130, 246, 0.3)",
+          darkLineColor: "rgba(59, 130, 246, 0.5)"
+        }}
+      />
+
+      <div id="dashboard" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
