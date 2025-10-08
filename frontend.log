@@ -453,3 +453,10 @@ Browserslist: browsers data (caniuse-lite) is 12 months old. Please run:
 1:00:25 AM [vite] hmr update /src/App.tsx, /src/index.css
 1:00:27 AM [vite] hmr update /src/App.tsx, /src/index.css
 1:00:30 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+1:02:07 AM [vite] hmr update /src/App.tsx, /src/index.css
+1:02:07 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+1:06:20 AM [vite] hmr update /src/App.tsx, /src/index.css
+1:06:20 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+1:08:08 AM [vite] page reload src/pages/tier-association-page.tsx
+1:08:11 AM [vite] page reload src/pages/tier-association-page.tsx
+1:08:32 AM [vite] page reload src/pages/tier-association-page.tsx
