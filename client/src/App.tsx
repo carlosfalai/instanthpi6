@@ -15,6 +15,7 @@ import DocumentsPage from "@/pages/documents-page";
 import MessagesPage from "@/pages/messages-page";
 import AIBillingPage from "@/pages/ai-billing-page";
 import KnowledgeBasePage from "@/pages/knowledge-base-page";
+import TierAssociationPage from "@/pages/tier-association-page";
 
 export default function App() {
   const [location, setLocation] = useLocation();
@@ -52,6 +53,8 @@ export default function App() {
         <Route path="/messages" component={MessagesPage} />
         <Route path="/ai-billing" component={AIBillingPage} />
         <Route path="/knowledge-base" component={KnowledgeBasePage} />
+        <Route path="/association" component={TierAssociationPage} />
+        <Route path="/tier-35" component={TierAssociationPage} />
         <Route path="/webhook-setup" component={WebhookSetupPage} />
         <Route>
           <div className="min-h-screen flex items-center justify-center">

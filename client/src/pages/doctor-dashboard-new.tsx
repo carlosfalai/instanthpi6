@@ -790,6 +790,20 @@ export default function DoctorDashboardNew() {
               <span className="text-sm">Settings</span>
             </button>
           </nav>
+
+          {/* Association Section - Separator */}
+          <div className="my-6 border-t border-slate-800"></div>
+          
+          <div className="mb-3">
+            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider px-3">Collaboration</p>
+          </div>
+          
+          <nav className="space-y-1">
+            <button onClick={() => navigate("/association")} className="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-md w-full text-left transition-all">
+              <Users className="w-4 h-4" />
+              <span className="text-sm">Association</span>
+            </button>
+          </nav>
         </div>
       </aside>
 
@@ -1746,13 +1760,14 @@ function MedicalSection({
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // Elegant monochromatic palette - NO rainbow clown colors
   const colorClasses = {
-    blue: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-    green: "bg-emerald-800/20 text-green-300 border-green-500/30",
-    purple: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-    orange: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-    red: "bg-red-500/20 text-red-300 border-red-500/30",
-    cyan: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30"
+    blue: "bg-slate-800/40 text-slate-300 border-slate-700/50",
+    green: "bg-slate-800/40 text-slate-300 border-slate-700/50",
+    purple: "bg-slate-800/40 text-slate-300 border-slate-700/50",
+    orange: "bg-slate-800/40 text-slate-300 border-slate-700/50",
+    red: "bg-slate-800/40 text-slate-300 border-slate-700/50",
+    cyan: "bg-slate-800/40 text-slate-300 border-slate-700/50"
   };
 
   return (
