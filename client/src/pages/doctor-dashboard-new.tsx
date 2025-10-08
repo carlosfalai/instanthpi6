@@ -283,6 +283,60 @@ export default function DoctorDashboardNew() {
     });
   };
 
+  const applyTemplateToReport = () => {
+    if (!frenchDoc || !selectedTemplate) return;
+    
+    // Get selected items from template
+    const updatedReport = { ...frenchDoc };
+    
+    // Add selected medications to report
+    if (selectedPlanItems.medications && selectedPlanItems.medications.length > 0) {
+      const additionalMeds = selectedTemplate.plan_items
+        .filter((item: any) => 
+          item.category?.toLowerCase() === 'medications' && 
+          selectedPlanItems.medications.includes(item.item)
+        )
+        .map((item: any) => `\n\n${item.item}${item.details ? `\n${item.details}` : ''}`)
+        .join('');
+      
+      updatedReport.medications = (updatedReport.medications || '') + additionalMeds;
+    }
+    
+    // Add selected lab tests
+    if (selectedPlanItems.tests && selectedPlanItems.tests.length > 0) {
+      const additionalTests = selectedTemplate.plan_items
+        .filter((item: any) => 
+          (item.category?.toLowerCase() === 'laboratory' || item.category?.toLowerCase() === 'tests') && 
+          selectedPlanItems.tests.includes(item.item)
+        )
+        .map((item: any) => item.item)
+        .join('\n');
+      
+      updatedReport.lab_tests = (updatedReport.lab_tests || '') + '\n' + additionalTests;
+    }
+    
+    // Add selected referrals  
+    if (selectedPlanItems.referrals && selectedPlanItems.referrals.length > 0) {
+      const additionalReferrals = selectedTemplate.plan_items
+        .filter((item: any) => 
+          (item.category?.toLowerCase() === 'referrals' || item.category?.toLowerCase() === 'specialist') && 
+          selectedPlanItems.referrals.includes(item.item)
+        )
+        .map((item: any) => `${item.item}${item.details ? ` - ${item.details}` : ''}`)
+        .join('\n\n');
+      
+      updatedReport.referrals = (updatedReport.referrals || '') + '\n\n' + additionalReferrals;
+    }
+    
+    // Update the report
+    setFrenchDoc(updatedReport);
+    
+    // Close modal and reset
+    setShowTemplateLibrary(false);
+    setSelectedTemplate(null);
+    setSelectedPlanItems({ medications: [], tests: [], referrals: [], lifestyle: [] });
+  };
+
   const openPatientDetails = async (patientId: string) => {
     setSelectedPatient(patientId);
     try {
@@ -1419,14 +1473,10 @@ export default function DoctorDashboardNew() {
                                   Cancel
                                 </Button>
                                 <Button
-                                  onClick={() => {
-                                    setShowTemplateLibrary(false);
-                                    // The selected plan items are now available for use in report generation
-                                    console.log("Selected plan items:", selectedPlanItems);
-                                  }}
+                                  onClick={applyTemplateToReport}
                                   className="bg-purple-600 hover:bg-purple-700"
                                 >
-                                  Apply Template
+                                  Apply Template to Report
                                 </Button>
                               </div>
                             )}
