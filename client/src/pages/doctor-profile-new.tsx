@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "../lib/supabase";
 import {
   ArrowLeft,
   Key,
@@ -13,15 +13,20 @@ import {
   Loader2,
   TestTube,
   Settings,
+  FileText,
+  Plus,
+  Trash2,
+  Edit,
+  Sparkles,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
+import { Textarea } from "../components/ui/textarea";
+import { useToast } from "../hooks/use-toast";
 
 export default function DoctorProfileNew() {
   const [, navigate] = useLocation();
@@ -48,15 +53,37 @@ export default function DoctorProfileNew() {
   
   // Verification status
   const [hasCredentials, setHasCredentials] = useState(false);
-  const [testResults, setTestResults] = useState({
+  
+  // API Testing status
+  const [apiStatus, setApiStatus] = useState({
+    spruce: 'unknown' as 'working' | 'broken' | 'unknown',
+    openai: 'unknown' as 'working' | 'broken' | 'unknown', 
+    claude: 'unknown' as 'working' | 'broken' | 'unknown'
+  });
+  const [testingAll, setTestingAll] = useState(false);
+  const [testResults, setTestResults] = useState<{
+    spruce: boolean | null | string;
+    openai: boolean | null | string;
+    claude: boolean | null | string;
+  }>({
     spruce: null,
     openai: null,
     claude: null
   });
   const [credentialsVerified, setCredentialsVerified] = useState(false);
+  
+  // Diagnostic Templates state
+  const [templates, setTemplates] = useState<any[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+  const [generatingTemplate, setGeneratingTemplate] = useState(false);
+  const [newTemplateName, setNewTemplateName] = useState("");
+  const [newDiagnosisName, setNewDiagnosisName] = useState("");
+  const [newTemplateSpecialty, setNewTemplateSpecialty] = useState("");
+  const [editingTemplate, setEditingTemplate] = useState<any>(null);
 
   useEffect(() => {
     loadProfile();
+    loadTemplates();
   }, []);
 
   const loadProfile = async () => {
@@ -93,11 +120,73 @@ export default function DoctorProfileNew() {
     }
   };
 
+  // Test individual API
+  const testAPI = async (provider: 'spruce' | 'openai' | 'claude') => {
+    setTesting(provider);
+    
+    const apiKey = provider === 'openai' ? openaiKey : 
+                   provider === 'claude' ? claudeKey : 
+                   spruceApiKey;
+    
+    console.log(`Testing ${provider} with key:`, apiKey ? `${apiKey.substring(0, 10)}...` : 'EMPTY');
+    
+    if (!apiKey) {
+      setApiStatus(prev => ({ ...prev, [provider]: 'broken' }));
+      setTestResults(prev => ({ ...prev, [provider]: 'No API key configured' }));
+      setTesting(null);
+      return;
+    }
+    
+    try {
+      const response = await fetch(`/api-doctor-credentials/test-${provider}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider,
+          api_key: apiKey,
+          spruce_access_id: provider === 'spruce' ? spruceAccessId : undefined
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setApiStatus(prev => ({ ...prev, [provider]: 'working' }));
+        setTestResults(prev => ({ ...prev, [provider]: data.message }));
+      } else {
+        setApiStatus(prev => ({ ...prev, [provider]: 'broken' }));
+        setTestResults(prev => ({ ...prev, [provider]: data.error }));
+      }
+    } catch (error) {
+      setApiStatus(prev => ({ ...prev, [provider]: 'broken' }));
+      setTestResults(prev => ({ ...prev, [provider]: 'Connection failed' }));
+    } finally {
+      setTesting(null);
+    }
+  };
+
+  // Test all APIs
+  const testAllAPIs = async () => {
+    setTestingAll(true);
+    setApiStatus({ spruce: 'unknown', openai: 'unknown', claude: 'unknown' });
+    
+    // Test each API in parallel
+    const tests: Promise<void>[] = [];
+    if (spruceAccessId && spruceApiKey) tests.push(testAPI('spruce'));
+    if (openaiKey) tests.push(testAPI('openai'));
+    if (claudeKey) tests.push(testAPI('claude'));
+    
+    await Promise.all(tests);
+    setTestingAll(false);
+  };
+
   const handleSaveCredentials = async () => {
     setSaving(true);
     try {
       const payload: any = {
         preferred_ai_provider: preferredAI,
+        doctor_id: 'default-doctor', // Use consistent ID
+        specialty: specialty
       };
 
       if (spruceAccessId) payload.spruce_access_id = spruceAccessId;
@@ -105,14 +194,20 @@ export default function DoctorProfileNew() {
       if (openaiKey) payload.openai_api_key = openaiKey;
       if (claudeKey) payload.claude_api_key = claudeKey;
 
+      console.log('Saving credentials:', payload);
+      
       const response = await fetch("/api-doctor-credentials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
+      console.log('Response status:', response.status);
+      const responseData = await response.json();
+      console.log('Response data:', responseData);
+
       if (!response.ok) {
-        throw new Error("Failed to save credentials");
+        throw new Error(responseData.error || "Failed to save credentials");
       }
 
       // Clear input fields after successful save
@@ -260,6 +355,177 @@ export default function DoctorProfileNew() {
     }
   };
 
+  // Template Management Functions
+  const loadTemplates = async () => {
+    setLoadingTemplates(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from("diagnostic_templates")
+        .select("*")
+        .eq("physician_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setTemplates(data || []);
+    } catch (error: any) {
+      console.error("Error loading templates:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les templates.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingTemplates(false);
+    }
+  };
+
+  const generateTemplateWithAI = async () => {
+    if (!newDiagnosisName || !claudeKey) {
+      toast({
+        title: "Informations manquantes",
+        description: "Veuillez entrer un nom de diagnostic et configurer votre clé API Claude.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setGeneratingTemplate(true);
+    try {
+      const response = await fetch("/api/ai-template-generation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          diagnosis_name: newDiagnosisName,
+          specialty: newTemplateSpecialty || specialty,
+          api_key: claudeKey,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+
+      // Pre-fill the form with AI-generated template
+      setNewTemplateName(data.template.template_name);
+      setEditingTemplate({
+        ...data.template,
+        physician_id: null, // Will be set on save
+        id: null,
+      });
+
+      toast({
+        title: "✨ Template généré",
+        description: "Vous pouvez maintenant le modifier et le sauvegarder.",
+      });
+    } catch (error: any) {
+      console.error("AI template generation error:", error);
+      toast({
+        title: "Erreur IA",
+        description: error.message || "Impossible de générer le template.",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingTemplate(false);
+    }
+  };
+
+  const saveTemplate = async () => {
+    if (!newTemplateName || !newDiagnosisName) {
+      toast({
+        title: "Informations manquantes",
+        description: "Veuillez entrer un nom et un diagnostic.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const templateData = {
+        physician_id: user.id,
+        template_name: newTemplateName,
+        diagnosis_name: newDiagnosisName,
+        specialty: newTemplateSpecialty || specialty,
+        plan_items: editingTemplate?.plan_items || [],
+      };
+
+      if (editingTemplate?.id) {
+        // Update existing
+        const { error } = await supabase
+          .from("diagnostic_templates")
+          .update(templateData)
+          .eq("id", editingTemplate.id);
+        if (error) throw error;
+      } else {
+        // Create new
+        const { error } = await supabase
+          .from("diagnostic_templates")
+          .insert(templateData);
+        if (error) throw error;
+      }
+
+      toast({
+        title: "✅ Template sauvegardé",
+        description: "Le template a été enregistré avec succès.",
+      });
+
+      // Reset form
+      setNewTemplateName("");
+      setNewDiagnosisName("");
+      setNewTemplateSpecialty("");
+      setEditingTemplate(null);
+
+      // Reload templates
+      loadTemplates();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const deleteTemplate = async (templateId: string) => {
+    if (!confirm("Êtes-vous sûr de vouloir supprimer ce template ?")) return;
+
+    try {
+      const { error } = await supabase
+        .from("diagnostic_templates")
+        .delete()
+        .eq("id", templateId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Template supprimé",
+        description: "Le template a été supprimé avec succès.",
+      });
+
+      loadTemplates();
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const editTemplate = (template: any) => {
+    setEditingTemplate(template);
+    setNewTemplateName(template.template_name);
+    setNewDiagnosisName(template.diagnosis_name);
+    setNewTemplateSpecialty(template.specialty);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 flex items-center justify-center">
@@ -314,10 +580,11 @@ export default function DoctorProfileNew() {
         )}
 
         <Tabs defaultValue="identity" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 bg-white border">
+          <TabsList className="grid w-full grid-cols-4 bg-white border">
             <TabsTrigger value="identity">Identité</TabsTrigger>
             <TabsTrigger value="api">API Intégrations</TabsTrigger>
             <TabsTrigger value="ai">IA Configuration</TabsTrigger>
+            <TabsTrigger value="templates">Diagnostics</TabsTrigger>
           </TabsList>
 
           {/* Identity Tab */}
@@ -583,20 +850,431 @@ export default function DoctorProfileNew() {
 
           {/* AI Configuration Tab */}
           <TabsContent value="ai">
-            <Card>
-              <CardHeader>
-                <CardTitle>Configuration IA (À venir)</CardTitle>
-                <CardDescription>
-                  Personnalisez les sorties de l'IA selon vos préférences médicales
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-500">
-                  Cette section permettra de configurer les modèles de sortie IA,
-                  les templates de documentation, et les préférences linguistiques.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              {/* Test All APIs Button */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TestTube className="h-5 w-5 text-purple-600" />
+                    Test des APIs
+                  </CardTitle>
+                  <CardDescription>
+                    Testez la connectivité de tous vos services API configurés
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Button 
+                    onClick={testAllAPIs}
+                    disabled={testingAll || (!spruceAccessId && !openaiKey && !claudeKey)}
+                    className="w-full"
+                  >
+                    {testingAll ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Test en cours...
+                      </>
+                    ) : (
+                      <>
+                        <TestTube className="h-4 w-4 mr-2" />
+                        Tester toutes les APIs
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* API Status Cards */}
+              <div className="grid gap-4">
+                {/* Spruce Health Status */}
+                {spruceAccessId && spruceApiKey && (
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <MessageSquare className="h-5 w-5 text-blue-600" />
+                          <div>
+                            <h3 className="font-semibold">Spruce Health</h3>
+                            <p className="text-sm text-gray-600">Gestion des patients</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {apiStatus.spruce === 'working' && (
+                            <div className="flex items-center gap-1 text-green-600">
+                              <Check className="h-4 w-4" />
+                              <span className="text-sm">Fonctionnel</span>
+                            </div>
+                          )}
+                          {apiStatus.spruce === 'broken' && (
+                            <div className="flex items-center gap-1 text-red-600">
+                              <AlertCircle className="h-4 w-4" />
+                              <span className="text-sm">Erreur</span>
+                            </div>
+                          )}
+                          {apiStatus.spruce === 'unknown' && (
+                            <div className="flex items-center gap-1 text-gray-500">
+                              <span className="text-sm">Non testé</span>
+                            </div>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => testAPI('spruce')}
+                            disabled={testing === 'spruce'}
+                          >
+                            {testing === 'spruce' ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              'Test'
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      {testResults.spruce && (
+                        <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                          {testResults.spruce}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* OpenAI Status */}
+                {openaiKey && (
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Bot className="h-5 w-5 text-green-600" />
+                          <div>
+                            <h3 className="font-semibold">OpenAI</h3>
+                            <p className="text-sm text-gray-600">GPT-4, GPT-3.5</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {apiStatus.openai === 'working' && (
+                            <div className="flex items-center gap-1 text-green-600">
+                              <Check className="h-4 w-4" />
+                              <span className="text-sm">Fonctionnel</span>
+                            </div>
+                          )}
+                          {apiStatus.openai === 'broken' && (
+                            <div className="flex items-center gap-1 text-red-600">
+                              <AlertCircle className="h-4 w-4" />
+                              <span className="text-sm">Erreur</span>
+                            </div>
+                          )}
+                          {apiStatus.openai === 'unknown' && (
+                            <div className="flex items-center gap-1 text-gray-500">
+                              <span className="text-sm">Non testé</span>
+                            </div>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => testAPI('openai')}
+                            disabled={testing === 'openai'}
+                          >
+                            {testing === 'openai' ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              'Test'
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      {testResults.openai && (
+                        <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                          {testResults.openai}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Claude Status */}
+                {claudeKey && (
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Bot className="h-5 w-5 text-orange-600" />
+                          <div>
+                            <h3 className="font-semibold">Anthropic Claude</h3>
+                            <p className="text-sm text-gray-600">Claude-3 Opus, Sonnet</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {apiStatus.claude === 'working' && (
+                            <div className="flex items-center gap-1 text-green-600">
+                              <Check className="h-4 w-4" />
+                              <span className="text-sm">Fonctionnel</span>
+                            </div>
+                          )}
+                          {apiStatus.claude === 'broken' && (
+                            <div className="flex items-center gap-1 text-red-600">
+                              <AlertCircle className="h-4 w-4" />
+                              <span className="text-sm">Erreur</span>
+                            </div>
+                          )}
+                          {apiStatus.claude === 'unknown' && (
+                            <div className="flex items-center gap-1 text-gray-500">
+                              <span className="text-sm">Non testé</span>
+                            </div>
+                          )}
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => testAPI('claude')}
+                            disabled={testing === 'claude'}
+                          >
+                            {testing === 'claude' ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              'Test'
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      {testResults.claude && (
+                        <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                          {testResults.claude}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* No APIs configured */}
+                {!spruceAccessId && !openaiKey && !claudeKey && (
+                  <Card>
+                    <CardContent className="p-8 text-center">
+                      <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="font-semibold text-gray-900 mb-2">Aucune API configurée</h3>
+                      <p className="text-gray-600 mb-4">
+                        Configurez vos identifiants API dans l'onglet "API Intégrations" pour pouvoir les tester ici.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </div>
+          </TabsContent>
+
+          {/* Diagnostics Templates Tab */}
+          <TabsContent value="templates">
+            <div className="space-y-6">
+              {/* Header Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    Templates de Plans de Traitement
+                  </CardTitle>
+                  <CardDescription>
+                    Créez et gérez vos templates de plans pour différents diagnostics. 
+                    Utilisez l'IA pour générer automatiquement des templates personnalisés.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              {/* Create/Edit Template Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">
+                    {editingTemplate?.id ? "Modifier le Template" : "Créer un Nouveau Template"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="diagnosis">Nom du Diagnostic *</Label>
+                      <Input
+                        id="diagnosis"
+                        value={newDiagnosisName}
+                        onChange={(e) => setNewDiagnosisName(e.target.value)}
+                        placeholder="ex: RSV, Appendicite, Pneumonie"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="template-name">Nom du Template</Label>
+                      <Input
+                        id="template-name"
+                        value={newTemplateName}
+                        onChange={(e) => setNewTemplateName(e.target.value)}
+                        placeholder="ex: Plan RSV Pédiatrie"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="specialty">Spécialité (optionnel)</Label>
+                    <Input
+                      id="specialty"
+                      value={newTemplateSpecialty}
+                      onChange={(e) => setNewTemplateSpecialty(e.target.value)}
+                      placeholder={specialty || "ex: Pédiatrie, Cardiologie"}
+                    />
+                  </div>
+
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      onClick={generateTemplateWithAI}
+                      disabled={!newDiagnosisName || !claudeKey || generatingTemplate}
+                      className="bg-gradient-to-r from-purple-600 to-indigo-600"
+                    >
+                      {generatingTemplate ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Génération IA...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="w-4 h-4 mr-2" />
+                          Générer avec IA
+                        </>
+                      )}
+                    </Button>
+
+                    <Button
+                      onClick={saveTemplate}
+                      disabled={!newTemplateName || !newDiagnosisName || saving}
+                      variant="default"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Enregistrement...
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4 mr-2" />
+                          Sauvegarder
+                        </>
+                      )}
+                    </Button>
+
+                    {editingTemplate?.id && (
+                      <Button
+                        onClick={() => {
+                          setEditingTemplate(null);
+                          setNewTemplateName("");
+                          setNewDiagnosisName("");
+                          setNewTemplateSpecialty("");
+                        }}
+                        variant="outline"
+                      >
+                        Annuler
+                      </Button>
+                    )}
+                  </div>
+
+                  {!claudeKey && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <p className="text-sm text-yellow-800">
+                        💡 Configurez votre clé API Claude dans l'onglet "API Intégrations" pour utiliser la génération IA.
+                      </p>
+                    </div>
+                  )}
+
+                  {editingTemplate?.plan_items && editingTemplate.plan_items.length > 0 && (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                      <h4 className="font-semibold mb-3 text-sm">Plan Items Preview:</h4>
+                      <div className="space-y-2 max-h-60 overflow-y-auto">
+                        {editingTemplate.plan_items.map((item: any, idx: number) => (
+                          <div key={idx} className="text-sm bg-white p-2 rounded border">
+                            <div className="flex items-start gap-2">
+                              <span className="font-medium text-blue-600">{item.category}:</span>
+                              <span>{item.item}</span>
+                            </div>
+                            {item.details && (
+                              <div className="text-xs text-gray-600 mt-1 ml-4">{item.details}</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Existing Templates List */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center justify-between">
+                    <span>Mes Templates</span>
+                    <Button
+                      onClick={loadTemplates}
+                      size="sm"
+                      variant="outline"
+                      disabled={loadingTemplates}
+                    >
+                      {loadingTemplates ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        "Actualiser"
+                      )}
+                    </Button>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {loadingTemplates ? (
+                    <div className="flex justify-center py-8">
+                      <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                    </div>
+                  ) : templates.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                      <p>Aucun template créé pour le moment.</p>
+                      <p className="text-sm mt-1">Créez votre premier template ci-dessus.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {templates.map((template) => (
+                        <div
+                          key={template.id}
+                          className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h4 className="font-semibold text-gray-900">{template.template_name}</h4>
+                              <p className="text-sm text-gray-600 mt-1">
+                                Diagnostic: <span className="font-medium">{template.diagnosis_name}</span>
+                              </p>
+                              {template.specialty && (
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Spécialité: {template.specialty}
+                                </p>
+                              )}
+                              <p className="text-xs text-gray-400 mt-2">
+                                {template.plan_items?.length || 0} items • 
+                                Créé le {new Date(template.created_at).toLocaleDateString()}
+                              </p>
+                            </div>
+                            <div className="flex gap-2 ml-4">
+                              <Button
+                                onClick={() => editTemplate(template)}
+                                size="sm"
+                                variant="outline"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                onClick={() => deleteTemplate(template.id)}
+                                size="sm"
+                                variant="outline"
+                                className="text-red-600 hover:bg-red-50"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

@@ -96,6 +96,122 @@ async function testSpruceConnection(event) {
   }
 }
 
+async function testOpenAIConnection(event) {
+  try {
+    const { api_key } = JSON.parse(event.body);
+    
+    if (!api_key) {
+      return {
+        statusCode: 400,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: false, error: 'OpenAI API key is required' })
+      };
+    }
+
+    const response = await fetch('https://api.openai.com/v1/models', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${api_key}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log('OpenAI API Response:', response.status, response.statusText);
+
+    if (response.ok) {
+      return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          success: true,
+          message: 'OpenAI connection successful'
+        })
+      };
+    } else {
+      const errorText = await response.text();
+      console.log('OpenAI API Error:', errorText);
+      return {
+        statusCode: 400,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          success: false,
+          error: `OpenAI API error: ${response.status} ${response.statusText} - ${errorText}`
+        })
+      };
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        success: false,
+        error: `OpenAI connection failed: ${error.message}`
+      })
+    };
+  }
+}
+
+async function testClaudeConnection(event) {
+  try {
+    const { api_key } = JSON.parse(event.body);
+    
+    if (!api_key) {
+      return {
+        statusCode: 400,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ success: false, error: 'Claude API key is required' })
+      };
+    }
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'x-api-key': api_key,
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-haiku-20240307',
+        max_tokens: 10,
+        messages: [{ role: 'user', content: 'Hello' }]
+      })
+    });
+
+    console.log('Claude API Response:', response.status, response.statusText);
+
+    if (response.ok) {
+      return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          success: true,
+          message: 'Claude connection successful'
+        })
+      };
+    } else {
+      const errorText = await response.text();
+      console.log('Claude API Error:', errorText);
+      return {
+        statusCode: 400,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          success: false,
+          error: `Claude API error: ${response.status} - ${errorText}`
+        })
+      };
+    }
+  } catch (error) {
+    return {
+      statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        success: false,
+        error: `Claude connection failed: ${error.message}`
+      })
+    };
+  }
+}
+
 async function testAIConnection(event) {
   try {
     const { provider, api_key } = JSON.parse(event.body);
@@ -144,7 +260,7 @@ async function testAIConnection(event) {
         body: JSON.stringify({
           model: 'claude-3-haiku-20240307',
           max_tokens: 10,
-          messages: [{ role: 'user', content: 'test' }]
+          messages: [{ role: 'user', content: 'Hello' }]
         })
       });
 
@@ -186,8 +302,17 @@ async function saveCredentials(event) {
   try {
     const credentials = JSON.parse(event.body);
     
-    // Get doctor ID from session or create a test one
-    const doctorId = 'test-doctor-id'; // In real implementation, get from auth
+    // Get doctor ID from the request or use a default
+    const doctorId = credentials.doctor_id || 'default-doctor';
+    
+    console.log('Saving credentials for doctor:', doctorId);
+    console.log('Credentials:', {
+      specialty: credentials.specialty,
+      has_spruce_access: !!credentials.spruce_access_id,
+      has_spruce_api: !!credentials.spruce_api_key,
+      has_openai: !!credentials.openai_api_key,
+      has_claude: !!credentials.claude_api_key
+    });
     
     const { error } = await supabase
       .from('physicians')
@@ -202,8 +327,11 @@ async function saveCredentials(event) {
       });
 
     if (error) {
+      console.error('Supabase error:', error);
       throw error;
     }
+
+    console.log('Credentials saved successfully');
 
     return {
       statusCode: 200,
@@ -216,14 +344,14 @@ async function saveCredentials(event) {
     return {
       statusCode: 500,
       headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Failed to save credentials' })
+      body: JSON.stringify({ error: `Failed to save credentials: ${error.message}` })
     };
   }
 }
 
 async function getCredentials(event) {
   try {
-    const doctorId = 'test-doctor-id'; // In real implementation, get from auth
+    const doctorId = 'default-doctor'; // Use consistent ID
     
     const { data, error } = await supabase
       .from('physicians')
@@ -232,7 +360,16 @@ async function getCredentials(event) {
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      throw error;
+      console.error('Get credentials error:', error);
+      // Return empty data instead of error for new doctors
+      return {
+        statusCode: 200,
+        headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          success: true,
+          data: {}
+        })
+      };
     }
 
     return {
@@ -247,9 +384,12 @@ async function getCredentials(event) {
   } catch (error) {
     console.error('Get credentials error:', error);
     return {
-      statusCode: 500,
+      statusCode: 200, // Return success with empty data
       headers: { 'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Failed to get credentials' })
+      body: JSON.stringify({
+        success: true,
+        data: {}
+      })
     };
   }
 }

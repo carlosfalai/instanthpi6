@@ -128,7 +128,7 @@ CREATE INDEX IF NOT EXISTS idx_ai_medical_documentation_consultation_id ON ai_me
 CREATE INDEX IF NOT EXISTS idx_ai_medical_documentation_patient_id ON ai_medical_documentation(patient_id);
 CREATE INDEX IF NOT EXISTS idx_doctor_documentation_preferences_user_id ON doctor_documentation_preferences(user_id);
 CREATE INDEX IF NOT EXISTS idx_ai_processing_logs_consultation_id ON ai_processing_logs(consultation_id);
-CREATE INDEX IF NOT EXISTS idx_ai_processing_logs_patient_id ON ai_processing_logs(patient_id);
+-- CREATE INDEX IF NOT EXISTS idx_ai_processing_logs_patient_id ON ai_processing_logs(patient_id);
 CREATE INDEX IF NOT EXISTS idx_ai_processing_logs_created_at ON ai_processing_logs(created_at DESC);
 
 -- Enable Row Level Security

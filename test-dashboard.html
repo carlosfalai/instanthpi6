@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard Test</title>
+</head>
+<body>
+    <div id="root">
+        <h1>Testing Dashboard Access</h1>
+        <p>If you can see this, the page is loading.</p>
+        <script>
+            console.log("Test page loaded");
+            // Test if we can access the dashboard
+            fetch('/doctor-dashboard')
+                .then(response => response.text())
+                .then(html => {
+                    console.log("Dashboard HTML length:", html.length);
+                    document.body.innerHTML += '<p>Dashboard HTML loaded: ' + html.length + ' characters</p>';
+                })
+                .catch(error => {
+                    console.error("Error loading dashboard:", error);
+                    document.body.innerHTML += '<p>Error: ' + error.message + '</p>';
+                });
+        </script>
+    </div>
+</body>
+</html>
