@@ -7,6 +7,23 @@
 **Deployment:** https://instanthpi.ca  
 **Last Updated:** October 8, 2025
 
+### Design Philosophy (From story/ Files):
+**Aesthetic:** Butler/Concierge - Elegant, Professional, White-Glove Service
+- **NO rainbow colors** - Different color per button = cheap AI clown aesthetic
+- **Sleek & Simple** - Professional medical interface
+- **Minimal UI** - Distraction-free, clinical focus
+- **Consistent Styling** - Everything blends together
+- **Butler Hero Image** - Elegant branding at top of dashboard
+- **No Footer Images** - Keep physician screens clean and focused
+
+**Key Design Decisions:**
+- Butler image as hero (reinforces premium service)
+- Removed footer images (reduce distraction)
+- Professional minimal UI for physicians
+- Consistent color palette (not different color per button)
+- Clean typography and spacing
+- Medical-grade professionalism
+
 ---
 
 ## 🎯 SESSION 10: DIAGNOSTICS TEMPLATES & AI-POWERED PLAN GENERATION
@@ -399,6 +416,24 @@ From screenshot analysis:
   - Asthma (chronic)
 - ✅ "Recent Consultations" sidebar (right)
 - ✅ "Patient Details & Medical Report" section
+
+### 🎨 AESTHETIC ISSUES IDENTIFIED:
+
+**Current Problems (Rainbow Clown Aesthetic):**
+- 🔴 Different colors for each button (blue, purple, green, yellow)
+- 🔴 Inconsistent button styles across sections
+- 🔴 Too many bright colors competing for attention
+- 🔴 Not elegant or professional enough
+- 🔴 Doesn't match butler/concierge aesthetic
+
+**User's Vision:**
+- Sleek email interface aesthetic (dark, consistent, minimal)
+- Butler/white-glove service elegance
+- Consistent professional color palette
+- Everything blends together harmoniously
+- Medical-grade professionalism
+
+**Fix Needed:** Complete redesign of dashboard to match elegant, professional aesthetic with consistent color palette
 
 ---
 
