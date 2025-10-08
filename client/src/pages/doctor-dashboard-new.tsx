@@ -256,90 +256,10 @@ export default function DoctorDashboardNew() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Enhanced Navigation */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                className="text-gray-400 hover:text-white hover:bg-gray-700"
-              >
-                <Users className="w-4 h-4 mr-2" />
-                All Patients
-              </Button>
-              <Button
-                variant="ghost"
-                className="text-gray-400 hover:text-white hover:bg-gray-700"
-              >
-                <Activity className="w-4 h-4 mr-2" />
-                Active Cases
-              </Button>
-              <Button
-                variant="ghost"
-                className="text-gray-400 hover:text-white hover:bg-gray-700"
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Completed
-              </Button>
-              <Button
-                variant="ghost"
-                className="text-gray-400 hover:text-white hover:bg-gray-700"
-              >
-                <Clock className="w-4 h-4 mr-2" />
-                Pending
-              </Button>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-400 hover:text-white hover:bg-gray-700"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                Export
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-gray-400 hover:text-white hover:bg-gray-700"
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                Settings
-              </Button>
-            </div>
-          </div>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Monthly Consultations */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">Monthly Consultations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Total Patients</span>
-                    <span className="text-2xl font-bold text-white">2.4k</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Active Cases</span>
-                    <span className="text-2xl font-bold text-white">1.3k</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Completion Rate</span>
-                      <span className="text-white">85%</span>
-                    </div>
-                    <div className="w-full bg-gray-700 rounded-full h-2">
-                      <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full" style={{width: '85%'}}></div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Enhanced Patient Cards */}
             {searchResults.length > 0 && (
@@ -369,113 +289,6 @@ export default function DoctorDashboardNew() {
               </Card>
             )}
 
-            {/* Analytics Dashboard */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5" />
-                  Medical Analytics
-                </CardTitle>
-                <p className="text-sm text-gray-400">Real-time medical metrics and trends</p>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Patient Flow Chart */}
-                  <div className="space-y-4">
-                    <h4 className="text-white font-semibold flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4" />
-                      Patient Flow
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">New Patients</span>
-                        <span className="text-white font-semibold">24</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Active Consultations</span>
-                        <span className="text-white font-semibold">49</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Completed Today</span>
-                        <span className="text-white font-semibold">18</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* AI Processing Stats */}
-                  <div className="space-y-4">
-                    <h4 className="text-white font-semibold flex items-center gap-2">
-                      <Brain className="w-4 h-4" />
-                      AI Processing
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Reports Generated</span>
-                        <span className="text-white font-semibold">156</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Accuracy Rate</span>
-                        <span className="text-green-400 font-semibold">94.2%</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Avg Processing Time</span>
-                        <span className="text-white font-semibold">2.3s</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Common Conditions */}
-                  <div className="space-y-4">
-                    <h4 className="text-white font-semibold flex items-center gap-2">
-                      <Heart className="w-4 h-4" />
-                      Top Conditions
-                    </h4>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Respiratory</span>
-                        <span className="text-white font-semibold">32%</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Cardiovascular</span>
-                        <span className="text-white font-semibold">28%</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-400 text-sm">Gastrointestinal</span>
-                        <span className="text-white font-semibold">24%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Revenue Summary */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">Revenue Summary</CardTitle>
-                <p className="text-sm text-gray-400">Last 30 Days</p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Consultation Fees</span>
-                    <span className="text-white font-semibold">$12,900</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">AI Processing</span>
-                    <span className="text-white font-semibold">$9,950</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Subscription</span>
-                    <span className="text-white font-semibold">$3,700</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Digital Reports</span>
-                    <span className="text-white font-semibold">$3,700</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Medical Transcription */}
             {selectedPatient && (
@@ -564,19 +377,6 @@ export default function DoctorDashboardNew() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Real-time Activity */}
-            <Card className="bg-gray-800 border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white text-lg">Real-time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-white mb-2">49</div>
-                  <p className="text-gray-400 text-sm">Active Consultations</p>
-                  <div className="mt-4 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg opacity-20"></div>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Recent Patients */}
             <Card className="bg-gray-800 border-gray-700">
@@ -632,64 +432,6 @@ export default function DoctorDashboardNew() {
           </div>
         </div>
 
-        {/* Bottom Row - Metric Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-yellow-500/20 rounded-lg flex items-center justify-center">
-                  <Activity className="w-5 h-5 text-yellow-400" />
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Total Consultations</p>
-                  <p className="text-2xl font-bold text-white">$59,304</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">This Month Consultations</p>
-                  <p className="text-2xl font-bold text-white">$12,661</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <Users className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">This Month Patients</p>
-                  <p className="text-2xl font-bold text-white">759</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gray-800 border-gray-700">
-            <CardContent className="p-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-purple-400" />
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">This Month Reports</p>
-                  <p className="text-2xl font-bold text-white">166,543</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </div>
 
       {/* Copy Toast */}
