@@ -200,7 +200,7 @@ export default function DoctorDashboardNew() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center">
                   <Stethoscope className="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -229,7 +229,7 @@ export default function DoctorDashboardNew() {
                 className="flex items-center gap-3 px-3 py-2 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors"
                 onClick={() => navigate("/doctor-profile")}
               >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center">
                   {docHeader.avatarUrl ? (
                     <img src={docHeader.avatarUrl} alt="Avatar" className="w-full h-full object-cover rounded-full" />
                   ) : (
@@ -302,7 +302,7 @@ export default function DoctorDashboardNew() {
                     <Button
                       onClick={generateFrenchTranscription}
                       disabled={generating}
-                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-gray-600 hover:bg-gray-700 text-white"
                     >
                       {generating ? (
                         <>
@@ -399,7 +399,7 @@ export default function DoctorDashboardNew() {
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                            <div className="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center">
                               <span className="text-white font-bold text-sm">
                                 {patient.patient_id?.charAt(0) || "P"}
                               </span>
@@ -457,19 +457,11 @@ function EnhancedPatientCard({
   onGenerateReport: () => void;
 }) {
   const getTriageColor = (level: string) => {
-    switch (level) {
-      case "High": return "bg-red-500/20 text-red-300 border-red-500/30";
-      case "Medium": return "bg-yellow-500/20 text-yellow-300 border-yellow-500/30";
-      default: return "bg-green-500/20 text-green-300 border-green-500/30";
-    }
+    return "bg-gray-500/20 text-gray-300 border-gray-500/30";
   };
 
   const getStatusIcon = (level: string) => {
-    switch (level) {
-      case "High": return <AlertTriangle className="w-4 h-4 text-red-400" />;
-      case "Medium": return <Clock className="w-4 h-4 text-yellow-400" />;
-      default: return <CheckCircle className="w-4 h-4 text-green-400" />;
-    }
+    return <CheckCircle className="w-4 h-4 text-gray-400" />;
   };
 
   return (
@@ -477,7 +469,7 @@ function EnhancedPatientCard({
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-lg">
                 {patient.patient_id?.charAt(0) || "P"}
               </span>
@@ -519,7 +511,7 @@ function EnhancedPatientCard({
           <Button
             onClick={onView}
             size="sm"
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+            className="flex-1 bg-gray-600 hover:bg-gray-700 text-white"
           >
             <Eye className="w-4 h-4 mr-2" />
             View
@@ -527,16 +519,14 @@ function EnhancedPatientCard({
           <Button
             onClick={onEdit}
             size="sm"
-            variant="outline"
-            className="border-gray-500 text-gray-300 hover:bg-gray-600"
+            className="bg-gray-600 hover:bg-gray-700 text-white"
           >
             <Edit className="w-4 h-4" />
           </Button>
           <Button
             onClick={onGenerateReport}
             size="sm"
-            variant="outline"
-            className="border-gray-500 text-gray-300 hover:bg-gray-600"
+            className="bg-gray-600 hover:bg-gray-700 text-white"
           >
             <Brain className="w-4 h-4" />
           </Button>
