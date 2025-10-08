@@ -10,6 +10,11 @@ import PatientLogin from "@/pages/patient-login";
 import PatientDashboard from "@/pages/patient-dashboard";
 import PublicPatientIntake from "@/pages/public-patient-intake";
 import WebhookSetupPage from "@/pages/webhook-setup-page";
+import PatientsPage from "@/pages/patients-page-new";
+import DocumentsPage from "@/pages/documents-page";
+import MessagesPage from "@/pages/messages-page";
+import AIBillingPage from "@/pages/ai-billing-page";
+import KnowledgeBasePage from "@/pages/knowledge-base-page";
 
 export default function App() {
   const [location, setLocation] = useLocation();
@@ -42,6 +47,11 @@ export default function App() {
         <Route path="/doctor-login" component={DoctorLogin} />
         <Route path="/doctor-dashboard" component={DoctorDashboard} />
         <Route path="/doctor-profile" component={DoctorProfileNew} />
+        <Route path="/patients" component={PatientsPage} />
+        <Route path="/documents" component={DocumentsPage} />
+        <Route path="/messages" component={MessagesPage} />
+        <Route path="/ai-billing" component={AIBillingPage} />
+        <Route path="/knowledge-base" component={KnowledgeBasePage} />
         <Route path="/webhook-setup" component={WebhookSetupPage} />
         <Route>
           <div className="min-h-screen flex items-center justify-center">

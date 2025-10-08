@@ -420,3 +420,5 @@ Browserslist: browsers data (caniuse-lite) is 12 months old. Please run:
 11:00:03 PM [vite] hmr update /src/pages/doctor-profile-new.tsx, /src/index.css
 11:27:17 PM [vite] hmr update /src/pages/doctor-profile-new.tsx, /src/index.css
 [Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+12:14:46 AM [vite] hmr update /src/App.tsx, /src/index.css
+12:14:52 AM [vite] hmr update /src/App.tsx, /src/index.css
