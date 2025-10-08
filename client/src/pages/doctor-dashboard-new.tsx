@@ -748,58 +748,58 @@ export default function DoctorDashboardNew() {
     : spruceCases;
 
   return (
-    <div className="min-h-screen bg-slate-950 flex">
+    <div className="min-h-screen bg-[#0d0d0d] flex">
       {/* Sidebar - Elegant, Minimal, Consistent */}
-      <aside className="w-64 bg-slate-900 border-r border-slate-800">
+      <aside className="w-64 bg-[#1a1a1a] border-r border-[#333]">
         <div className="p-6">
           {/* Logo - Elegant branding */}
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center border border-slate-700">
-              <Stethoscope className="w-6 h-6 text-slate-300" />
+            <div className="w-10 h-10 bg-[#222] rounded-lg flex items-center justify-center border border-[#2a2a2a]">
+              <Stethoscope className="w-6 h-6 text-[#999]" />
             </div>
             <div>
-              <h1 className="text-lg font-semibold text-slate-100">InstantHPI</h1>
-              <p className="text-xs text-slate-500">Medical Platform</p>
+              <h1 className="text-lg font-semibold text-[#e6e6e6]">InstantHPI</h1>
+              <p className="text-xs text-[#666]">Medical Platform</p>
             </div>
           </div>
 
           {/* Navigation - Consistent, elegant styling */}
           <nav className="space-y-1">
-            <button onClick={() => navigate("/doctor-dashboard")} className="flex items-center gap-3 px-3 py-2.5 bg-slate-800 text-slate-100 rounded-md w-full text-left transition-all hover:bg-slate-750 border border-slate-700">
+            <button onClick={() => navigate("/doctor-dashboard")} className="flex items-center gap-3 px-3 py-2.5 bg-[#222] text-[#e6e6e6] rounded-md w-full text-left transition-all hover:bg-slate-750 border border-[#2a2a2a]">
               <Home className="w-4 h-4" />
               <span className="text-sm font-medium">Dashboard</span>
             </button>
-            <button onClick={() => navigate("/patients")} className="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/patients")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
               <Users2 className="w-4 h-4" />
               <span className="text-sm">Patients</span>
             </button>
-            <button onClick={() => navigate("/documents")} className="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/documents")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
               <FileTextIcon className="w-4 h-4" />
               <span className="text-sm">Reports</span>
             </button>
-            <button onClick={() => navigate("/messages")} className="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/messages")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
               <MessageSquare className="w-4 h-4" />
               <span className="text-sm">Messages</span>
             </button>
-            <button onClick={() => navigate("/ai-billing")} className="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/ai-billing")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
               <Database className="w-4 h-4" />
               <span className="text-sm">Analytics</span>
             </button>
-            <button onClick={() => navigate("/doctor-profile")} className="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/doctor-profile")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
               <Settings className="w-4 h-4" />
               <span className="text-sm">Settings</span>
             </button>
           </nav>
 
           {/* Association Section - Separator */}
-          <div className="my-6 border-t border-slate-800"></div>
+          <div className="my-6 border-t border-[#333]"></div>
           
           <div className="mb-3">
-            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider px-3">Collaboration</p>
+            <p className="text-xs font-medium text-[#666] uppercase tracking-wider px-3">Collaboration</p>
           </div>
           
           <nav className="space-y-1">
-            <button onClick={() => navigate("/association")} className="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/association")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
               <Users className="w-4 h-4" />
               <span className="text-sm">Association</span>
             </button>
@@ -808,7 +808,7 @@ export default function DoctorDashboardNew() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 bg-gray-950">
+      <main className="flex-1 bg-[#0d0d0d]">
         <div className="p-6">
           <div className="mb-6">
 
@@ -816,10 +816,10 @@ export default function DoctorDashboardNew() {
             {/* Left Column - Search and Spruce (3/4 width) */}
             <div className="lg:col-span-3 space-y-6">
               {/* Patient Search - Elegant, minimal */}
-              <Card className="bg-slate-900/50 border-slate-800 shadow-sm">
+              <Card className="bg-[#1a1a1a]/50 border-[#333] shadow-sm">
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-slate-100 text-base font-medium flex items-center gap-2">
-                    <Search className="w-4 h-4 text-slate-400" />
+                  <CardTitle className="text-[#e6e6e6] text-base font-medium flex items-center gap-2">
+                    <Search className="w-4 h-4 text-[#999]" />
                     Search Patients
                   </CardTitle>
                 </CardHeader>
@@ -829,12 +829,12 @@ export default function DoctorDashboardNew() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Enter patient ID..."
-                      className="bg-gray-700 border-gray-600 text-white"
+                      className="bg-[#2a2a2a] border-[#333] text-[#e6e6e6]"
                     />
                     <Button
                       onClick={searchPatients}
                       disabled={loading}
-                      className="bg-slate-800 hover:bg-slate-750"
+                      className="bg-[#222] hover:bg-slate-750"
                     >
                       {loading ? <Activity className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                     </Button>
@@ -846,14 +846,14 @@ export default function DoctorDashboardNew() {
                         <div
                           key={patient.id}
                           onClick={() => openPatientDetails(patient.patient_id)}
-                          className="p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer"
+                          className="p-3 bg-[#2a2a2a] rounded-lg hover:bg-[#333] cursor-pointer"
                         >
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="font-semibold text-white">{patient.patient_id}</p>
-                              <p className="text-sm text-gray-400">{patient.chief_complaint}</p>
+                              <p className="font-semibold text-[#e6e6e6]">{patient.patient_id}</p>
+                              <p className="text-sm text-[#999]">{patient.chief_complaint}</p>
                             </div>
-                            <Badge className="bg-slate-800 text-white">
+                            <Badge className="bg-[#222] text-[#e6e6e6]">
                               {patient.triage_level}
                             </Badge>
                           </div>
@@ -865,9 +865,9 @@ export default function DoctorDashboardNew() {
               </Card>
 
               {/* Spruce Integration */}
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-[#222] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="text-white text-lg flex items-center gap-2">
+                  <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
                     <Phone className="w-5 h-5 text-blue-500" />
                     Spruce Integration
                   </CardTitle>
@@ -876,26 +876,26 @@ export default function DoctorDashboardNew() {
                   {/* Spruce Search */}
                   <div className="mb-4">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#999] h-4 w-4" />
                       <Input
                         type="text"
                         placeholder="Search conversations..."
                         value={spruceSearchQuery}
                         onChange={(e) => setSpruceSearchQuery(e.target.value)}
-                        className="pl-9 bg-gray-700 border-gray-600 text-white"
+                        className="pl-9 bg-[#2a2a2a] border-[#333] text-[#e6e6e6]"
                       />
                     </div>
                   </div>
 
                   {loadingSpruce ? (
                     <div className="text-center py-8">
-                      <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4 animate-spin" />
-                      <p className="text-gray-400">Loading Spruce cases...</p>
+                      <Activity className="w-12 h-12 text-[#999] mx-auto mb-4 animate-spin" />
+                      <p className="text-[#999]">Loading Spruce cases...</p>
                     </div>
                   ) : filteredSpruceCases.length === 0 ? (
                     <div className="text-center py-8">
-                      <Phone className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-400">No Spruce conversations found</p>
+                      <Phone className="w-12 h-12 text-[#999] mx-auto mb-4" />
+                      <p className="text-[#999]">No Spruce conversations found</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -905,26 +905,26 @@ export default function DoctorDashboardNew() {
                           onClick={() => setSelectedSpruceConversation(conversation)}
                           className={`p-3 rounded-lg transition-colors cursor-pointer ${
                             selectedSpruceConversation?.id === conversation.id
-                              ? 'bg-slate-800 hover:bg-slate-750'
-                              : 'bg-gray-700 hover:bg-gray-600'
+                              ? 'bg-[#222] hover:bg-slate-750'
+                              : 'bg-[#2a2a2a] hover:bg-[#333]'
                           }`}
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-slate-800 rounded-lg flex items-center justify-center">
-                                <Phone className="w-4 h-4 text-white" />
+                              <div className="w-8 h-8 bg-[#222] rounded-lg flex items-center justify-center">
+                                <Phone className="w-4 h-4 text-[#e6e6e6]" />
                               </div>
                               <div>
-                                <p className="font-semibold text-white text-sm">
+                                <p className="font-semibold text-[#e6e6e6] text-sm">
                                   {conversation.patient_name || `Conversation ${conversation.id}`}
                                 </p>
-                                <p className="text-gray-400 text-xs">
+                                <p className="text-[#999] text-xs">
                                   {conversation.last_message || 'No messages yet'}
                                 </p>
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="text-gray-400 text-xs">
+                              <p className="text-[#999] text-xs">
                                 {conversation.updated_at ? 
                                   format(new Date(conversation.updated_at), 'MMM d, HH:mm') : 
                                   'Unknown time'
@@ -944,13 +944,13 @@ export default function DoctorDashboardNew() {
               </Card>
 
               {/* Quick Diagnosis Templates */}
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-[#222] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="text-white text-lg flex items-center gap-2">
+                  <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
                     <Zap className="w-5 h-5 text-yellow-500" />
                     Quick Diagnosis Templates
                   </CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription className="text-[#999]">
                     Pre-built protocols for common conditions
                   </CardDescription>
                 </CardHeader>
@@ -958,13 +958,13 @@ export default function DoctorDashboardNew() {
                   {/* Template Search */}
                   <div className="mb-4">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#999] h-4 w-4" />
                       <Input
                         type="text"
                         placeholder="Search diagnoses..."
                         value={templateSearchQuery}
                         onChange={(e) => setTemplateSearchQuery(e.target.value)}
-                        className="pl-9 bg-gray-700 border-gray-600 text-white"
+                        className="pl-9 bg-[#2a2a2a] border-[#333] text-[#e6e6e6]"
                       />
                     </div>
                   </div>
@@ -986,13 +986,13 @@ export default function DoctorDashboardNew() {
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <Stethoscope className="w-4 h-4 text-gray-300" />
-                              <span className="text-white text-sm font-medium">{template.name}</span>
+                              <Stethoscope className="w-4 h-4 text-[#e6e6e6]" />
+                              <span className="text-[#e6e6e6] text-sm font-medium">{template.name}</span>
                             </div>
                             <Badge className={
                               template.category === 'acute' ? 'bg-red-600' :
-                              template.category === 'chronic' ? 'bg-slate-800' :
-                              'bg-slate-800'
+                              template.category === 'chronic' ? 'bg-[#222]' :
+                              'bg-[#222]'
                             }>
                               {template.category}
                             </Badge>
@@ -1004,7 +1004,7 @@ export default function DoctorDashboardNew() {
                   
                   <Button
                     onClick={() => navigate("/knowledge-base")}
-                    className="w-full mt-4 bg-slate-800 hover:bg-yellow-700"
+                    className="w-full mt-4 bg-[#222] hover:bg-yellow-700"
                   >
                     <Zap className="w-4 h-4 mr-2" />
                     View All Templates
@@ -1014,10 +1014,10 @@ export default function DoctorDashboardNew() {
 
               {/* Template Detail Builder */}
               {showTemplateLibrary && selectedDiagnosis && (
-                <Card className="bg-gray-800 border-gray-700 border-2 border-yellow-500">
+                <Card className="bg-[#222] border-[#2a2a2a] border-2 border-yellow-500">
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-white text-lg flex items-center gap-2">
+                      <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
                         <Brain className="w-5 h-5 text-yellow-500" />
                         Plan Builder: {diagnosisTemplates.find(d => d.id === selectedDiagnosis)?.name}
                       </CardTitle>
@@ -1025,12 +1025,12 @@ export default function DoctorDashboardNew() {
                         onClick={() => setShowTemplateLibrary(false)}
                         size="sm"
                         variant="ghost"
-                        className="text-gray-400"
+                        className="text-[#999]"
                       >
                         ✕
                       </Button>
                     </div>
-                    <CardDescription className="text-gray-400">
+                    <CardDescription className="text-[#999]">
                       Click items to add to your SAP Plan section
                     </CardDescription>
                   </CardHeader>
@@ -1121,9 +1121,9 @@ export default function DoctorDashboardNew() {
                       </div>
 
                       {/* Plan Preview */}
-                      <div className="bg-gray-700 border border-gray-600 rounded-lg p-3">
-                        <h4 className="text-gray-300 font-semibold mb-2">📝 Plan Preview:</h4>
-                        <p className="text-gray-400 text-sm whitespace-pre-wrap">
+                      <div className="bg-[#2a2a2a] border border-[#333] rounded-lg p-3">
+                        <h4 className="text-[#e6e6e6] font-semibold mb-2">📝 Plan Preview:</h4>
+                        <p className="text-[#999] text-sm whitespace-pre-wrap">
                           {buildPlanFromSelections() || "Select items above to build your plan..."}
                         </p>
                       </div>
@@ -1131,7 +1131,7 @@ export default function DoctorDashboardNew() {
                       {/* Apply Button */}
                       <Button
                         onClick={applyPlanToSAP}
-                        className="w-full bg-slate-800 hover:bg-yellow-700"
+                        className="w-full bg-[#222] hover:bg-yellow-700"
                         disabled={!frenchDoc}
                       >
                         <CheckCircle className="w-4 h-4 mr-2" />
@@ -1143,10 +1143,10 @@ export default function DoctorDashboardNew() {
               )}
 
               {/* File Management */}
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-[#222] border-[#2a2a2a]">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-white text-lg flex items-center gap-2">
+                    <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
                       <FileText className="w-5 h-5 text-green-500" />
                       File Management
                     </CardTitle>
@@ -1156,7 +1156,7 @@ export default function DoctorDashboardNew() {
                         disabled={loadingReports}
                         size="sm"
                         variant="outline"
-                        className="text-gray-300 border-gray-600 hover:bg-gray-700"
+                        className="text-[#e6e6e6] border-[#333] hover:bg-[#2a2a2a]"
                       >
                         {loadingReports ? (
                           <Activity className="w-4 h-4 animate-spin" />
@@ -1181,32 +1181,32 @@ export default function DoctorDashboardNew() {
                 <CardContent>
                   {loadingReports ? (
                     <div className="text-center py-8">
-                      <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4 animate-spin" />
-                      <p className="text-gray-400">Loading reports...</p>
+                      <Activity className="w-12 h-12 text-[#999] mx-auto mb-4 animate-spin" />
+                      <p className="text-[#999]">Loading reports...</p>
                     </div>
                   ) : reports.length === 0 ? (
                     <div className="text-center py-8">
-                      <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-400">No reports found</p>
-                      <p className="text-gray-500 text-sm">Generate medical reports to see them here</p>
+                      <FileText className="w-12 h-12 text-[#999] mx-auto mb-4" />
+                      <p className="text-[#999]">No reports found</p>
+                      <p className="text-[#666] text-sm">Generate medical reports to see them here</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {reports.map((report) => (
                         <div
                           key={report.filename}
-                          className="p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors"
+                          className="p-3 bg-[#2a2a2a] rounded-lg hover:bg-[#333] transition-colors"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                                <FileText className="w-4 h-4 text-white" />
+                                <FileText className="w-4 h-4 text-[#e6e6e6]" />
                               </div>
                               <div>
-                                <p className="font-semibold text-white text-sm">
+                                <p className="font-semibold text-[#e6e6e6] text-sm">
                                   {report.filename}
                                 </p>
-                                <p className="text-gray-400 text-xs">
+                                <p className="text-[#999] text-xs">
                                   Created: {new Date(report.created).toLocaleDateString()} • Size: {report.size}
                                 </p>
                               </div>
@@ -1216,7 +1216,7 @@ export default function DoctorDashboardNew() {
                                 onClick={() => window.open(report.url, '_blank')}
                                 size="sm"
                                 variant="outline"
-                                className="text-blue-300 border-slate-700 hover:bg-blue-900/20"
+                                className="text-blue-300 border-[#2a2a2a] hover:bg-blue-900/20"
                               >
                                 <Eye className="w-4 h-4 mr-1" />
                                 View
@@ -1242,9 +1242,9 @@ export default function DoctorDashboardNew() {
             {/* Right Column - Recent Consultations and Medical Report (1/4 width) */}
             <div className="space-y-6">
               {/* Recent Consultations */}
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-[#222] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
+                  <CardTitle className="text-[#e6e6e6] flex items-center gap-2">
                     <Clock className="w-5 h-5" />
                     Recent Consultations
                   </CardTitle>
@@ -1268,13 +1268,13 @@ export default function DoctorDashboardNew() {
               </Card>
 
               {/* Patient Details & Medical Report Generation */}
-              <Card className="bg-gray-800 border-gray-700">
+              <Card className="bg-[#222] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="text-white text-lg flex items-center gap-2">
+                  <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
                     <Brain className="w-5 h-5 text-purple-500" />
                     Patient Details & Medical Report
                   </CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardDescription className="text-[#999]">
                     Complete patient information and AI-powered documentation
                   </CardDescription>
                 </CardHeader>
@@ -1328,9 +1328,9 @@ export default function DoctorDashboardNew() {
 
                           {/* Original Form Data */}
                           {selectedPatientData.consultation?.form_data && (
-                            <div className="bg-gray-700 border border-gray-600 rounded-lg p-3 max-h-40 overflow-y-auto">
-                              <h4 className="text-gray-300 text-sm font-semibold mb-2">📝 Form Data:</h4>
-                              <div className="text-xs text-gray-400 space-y-1">
+                            <div className="bg-[#2a2a2a] border border-[#333] rounded-lg p-3 max-h-40 overflow-y-auto">
+                              <h4 className="text-[#e6e6e6] text-sm font-semibold mb-2">📝 Form Data:</h4>
+                              <div className="text-xs text-[#999] space-y-1">
                                 {Object.entries(selectedPatientData.consultation.form_data).map(([key, value]) => (
                                   <div key={key}>
                                     <strong>{key}:</strong> {String(value)}
@@ -1346,7 +1346,7 @@ export default function DoctorDashboardNew() {
                       <Button
                         onClick={generateMedicalReport}
                         disabled={generating}
-                        className="w-full bg-slate-800 hover:bg-slate-750 text-white"
+                        className="w-full bg-[#222] hover:bg-slate-750 text-[#e6e6e6]"
                       >
                         {generating ? (
                           <>
@@ -1372,7 +1372,7 @@ export default function DoctorDashboardNew() {
                                 setShowTemplateLibrary(true);
                               }}
                               variant="outline"
-                              className="w-full border-slate-700 text-slate-300 hover:bg-purple-50"
+                              className="w-full border-[#2a2a2a] text-[#999] hover:bg-purple-50"
                             >
                               <FileText className="w-4 h-4 mr-2" />
                               Select Plan Template
@@ -1389,11 +1389,11 @@ export default function DoctorDashboardNew() {
                             {/* Templates List */}
                             <div className="space-y-4 mt-4">
                               {availableTemplates.length === 0 ? (
-                                <div className="text-center py-8 text-gray-500">
+                                <div className="text-center py-8 text-[#666]">
                                   <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
                                   <p>No templates found for this diagnosis.</p>
                                   <p className="text-sm mt-2">
-                                    Create one in your <a href="/doctor-profile" className="text-slate-300 underline">Profile Settings</a>
+                                    Create one in your <a href="/doctor-profile" className="text-[#999] underline">Profile Settings</a>
                                   </p>
                                 </div>
                               ) : (
@@ -1416,7 +1416,7 @@ export default function DoctorDashboardNew() {
                                           </p>
                                         </div>
                                         {selectedTemplate?.id === template.id && (
-                                          <CheckCircle className="w-5 h-5 text-slate-300" />
+                                          <CheckCircle className="w-5 h-5 text-[#999]" />
                                         )}
                                       </div>
 
@@ -1436,7 +1436,7 @@ export default function DoctorDashboardNew() {
                                                   id={`item-${idx}`}
                                                 />
                                                 <label htmlFor={`item-${idx}`} className="flex-1 text-sm cursor-pointer">
-                                                  <span className="font-medium text-slate-300">{item.category}:</span>{" "}
+                                                  <span className="font-medium text-[#999]">{item.category}:</span>{" "}
                                                   {item.item}
                                                   {item.details && (
                                                     <div className="text-xs text-gray-600 mt-1">{item.details}</div>
@@ -1467,7 +1467,7 @@ export default function DoctorDashboardNew() {
                                 </Button>
                                 <Button
                                   onClick={applyTemplateToReport}
-                                  className="bg-slate-800 hover:bg-slate-750"
+                                  className="bg-[#222] hover:bg-slate-750"
                                 >
                                   Apply Template to Report
                                 </Button>
@@ -1479,8 +1479,8 @@ export default function DoctorDashboardNew() {
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-400">Select a patient to view details and generate report</p>
+                      <User className="w-12 h-12 text-[#999] mx-auto mb-4" />
+                      <p className="text-[#999]">Select a patient to view details and generate report</p>
                     </div>
                   )}
                 </CardContent>
@@ -1488,9 +1488,9 @@ export default function DoctorDashboardNew() {
 
               {/* Medical Report Sections */}
               {frenchDoc && (
-                <Card className="bg-gray-800 border-gray-700">
+                <Card className="bg-[#222] border-[#2a2a2a]">
                   <CardHeader>
-                    <CardTitle className="text-white text-lg flex items-center gap-2">
+                    <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
                       <FileText className="w-5 h-5 text-green-500" />
                       Medical Report
                     </CardTitle>
@@ -1610,13 +1610,13 @@ export default function DoctorDashboardNew() {
                             </div>
                             <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>
-                                <span className="text-gray-400">Time Saved:</span>
+                                <span className="text-[#999]">Time Saved:</span>
                                 <span className="text-green-300 font-semibold ml-2">
                                   {savings.totalTimeSaved} minutes
                                 </span>
                               </div>
                               <div>
-                                <span className="text-gray-400">Money Saved:</span>
+                                <span className="text-[#999]">Money Saved:</span>
                                 <span className="text-green-300 font-semibold ml-2">
                                   ${savings.moneySaved} CAD
                                 </span>
@@ -1636,7 +1636,7 @@ export default function DoctorDashboardNew() {
 
       {/* Copy Toast */}
       {copyToast && (
-        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg">
+        <div className="fixed bottom-4 right-4 bg-green-600 text-[#e6e6e6] px-4 py-2 rounded-lg shadow-lg">
           {copyToast}
         </div>
       )}
@@ -1657,27 +1657,27 @@ function EnhancedPatientCard({
   onGenerateReport: () => void;
 }) {
   const getTriageColor = (level: string) => {
-    return "bg-gray-500/20 text-gray-300 border-gray-500/30";
+    return "bg-gray-500/20 text-[#e6e6e6] border-gray-500/30";
   };
 
   const getStatusIcon = (level: string) => {
-    return <CheckCircle className="w-4 h-4 text-gray-400" />;
+    return <CheckCircle className="w-4 h-4 text-[#999]" />;
   };
 
   return (
-    <Card className="bg-gray-700 border-gray-600 hover:bg-gray-600 transition-all duration-200">
+    <Card className="bg-[#2a2a2a] border-[#333] hover:bg-[#333] transition-all duration-200">
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">
+            <div className="w-12 h-12 bg-[#333] rounded-full flex items-center justify-center">
+              <span className="text-[#e6e6e6] font-bold text-lg">
                 {patient.patient_id?.charAt(0) || "P"}
               </span>
             </div>
             <div>
-              <h3 className="font-semibold text-white text-lg">{patient.patient_id}</h3>
-              <p className="text-sm text-gray-400">{patient.chief_complaint}</p>
-              <p className="text-xs text-gray-500">
+              <h3 className="font-semibold text-[#e6e6e6] text-lg">{patient.patient_id}</h3>
+              <p className="text-sm text-[#999]">{patient.chief_complaint}</p>
+              <p className="text-xs text-[#666]">
                 {format(new Date(patient.created_at), "MMM d, yyyy 'at' h:mm a")}
               </p>
             </div>
@@ -1691,17 +1691,17 @@ function EnhancedPatientCard({
         </div>
 
         <div className="space-y-3">
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-[#999]">
             <Calendar className="w-4 h-4" />
             <span>Last visit: {format(new Date(patient.created_at), "MMM d")}</span>
           </div>
           
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-[#999]">
             <Heart className="w-4 h-4" />
             <span>Condition: {patient.chief_complaint}</span>
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-[#999]">
             <Activity className="w-4 h-4" />
             <span>Status: {patient.status || 'Active'}</span>
           </div>
@@ -1711,7 +1711,7 @@ function EnhancedPatientCard({
           <Button
             onClick={onView}
             size="sm"
-            className="flex-1 bg-gray-600 hover:bg-gray-700 text-white"
+            className="flex-1 bg-[#333] hover:bg-[#2a2a2a] text-[#e6e6e6]"
           >
             <Eye className="w-4 h-4 mr-2" />
             View
@@ -1719,14 +1719,14 @@ function EnhancedPatientCard({
           <Button
             onClick={onEdit}
             size="sm"
-            className="bg-gray-600 hover:bg-gray-700 text-white"
+            className="bg-[#333] hover:bg-[#2a2a2a] text-[#e6e6e6]"
           >
             <Edit className="w-4 h-4" />
           </Button>
           <Button
             onClick={onGenerateReport}
             size="sm"
-            className="bg-gray-600 hover:bg-gray-700 text-white"
+            className="bg-[#333] hover:bg-[#2a2a2a] text-[#e6e6e6]"
           >
             <Brain className="w-4 h-4" />
           </Button>
@@ -1762,22 +1762,22 @@ function MedicalSection({
 
   // Elegant monochromatic palette - NO rainbow clown colors
   const colorClasses = {
-    blue: "bg-slate-800/40 text-slate-300 border-slate-700/50",
-    green: "bg-slate-800/40 text-slate-300 border-slate-700/50",
-    purple: "bg-slate-800/40 text-slate-300 border-slate-700/50",
-    orange: "bg-slate-800/40 text-slate-300 border-slate-700/50",
-    red: "bg-slate-800/40 text-slate-300 border-slate-700/50",
-    cyan: "bg-slate-800/40 text-slate-300 border-slate-700/50"
+    blue: "bg-[#222]/40 text-[#999] border-[#2a2a2a]/50",
+    green: "bg-[#222]/40 text-[#999] border-[#2a2a2a]/50",
+    purple: "bg-[#222]/40 text-[#999] border-[#2a2a2a]/50",
+    orange: "bg-[#222]/40 text-[#999] border-[#2a2a2a]/50",
+    red: "bg-[#222]/40 text-[#999] border-[#2a2a2a]/50",
+    cyan: "bg-[#222]/40 text-[#999] border-[#2a2a2a]/50"
   };
 
   return (
-    <div className="bg-gray-700 rounded-lg border border-gray-600 p-4 hover:bg-gray-600 transition-all duration-200">
+    <div className="bg-[#2a2a2a] rounded-lg border border-[#333] p-4 hover:bg-[#333] transition-all duration-200">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className={`p-1.5 rounded-lg ${colorClasses[color as keyof typeof colorClasses]}`}>
             {icon}
           </div>
-          <h4 className="text-sm font-semibold text-white">{title}</h4>
+          <h4 className="text-sm font-semibold text-[#e6e6e6]">{title}</h4>
           {copyCount > 0 && (
             <Badge variant="secondary" className="bg-emerald-900/20 text-emerald-300 border-emerald-800/40 text-xs">
               {copyCount}×
@@ -1793,8 +1793,8 @@ function MedicalSection({
             copied 
               ? 'bg-emerald-800/20 text-green-300' 
               : content 
-                ? 'text-gray-300 hover:bg-gray-600' 
-                : 'text-gray-500 cursor-not-allowed'
+                ? 'text-[#e6e6e6] hover:bg-[#333]' 
+                : 'text-[#666] cursor-not-allowed'
           }`}
         >
           {copied ? (
@@ -1813,13 +1813,13 @@ function MedicalSection({
       
       <div className="min-h-[80px]">
         {content ? (
-          <div className="text-sm text-gray-300 leading-relaxed whitespace-pre-wrap bg-gray-800 p-3 rounded border border-gray-600 font-mono text-xs">
+          <div className="text-sm text-[#e6e6e6] leading-relaxed whitespace-pre-wrap bg-[#222] p-3 rounded border border-[#333] font-mono text-xs">
             {content}
           </div>
         ) : (
           <div className="flex items-center justify-center h-20">
             <div className="text-center">
-              <div className="text-gray-500 text-xs">
+              <div className="text-[#666] text-xs">
                 Click "Generate" to create content
               </div>
             </div>
