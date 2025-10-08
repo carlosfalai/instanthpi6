@@ -474,6 +474,11 @@ From screenshot analysis:
 
 **Current Status:** Need to implement these features while maintaining elegant design
 
+### 💬 Spruce Enhancement:
+- Adding hero-video-dialog component from shadcn
+- Better visual integration for Spruce conversations
+- Modern dialog interface
+
 ---
 
 ## 🎨 COMPLETE DESIGN SYSTEM (Linear/GitHub Style)
