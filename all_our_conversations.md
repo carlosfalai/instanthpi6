@@ -5,7 +5,7 @@
 **Technology Stack:** React/Wouter, Supabase, Tailwind CSS, Netlify Functions  
 **AI Model:** Claude Sonnet 4.5  
 **Deployment:** https://instanthpi.ca  
-**Last Updated:** October 8, 2025
+**Last Updated:** October 8, 2025 — Session 10.2
 
 ### Design Philosophy (From story/ Files):
 **Aesthetic:** Butler/Concierge - Elegant, Professional, White-Glove Service
@@ -1029,3 +1029,40 @@ User clarified the REAL vision - this is much bigger than I implemented:
 - Integrate patient data + style template + request → output
 
 This is the CORRECT implementation - continuing in next session...
+
+---
+
+## 📄 SESSION 10.2 – OpenAI Support, API Route, JSX Fix, Doc Updates
+**Date:** Oct 8, 2025 — later same day
+
+### What changed
+- Added OpenAI provider to `netlify/functions/ai-generate-section.js` (uses `openai` SDK, `gpt-4o-mini` with system+user prompt; returns plain text)
+- Added API route mapping:
+  - `netlify.toml`: `/api/ai-generate-section -> /.netlify/functions/ai-generate-section`
+  - `_redirects`: same route added
+- Fixed JSX tag mismatch in `client/src/pages/doctor-dashboard-new.tsx` (unclosed wrapper caused `</main>`/`</div>` mismatch around L1635–1645; added the missing closing of the empty header container and corrected final wrapper close)
+- Rebuilt and deployed to production `instanthpi.ca` (unique deploy URL logged)
+
+### Current AI section generation behavior
+- Input: `section_name`, `custom_request`, `patient_data`, `writing_style_template`, `api_key`, `api_provider` ("claude" | "openai")
+- Claude model: `claude-3-5-sonnet-20241022`
+- OpenAI model: `gpt-4o-mini`
+- Output: `{ generated_text }` (plain text, no markdown)
+
+### Next integration steps (from user vision)
+- Redesign doctor profile “Templates” to WRITING STYLE templates per section
+- Add AI Prompt Box to each dashboard section and wire to this endpoint
+- Pull doctor’s preferred provider and key from credentials store
+
+### Known pending DB step
+- `writing_style_templates` schema: REST check showed missing table. Migration needs to run in Supabase SQL editor.
+
+### Links
+- Production: instanthpi.ca
+- Unique deploy: 68e5feed8368c5c1ad62e685--instanthpi-medical.netlify.app
+
+### Conversation references captured
+- “continue with other model” → implemented OpenAI
+- “check also all that was discussed… keep updating that file” → this section added
+
+---
