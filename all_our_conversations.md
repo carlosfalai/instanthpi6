@@ -472,6 +472,46 @@ From screenshot analysis:
 - Referral system to send patients to colleagues
 - Association member collaboration features
 
+### 🤖 AI PROMPT BOX SYSTEM - CORRECT UNDERSTANDING:
+
+**What User ACTUALLY Wants (Clarified):**
+
+**Doctor Profile → Templates Section:**
+- NOT diagnostic templates (that was wrong interpretation)
+- WRITING STYLE templates for each section:
+  - "How I want referrals written" (style, tone, format)
+  - "How I want SAP notes written" (concise, detailed, etc.)
+  - "How I want patient messages written" (casual, formal, spartan)
+  - "How I want imaging requisitions written"
+  - "How I want prescriptions formatted"
+  - etc.
+
+**Dashboard → AI Prompt Box Integration:**
+```
+1. Doctor clicks section (e.g., "Prepare patient message")
+2. AI Prompt Box opens
+3. Doctor can type: "1 paragraph, casual, spartan, 5-6 phrases, explain the plan"
+4. AI uses:
+   - Patient data
+   - Doctor's WRITING STYLE template for that section
+   - The specific request
+5. AI generates content
+6. Content appears in that section
+7. Doctor clicks Copy button
+```
+
+**Examples:**
+- Click "Message au Patient" → Prompt box → "Make it casual and reassuring" → AI generates → Copy
+- Click "Référence Cardiologie" → Prompt box → Uses doctor's referral style template → Generates → Copy
+- Click "Prescription" → Prompt box → Uses medication template style → Generates → Copy
+
+**Components Needed:**
+1. ✅ AI Prompt Box (installing now)
+2. ⚠️ Redesign Templates in Profile (writing styles, not diagnoses)
+3. ⚠️ Add prompt box to each dashboard section
+4. ⚠️ Connect to doctor's style templates
+5. ⚠️ API integration with OpenAI/Claude using doctor's key
+
 **Current Status:** Need to implement these features while maintaining elegant design
 
 ### 💬 Spruce Enhancement (Commit ee58a88):
