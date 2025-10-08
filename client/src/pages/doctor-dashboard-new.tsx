@@ -214,42 +214,26 @@ export default function DoctorDashboardNew() {
     }
   };
 
-  const generateDiagnosisPrediction = async (consultation: any, patientAnswers: any) => {
+  // Parse diagnosis from existing SAP note in medical report
+  const parseDiagnosisFromSAP = (sapNote: string) => {
     try {
-      // Get physician's Claude API key
-      const response = await fetch("/api/doctor/credentials");
-      if (!response.ok) return null;
+      // SAP format: "A: 1) Primary diagnosis 2) Diff diagnosis 2..."
+      const assessmentMatch = sapNote.match(/A:\s*(.+?)(?:\nP:|$)/s);
+      if (!assessmentMatch) return [];
       
-      const credentials = await response.json();
-      if (!credentials.claude_api_key) return null;
-
-      // Generate diagnosis prediction
-      const diagnosisResponse = await fetch("/api/ai-diagnosis-prediction", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          hpi_summary: consultation.hpi_summary || consultation.chief_complaint,
-          patient_answers: patientAnswers,
-          api_key: credentials.claude_api_key,
-        }),
-      });
-
-      const diagnosisData = await diagnosisResponse.json();
-      if (!diagnosisData.success) return null;
-
-      // Save diagnosis to consultation
-      await supabase
-        .from("consultations")
-        .update({
-          ai_diagnosis: diagnosisData.diagnoses,
-          ai_diagnosis_generated_at: new Date().toISOString(),
-        })
-        .eq("id", consultation.id);
-
-      return diagnosisData.diagnoses;
+      const assessmentLine = assessmentMatch[1];
+      const diagnosisMatches = assessmentLine.match(/\d+\)\s*([^()]+?)(?:\s*\(|,|\s*\d+\)|$)/g);
+      
+      if (!diagnosisMatches) return [];
+      
+      return diagnosisMatches.map(d => 
+        d.replace(/^\d+\)\s*/, '')
+         .replace(/\s*\(.*?\)\s*$/, '')
+         .trim()
+      );
     } catch (error) {
-      console.error("Error generating diagnosis:", error);
-      return null;
+      console.error("Error parsing SAP diagnosis:", error);
+      return [];
     }
   };
 
@@ -328,14 +312,6 @@ export default function DoctorDashboardNew() {
 
       if (answersError) {
         console.error("Error loading patient answers:", answersError);
-      }
-
-      // Generate AI diagnosis if not already done
-      if (consultation && !consultation.ai_diagnosis) {
-        const diagnoses = await generateDiagnosisPrediction(consultation, patientAnswers);
-        if (diagnoses && consultation) {
-          consultation.ai_diagnosis = diagnoses;
-        }
       }
 
       // Combine all patient data
@@ -828,14 +804,7 @@ export default function DoctorDashboardNew() {
                           <div className="flex items-center justify-between">
                             <div>
                               <p className="font-semibold text-white">{patient.patient_id}</p>
-                              <p className="text-sm text-gray-400">
-                                {patient.chief_complaint}
-                                {patient.ai_diagnosis && patient.ai_diagnosis.length > 0 && (
-                                  <span className="ml-2 text-purple-300">
-                                    → {patient.ai_diagnosis[0].diagnosis} ({patient.ai_diagnosis[0].confidence}%)
-                                  </span>
-                                )}
-                              </p>
+                              <p className="text-sm text-gray-400">{patient.chief_complaint}</p>
                             </div>
                             <Badge className="bg-blue-600 text-white">
                               {patient.triage_level}
@@ -1346,13 +1315,13 @@ export default function DoctorDashboardNew() {
                       </Button>
 
                       {/* Template Selection Button */}
-                      {selectedPatientData?.consultation?.ai_diagnosis && 
-                       selectedPatientData.consultation.ai_diagnosis.length > 0 && (
+                      {frenchDoc && frenchDoc.sap_note && (
                         <Dialog open={showTemplateLibrary} onOpenChange={setShowTemplateLibrary}>
                           <DialogTrigger asChild>
                             <Button
                               onClick={() => {
-                                setSelectedDiagnosis(selectedPatientData.consultation.ai_diagnosis[0].diagnosis);
+                                const diagnoses = parseDiagnosisFromSAP(frenchDoc.sap_note || "");
+                                setSelectedDiagnosis(diagnoses[0] || "");
                                 setShowTemplateLibrary(true);
                               }}
                               variant="outline"
@@ -1664,14 +1633,7 @@ function EnhancedPatientCard({
             </div>
             <div>
               <h3 className="font-semibold text-white text-lg">{patient.patient_id}</h3>
-              <p className="text-sm text-gray-400">
-                {patient.chief_complaint}
-                {patient.ai_diagnosis && patient.ai_diagnosis.length > 0 && (
-                  <span className="ml-2 text-purple-300 font-semibold">
-                    → {patient.ai_diagnosis[0].diagnosis} ({patient.ai_diagnosis[0].confidence}%)
-                  </span>
-                )}
-              </p>
+              <p className="text-sm text-gray-400">{patient.chief_complaint}</p>
               <p className="text-xs text-gray-500">
                 {format(new Date(patient.created_at), "MMM d, yyyy 'at' h:mm a")}
               </p>
@@ -1693,14 +1655,7 @@ function EnhancedPatientCard({
           
           <div className="flex items-center gap-2 text-sm text-gray-400">
             <Heart className="w-4 h-4" />
-            <span>
-              Condition: {patient.chief_complaint}
-              {patient.ai_diagnosis && patient.ai_diagnosis.length > 0 && (
-                <span className="ml-2 text-purple-300">
-                  → {patient.ai_diagnosis[0].diagnosis} ({patient.ai_diagnosis[0].confidence}%)
-                </span>
-              )}
-            </span>
+            <span>Condition: {patient.chief_complaint}</span>
           </div>
 
           <div className="flex items-center gap-2 text-sm text-gray-400">

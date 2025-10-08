@@ -422,3 +422,11 @@ Browserslist: browsers data (caniuse-lite) is 12 months old. Please run:
 [Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
 12:14:46 AM [vite] hmr update /src/App.tsx, /src/index.css
 12:14:52 AM [vite] hmr update /src/App.tsx, /src/index.css
+12:17:11 AM [vite] hmr update /src/App.tsx, /src/index.css
+12:24:23 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+12:24:35 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+12:24:38 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+12:24:41 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+12:24:44 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+12:24:47 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+12:24:50 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
