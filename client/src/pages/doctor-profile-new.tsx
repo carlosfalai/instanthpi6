@@ -48,6 +48,11 @@ export default function DoctorProfileNew() {
   
   // Verification status
   const [hasCredentials, setHasCredentials] = useState(false);
+  const [testResults, setTestResults] = useState({
+    spruce: null,
+    openai: null,
+    claude: null
+  });
   const [credentialsVerified, setCredentialsVerified] = useState(false);
 
   useEffect(() => {
@@ -100,7 +105,7 @@ export default function DoctorProfileNew() {
       if (openaiKey) payload.openai_api_key = openaiKey;
       if (claudeKey) payload.claude_api_key = claudeKey;
 
-      const response = await fetch("/api/doctor/credentials", {
+      const response = await fetch("/api-doctor-credentials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -145,7 +150,7 @@ export default function DoctorProfileNew() {
 
     setTesting("spruce");
     try {
-      const response = await fetch("/api/doctor/credentials/test-spruce", {
+      const response = await fetch("/api-doctor-credentials/test-spruce", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -157,14 +162,17 @@ export default function DoctorProfileNew() {
       const data = await response.json();
 
       if (data.success) {
+        setTestResults(prev => ({ ...prev, spruce: true }));
         toast({
           title: "✅ Connexion réussie",
           description: `Spruce Health connecté. ${data.conversation_count} conversations trouvées.`,
         });
       } else {
+        setTestResults(prev => ({ ...prev, spruce: false }));
         throw new Error(data.error || "Test failed");
       }
     } catch (error: any) {
+      setTestResults(prev => ({ ...prev, spruce: false }));
       toast({
         title: "Échec de connexion",
         description: error.message,
@@ -189,7 +197,7 @@ export default function DoctorProfileNew() {
 
     setTesting(provider);
     try {
-      const response = await fetch("/api/doctor/credentials/test-ai", {
+      const response = await fetch("/api-doctor-credentials/test-ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -201,14 +209,17 @@ export default function DoctorProfileNew() {
       const data = await response.json();
 
       if (data.success) {
+        setTestResults(prev => ({ ...prev, [provider]: true }));
         toast({
           title: "✅ Connexion réussie",
           description: `${provider === "openai" ? "OpenAI" : "Claude"} connecté avec succès.`,
         });
       } else {
+        setTestResults(prev => ({ ...prev, [provider]: false }));
         throw new Error(data.error || "Test failed");
       }
     } catch (error: any) {
+      setTestResults(prev => ({ ...prev, [provider]: false }));
       toast({
         title: "Échec de connexion",
         description: error.message,
@@ -396,12 +407,22 @@ export default function DoctorProfileNew() {
                 <Button
                   variant="outline"
                   onClick={handleTestSpruce}
-                  disabled={testing === "spruce"}
+                  disabled={testing === "spruce" || !spruceAccessId || !spruceApiKey}
                 >
                   {testing === "spruce" ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                       Test en cours...
+                    </>
+                  ) : testResults.spruce === true ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2 text-green-500" />
+                      Connexion réussie
+                    </>
+                  ) : testResults.spruce === false ? (
+                    <>
+                      <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
+                      Échec de connexion
                     </>
                   ) : (
                     <>
@@ -457,23 +478,33 @@ export default function DoctorProfileNew() {
                         </Button>
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleTestAI("openai")}
-                      disabled={testing === "openai"}
-                    >
-                      {testing === "openai" ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Test en cours...
-                        </>
-                      ) : (
-                        <>
-                          <TestTube className="h-4 w-4 mr-2" />
-                          Tester OpenAI
-                        </>
-                      )}
-                    </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleTestAI("openai")}
+                  disabled={testing === "openai" || !openaiKey}
+                >
+                  {testing === "openai" ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Test en cours...
+                    </>
+                  ) : testResults.openai === true ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2 text-green-500" />
+                      Connexion réussie
+                    </>
+                  ) : testResults.openai === false ? (
+                    <>
+                      <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
+                      Échec de connexion
+                    </>
+                  ) : (
+                    <>
+                      <TestTube className="h-4 w-4 mr-2" />
+                      Tester OpenAI
+                    </>
+                  )}
+                </Button>
                   </div>
                 )}
 
@@ -498,23 +529,33 @@ export default function DoctorProfileNew() {
                         </Button>
                       </div>
                     </div>
-                    <Button
-                      variant="outline"
-                      onClick={() => handleTestAI("claude")}
-                      disabled={testing === "claude"}
-                    >
-                      {testing === "claude" ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Test en cours...
-                        </>
-                      ) : (
-                        <>
-                          <TestTube className="h-4 w-4 mr-2" />
-                          Tester Claude
-                        </>
-                      )}
-                    </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => handleTestAI("claude")}
+                  disabled={testing === "claude" || !claudeKey}
+                >
+                  {testing === "claude" ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Test en cours...
+                    </>
+                  ) : testResults.claude === true ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2 text-green-500" />
+                      Connexion réussie
+                    </>
+                  ) : testResults.claude === false ? (
+                    <>
+                      <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
+                      Échec de connexion
+                    </>
+                  ) : (
+                    <>
+                      <TestTube className="h-4 w-4 mr-2" />
+                      Tester Claude
+                    </>
+                  )}
+                </Button>
                   </div>
                 )}
               </CardContent>
