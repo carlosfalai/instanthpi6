@@ -811,7 +811,7 @@ export default function DoctorDashboardNew() {
       <main className="flex-1 bg-[#0d0d0d]">
         <div className="p-6">
           <div className="mb-6">
-
+          </div>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Left Column - Search and Spruce (3/4 width) */}
             <div className="lg:col-span-3 space-y-6">

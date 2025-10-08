@@ -6,6 +6,7 @@
 /api/spruce/conversations/* /.netlify/functions/api-spruce-conversations-messages 200
 /api/spruce/webhook /.netlify/functions/spruce-webhook 200
 /api/assets/images /assets/images.json 200
+/api/ai-generate-section /.netlify/functions/ai-generate-section 200
 # Ollama endpoints removed - using OpenAI/Anthropic APIs only
 
 # Redirect all routes to index.html for client-side routing (must be last)

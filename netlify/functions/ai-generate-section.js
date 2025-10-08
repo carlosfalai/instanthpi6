@@ -1,4 +1,5 @@
 const Anthropic = require("@anthropic-ai/sdk");
+const OpenAI = require("openai");
 
 exports.handler = async (event) => {
   const headers = {
@@ -87,12 +88,35 @@ Be concise, clinically appropriate, and match the requested tone and style exact
           tokens_used: message.usage.input_tokens + message.usage.output_tokens,
         }),
       };
+    } else if (api_provider === "openai") {
+      const openai = new OpenAI({ apiKey: api_key });
+
+      const chat = await openai.chat.completions.create({
+        model: "gpt-4o-mini", // lightweight, adjust if needed
+        messages: [
+          { role: "system", content: "You are a medical AI assistant that writes concise, clinically appropriate text. Return plain text only." },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.3,
+        max_tokens: 1200
+      });
+
+      const generatedText = chat.choices?.[0]?.message?.content || "";
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          success: true,
+          section: section_name,
+          generated_text: generatedText,
+        }),
+      };
     } else {
-      // OpenAI implementation would go here
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: "OpenAI provider not yet implemented" }),
+        body: JSON.stringify({ error: "Unsupported provider" }),
       };
     }
 

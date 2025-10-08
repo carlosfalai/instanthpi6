@@ -71,6 +71,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/ai-generate-section"
+  to = "/.netlify/functions/ai-generate-section"
+  status = 200
+
+[[redirects]]
   from = "/api/patient-data"
   to = "/.netlify/functions/api-patient-data"
   status = 200
