@@ -1590,7 +1590,7 @@ export default function DoctorDashboardNew() {
                                 <TrendingUp className="w-4 h-4" />
                                 Time & Money Saved
                               </h4>
-                              <Badge className="bg-green-600 text-white">
+                              <Badge className="bg-emerald-900/30 text-emerald-300 border border-emerald-800/50">
                                 {savings.totalCopies} copies
                               </Badge>
                             </div>
@@ -1764,7 +1764,7 @@ function MedicalSection({
           </div>
           <h4 className="text-sm font-semibold text-white">{title}</h4>
           {copyCount > 0 && (
-            <Badge variant="secondary" className="bg-green-900/20 text-green-300 border-green-600 text-xs">
+            <Badge variant="secondary" className="bg-emerald-900/20 text-emerald-300 border-emerald-800/40 text-xs">
               {copyCount}×
             </Badge>
           )}
