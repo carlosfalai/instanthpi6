@@ -429,6 +429,90 @@ export default function DoctorDashboardNew() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Spruce Integration */}
+            <Card className="bg-gray-800 border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white text-lg">Spruce Integration</CardTitle>
+                <p className="text-sm text-gray-400">Search and manage patient conversations</p>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Input
+                      type="text"
+                      placeholder="Search patients in Spruce..."
+                      className="pl-10 pr-4 py-2 bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-transparent w-full"
+                    />
+                  </div>
+                  
+                  {/* Spruce Patient List */}
+                  <div className="space-y-3">
+                    <div className="p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center">
+                            <span className="text-white font-bold text-sm">J</span>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white text-sm">John Smith</p>
+                            <p className="text-xs text-gray-400">Active conversation</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className="text-xs bg-gray-500/20 text-gray-300">
+                            Online
+                          </Badge>
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center">
+                            <span className="text-white font-bold text-sm">M</span>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white text-sm">Maria Garcia</p>
+                            <p className="text-xs text-gray-400">Last message 2 hours ago</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className="text-xs bg-gray-500/20 text-gray-300">
+                            Pending
+                          </Badge>
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 bg-gray-600 rounded-lg flex items-center justify-center">
+                            <span className="text-white font-bold text-sm">R</span>
+                          </div>
+                          <div>
+                            <p className="font-semibold text-white text-sm">Robert Johnson</p>
+                            <p className="text-xs text-gray-400">Follow-up scheduled</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge className="text-xs bg-gray-500/20 text-gray-300">
+                            Scheduled
+                          </Badge>
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
