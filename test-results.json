@@ -11,7 +11,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 3
+      "actualWorkers": 1
     },
     "preserveOutput": "always",
     "reporter": [
@@ -37,7 +37,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 3
+          "actualWorkers": 1
         },
         "id": "chromium",
         "name": "chromium",
@@ -53,7 +53,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 3
+          "actualWorkers": 1
         },
         "id": "firefox",
         "name": "firefox",
@@ -69,7 +69,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 3
+          "actualWorkers": 1
         },
         "id": "webkit",
         "name": "webkit",
@@ -85,7 +85,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 3
+          "actualWorkers": 1
         },
         "id": "Mobile Chrome",
         "name": "Mobile Chrome",
@@ -101,7 +101,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 3
+          "actualWorkers": 1
         },
         "id": "Mobile Safari",
         "name": "Mobile Safari",
@@ -122,338 +122,90 @@
   },
   "suites": [
     {
-      "title": "layout-universalization.spec.ts",
-      "file": "layout-universalization.spec.ts",
+      "title": "auth-flow.spec.ts",
+      "file": "auth-flow.spec.ts",
       "column": 0,
       "line": 0,
-      "specs": [],
-      "suites": [
+      "specs": [
         {
-          "title": "Layout Universalization Audit",
-          "file": "layout-universalization.spec.ts",
-          "line": 541,
-          "column": 6,
-          "specs": [
+          "title": "Demo login lands on dashboard without blank screen",
+          "ok": false,
+          "tags": [],
+          "tests": [
             {
-              "title": "1. Audit All Pages",
-              "ok": true,
-              "tags": [],
-              "tests": [
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
                 {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 4920,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m20\u001b[39m\nReceived:   \u001b[31m10\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m20\u001b[39m\nReceived:   \u001b[31m10\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/auth-flow.spec.ts:27:26",
+                    "location": {
+                      "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/auth-flow.spec.ts",
+                      "column": 26,
+                      "line": 27
+                    },
+                    "snippet": "  25 |   expect(page.url()).toContain('/doctor-dashboard');\n  26 |   const content = (await page.locator('body').textContent()) || '';\n> 27 |   expect(content.length).toBeGreaterThan(20);\n     |                          ^\n  28 | });\n  29 |\n  30 |"
+                  },
+                  "errors": [
                     {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 13832,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "\n📊 Auditing: landing (public)\n"
-                        },
-                        {
-                          "text": "   Colors: 7 backgrounds, 8 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: none navigation\n"
-                        },
-                        {
-                          "text": "   Issues: 2 inconsistencies\n"
-                        },
-                        {
-                          "text": "     ❌ Using patient light-purple theme instead of dark theme\n"
-                        },
-                        {
-                          "text": "     ⚠️ Palette drift: 100% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(230, 224, 242), rgb(219, 234, 254), rgb(37, 99, 235), rgb(220, 252, 231))\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: multi-login (public)\n"
-                        },
-                        {
-                          "text": "   Colors: 1 backgrounds, 5 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: none navigation\n"
-                        },
-                        {
-                          "text": "   Issues: 1 inconsistencies\n"
-                        },
-                        {
-                          "text": "     ⚠️ Palette drift: 100% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(255, 255, 255))\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: patient-intake (patient)\n"
-                        },
-                        {
-                          "text": "   Colors: 4 backgrounds, 13 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: none navigation\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: patient-login (patient)\n"
-                        },
-                        {
-                          "text": "   Colors: 4 backgrounds, 7 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: none navigation\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: patient-dashboard (patient)\n"
-                        },
-                        {
-                          "text": "   Colors: 4 backgrounds, 7 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: none navigation\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: doctor-login (doctor)\n"
-                        },
-                        {
-                          "text": "   Colors: 1 backgrounds, 3 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: none navigation\n"
-                        },
-                        {
-                          "text": "   Issues: 1 inconsistencies\n"
-                        },
-                        {
-                          "text": "     ⚠️ Palette drift: 100% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(255, 255, 255))\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: doctor-dashboard (doctor)\n"
-                        },
-                        {
-                          "text": "   Colors: 0 backgrounds, 1 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: none navigation\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: doctor-profile (doctor)\n"
-                        },
-                        {
-                          "text": "   Colors: 1 backgrounds, 3 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: none navigation\n"
-                        },
-                        {
-                          "text": "   Issues: 1 inconsistencies\n"
-                        },
-                        {
-                          "text": "     ⚠️ Palette drift: 100% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(255, 255, 255))\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: patients-page (doctor)\n"
-                        },
-                        {
-                          "text": "   Colors: 5 backgrounds, 4 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: none navigation\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: documents-page (doctor)\n"
-                        },
-                        {
-                          "text": "   Colors: 4 backgrounds, 7 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: top navigation\n"
-                        },
-                        {
-                          "text": "   Issues: 1 inconsistencies\n"
-                        },
-                        {
-                          "text": "     ⚠️ Palette drift: 75% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235))\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: messages-page (doctor)\n"
-                        },
-                        {
-                          "text": "   Colors: 4 backgrounds, 6 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: top navigation\n"
-                        },
-                        {
-                          "text": "   Issues: 1 inconsistencies\n"
-                        },
-                        {
-                          "text": "     ⚠️ Palette drift: 75% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235))\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: ai-billing (doctor)\n"
-                        },
-                        {
-                          "text": "   Colors: 8 backgrounds, 9 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: top navigation\n"
-                        },
-                        {
-                          "text": "   Issues: 1 inconsistencies\n"
-                        },
-                        {
-                          "text": "     ⚠️ Palette drift: 75% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235), rgba(30, 58, 138, 0.2))\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: knowledge-base (doctor)\n"
-                        },
-                        {
-                          "text": "   Colors: 5 backgrounds, 6 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: top navigation\n"
-                        },
-                        {
-                          "text": "   Issues: 1 inconsistencies\n"
-                        },
-                        {
-                          "text": "     ⚠️ Palette drift: 60% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235))\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: association (doctor)\n"
-                        },
-                        {
-                          "text": "   Colors: 8 backgrounds, 11 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: top navigation\n"
-                        },
-                        {
-                          "text": "   Issues: 1 inconsistencies\n"
-                        },
-                        {
-                          "text": "     ⚠️ Palette drift: 63% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235), rgb(30, 64, 175))\n"
-                        },
-                        {
-                          "text": "\n📊 Auditing: tier-35 (doctor)\n"
-                        },
-                        {
-                          "text": "   Colors: 8 backgrounds, 11 text colors\n"
-                        },
-                        {
-                          "text": "   Layout: top navigation\n"
-                        },
-                        {
-                          "text": "   Issues: 1 inconsistencies\n"
-                        },
-                        {
-                          "text": "     ⚠️ Palette drift: 63% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235), rgb(30, 64, 175))\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-10-08T13:14:59.232Z",
-                      "annotations": [],
-                      "attachments": []
+                      "location": {
+                        "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/auth-flow.spec.ts",
+                        "column": 26,
+                        "line": 27
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m20\u001b[39m\nReceived:   \u001b[31m10\u001b[39m\n\n  25 |   expect(page.url()).toContain('/doctor-dashboard');\n  26 |   const content = (await page.locator('body').textContent()) || '';\n> 27 |   expect(content.length).toBeGreaterThan(20);\n     |                          ^\n  28 | });\n  29 |\n  30 |\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/auth-flow.spec.ts:27:26"
                     }
                   ],
-                  "status": "expected"
-                }
-              ],
-              "id": "73bf98eef2c526760ed8-12b958b522e74628e62d",
-              "file": "layout-universalization.spec.ts",
-              "line": 544,
-              "column": 3
-            },
-            {
-              "title": "2. Generate Comprehensive Report",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-10-19T20:19:19.066Z",
                   "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
+                  "attachments": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 4,
-                      "errors": [],
-                      "stdout": [
-                        {
-                          "text": "\n✅ Report generated: test-results/layout-reports/layout-audit-1759929299264.html\n"
-                        },
-                        {
-                          "text": "✅ JSON data saved: test-results/layout-reports/layout-audit-1759929299264.json\n"
-                        }
-                      ],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-10-08T13:14:59.238Z",
-                      "annotations": [],
-                      "attachments": []
+                      "name": "screenshot",
+                      "contentType": "image/png",
+                      "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/auth-flow-Demo-login-lands-on-dashboard-without-blank-screen-chromium/test-failed-1.png"
+                    },
+                    {
+                      "name": "video",
+                      "contentType": "video/webm",
+                      "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/auth-flow-Demo-login-lands-on-dashboard-without-blank-screen-chromium/video.webm"
                     }
                   ],
-                  "status": "expected"
+                  "errorLocation": {
+                    "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/auth-flow.spec.ts",
+                    "column": 26,
+                    "line": 27
+                  }
                 }
               ],
-              "id": "73bf98eef2c526760ed8-724f111dce4dc9404303",
-              "file": "layout-universalization.spec.ts",
-              "line": 558,
-              "column": 3
-            },
-            {
-              "title": "3. Verify Design System Compliance",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2025-10-08T13:14:59.258Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "73bf98eef2c526760ed8-ea293b9b033c0f4644f0",
-              "file": "layout-universalization.spec.ts",
-              "line": 570,
-              "column": 3
+              "status": "unexpected"
             }
-          ]
+          ],
+          "id": "df6b40174562c70df515-16316c076931cc4d99b3",
+          "file": "auth-flow.spec.ts",
+          "line": 5,
+          "column": 1
         }
       ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-10-08T13:14:58.529Z",
-    "duration": 16048.057000000003,
-    "expected": 3,
+    "startTime": "2025-10-19T20:19:18.773Z",
+    "duration": 5428.9220000000005,
+    "expected": 0,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 1,
     "flaky": 0
   }
 }

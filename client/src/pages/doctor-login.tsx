@@ -79,21 +79,42 @@ export default function DoctorLogin() {
       // For demo purposes, using a simple check
       // In production, this would be a proper authentication
       if (email === "doctor@instanthpi.ca" && password === "medical123") {
+        const loginTime = new Date().toISOString();
+        console.log(`[DoctorLogin] Demo login successful at ${loginTime}`);
+        
         // Set a session flag
         localStorage.setItem("doctor_authenticated", "true");
+        const verifyAuth = localStorage.getItem("doctor_authenticated");
+        console.log('[DoctorLogin] localStorage.setItem("doctor_authenticated", "true")', {
+          wasSet: verifyAuth === "true",
+          storedValue: verifyAuth,
+          timestamp: loginTime
+        });
+        
         localStorage.setItem("doctor_info", JSON.stringify({
           email: email,
           name: "Doctor",
           specialty: "General Medicine"
         }));
+        const verifyInfo = localStorage.getItem("doctor_info");
+        console.log('[DoctorLogin] localStorage.setItem("doctor_info", ...)', {
+          wasSet: Boolean(verifyInfo),
+          timestamp: loginTime
+        });
+        
+        console.log('[DoctorLogin] Navigating to /doctor-dashboard in 100ms');
         // Add a small delay to ensure localStorage is set
         setTimeout(() => {
+          console.log('[DoctorLogin] Executing navigation callback');
+          const preNavAuth = localStorage.getItem("doctor_authenticated");
+          console.log('[DoctorLogin] Pre-navigation localStorage check:', { preNavAuth });
           navigate("/doctor-dashboard");
         }, 100);
       } else {
         setMessage("Invalid credentials. Use doctor@instanthpi.ca / medical123");
       }
     } catch (error: any) {
+      console.error('[DoctorLogin] Login error:', error);
       setMessage("Login failed. Please try again.");
     } finally {
       setLoading(false);
