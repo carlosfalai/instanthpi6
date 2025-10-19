@@ -28,9 +28,7 @@ export default function App() {
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
         // Redirect based on the login page
-        if (location === "/doctor-login") {
-          setLocation("/doctor-dashboard");
-        } else if (location === "/patient-login") {
+        if (location === "/patient-login") {
           setLocation("/patient-dashboard");
         }
       } else if (event === "SIGNED_OUT") {

@@ -20,8 +20,8 @@ export default function DoctorLogin() {
       // Check localStorage FIRST (demo login has priority)
       const isLocalAuth = localStorage.getItem("doctor_authenticated") === "true";
       if (isLocalAuth) {
-        // Already logged in via demo - go to dashboard
-        navigate("/doctor-dashboard");
+        // Already logged in via demo - show banner, do not auto-redirect
+        setMessage("You are already signed in. Continue to dashboard or sign out.");
         return;
       }
 
@@ -37,15 +37,15 @@ export default function DoctorLogin() {
           return;
         }
 
-        // Only redirect if we have a valid Supabase session
+        // Only show banner if we have a valid Supabase session
         // AND it hasn't been more than 1 hour (session is fresh)
         if (session && session.user) {
           const sessionAge = Date.now() - (session.created_at ? new Date(session.created_at).getTime() : 0);
           const oneHour = 60 * 60 * 1000;
           
           if (sessionAge < oneHour) {
-            // Fresh OAuth session - redirect to dashboard
-            navigate("/doctor-dashboard");
+            // Fresh OAuth session - show banner, do not auto-redirect
+            setMessage("You are already signed in. Continue to dashboard or sign out.");
           } else {
             // Stale session - allow user to login again
             console.log("Stale Supabase session detected, showing login form");
@@ -130,6 +130,37 @@ export default function DoctorLogin() {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
+            {message && message.toLowerCase().includes("already signed") && (
+              <div className="flex items-center justify-between rounded-md border border-amber-300 bg-amber-50 p-3 text-amber-900">
+                <span className="text-sm">You are already signed in.</span>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                    onClick={() => navigate("/doctor-dashboard")}
+                  >
+                    Continue
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="border-gray-300"
+                    onClick={async () => {
+                      try {
+                        localStorage.removeItem("doctor_authenticated");
+                        localStorage.removeItem("doctor_info");
+                        await supabase.auth.signOut();
+                        setMessage("");
+                      } catch (e) {
+                        console.error("Sign out failed", e);
+                      }
+                    }}
+                  >
+                    Sign out
+                  </Button>
+                </div>
+              </div>
+            )}
             {/* Google Sign-in Button */}
             <Button
               type="button"
