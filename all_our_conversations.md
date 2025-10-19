@@ -1922,3 +1922,34 @@ The login page's session check (line 30-31 in doctor-login.tsx) is too aggressiv
 - Demo credentials work
 - No white screen after login
 - Dashboard loads with data or shows error boundary if there are issues
+
+---
+
+## 🧭 SESSION 12.6: Auth/UI Stabilization, Styling, and Live Testing
+Date: October 19, 2025  
+Status: ✅ Deployed to production
+
+### Changes
+- Routing/auth
+  - Removed instant redirect from `/doctor-login` (App.tsx SIGNED_IN guard limited; SIGNED_OUT redirect removed).
+  - Added banner + Sign out on `/doctor-login` when a session exists (no auto-jump).
+  - Global RootErrorBoundary added in `App.tsx` to prevent blank white page and show actionable error UI.
+- Supabase
+  - Made env handling safe in `client/src/lib/supabase.ts` (no throw on missing vars; degraded-mode fallback + console error).
+- UI/Styling
+  - Forced light theme on `doctor-login` inputs + Google button to avoid dark token bleed (`!bg-white`, `!border-gray-300`, etc.).
+- Testing
+  - Headless Chrome (Playwright) against production for `doctor-login` – page loads, elements present; captured a non-fatal evaluate error in the test script (string check). Will harden test.
+
+### Tooling
+- Gemini CLI installed/updated locally (gemini --version: 0.9.0) for future AI dev workflows.
+
+### Why this matters
+- Eliminates auto-redirect loops and reduces white-screen cases.
+- If any render error happens, users now see an error banner with a way back to login.
+- Login page uses the intended light aesthetic.
+
+### Next steps
+1. Run full production navigation smoke tests (all sidebar/top links; back/forward) and capture failing routes.
+2. Patch any remaining routes that blank or double-route.
+3. Consolidate doctor pages to the consistent dark Linear-style palette; align patient pages separately.

@@ -17,6 +17,7 @@ import AIBillingPage from "@/pages/ai-billing-page";
 import KnowledgeBasePage from "@/pages/knowledge-base-page";
 import TierAssociationPage from "@/pages/tier-association-page";
 import AuthCallback from "@/pages/auth-callback";
+import { ProtectedRoute } from "@/lib/auth-guard";
 
 class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
   constructor(props: { children: React.ReactNode }) {
@@ -79,15 +80,51 @@ export default function App() {
           <Route path="/patient-dashboard" component={PatientDashboard} />
           <Route path="/login" component={LoginPage} />
           <Route path="/doctor-login" component={DoctorLogin} />
-          <Route path="/doctor-dashboard" component={DoctorDashboard} />
-          <Route path="/doctor-profile" component={DoctorProfileNew} />
-          <Route path="/patients" component={PatientsPage} />
-          <Route path="/documents" component={DocumentsPage} />
-          <Route path="/messages" component={MessagesPage} />
-          <Route path="/ai-billing" component={AIBillingPage} />
-          <Route path="/knowledge-base" component={KnowledgeBasePage} />
-          <Route path="/association" component={TierAssociationPage} />
-          <Route path="/tier-35" component={TierAssociationPage} />
+          <Route path="/doctor-dashboard">
+            <ProtectedRoute>
+              <DoctorDashboard />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/doctor-profile">
+            <ProtectedRoute>
+              <DoctorProfileNew />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/patients">
+            <ProtectedRoute>
+              <PatientsPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/documents">
+            <ProtectedRoute>
+              <DocumentsPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/messages">
+            <ProtectedRoute>
+              <MessagesPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/ai-billing">
+            <ProtectedRoute>
+              <AIBillingPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/knowledge-base">
+            <ProtectedRoute>
+              <KnowledgeBasePage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/association">
+            <ProtectedRoute>
+              <TierAssociationPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/tier-35">
+            <ProtectedRoute>
+              <TierAssociationPage />
+            </ProtectedRoute>
+          </Route>
           <Route path="/auth/callback" component={AuthCallback} />
           <Route path="/webhook-setup" component={WebhookSetupPage} />
           <Route>
