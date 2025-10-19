@@ -1027,11 +1027,13 @@ export default function DoctorDashboardNew() {
     };
 
     // Filter Spruce conversations based on search
-    const filteredSpruceCases = spruceSearchQuery
-      ? spruceCases.filter((conv) =>
-          (conv.patient_name || `Conversation ${conv.id}`).toLowerCase().includes(spruceSearchQuery.toLowerCase())
-        )
-      : spruceCases;
+    const filteredSpruceCases = (spruceCases && Array.isArray(spruceCases)) 
+      ? (spruceSearchQuery
+          ? spruceCases.filter((conv) =>
+              (conv.patient_name || `Conversation ${conv.id}`).toLowerCase().includes(spruceSearchQuery.toLowerCase())
+            )
+          : spruceCases)
+      : [];
 
     // Show initial loading skeleton
     const isInitializing = loading && searchResults.length === 0 && searchQuery === "";
