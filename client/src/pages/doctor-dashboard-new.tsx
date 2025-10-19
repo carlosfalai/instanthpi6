@@ -403,7 +403,7 @@ export default function DoctorDashboardNew() {
     const loadReports = async () => {
       setLoadingReports(true);
       try {
-        const response = await fetch('/api/file-management');
+        const response = await fetch('/api/file-management/list');
         console.log('[Dashboard] file-management response status:', response.status);
         
         if (!response.ok) {
