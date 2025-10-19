@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { LoginPage } from "@/components/auth/LoginPage";
 import Landing from "@/pages/landing";
 import DoctorDashboard from "@/pages/doctor-dashboard-new";
+import DoctorDashboardSimple from "@/pages/doctor-dashboard-simple";
 import DoctorLogin from "@/pages/doctor-login";
 import DoctorProfileNew from "@/pages/doctor-profile-new";
 import PatientLogin from "@/pages/patient-login";
@@ -85,6 +86,7 @@ export default function App() {
               <DoctorDashboard />
             </ProtectedRoute>
           </Route>
+          <Route path="/doctor-dashboard-simple" component={DoctorDashboardSimple} />
           <Route path="/doctor-profile">
             <ProtectedRoute>
               <DoctorProfileNew />
