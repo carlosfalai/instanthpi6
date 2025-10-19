@@ -19,7 +19,12 @@ test.describe('Production Navigation Smoke', () => {
       if ((await email.count()) > 0 && (await pwd.count()) > 0) {
         await email.fill('doctor@instanthpi.ca');
         await pwd.fill('medical123');
-        await page.getByRole('button', { name: /sign in/i }).click();
+        const submitBtn = page.getByRole('button', { name: 'Sign In', exact: true });
+        if (await submitBtn.count()) {
+          await submitBtn.click();
+        } else {
+          await page.locator('button[type="submit"]').first().click();
+        }
       }
     }
 

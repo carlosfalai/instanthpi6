@@ -1069,7 +1069,7 @@ export default function DoctorDashboardNew() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 bg-[#0d0d0d]">
+        <main className="flex-1 bg-[#0d0d0d]" data-testid="dashboard-root">
           {isInitializing ? (
             // Loading skeleton
             <div className="flex items-center justify-center min-h-screen">
