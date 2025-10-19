@@ -1953,3 +1953,45 @@ Status: ✅ Deployed to production
 1. Run full production navigation smoke tests (all sidebar/top links; back/forward) and capture failing routes.
 2. Patch any remaining routes that blank or double-route.
 3. Consolidate doctor pages to the consistent dark Linear-style palette; align patient pages separately.
+
+---
+
+## 🧭 SESSION 12.7: Navigation Guard & Smoke Tests (Plan Execution)
+Date: October 19, 2025 (continued)  
+Status: ✅ Partially Complete; 1 Known Issue
+
+### Implementation Summary
+**Completed:**
+- `client/src/lib/auth-guard.tsx`: ProtectedRoute guard that checks local + Supabase auth; skeleton loader while checking; shows "auth required" card if unauthed.
+- `client/src/App.tsx`: wrapped all doctor routes (dashboard, profile, patients, documents, messages, ai-billing, knowledge-base, association, tier-35) in `<ProtectedRoute>`.
+- Global `RootErrorBoundary` in App.tsx (from Session 12.6) catches render errors.
+- Safe Supabase env loading (no throws on missing vars).
+- Doctor-login light theme enforced (`!bg-white`, `!border-gray-300` on inputs/button).
+- Banner + Sign out added to login page for already-authed users.
+- Playwright tests added: `tests/auth-flow.spec.ts` (demo login → dashboard) and `tests/prod-nav-smoke.spec.ts` (login → sidebar nav + back/forward).
+- Dashboard root tagged with `data-testid="dashboard-root"` for test stability.
+
+**Test Results (Production):**
+- ✅ `auth-flow.spec.ts` PASSED: Demo login successfully lands on dashboard without white screen.
+- ❌ `prod-nav-smoke.spec.ts` FAILED: After login, dashboard root element not detected; indicates ProtectedRoute or dashboard not rendering on production.
+
+**Root Cause of Nav-Smoke Failure:**
+- ProtectedRoute skeleton is showing but the full dashboard is not rendering after the spinner clears.
+- Possible causes: (1) ProtectedRoute showing "auth required" card on prod despite valid localStorage; (2) Dashboard component not rendering under ProtectedRoute; (3) Deployment lag or cache issue.
+
+### Action Items for Next Session
+1. **Debug prod ProtectedRoute:** Add console logs to ProtectedRoute to track auth state on production.
+2. **Verify localStorage persistence:** Ensure `doctor_authenticated` flag survives login redirect to dashboard on prod.
+3. **Check dashboard rendering:** Ensure doctor-dashboard-new.tsx renders properly when wrapped in ProtectedRoute.
+4. **Re-run smoke tests:** After fix, confirm nav-smoke passes on production.
+5. **Add forced-error UI test:** (Deferred) Test that ErrorBoundary renders error UI instead of blank.
+6. **Tokenize dark theme:** (Deferred) Create design tokens for doctor component colors.
+
+### Code Artifacts
+- **New Files:** `client/src/lib/auth-guard.tsx`, `tests/auth-flow.spec.ts`, `tests/prod-nav-smoke.spec.ts`
+- **Modified Files:** `client/src/App.tsx` (wrapped routes), `client/src/pages/doctor-dashboard-new.tsx` (data-testid), `client/src/pages/doctor-login.tsx` (light theme)
+- **Test Artifacts:** `test-results/auth-flow-*.png`, `test-results/prod-nav-smoke-*.png` (videos available)
+
+### Commits
+- `101b9ec` - Auth: add ProtectedRoute guard; wrap doctor routes; add prod nav/auth smoke tests
+- `4447885` - Tests: add data-testid=dashboard-root to doctor-dashboard for smoke stability
