@@ -82,34 +82,43 @@ export default function DoctorLogin() {
         const loginTime = new Date().toISOString();
         console.log(`[DoctorLogin] Demo login successful at ${loginTime}`);
         
-        // Set a session flag
+        // Set auth flags BOTH in localStorage and sessionStorage for redundancy
         localStorage.setItem("doctor_authenticated", "true");
-        const verifyAuth = localStorage.getItem("doctor_authenticated");
-        console.log('[DoctorLogin] localStorage.setItem("doctor_authenticated", "true")', {
-          wasSet: verifyAuth === "true",
-          storedValue: verifyAuth,
-          timestamp: loginTime
-        });
+        sessionStorage.setItem("doctor_authenticated", "true");
         
         localStorage.setItem("doctor_info", JSON.stringify({
           email: email,
           name: "Doctor",
           specialty: "General Medicine"
         }));
-        const verifyInfo = localStorage.getItem("doctor_info");
-        console.log('[DoctorLogin] localStorage.setItem("doctor_info", ...)', {
-          wasSet: Boolean(verifyInfo),
-          timestamp: loginTime
+        sessionStorage.setItem("doctor_info", JSON.stringify({
+          email: email,
+          name: "Doctor",
+          specialty: "General Medicine"
+        }));
+        
+        // Verify that both were set
+        const verifyLocalAuth = localStorage.getItem("doctor_authenticated");
+        const verifySessionAuth = sessionStorage.getItem("doctor_authenticated");
+        console.log('[DoctorLogin] Auth flags set:', {
+          localStorageValue: verifyLocalAuth,
+          sessionStorageValue: verifySessionAuth,
+          timestamp: loginTime,
+          bothSet: verifyLocalAuth === "true" && verifySessionAuth === "true"
         });
         
-        console.log('[DoctorLogin] Navigating to /doctor-dashboard in 100ms');
-        // Add a small delay to ensure localStorage is set
+        console.log('[DoctorLogin] Navigating to /doctor-dashboard in 500ms (longer delay for propagation)');
+        // Longer delay to ensure both storage systems are propagated
         setTimeout(() => {
           console.log('[DoctorLogin] Executing navigation callback');
-          const preNavAuth = localStorage.getItem("doctor_authenticated");
-          console.log('[DoctorLogin] Pre-navigation localStorage check:', { preNavAuth });
+          const preNavLocalAuth = localStorage.getItem("doctor_authenticated");
+          const preNavSessionAuth = sessionStorage.getItem("doctor_authenticated");
+          console.log('[DoctorLogin] Pre-navigation auth check:', { 
+            localStorage: preNavLocalAuth, 
+            sessionStorage: preNavSessionAuth 
+          });
           navigate("/doctor-dashboard");
-        }, 100);
+        }, 500);
       } else {
         setMessage("Invalid credentials. Use doctor@instanthpi.ca / medical123");
       }

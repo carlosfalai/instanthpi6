@@ -21,26 +21,29 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         const checkStartTime = performance.now();
         console.log(`[ProtectedRoute] Auth check starting at ${new Date().toISOString()}`);
         
-        // Demo/local auth first
+        // Demo/local auth first (check BOTH localStorage and sessionStorage)
         const localAuthValue = localStorage.getItem("doctor_authenticated");
-        const localAuth = localAuthValue === "true";
+        const sessionAuthValue = sessionStorage.getItem("doctor_authenticated");
+        const localAuth = localAuthValue === "true" || sessionAuthValue === "true";
         const checkTime1 = performance.now();
         
         const debugData = {
           timestamp: new Date().toISOString(),
           localAuthRaw: localAuthValue,
+          sessionAuthRaw: sessionAuthValue,
           localAuthBoolean: localAuth,
           checkTime1Ms: (checkTime1 - checkStartTime).toFixed(2),
         };
         
-        console.log('[ProtectedRoute] Local auth check:', { 
+        console.log('[ProtectedRoute] Local/Session auth check:', { 
           localAuthRaw: localAuthValue,
+          sessionAuthRaw: sessionAuthValue,
           localAuth,
           timingMs: (checkTime1 - checkStartTime).toFixed(2)
         });
         
         if (localAuth) {
-          console.log('[ProtectedRoute] ✓ Local auth found, setting isAuthed=true');
+          console.log('[ProtectedRoute] ✓ Local/Session auth found, setting isAuthed=true');
           if (isMounted) {
             setDebugInfo({ ...debugData, result: 'LOCAL_AUTH_SUCCESS' });
             setIsAuthed(true);
