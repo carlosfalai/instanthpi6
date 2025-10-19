@@ -41,7 +41,22 @@ test('Demo login lands on dashboard without blank screen', async ({ page }) => {
   expect(page.url()).toContain('/doctor-dashboard');
   const content = (await page.locator('body').textContent()) || '';
   console.log(`[Test] Body text length: ${content.length}`);
+  console.log(`[Test] Body text full content (JSON):`);
+  console.log(JSON.stringify(content));
   console.log(`[Test] Body text preview: ${content.substring(0, 100)}`);
+  
+  // Check for specific elements
+  const sidebarCount = await page.locator('aside').count();
+  const mainCount = await page.locator('main').count();
+  const dashboardRootCount = await page.locator('[data-testid="dashboard-root"]').count();
+  console.log(`[Test] Element counts - sidebar: ${sidebarCount}, main: ${mainCount}, dashboard-root: ${dashboardRootCount}`);
+  
+  // Check if error boundary is showing
+  const errorMsg = await page.locator('text=/error|error/i').first();
+  if (await errorMsg.count() > 0) {
+    console.log(`[Test] Error message found:`, await errorMsg.textContent());
+  }
+  
   expect(content.length).toBeGreaterThan(20);
 });
 
