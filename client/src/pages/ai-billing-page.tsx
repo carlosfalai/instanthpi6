@@ -182,7 +182,7 @@ export default function AiBillingPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <Card className="bg-[#1e1e1e] border-[#2a2a2a]">
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardContent className="flex items-start p-4">
                   <div className="mr-3 mt-1">
                     <div className="p-2 bg-blue-900/20 border border-blue-800/30 rounded-md">
@@ -203,7 +203,7 @@ export default function AiBillingPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#1e1e1e] border-[#2a2a2a]">
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardContent className="flex items-start p-4">
                   <div className="mr-3 mt-1">
                     <div className="p-2 bg-green-900/20 border border-green-800/30 rounded-md">
@@ -228,7 +228,7 @@ export default function AiBillingPage() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#1e1e1e] border-[#2a2a2a]">
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardContent className="flex items-start p-4">
                   <div className="mr-3 mt-1">
                     <div className="p-2 bg-purple-900/20 border border-purple-800/30 rounded-md">
@@ -259,15 +259,15 @@ export default function AiBillingPage() {
                     placeholder="Search patients or descriptions..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-8 bg-[#1e1e1e] border-gray-700 text-white w-full md:w-64"
+                    className="pl-8 bg-[#1a1a1a] border-gray-700 text-white w-full md:w-64"
                   />
                 </div>
 
                 <Select value={filterStatus} onValueChange={setFilterStatus}>
-                  <SelectTrigger className="w-full md:w-40 bg-[#1e1e1e] border-gray-700 text-white">
+                  <SelectTrigger className="w-full md:w-40 bg-[#1a1a1a] border-gray-700 text-white">
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
-                  <SelectContent className="bg-[#1e1e1e] border-gray-700 text-white">
+                  <SelectContent className="bg-[#1a1a1a] border-gray-700 text-white">
                     <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="processed">Processed</SelectItem>
@@ -277,12 +277,12 @@ export default function AiBillingPage() {
 
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="bg-[#1e1e1e] border-gray-700 text-white">
+                    <Button variant="outline" className="bg-[#1a1a1a] border-gray-700 text-white">
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-[#1e1e1e] border-gray-700">
+                  <PopoverContent className="w-auto p-0 bg-[#1a1a1a] border-gray-700">
                     <CalendarComponent
                       mode="single"
                       selected={selectedDate}
@@ -321,7 +321,7 @@ export default function AiBillingPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-[#1e1e1e] border-gray-700 text-white"
+                  className="bg-[#1a1a1a] border-gray-700 text-white"
                   onClick={() => handleRegenerateAI()}
                   disabled={!aiEnabled}
                 >
@@ -332,7 +332,7 @@ export default function AiBillingPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-[#1e1e1e] border-gray-700 text-white"
+                  className="bg-[#1a1a1a] border-gray-700 text-white"
                   onClick={() => handleExport("pdf")}
                 >
                   <Download className="mr-1 h-4 w-4" />
@@ -342,7 +342,7 @@ export default function AiBillingPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-[#1e1e1e] border-gray-700 text-white"
+                  className="bg-[#1a1a1a] border-gray-700 text-white"
                   onClick={() => handleExport("email")}
                 >
                   <Mail className="mr-1 h-4 w-4" />
@@ -352,7 +352,7 @@ export default function AiBillingPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="bg-[#1e1e1e] border-gray-700 text-white"
+                  className="bg-[#1a1a1a] border-gray-700 text-white"
                   onClick={() => handleExport("csv")}
                 >
                   <Printer className="mr-1 h-4 w-4" />
@@ -363,7 +363,7 @@ export default function AiBillingPage() {
           </header>
 
           <main>
-            <Card className="bg-[#1e1e1e] border-[#2a2a2a]">
+            <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
               <CardHeader className="pb-0">
                 <CardTitle>Billing Entries</CardTitle>
                 <CardDescription className="text-[#999]">
@@ -494,7 +494,7 @@ export default function AiBillingPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="bg-[#1e1e1e] border-gray-700 text-white"
+                    className="bg-[#1a1a1a] border-gray-700 text-white"
                   >
                     <Settings className="mr-1 h-4 w-4" />
                     Settings

@@ -136,7 +136,7 @@ export default function MessagesPage() {
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
               <Input
                 placeholder="Search patients..."
-                className="pl-8 bg-gray-900 border-gray-700"
+                className="pl-8 bg-[#1a1a1a] border-[#333]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -260,7 +260,7 @@ export default function MessagesPage() {
                 <div className="flex space-x-2">
                   <Input
                     placeholder="Type your message..."
-                    className="bg-gray-900 border-gray-700"
+                    className="bg-[#1a1a1a] border-[#333]"
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     onKeyDown={(e) => {

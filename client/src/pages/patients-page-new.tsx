@@ -153,14 +153,14 @@ export default function PatientsPage() {
   };
 
   return (
-    <div className="flex h-screen bg-[#121212] overflow-hidden">
+    <div className="flex h-screen bg-[#0d0d0d] overflow-hidden">
       {/* Left column - Patient List */}
       <div className="w-full md:w-1/3 border-r border-[#333] flex flex-col bg-[#1a1a1a] overflow-hidden">
         {/* Patient List Header */}
         <div className="p-3 border-b border-[#333] flex items-center justify-between">
           <div className="flex items-center space-x-1">
             <Select value={sortOrder} onValueChange={(value) => setSortOrder(value as any)}>
-              <SelectTrigger className="bg-[#252525] border-[#444] text-white w-44 h-8">
+              <SelectTrigger className="bg-[#1a1a1a] border-[#444] text-white w-44 h-8">
                 <div className="flex items-center">
                   <ChevronDown className="h-4 w-4 mr-1" />
                   <SelectValue>
@@ -172,7 +172,7 @@ export default function PatientsPage() {
                   </SelectValue>
                 </div>
               </SelectTrigger>
-              <SelectContent className="bg-[#252525] border-[#444] text-white">
+              <SelectContent className="bg-[#1a1a1a] border-[#444] text-white">
                 <SelectItem value="newest">All, Newest First</SelectItem>
                 <SelectItem value="unread">Unread Only</SelectItem>
                 <SelectItem value="oldest">Oldest First</SelectItem>
@@ -206,7 +206,7 @@ export default function PatientsPage() {
             <Input
               type="text"
               placeholder="Search patients..."
-              className="pl-10 bg-[#252525] border-[#444] text-white w-full"
+              className="pl-10 bg-[#1a1a1a] border-[#444] text-white w-full"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -225,8 +225,8 @@ export default function PatientsPage() {
                 {filteredPatients.map((patient: Patient) => (
                   <div
                     key={patient.id}
-                    className={`border-b border-[#333] hover:bg-[#252525] cursor-pointer transition-colors
-                      ${selectedPatient?.id === patient.id ? "bg-[#2a2a2a]" : ""}`}
+                    className={`border-b border-[#333] hover:bg-[#1a1a1a] cursor-pointer transition-colors
+                      ${selectedPatient?.id === patient.id ? "bg-[#222]" : ""}`}
                     onClick={() => handlePatientSelect(patient)}
                   >
                     <div className="p-3 flex items-start">
@@ -263,7 +263,7 @@ export default function PatientsPage() {
                 {filteredPatients.map((patient: Patient) => (
                   <div
                     key={patient.id}
-                    className={`p-4 rounded-md bg-[#252525] hover:bg-[#2a2a2a] cursor-pointer border border-[#333] transition-colors
+                    className={`p-4 rounded-md bg-[#1a1a1a] hover:bg-[#222] cursor-pointer border border-[#333] transition-colors
                       ${selectedPatient?.id === patient.id ? "border-blue-500" : "border-[#333]"}`}
                     onClick={() => handlePatientSelect(patient)}
                   >
@@ -367,14 +367,14 @@ export default function PatientsPage() {
 
               <div className="mb-6">
                 <h3 className="text-md font-semibold mb-2 text-white">Recent Communications</h3>
-                <div className="bg-[#252525] rounded-md p-3 text-sm text-gray-400">
+                <div className="bg-[#1a1a1a] rounded-md p-3 text-sm text-gray-400">
                   <p>No recent communications</p>
                 </div>
               </div>
 
               <div>
                 <h3 className="text-md font-semibold mb-2 text-white">Medical Information</h3>
-                <div className="bg-[#252525] rounded-md p-3 text-sm text-gray-400">
+                <div className="bg-[#1a1a1a] rounded-md p-3 text-sm text-gray-400">
                   <p>No medical information available</p>
                 </div>
               </div>
@@ -399,7 +399,7 @@ export default function PatientsPage() {
         {selectedPatient ? (
           <div className="p-4">
             <div className="space-y-4">
-              <div className="bg-[#252525] rounded-md p-4">
+              <div className="bg-[#1a1a1a] rounded-md p-4">
                 <h3 className="text-md font-semibold mb-2 text-white">Suggested Actions</h3>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-center text-blue-400 hover:text-blue-300 cursor-pointer">
@@ -415,7 +415,7 @@ export default function PatientsPage() {
                 </ul>
               </div>
 
-              <div className="bg-[#252525] rounded-md p-4">
+              <div className="bg-[#1a1a1a] rounded-md p-4">
                 <h3 className="text-md font-semibold mb-2 text-white">Patient Insights</h3>
                 <p className="text-sm text-gray-400">
                   AI analysis of this patient's data is not available. Select "Generate Insights" to
