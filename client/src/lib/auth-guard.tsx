@@ -17,8 +17,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       try {
         // Demo/local auth first
         const localAuth = localStorage.getItem("doctor_authenticated") === "true";
+        console.log('[ProtectedRoute] Local auth check:', { localAuth });
         if (localAuth) {
           if (isMounted) {
+            console.log('[ProtectedRoute] Local auth found, setting isAuthed=true');
             setIsAuthed(true);
             setIsChecking(false);
           }
@@ -29,12 +31,14 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         const {
           data: { session },
         } = await supabase.auth.getSession();
+        const hasSession = Boolean(session?.user);
+        console.log('[ProtectedRoute] Supabase session check:', { hasSession, userEmail: session?.user?.email });
         if (isMounted) {
-          setIsAuthed(Boolean(session?.user));
+          setIsAuthed(hasSession);
           setIsChecking(false);
         }
       } catch (err) {
-        console.error("Auth guard check failed:", err);
+        console.error('[ProtectedRoute] Auth guard check failed:', err);
         if (isMounted) {
           setIsAuthed(false);
           setIsChecking(false);
@@ -47,6 +51,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }, []);
 
   if (isChecking) {
+    console.log('[ProtectedRoute] Rendering skeleton (checking)');
     return (
       <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center">
         <div className="text-center space-y-3">
@@ -58,6 +63,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!isAuthed) {
+    console.log('[ProtectedRoute] Not authenticated, rendering auth required card');
     return (
       <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center p-6">
         <div className="max-w-md w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl p-6">
@@ -76,6 +82,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
+  console.log('[ProtectedRoute] Authenticated, rendering children');
   return <>{children}</>;
 }
 
