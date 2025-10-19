@@ -166,7 +166,7 @@ export default function DoctorLogin() {
               type="button"
               onClick={handleGoogleLogin}
               disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 py-6 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 rounded-md shadow-sm"
+              className="w-full flex items-center justify-center gap-3 py-6 !bg-white hover:!bg-gray-50 !text-gray-900 !border !border-gray-300 rounded-md shadow-sm"
               variant="outline"
             >
               <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -209,7 +209,7 @@ export default function DoctorLogin() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:ring-purple-500 focus:border-purple-500"
+                  className="!bg-white !border-gray-300 !text-gray-900 !placeholder:text-gray-400 focus:!ring-purple-500 focus:!border-purple-500"
                 />
               </div>
               <div className="space-y-2">
@@ -221,7 +221,7 @@ export default function DoctorLogin() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:ring-purple-500 focus:border-purple-500"
+                  className="!bg-white !border-gray-300 !text-gray-900 !placeholder:text-gray-400 focus:!ring-purple-500 focus:!border-purple-500"
                 />
               </div>
 
