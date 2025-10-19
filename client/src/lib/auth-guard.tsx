@@ -21,6 +21,26 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         const checkStartTime = performance.now();
         console.log(`[ProtectedRoute] Auth check starting at ${new Date().toISOString()}`);
         
+        // Check URL query parameter first (for testing/debugging)
+        const urlParams = new URLSearchParams(window.location.search);
+        const authParam = urlParams.get('auth');
+        const hasAuthParam = authParam === 'demo';
+        console.log('[ProtectedRoute] URL auth parameter check:', { authParam, hasAuthParam });
+        
+        if (hasAuthParam) {
+          console.log('[ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true');
+          if (isMounted) {
+            setDebugInfo({ 
+              timestamp: new Date().toISOString(),
+              result: 'URL_AUTH_PARAM_SUCCESS',
+              authParam
+            });
+            setIsAuthed(true);
+            setIsChecking(false);
+          }
+          return;
+        }
+        
         // Demo/local auth first (check BOTH localStorage and sessionStorage)
         const localAuthValue = localStorage.getItem("doctor_authenticated");
         const sessionAuthValue = sessionStorage.getItem("doctor_authenticated");

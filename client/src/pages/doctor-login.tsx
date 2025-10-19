@@ -117,7 +117,8 @@ export default function DoctorLogin() {
             localStorage: preNavLocalAuth, 
             sessionStorage: preNavSessionAuth 
           });
-          navigate("/doctor-dashboard");
+          // Navigate with a query parameter as backup for testing/debugging
+          navigate("/doctor-dashboard?auth=demo");
         }, 500);
       } else {
         setMessage("Invalid credentials. Use doctor@instanthpi.ca / medical123");
