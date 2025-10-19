@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
 import { startGoogleLogin } from "@/lib/auth";
+import { setDemoAuth, hasLocalAuth, logAuthDecision } from "@/lib/auth-utils";
 
 export default function DoctorLogin() {
   const [, navigate] = useLocation();
@@ -79,45 +80,20 @@ export default function DoctorLogin() {
       // For demo purposes, using a simple check
       // In production, this would be a proper authentication
       if (email === "doctor@instanthpi.ca" && password === "medical123") {
-        const loginTime = new Date().toISOString();
-        console.log(`[DoctorLogin] Demo login successful at ${loginTime}`);
+        logAuthDecision('local', { email });
         
-        // Set auth flags BOTH in localStorage and sessionStorage for redundancy
-        localStorage.setItem("doctor_authenticated", "true");
-        sessionStorage.setItem("doctor_authenticated", "true");
+        // Use consolidated auth utility
+        const authSuccess = setDemoAuth(email, "Doctor", "General Medicine");
         
-        localStorage.setItem("doctor_info", JSON.stringify({
-          email: email,
-          name: "Doctor",
-          specialty: "General Medicine"
-        }));
-        sessionStorage.setItem("doctor_info", JSON.stringify({
-          email: email,
-          name: "Doctor",
-          specialty: "General Medicine"
-        }));
+        if (!authSuccess) {
+          setMessage("Failed to set authentication. Please try again.");
+          setLoading(false);
+          return;
+        }
         
-        // Verify that both were set
-        const verifyLocalAuth = localStorage.getItem("doctor_authenticated");
-        const verifySessionAuth = sessionStorage.getItem("doctor_authenticated");
-        console.log('[DoctorLogin] Auth flags set:', {
-          localStorageValue: verifyLocalAuth,
-          sessionStorageValue: verifySessionAuth,
-          timestamp: loginTime,
-          bothSet: verifyLocalAuth === "true" && verifySessionAuth === "true"
-        });
-        
-        console.log('[DoctorLogin] Navigating to /doctor-dashboard in 500ms (longer delay for propagation)');
-        // Longer delay to ensure both storage systems are propagated
+        console.log('[DoctorLogin] Navigating to /doctor-dashboard in 500ms');
+        // Delay to ensure both storage systems are propagated
         setTimeout(() => {
-          console.log('[DoctorLogin] Executing navigation callback');
-          const preNavLocalAuth = localStorage.getItem("doctor_authenticated");
-          const preNavSessionAuth = sessionStorage.getItem("doctor_authenticated");
-          console.log('[DoctorLogin] Pre-navigation auth check:', { 
-            localStorage: preNavLocalAuth, 
-            sessionStorage: preNavSessionAuth 
-          });
-          // Navigate with a query parameter as backup for testing/debugging
           navigate("/doctor-dashboard?auth=demo");
         }, 500);
       } else {
