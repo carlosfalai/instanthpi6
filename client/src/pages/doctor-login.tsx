@@ -17,18 +17,43 @@ export default function DoctorLogin() {
 
   useEffect(() => {
     const checkSession = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-
-      if (error) {
-        console.error("Failed to fetch session", error.message);
+      // Check localStorage FIRST (demo login has priority)
+      const isLocalAuth = localStorage.getItem("doctor_authenticated") === "true";
+      if (isLocalAuth) {
+        // Already logged in via demo - go to dashboard
+        navigate("/doctor-dashboard");
         return;
       }
 
-      if (session) {
-        navigate("/doctor-dashboard");
+      // Only check Supabase for VALID OAuth sessions
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error("Failed to fetch session", error.message);
+          return;
+        }
+
+        // Only redirect if we have a valid Supabase session
+        // AND it hasn't been more than 1 hour (session is fresh)
+        if (session && session.user) {
+          const sessionAge = Date.now() - (session.created_at ? new Date(session.created_at).getTime() : 0);
+          const oneHour = 60 * 60 * 1000;
+          
+          if (sessionAge < oneHour) {
+            // Fresh OAuth session - redirect to dashboard
+            navigate("/doctor-dashboard");
+          } else {
+            // Stale session - allow user to login again
+            console.log("Stale Supabase session detected, showing login form");
+          }
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
+        // Show login form if check fails
       }
     };
 

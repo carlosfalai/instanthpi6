@@ -1774,3 +1774,94 @@ When the dashboard encounters a render error:
 - `8e2ee44` - CRITICAL FIX: Proper TypeScript typing for ErrorBoundary
 
 This should fix the white screen issue! Test it now and you should see either the dashboard or an error box, never a blank white page.
+
+---
+
+## 🎯 SESSION 12: ROOT CAUSE ANALYSIS - LOGIN FLOW ISSUE (CURRENT)
+**Date:** October 19, 2025  
+**Status:** 🔍 INVESTIGATION IN PROGRESS  
+**Problem:** Login process doesn't work - user redirected immediately to dashboard instead of showing login form, resulting in white screen  
+
+### FINDINGS:
+
+#### Problem 1: Session Redirect Logic
+**File:** `client/src/pages/doctor-login.tsx` (lines 18-36)
+
+```typescript
+useEffect(() => {
+  const checkSession = async () => {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error("Failed to fetch session", error.message);
+      return;
+    }
+    if (session) {
+      navigate("/doctor-dashboard");  // ← REDIRECTS IF ANY SESSION EXISTS
+    }
+  };
+  checkSession();
+}, [navigate]);
+```
+
+**Issue:** The login page checks Supabase for an existing session. If ANY session exists (including expired/invalid sessions), it immediately redirects to the dashboard WITHOUT showing the login form.
+
+**Consequence:** 
+1. User lands on `/doctor-login`
+2. Component mounts
+3. useEffect checks Supabase for session
+4. If session exists (stale session from previous attempt), redirects to `/doctor-dashboard`
+5. Dashboard loads but fails because session is invalid/expired → white screen
+
+#### Problem 2: Demo Login Bypass
+**File:** `client/src/pages/doctor-login.tsx` (lines 56-67)
+
+```typescript
+if (email === "doctor@instanthpi.ca" && password === "medical123") {
+  localStorage.setItem("doctor_authenticated", "true");
+  localStorage.setItem("doctor_info", JSON.stringify({...}));
+  setTimeout(() => {
+    navigate("/doctor-dashboard");
+  }, 100);
+}
+```
+
+**Issue:** Demo login sets localStorage flags and navigates, but this code NEVER RUNS because of the session redirect above. The useEffect at line 18 runs first and redirects before user can input credentials.
+
+#### Problem 3: Dashboard Auth Check
+**File:** `client/src/pages/doctor-dashboard.tsx` (lines 37-55)
+
+```typescript
+const checkAuthAndLoadProfile = async () => {
+  const isLocalAuth = localStorage.getItem("doctor_authenticated") === "true";
+  const { data: { session } } = await supabase.auth.getSession();
+  const isSupabaseAuth = !!session;
+  
+  if (!isLocalAuth && !isSupabaseAuth) {
+    navigate("/doctor-login");  // Goes back to login
+    return;
+  }
+  await loadDoctorProfile();
+};
+```
+
+**Issue:** Dashboard checks for EITHER `localStorage` ("demo login") OR Supabase session. If neither exists, goes back to login. But the user can't GET to demo login because the login page redirects automatically.
+
+**Result:** Infinite redirect loop or white screen
+
+### ROOT CAUSE: 
+The login page's session check (line 30-31 in doctor-login.tsx) is too aggressive. It should:
+1. Only redirect if it's a **VALID, FRESH** Supabase session (Google/Microsoft OAuth)
+2. Allow demo login form to show up even if there's a stale session
+3. Or better: Check localStorage first before Supabase
+
+### WHAT NEEDS TO BE FIXED:
+1. Modify doctor-login.tsx to NOT redirect on every session existence
+2. Clear stale sessions before checking
+3. Allow demo login form to always be visible
+4. Only auto-redirect for valid OAuth sessions
+
+### NEXT STEPS:
+1. Test locally with proper session clearing
+2. Fix the session redirect logic
+3. Verify demo login works end-to-end
+4. Test on production after deploy
