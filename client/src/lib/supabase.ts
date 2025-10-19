@@ -3,15 +3,18 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl) {
-  throw new Error("VITE_SUPABASE_URL environment variable is required");
+// Do NOT crash the app if env vars are missing; warn and create a safe fallback client.
+if (!supabaseUrl || !supabaseAnonKey) {
+  // eslint-disable-next-line no-console
+  console.error(
+    "Supabase env vars missing (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY). Running in degraded mode."
+  );
 }
 
-if (!supabaseAnonKey) {
-  throw new Error("VITE_SUPABASE_ANON_KEY environment variable is required");
-}
+const urlFallback = supabaseUrl || "https://invalid-project.supabase.co";
+const keyFallback = supabaseAnonKey || "invalid-anon-key";
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+export const supabase = createClient(urlFallback, keyFallback, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
