@@ -21,17 +21,20 @@ const supabase = createClient(
 );
 
 // Add Error Boundary Component
-class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any}> {
-  constructor(props: any) {
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null };
   }
 
-  static getDerivedStateFromError(error: any) {
+  static getDerivedStateFromError(error: Error) {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: any, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Dashboard Error Boundary caught:', error, errorInfo);
   }
 
@@ -44,7 +47,7 @@ class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasErr
               <span className="text-3xl">⚠️</span>
             </div>
             <h2 className="text-xl font-bold text-[#e6e6e6] mb-3">Dashboard Error</h2>
-            <p className="text-[#999] mb-6 text-sm break-words">{this.state.error?.toString()}</p>
+            <p className="text-[#999] mb-6 text-sm break-words">{this.state.error?.message || 'An unknown error occurred'}</p>
             <button
               onClick={() => window.location.href = "/doctor-login"}
               className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white py-2 rounded-md"
