@@ -371,10 +371,25 @@ export default function DoctorDashboardNew() {
     setLoadingSpruce(true);
     try {
       const response = await fetch('/api/spruce-conversations-all');
+      console.log('[Dashboard] spruce-conversations-all response status:', response.status);
+      
+      if (!response.ok) {
+        console.error('[Dashboard] spruce-conversations-all returned status:', response.status);
+        setSpruceCases([]);
+        return;
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        console.error('[Dashboard] spruce-conversations-all returned non-JSON:', contentType);
+        setSpruceCases([]);
+        return;
+      }
+      
       const data = await response.json();
       setSpruceCases(data || []);
     } catch (error) {
-      console.error("Error loading Spruce cases:", error);
+      console.error("[Dashboard] Error loading Spruce cases:", error);
       setSpruceCases([]);
     } finally {
       setLoadingSpruce(false);
@@ -385,10 +400,25 @@ export default function DoctorDashboardNew() {
     setLoadingReports(true);
     try {
       const response = await fetch('/api/file-management');
+      console.log('[Dashboard] file-management response status:', response.status);
+      
+      if (!response.ok) {
+        console.error('[Dashboard] file-management returned status:', response.status);
+        setReports([]);
+        return;
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType?.includes('application/json')) {
+        console.error('[Dashboard] file-management returned non-JSON:', contentType);
+        setReports([]);
+        return;
+      }
+      
       const data = await response.json();
       setReports(data || []);
     } catch (error) {
-      console.error("Error loading reports:", error);
+      console.error("[Dashboard] Error loading reports:", error);
       setReports([]);
     } finally {
       setLoadingReports(false);

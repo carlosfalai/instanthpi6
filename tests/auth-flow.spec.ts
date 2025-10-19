@@ -3,6 +3,19 @@ import { test, expect } from '@playwright/test';
 const BASE_URL = process.env.BASE_URL || 'https://instanthpi.ca';
 
 test('Demo login lands on dashboard without blank screen', async ({ page }) => {
+  // Capture console logs
+  const consoleLogs: Array<{type: string, text: string}> = [];
+  page.on('console', msg => {
+    consoleLogs.push({ type: msg.type(), text: msg.text() });
+    console.log(`[Browser Console] [${msg.type()}] ${msg.text()}`);
+  });
+  
+  // Capture page errors
+  page.on('pageerror', err => {
+    console.log(`[Page Error] ${err.message}`);
+    consoleLogs.push({ type: 'error', text: err.message });
+  });
+  
   await page.goto(`${BASE_URL}/doctor-login`, { waitUntil: 'networkidle' });
 
   // Prefer demo credentials path
@@ -21,9 +34,14 @@ test('Demo login lands on dashboard without blank screen', async ({ page }) => {
 
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(1200);
+  
+  console.log(`[Test] Final URL: ${page.url()}`);
+  console.log(`[Test] All console logs captured:`, consoleLogs);
 
   expect(page.url()).toContain('/doctor-dashboard');
   const content = (await page.locator('body').textContent()) || '';
+  console.log(`[Test] Body text length: ${content.length}`);
+  console.log(`[Test] Body text preview: ${content.substring(0, 100)}`);
   expect(content.length).toBeGreaterThan(20);
 });
 
