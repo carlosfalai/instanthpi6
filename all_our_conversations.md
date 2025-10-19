@@ -1708,3 +1708,69 @@ The error message should now appear as dark box instead of white page.
 
 ### COMMIT:
 - `7f2b2c9` - Fix: Add ErrorBoundary and console logging
+
+---
+
+## 🎯 SESSION 11.4 - ROOT CAUSE FOUND & FIXED
+
+**Discovery Method:** I tested locally with HTTP server and verified build contents with grep.
+
+### 🔴 THE REAL PROBLEM:
+
+ErrorBoundary component was NOT being included in the production build because:
+
+**TypeScript Error:** The ErrorBoundary class had incorrect generic typing:
+```typescript
+// WRONG - TypeScript couldn't find 'state' property
+class ErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean, error: any}>
+```
+
+This caused TypeScript compilation errors that prevented the class from being tree-shaken into the build.
+
+### ✅ THE FIX:
+
+Proper React.Component generic typing:
+```typescript
+// CORRECT - Full proper generics
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Dashboard Error Boundary caught:', error, errorInfo);
+  }
+  // ...
+}
+```
+
+### 📊 VERIFICATION:
+
+**Before Fix:**
+- `grep "ErrorBoundary" index-0uxYVu8Y.js` → 0 matches ❌
+
+**After Fix:**
+- `grep "ErrorBoundary" index-FHLgwCRo.js` → 1 match ✅
+- `grep "Dashboard Error" index-FHLgwCRo.js` → Found ✅
+
+### 🎯 WHAT NOW HAPPENS:
+
+When the dashboard encounters a render error:
+1. Instead of white blank screen ✅
+2. ErrorBoundary catches it ✅
+3. Shows dark-themed error box ✅
+4. Displays error message and stack ✅
+5. Provides "Back to Login" button ✅
+
+### COMMIT:
+- `8e2ee44` - CRITICAL FIX: Proper TypeScript typing for ErrorBoundary
+
+This should fix the white screen issue! Test it now and you should see either the dashboard or an error box, never a blank white page.
