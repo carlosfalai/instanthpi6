@@ -1,6 +1,7 @@
 import React from "react";
 import { useLocation } from "wouter";
 import { supabase } from "@/lib/supabase";
+import { hasLocalAuth, isSupabaseSessionFresh, logAuthDecision } from "@/lib/auth-utils";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         
         if (hasAuthParam) {
           console.log('[ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true');
+          logAuthDecision('url_param', { param: authParam });
           if (isMounted) {
             setDebugInfo({ 
               timestamp: new Date().toISOString(),
@@ -42,28 +44,19 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         }
         
         // Demo/local auth first (check BOTH localStorage and sessionStorage)
-        const localAuthValue = localStorage.getItem("doctor_authenticated");
-        const sessionAuthValue = sessionStorage.getItem("doctor_authenticated");
-        const localAuth = localAuthValue === "true" || sessionAuthValue === "true";
+        const localAuth = hasLocalAuth();
         const checkTime1 = performance.now();
         
         const debugData = {
           timestamp: new Date().toISOString(),
-          localAuthRaw: localAuthValue,
-          sessionAuthRaw: sessionAuthValue,
-          localAuthBoolean: localAuth,
           checkTime1Ms: (checkTime1 - checkStartTime).toFixed(2),
         };
         
-        console.log('[ProtectedRoute] Local/Session auth check:', { 
-          localAuthRaw: localAuthValue,
-          sessionAuthRaw: sessionAuthValue,
-          localAuth,
-          timingMs: (checkTime1 - checkStartTime).toFixed(2)
-        });
+        console.log('[ProtectedRoute] Local auth check:', { localAuth, timingMs: (checkTime1 - checkStartTime).toFixed(2) });
         
         if (localAuth) {
-          console.log('[ProtectedRoute] ✓ Local/Session auth found, setting isAuthed=true');
+          console.log('[ProtectedRoute] ✓ Local auth found, setting isAuthed=true');
+          logAuthDecision('local', { localStorage: true });
           if (isMounted) {
             setDebugInfo({ ...debugData, result: 'LOCAL_AUTH_SUCCESS' });
             setIsAuthed(true);
@@ -72,7 +65,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           return;
         }
 
-        // Supabase session
+        // Supabase session - only accept if fresh (less than 1 hour old)
         const checkTime2 = performance.now();
         const {
           data: { session },
@@ -81,13 +74,17 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         const checkTime3 = performance.now();
         
         const hasSession = Boolean(session?.user);
+        const isFresh = hasSession ? isSupabaseSessionFresh(session, 60) : false;
+        
         debugData.supabaseCheckMs = (checkTime3 - checkTime2).toFixed(2);
         debugData.supabaseSessionExists = hasSession;
+        debugData.supabaseSessionFresh = isFresh;
         debugData.supabaseUserEmail = session?.user?.email || 'none';
         debugData.supabaseError = sessionError?.message || 'none';
         
         console.log('[ProtectedRoute] Supabase session check:', { 
-          hasSession, 
+          hasSession,
+          isFresh,
           userEmail: session?.user?.email,
           error: sessionError?.message,
           timingMs: (checkTime3 - checkTime2).toFixed(2)
@@ -95,8 +92,16 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         
         if (isMounted) {
           setDebugInfo(debugData);
-          setIsAuthed(hasSession);
+          setIsAuthed(isFresh);
           setIsChecking(false);
+        }
+        
+        if (isFresh) {
+          logAuthDecision('supabase', { email: session?.user?.email, fresh: true });
+        } else if (hasSession) {
+          logAuthDecision('supabase', { email: session?.user?.email, fresh: false, rejected: 'stale' });
+        } else {
+          logAuthDecision('none', { sessionError: sessionError?.message });
         }
       } catch (err: any) {
         const errorTime = performance.now();
