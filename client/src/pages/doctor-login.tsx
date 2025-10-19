@@ -96,10 +96,10 @@ export default function DoctorLogin() {
 
   return (
     <div className={`min-h-screen flex items-center justify-center ${currentBg}`}>
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md bg-white shadow-xl border-0">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Medical Dashboard</CardTitle>
-          <CardDescription className="text-center">
+          <CardTitle className="text-2xl font-bold text-center text-gray-900">Medical Dashboard</CardTitle>
+          <CardDescription className="text-center text-gray-600">
             Access the InstantHPI Medical Platform
           </CardDescription>
         </CardHeader>
@@ -110,7 +110,7 @@ export default function DoctorLogin() {
               type="button"
               onClick={handleGoogleLogin}
               disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 py-6 bg-[#1a1a1a] hover:bg-[#222] text-[#e6e6e6] border border-[#333] rounded-md shadow-sm"
+              className="w-full flex items-center justify-center gap-3 py-6 bg-white hover:bg-gray-50 text-gray-900 border border-gray-300 rounded-md shadow-sm"
               variant="outline"
             >
               <svg className="w-6 h-6" viewBox="0 0 24 24">
@@ -136,54 +136,62 @@ export default function DoctorLogin() {
 
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-[#1a1a1a] px-2 text-gray-500">Or continue with</span>
+                <span className="bg-white px-2 text-gray-500">Or continue with</span>
               </div>
             </div>
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-[#e6e6e6]">Email</Label>
+                <Label htmlFor="email" className="text-gray-900">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   placeholder="doctor@instanthpi.ca"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
                   required
+                  className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:ring-purple-500 focus:border-purple-500"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-[#e6e6e6]">Password</Label>
+                <Label htmlFor="password" className="text-gray-900">Password</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter password"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
                   required
+                  className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:ring-purple-500 focus:border-purple-500"
                 />
               </div>
 
-              <Button type="submit" className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white" disabled={loading}>
-                {loading ? "Signing in..." : "Sign In"}
-              </Button>
+              {message && (
+                <div className={`p-3 rounded-md text-sm ${
+                  message.includes("Invalid") 
+                    ? "bg-red-50 text-red-800 border border-red-200" 
+                    : "bg-green-50 text-green-800 border border-green-200"
+                }`}>
+                  {message}
+                </div>
+              )}
 
+              <Button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-6"
+              >
+                {loading ? "Signing in..." : "Sign in"}
+              </Button>
             </form>
 
-            {message && (
-              <div className="p-3 rounded-md text-sm bg-amber-50 text-amber-800 mt-4">
-                {message}
-              </div>
-            )}
-
-            <p className="text-center text-sm text-gray-500 mt-4">
-              Secure authentication for healthcare professionals
-            </p>
+            <div className="text-center text-sm text-gray-600">
+              <p>Demo Credentials:</p>
+              <p className="font-mono text-xs mt-1">doctor@instanthpi.ca / medical123</p>
+            </div>
           </div>
         </CardContent>
       </Card>
