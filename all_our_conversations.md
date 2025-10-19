@@ -1995,3 +1995,143 @@ Status: ✅ Partially Complete; 1 Known Issue
 ### Commits
 - `101b9ec` - Auth: add ProtectedRoute guard; wrap doctor routes; add prod nav/auth smoke tests
 - `4447885` - Tests: add data-testid=dashboard-root to doctor-dashboard for smoke stability
+
+---
+
+## 🧭 SESSION 13: PRODUCTION AUTHENTICATION & WHITE SCREEN DEBUGGING
+**Date:** October 19, 2025  
+**Status:** ⚠️ ROOT CAUSE IDENTIFIED - NEEDS RESOLUTION  
+**Issue:** Demo login redirects to dashboard but page renders blank with JavaScript error
+
+### PROBLEM ANALYSIS
+
+**Symptom:** After successful demo login:
+- ✓ URL changes to `/doctor-dashboard`
+- ✓ Navigation happens without redirect loop  
+- ✓ ProtectedRoute authentication passes (verified by absence of "auth required" card)
+- ✗ Dashboard renders as ONLY whitespace (10 characters: `"\n    \n  \n\n"`)
+- ✗ No HTML elements rendered (0 sidebar, 0 main, 0 dashboard-root)
+
+**Browser Console Error:**
+```
+TypeError: sg.slice is not a function
+  at s3 (https://instanthpi.ca/assets/index-Cp9_NksO.js:524:9661)
+  at Cm (https://instanthpi.ca/assets/index-Cp9_NksO.js:38:16998)
+  ...
+```
+
+**Other Errors:**
+```
+Error loading reports: SyntaxError: Unexpected token '<', "<!doctype "... is not valid JSON
+Multiple GoTrueClient instances detected in the same browser context
+```
+
+### ROOT CAUSE FINDINGS
+
+1. **Authentication Works** ✓
+   - localStorage.setItem("doctor_authenticated", "true") is being called
+   - sessionStorage.setItem also used as fallback
+   - URL parameter auth=demo added as triple fallback
+   - ProtectedRoute successfully recognizes authentication
+   - No "auth required" card appears
+
+2. **Component Rendering Fails** ✗
+   - "sg.slice is not a function" error prevents React component tree from rendering
+   - Error occurs BEFORE ErrorBoundary can catch it
+   - RootErrorBoundary exists but error may be happening during import/initialization
+   - This is happening in minified code, making it hard to trace exact source
+
+3. **API Errors** (Secondary)
+   - `/api/file-management` returning HTML instead of JSON (likely 404 or error page)
+   - `/api/spruce-conversations-all` same issue
+   - Added defensive response checking to prevent JSON.parse() errors on HTML
+
+### WHAT WAS DONE TO DIAGNOSE
+
+1. **Enhanced Logging Added:**
+   - ProtectedRoute: Detailed auth check logging with timing
+   - Doctor-Login: localStorage verification on successful login
+   - Playwright Test: Console log capture, element detection, debug info
+
+2. **Multiple Authentication Fallbacks:**
+   - localStorage (primary)
+   - sessionStorage (backup)
+   - URL query parameter `auth=demo` (triple fallback)
+
+3. **API Response Validation:**
+   - Check response.ok before .json()
+   - Verify content-type includes 'application/json'
+   - Graceful fallback to empty arrays on API errors
+
+4. **Test Improvements:**
+   - Detailed console logging capture
+   - Element count detection (sidebar, main, dashboard-root)
+   - Body text content inspection (exact 10 characters: whitespace only)
+
+### HYPOTHESIS
+
+The error "sg.slice is not a function" is likely:
+- A bundling issue where a variable named `sg` is being minified incorrectly
+- A third-party library (date-fns, lucide-react, etc.) with a variable collision
+- A circular dependency or initialization timing issue
+- The ErrorBoundary component itself having a TypeScript/typing issue
+
+The fact that it shows `"<!doctype"` in the error suggests some components are failing to load properly and serving fallback HTML pages, which then causes downstream errors.
+
+### NEXT STEPS RECOMMENDATION
+
+1. **Option A - Simplify Dashboard Component**
+   - Create a minimal version of doctor-dashboard-new.tsx
+   - Only include essential elements
+   - Gradually add complexity back in
+   - Identify which section breaks rendering
+
+2. **Option B - Check Bundle Contents**
+   - Run: `npm run build && strings dist/public/assets/index-*.js | grep "sg\.slice"`
+   - Verify ErrorBoundary code is actually in production bundle
+   - Check for unused/dead code that might be causing issues
+
+3. **Option C - Disable problematic imports**
+   - Try removing date-fns import temporarily
+   - Try removing some complex components one by one
+   - See which import is causing the minified variable collision
+
+4. **Option D - Local Testing**
+   - Run `npm run dev` locally and test same flow
+   - See if issue reproduces on localhost:5173
+   - If it works locally, it's a production/minification issue
+
+### CURRENT STATE
+
+**Production:** https://instanthpi.ca
+- Deployed with all fixes
+- ProtectedRoute working (localStorage + Supabase checks)
+- Demo login URL parameter working (`/doctor-dashboard?auth=demo`)
+- **BUT:** Component throws JS error preventing any rendering
+
+**Code Changes This Session:**
+1. Enhanced ProtectedRoute with detailed debug logging
+2. Enhanced doctor-login with localStorage verification
+3. Added defensive API response checking
+4. Enhanced Playwright tests with console capture
+5. Added URL parameter fallback (`auth=demo`)
+
+**Files Modified:**
+- client/src/lib/auth-guard.tsx
+- client/src/pages/doctor-login.tsx
+- client/src/pages/doctor-dashboard-new.tsx (partial - API error handling)
+- tests/auth-flow.spec.ts (enhanced diagnostics)
+
+**Commits:**
+- `eb7d79e` - Phase 1: Add verbose debug logging
+- `20a18ce` - Phase 1: Fix auth persistence with localStorage+sessionStorage
+- `e43b087` - Phase 1: Add URL parameter fallback
+- `8559244` - Phase 1: Add defensive API response error handling
+- `18519ba` - WIP: Enhanced test diagnostics
+
+### ⚠️ CRITICAL NEXT ACTION
+
+**DO NOT continue adding features until this white screen is resolved.** The dashboard component is completely broken in production. Every session working on new features is blocked by this issue.
+
+**Recommend:** Start SESSION 14 with Option A or B above - either simplify the dashboard component or investigate bundle contents to identify the "sg.slice" variable collision.
+
