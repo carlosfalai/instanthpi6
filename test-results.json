@@ -1,0 +1,459 @@
+{
+  "config": {
+    "configFile": "/Users/carlosfavielfont/Downloads/Instanthpi 6/playwright.config.ts",
+    "rootDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 3
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "layout-universalization.spec.ts",
+      "file": "layout-universalization.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Layout Universalization Audit",
+          "file": "layout-universalization.spec.ts",
+          "line": 541,
+          "column": 6,
+          "specs": [
+            {
+              "title": "1. Audit All Pages",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 13832,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "\n📊 Auditing: landing (public)\n"
+                        },
+                        {
+                          "text": "   Colors: 7 backgrounds, 8 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: none navigation\n"
+                        },
+                        {
+                          "text": "   Issues: 2 inconsistencies\n"
+                        },
+                        {
+                          "text": "     ❌ Using patient light-purple theme instead of dark theme\n"
+                        },
+                        {
+                          "text": "     ⚠️ Palette drift: 100% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(230, 224, 242), rgb(219, 234, 254), rgb(37, 99, 235), rgb(220, 252, 231))\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: multi-login (public)\n"
+                        },
+                        {
+                          "text": "   Colors: 1 backgrounds, 5 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: none navigation\n"
+                        },
+                        {
+                          "text": "   Issues: 1 inconsistencies\n"
+                        },
+                        {
+                          "text": "     ⚠️ Palette drift: 100% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(255, 255, 255))\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: patient-intake (patient)\n"
+                        },
+                        {
+                          "text": "   Colors: 4 backgrounds, 13 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: none navigation\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: patient-login (patient)\n"
+                        },
+                        {
+                          "text": "   Colors: 4 backgrounds, 7 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: none navigation\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: patient-dashboard (patient)\n"
+                        },
+                        {
+                          "text": "   Colors: 4 backgrounds, 7 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: none navigation\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: doctor-login (doctor)\n"
+                        },
+                        {
+                          "text": "   Colors: 1 backgrounds, 3 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: none navigation\n"
+                        },
+                        {
+                          "text": "   Issues: 1 inconsistencies\n"
+                        },
+                        {
+                          "text": "     ⚠️ Palette drift: 100% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(255, 255, 255))\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: doctor-dashboard (doctor)\n"
+                        },
+                        {
+                          "text": "   Colors: 0 backgrounds, 1 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: none navigation\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: doctor-profile (doctor)\n"
+                        },
+                        {
+                          "text": "   Colors: 1 backgrounds, 3 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: none navigation\n"
+                        },
+                        {
+                          "text": "   Issues: 1 inconsistencies\n"
+                        },
+                        {
+                          "text": "     ⚠️ Palette drift: 100% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(255, 255, 255))\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: patients-page (doctor)\n"
+                        },
+                        {
+                          "text": "   Colors: 5 backgrounds, 4 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: none navigation\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: documents-page (doctor)\n"
+                        },
+                        {
+                          "text": "   Colors: 4 backgrounds, 7 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: top navigation\n"
+                        },
+                        {
+                          "text": "   Issues: 1 inconsistencies\n"
+                        },
+                        {
+                          "text": "     ⚠️ Palette drift: 75% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235))\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: messages-page (doctor)\n"
+                        },
+                        {
+                          "text": "   Colors: 4 backgrounds, 6 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: top navigation\n"
+                        },
+                        {
+                          "text": "   Issues: 1 inconsistencies\n"
+                        },
+                        {
+                          "text": "     ⚠️ Palette drift: 75% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235))\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: ai-billing (doctor)\n"
+                        },
+                        {
+                          "text": "   Colors: 8 backgrounds, 9 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: top navigation\n"
+                        },
+                        {
+                          "text": "   Issues: 1 inconsistencies\n"
+                        },
+                        {
+                          "text": "     ⚠️ Palette drift: 75% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235), rgba(30, 58, 138, 0.2))\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: knowledge-base (doctor)\n"
+                        },
+                        {
+                          "text": "   Colors: 5 backgrounds, 6 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: top navigation\n"
+                        },
+                        {
+                          "text": "   Issues: 1 inconsistencies\n"
+                        },
+                        {
+                          "text": "     ⚠️ Palette drift: 60% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235))\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: association (doctor)\n"
+                        },
+                        {
+                          "text": "   Colors: 8 backgrounds, 11 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: top navigation\n"
+                        },
+                        {
+                          "text": "   Issues: 1 inconsistencies\n"
+                        },
+                        {
+                          "text": "     ⚠️ Palette drift: 63% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235), rgb(30, 64, 175))\n"
+                        },
+                        {
+                          "text": "\n📊 Auditing: tier-35 (doctor)\n"
+                        },
+                        {
+                          "text": "   Colors: 8 backgrounds, 11 text colors\n"
+                        },
+                        {
+                          "text": "   Layout: top navigation\n"
+                        },
+                        {
+                          "text": "   Issues: 1 inconsistencies\n"
+                        },
+                        {
+                          "text": "     ⚠️ Palette drift: 63% of sampled backgrounds fall outside the Linear-inspired dark theme (examples: rgb(249, 250, 251), rgb(255, 255, 255), rgb(37, 99, 235), rgb(30, 64, 175))\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-08T13:14:59.232Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "73bf98eef2c526760ed8-12b958b522e74628e62d",
+              "file": "layout-universalization.spec.ts",
+              "line": 544,
+              "column": 3
+            },
+            {
+              "title": "2. Generate Comprehensive Report",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 4,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "\n✅ Report generated: test-results/layout-reports/layout-audit-1759929299264.html\n"
+                        },
+                        {
+                          "text": "✅ JSON data saved: test-results/layout-reports/layout-audit-1759929299264.json\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-08T13:14:59.238Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "73bf98eef2c526760ed8-724f111dce4dc9404303",
+              "file": "layout-universalization.spec.ts",
+              "line": 558,
+              "column": 3
+            },
+            {
+              "title": "3. Verify Design System Compliance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-10-08T13:14:59.258Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "73bf98eef2c526760ed8-ea293b9b033c0f4644f0",
+              "file": "layout-universalization.spec.ts",
+              "line": 570,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-10-08T13:14:58.529Z",
+    "duration": 16048.057000000003,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

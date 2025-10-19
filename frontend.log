@@ -474,3 +474,155 @@ Browserslist: browsers data (caniuse-lite) is 12 months old. Please run:
 2:01:24 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
 2:02:31 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
 2:03:33 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+2:03:53 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+2:06:00 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+7:30:06 AM [vite] hmr update /src/pages/public-patient-intake.tsx, /src/index.css
+7:31:22 AM [vite] hmr update /src/pages/public-patient-intake.tsx, /src/index.css
+7:36:16 AM [vite] hmr update /src/pages/public-patient-intake.tsx, /src/index.css
+7:37:10 AM [vite] hmr update /src/pages/public-patient-intake.tsx, /src/index.css
+7:37:48 AM [vite] hmr update /src/pages/public-patient-intake.tsx, /src/index.css
+7:38:45 AM [vite] hmr update /src/pages/public-patient-intake.tsx, /src/index.css
+7:50:50 AM [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css
+7:50:58 AM [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css
+7:57:56 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+7:58:06 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+7:59:19 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:00:31 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:00:42 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:17:39 AM [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css
+8:17:41 AM [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css
+8:17:53 AM [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css
+8:18:15 AM [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css
+8:18:37 AM [vite] hmr update /src/pages/public-patient-intake.tsx, /src/index.css
+8:19:03 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:19:24 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:19:27 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:19:31 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:19:34 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:19:43 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:19:51 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:19:54 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:20:02 AM [vite] page reload src/pages/doctor-profile.tsx
+8:20:05 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:20:05 AM [vite] hmr update /src/pages/public-patient-intake.tsx, /src/index.css
+8:20:05 AM [vite] hmr update /src/pages/public-patient-intake.tsx, /src/index.css
+8:20:05 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:20:06 AM [vite] page reload src/pages/doctor-profile.tsx
+8:20:06 AM [vite] page reload src/pages/doctor-profile.tsx
+8:20:09 AM [vite] page reload src/pages/doctor-profile.tsx
+8:20:21 AM [vite] page reload src/pages/doctor-profile.tsx
+8:20:23 AM [vite] page reload src/pages/doctor-profile.tsx
+8:20:23 AM [vite] page reload src/pages/doctor-profile.tsx
+8:20:23 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:20:23 AM [vite] hmr update /src/pages/public-patient-intake.tsx, /src/index.css
+8:20:23 AM [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css
+8:20:23 AM [vite] hmr update /src/components/patient/PatientIntakeForm.tsx, /src/index.css
+8:20:23 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:29:27 AM [vite] page reload src/pages/doctor-profile.tsx
+8:29:39 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:29:39 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:29:40 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:30:17 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:30:37 AM [vite] page reload src/pages/doctor-profile.tsx
+8:30:37 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:30:37 AM [vite] page reload src/pages/doctor-profile.tsx
+8:30:37 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:37:34 AM [vite] page reload src/pages/doctor-profile.tsx
+8:37:34 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:40:10 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:40:22 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:40:27 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:40:31 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:40:36 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:40:41 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:40:44 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:40:47 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:00 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:00 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:03 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:05 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:08 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:10 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:14 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:16 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:19 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:23 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:27 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:30 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:32 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:35 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:40 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:41:42 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:42:36 AM [vite] page reload src/pages/documents-page.tsx
+8:43:47 AM [vite] hmr update /src/components/layout/AppLayoutSpruce.tsx, /src/index.css
+8:43:59 AM [vite] hmr update /src/components/layout/AppLayoutSpruce.tsx, /src/index.css
+8:44:28 AM [vite] hmr update /src/components/layout/AppLayoutSpruce.tsx, /src/index.css
+8:44:56 AM [vite] hmr update /src/components/layout/AppLayoutSpruce.tsx, /src/index.css
+8:45:00 AM [vite] hmr update /src/components/layout/AppLayoutSpruce.tsx, /src/index.css
+8:45:32 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:46:11 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:46:13 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:46:49 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:46:50 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:46:52 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:46:53 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:47:14 AM [vite] page reload src/pages/ai-billing-page.tsx
+8:47:19 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:47:24 AM [vite] page reload src/pages/ai-billing-page.tsx
+8:47:29 AM [vite] page reload src/pages/ai-billing-page.tsx
+8:47:31 AM [vite] page reload src/pages/ai-billing-page.tsx
+8:47:31 AM [vite] hmr update /src/components/layout/AppLayoutSpruce.tsx, /src/index.css
+8:47:31 AM [vite] page reload src/pages/documents-page.tsx
+8:47:31 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:47:31 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:47:31 AM [vite] page reload src/pages/documents-page.tsx
+8:47:31 AM [vite] page reload src/pages/ai-billing-page.tsx
+8:47:31 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:47:31 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:47:31 AM [vite] hmr update /src/components/layout/AppLayoutSpruce.tsx, /src/index.css
+8:47:31 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:47:31 AM [vite] page reload src/pages/documents-page.tsx
+8:47:31 AM [vite] hmr update /src/components/layout/AppLayoutSpruce.tsx, /src/index.css
+8:47:31 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:47:31 AM [vite] page reload src/pages/ai-billing-page.tsx
+8:47:31 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
+8:47:31 AM [vite] page reload src/pages/documents-page.tsx
+8:47:31 AM [vite] hmr update /src/components/layout/AppLayoutSpruce.tsx, /src/index.css
+8:47:31 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+8:47:31 AM [vite] page reload src/pages/ai-billing-page.tsx
+8:48:22 AM [vite] page reload src/pages/ai-billing-page.tsx
+7:50:25 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
+7:50:32 AM [vite] hmr update /src/pages/patient-login.tsx, /src/index.css
+7:50:38 AM [vite] hmr update /src/pages/patient-login.tsx, /src/index.css
+7:50:50 AM [vite] hmr update /src/components/auth/LoginPage.tsx, /src/index.css
+7:51:25 AM [vite] hmr update /src/App.tsx, /src/index.css
+7:51:37 AM [vite] hmr update /src/components/auth/LoginPage.tsx, /src/index.css
+9:02:37 AM [vite] hmr update /src/pages/landing.tsx, /src/index.css
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+[Browserslist] Could not parse /Users/carlosfavielfont/Downloads/package.json. Ignoring it.
+10:48:16 PM [vite] ✨ new dependencies optimized: @tanstack/react-query, @radix-ui/react-scroll-area, @radix-ui/react-avatar, @radix-ui/react-select, @radix-ui/react-popover, @radix-ui/react-switch, react-day-picker, @radix-ui/react-separator
+10:48:16 PM [vite] ✨ optimized dependencies changed. reloading

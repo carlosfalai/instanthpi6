@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -12,14 +12,18 @@ interface DoctorProfile {
   license: string;
   phone: string;
   address: string;
-  experience: string;
+  clinicName?: string;
+  experience?: string;
   education: string;
   certifications: string[];
   avatarUrl?: string;
+  signature?: string;
+  ai_api_key?: string;
+  ai_provider?: 'claude' | 'openai';
 }
 
 export default function DoctorProfile() {
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const [location] = useLocation();
   const [profile, setProfile] = useState<DoctorProfile>({
     name: '',
@@ -28,10 +32,12 @@ export default function DoctorProfile() {
     license: '',
     phone: '',
     address: '',
+    clinicName: '',
     experience: '',
     education: '',
     certifications: [],
-    avatarUrl: ''
+    avatarUrl: '',
+    signature: ''
   });
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -55,10 +61,12 @@ export default function DoctorProfile() {
           license: 'CMQ-12345',
           phone: '+1 (514) 555-0123',
           address: '123 Rue Medical, Montréal, QC H1A 1A1',
+          clinicName: 'Centre Médical Font',
           experience: '15 ans d\'expérience en médecine générale',
           education: 'MD - Université de Montréal (2008)',
           certifications: ['Collège des Médecins du Québec', 'Médecine d\'Urgence'],
-          avatarUrl: ''
+          avatarUrl: '',
+          signature: 'Dr. Carlos Faviel Font'
         });
       }
     } catch (error) {
@@ -377,6 +385,74 @@ export default function DoctorProfile() {
                         ))}
                       </div>
                     )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Signature (pour les documents)
+                    </label>
+                    {isEditing ? (
+                      <Input
+                        value={profile.signature}
+                        onChange={(e) => handleInputChange('signature', e.target.value)}
+                        placeholder="Ex: Dr. Carlos Faviel Font"
+                        className="bg-white/20 border-white/30 text-white placeholder-gray-400"
+                      />
+                    ) : (
+                      <p className="text-white">{profile.signature || 'Non définie'}</p>
+                    )}
+                    <p className="text-xs text-gray-400 mt-1">
+                      Cette signature apparaîtra sur vos documents PDF
+                    </p>
+                  </div>
+
+                  {/* AI Settings Section */}
+                  <div className="border-t border-white/20 pt-6 mt-6">
+                    <h3 className="text-white font-semibold mb-4">Paramètres IA</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Fournisseur IA
+                        </label>
+                        {isEditing ? (
+                          <select
+                            value={profile.ai_provider || 'claude'}
+                            onChange={(e) => setProfile({...profile, ai_provider: e.target.value as 'claude' | 'openai'})}
+                            className="w-full px-3 py-2 bg-white/20 border border-white/30 text-white rounded-md"
+                          >
+                            <option value="claude" className="bg-slate-900">Claude (Anthropic)</option>
+                            <option value="openai" className="bg-slate-900">OpenAI (GPT-4)</option>
+                          </select>
+                        ) : (
+                          <p className="text-white">
+                            {profile.ai_provider === 'openai' ? 'OpenAI (GPT-4)' : 'Claude (Anthropic)'}
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Clé API {profile.ai_provider === 'openai' ? 'OpenAI' : 'Claude'}
+                        </label>
+                        {isEditing ? (
+                          <Input
+                            type="password"
+                            value={profile.ai_api_key || ''}
+                            onChange={(e) => setProfile({...profile, ai_api_key: e.target.value})}
+                            placeholder={profile.ai_provider === 'openai' ? 'sk-...' : 'sk-ant-...'}
+                            className="bg-white/20 border-white/30 text-white placeholder-gray-400"
+                          />
+                        ) : (
+                          <p className="text-white">
+                            {profile.ai_api_key 
+                              ? '●●●●●●●●●●' + profile.ai_api_key.slice(-4)
+                              : 'Non configurée'}
+                          </p>
+                        )}
+                        <p className="text-xs text-gray-400 mt-1">
+                          Votre clé API sera utilisée uniquement pour générer du contenu IA dans vos documents
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

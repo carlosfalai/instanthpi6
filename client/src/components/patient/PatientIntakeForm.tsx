@@ -35,6 +35,7 @@ export function PatientIntakeForm() {
   const [doctorHpiSummary, setDoctorHpiSummary] = useState<string>("");
   const [triageResult, setTriageResult] = useState<any>(null);
   const [comprehensiveReport, setComprehensiveReport] = useState<any>(null);
+  const [subjectivePrintHtml, setSubjectivePrintHtml] = useState<string>("");
 
   // Handle patient answer input
   const handleAnswerChange = (questionIndex: number, answer: string) => {
@@ -42,6 +43,42 @@ export function PatientIntakeForm() {
       ...prev,
       [questionIndex]: answer
     }));
+  };
+
+  // Generate Subjective-only printable document for physician handoff
+  const generateSubjectivePrintable = async () => {
+    try {
+      const patientId = deIdentifiedId || generateDeIdentifiedId();
+      
+      const response = await fetch('/api/patient-hpi-print', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          patient_id: patientId,
+          language: 'fr',
+          demographics: {
+            age: parseInt(age) || 0,
+            gender: gender,
+            sex: gender
+          },
+          hpi_summary: triageResult?.hpi_summary || "Résumé de consultation généré par l'IA",
+          hpi_confirmed: hpiConfirmed,
+          hpi_corrections: hpiCorrections,
+          follow_up_answers: patientAnswers
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.print_html) {
+          setSubjectivePrintHtml(data.print_html);
+        }
+      }
+    } catch (error) {
+      console.error('Error generating Subjective printable:', error);
+    }
   };
 
   // Save patient answers and generate enhanced SOAP note
@@ -114,10 +151,14 @@ export function PatientIntakeForm() {
   };
 
   const generateDeIdentifiedId = () => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    // Letter+digit pairs × 5 (matches original InstantHPI Formsite logic)
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
     let code = "";
-    for (let i = 0; i < 10; i++) {
-      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    for (let i = 0; i < 5; i++) {
+      const L = letters.charAt(Math.floor(Math.random() * letters.length));
+      const D = numbers.charAt(Math.floor(Math.random() * numbers.length));
+      code += L + D;
     }
     setDeIdentifiedId(code);
     return code;
@@ -305,12 +346,44 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
             {/* Save Answers Button */}
             <div className="mt-6 print:hidden">
               <Button
-                onClick={savePatientAnswers}
+                onClick={async () => {
+                  await savePatientAnswers();
+                  // Generate Subjective-only printable after saving
+                  await generateSubjectivePrintable();
+                }}
                 className="w-full bg-green-600 hover:bg-green-700 text-white"
               >
                 Sauvegarder mes réponses et générer le rapport médical
               </Button>
             </div>
+
+            {/* Subjective-only Printable Document for Physician */}
+            {subjectivePrintHtml && (
+              <div className="bg-cyan-50 border-2 border-cyan-300 rounded-lg p-6 mb-6 print:hidden">
+                <h3 className="font-bold text-lg text-cyan-900 mb-4">
+                  📄 Document pour le Médecin (Sujet uniquement)
+                </h3>
+                <p className="text-sm text-cyan-800 mb-4">
+                  Ce document contient uniquement votre historique confirmé (Subjectif) pour le médecin.
+                </p>
+                
+                <div className="flex gap-4 justify-center">
+                  <Button
+                    onClick={() => {
+                      const w = window.open("", "_blank");
+                      if (w) {
+                        w.document.open();
+                        w.document.write(subjectivePrintHtml);
+                        w.document.close();
+                      }
+                    }}
+                    className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-2"
+                  >
+                    🖨️ Ouvrir et Imprimer le Document Médical
+                  </Button>
+                </div>
+              </div>
+            )}
 
             {/* Patient's Printable Medical Document */}
             {enhancedSoapNote && (

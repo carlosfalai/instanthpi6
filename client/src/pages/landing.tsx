@@ -1,125 +1,147 @@
 import React from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Stethoscope, User, ArrowRight } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Stethoscope,
+  HeartPulse,
+  ShieldCheck,
+  Brain,
+  Timer,
+  Lightbulb,
+  CheckCircle,
+  TrendingUp,
+} from "lucide-react";
 
-export default function Landing() {
+interface FeatureCardProps {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+}
+
+const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, description }) => (
+  <Card className="border-[--border-subtle] bg-[--bg-secondary] shadow-sm transition-colors hover:bg-[--bg-secondary]/80">
+    <CardContent className="flex h-full flex-col gap-3 p-6">
+      <Icon className="h-5 w-5 text-[--accent-purple]" aria-hidden />
+      <h3 className="text-lg font-medium text-[--text-primary]">{title}</h3>
+      <p className="text-sm leading-relaxed text-[--text-secondary]">{description}</p>
+    </CardContent>
+  </Card>
+);
+
+const features: FeatureCardProps[] = [
+  {
+    icon: Brain,
+    title: "Anamnèse Intelligente",
+    description: "Capturez des antécédents médicaux précis et complets grâce à notre IA intuitive.",
+  },
+  {
+    icon: Timer,
+    title: "Gain de Temps Précieux",
+    description: "Automatisez la collecte d'informations pour vous concentrer sur le diagnostic et les soins.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Sécurité et Conformité",
+    description: "Cryptage de bout en bout conforme aux réglementations de santé les plus exigeantes.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Décisions Éclairées",
+    description: "Accédez à des dossiers structurés pour faciliter la prise de décision clinique.",
+  },
+];
+
+const stats = [
+  {
+    icon: Lightbulb,
+    highlight: "+30%",
+    label: "de temps gagné par consultation",
+    accent: "text-[--accent-blue]",
+  },
+  {
+    icon: CheckCircle,
+    highlight: "100%",
+    label: "conforme RGPD & normes de santé",
+    accent: "text-[--accent-green]",
+  },
+  {
+    icon: Brain,
+    highlight: "IA avancée",
+    label: "pour des diagnostics plus précis",
+    accent: "text-[--accent-purple]",
+  },
+];
+
+const Landing: React.FC = () => {
   const [, navigate] = useLocation();
 
   return (
-    <div className="min-h-screen" style={{backgroundColor: '#E6E0F2'}}>
-      {/* Header */}
-      <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            InstantHPI
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Plateforme médicale intelligente pour patients et médecins
-          </p>
+    <div className="min-h-screen bg-[#E6E0F2] text-gray-800">
+      <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col items-center justify-center gap-8 px-4 py-16 text-center lg:min-h-screen lg:py-24">
+        <h1 className="max-w-4xl text-3xl font-medium text-gray-900 sm:text-4xl md:text-5xl lg:text-6xl">
+          InstantHPI : l&apos;avenir de l&apos;anamnèse médicale instantanée
+        </h1>
+        <p className="max-w-3xl text-lg leading-relaxed text-gray-600 sm:text-xl">
+          Optimisez les diagnostics et renforcez la relation patient-médecin. InstantHPI simplifie la
+          collecte d&apos;informations et accélère chaque consultation.
+        </p>
+        <div className="flex flex-col gap-4 sm:flex-row">
+          <Button
+            className="flex items-center gap-2 bg-[--accent-purple] px-6 py-3 text-base font-medium text-[--text-primary] shadow-md transition-colors hover:bg-[#7a4ddb]"
+            onClick={() => navigate("/doctor-login")}
+          >
+            <Stethoscope className="h-5 w-5" aria-hidden />
+            Connexion Médecin
+          </Button>
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 border-[--border-default] bg-[--bg-secondary] px-6 py-3 text-base font-medium text-[--text-primary] shadow-md transition-colors hover:bg-[--bg-tertiary]"
+            onClick={() => navigate("/patient-login")}
+          >
+            <HeartPulse className="h-5 w-5" aria-hidden />
+            Connexion Patient
+          </Button>
         </div>
+      </section>
 
-        {/* Login Options */}
-        <div className="max-w-4xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Doctor Login */}
-            <Card className="hover:shadow-lg transition-shadow duration-300">
-              <CardHeader className="text-center pb-4">
-                <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                  <Stethoscope className="w-8 h-8 text-blue-600" />
-                </div>
-                <CardTitle className="text-2xl text-gray-900">Doctor's Lounge</CardTitle>
-                <CardDescription className="text-gray-600">
-                  Accès sécurisé pour les professionnels de la santé
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-sm text-gray-500 mb-6">
-                  Consultez les dossiers patients, générez des rapports médicaux complets, 
-                  et accédez aux outils d'IA pour optimiser vos consultations.
-                </p>
-                <Button 
-                  onClick={() => navigate("/doctor-login")}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                >
-                  <Stethoscope className="w-4 h-4 mr-2" />
-                  Connexion Médecin
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Patient Login */}
-            <Card className="hover:shadow-lg transition-shadow duration-300">
-              <CardHeader className="text-center pb-4">
-                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                  <User className="w-8 h-8 text-green-600" />
-                </div>
-                <CardTitle className="text-2xl text-gray-900">Patient Portal</CardTitle>
-                <CardDescription className="text-gray-600">
-                  Accès simple et sécurisé pour les patients
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <p className="text-sm text-gray-500 mb-6">
-                  Remplissez votre consultation médicale, répondez aux questions de suivi, 
-                  et générez un document médical pour votre médecin.
-                </p>
-                <Button 
-                  onClick={() => navigate("/patient-login")}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  Connexion Patient
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Features Section */}
-          <div className="mt-16 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
-              Fonctionnalités
-            </h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="p-6 bg-white rounded-lg shadow-sm">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Stethoscope className="w-6 h-6 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Pour les Médecins</h3>
-                <p className="text-sm text-gray-600">
-                  Rapports médicaux complets, prescriptions, références spécialisées, 
-                  et documentation d'assurance générés automatiquement.
-                </p>
-              </div>
-              <div className="p-6 bg-white rounded-lg shadow-sm">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <User className="w-6 h-6 text-green-600" />
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">Pour les Patients</h3>
-                <p className="text-sm text-gray-600">
-                  Consultation médicale guidée, questions de suivi personnalisées, 
-                  et document imprimable pour votre médecin.
-                </p>
-              </div>
-              <div className="p-6 bg-white rounded-lg shadow-sm">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                <h3 className="font-semibold text-gray-900 mb-2">IA Médicale</h3>
-                <p className="text-sm text-gray-600">
-                  Intelligence artificielle avancée pour la génération de rapports médicaux, 
-                  triage, et documentation clinique.
-                </p>
-              </div>
-            </div>
+      <section className="bg-[--bg-primary] px-4 py-16 lg:py-24">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-center text-3xl font-medium text-[--text-primary] sm:text-4xl">
+            Pourquoi choisir InstantHPI ?
+          </h2>
+          <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {features.map((feature) => (
+              <FeatureCard key={feature.title} {...feature} />
+            ))}
           </div>
         </div>
-      </div>
+      </section>
+
+      <section className="bg-[#E6E0F2] px-4 py-16 lg:py-24">
+        <div className="mx-auto max-w-6xl text-center">
+          <h2 className="text-3xl font-medium text-gray-900 sm:text-4xl">
+            Des soins améliorés, en toute confiance.
+          </h2>
+          <div className="mt-12 grid grid-cols-1 gap-10 md:grid-cols-3">
+            {stats.map(({ icon: Icon, highlight, label, accent }) => (
+              <div key={highlight} className="flex flex-col items-center gap-3">
+                <Icon className={`h-10 w-10 ${accent}`} aria-hidden />
+                <p className="text-4xl font-semibold text-gray-900">{highlight}</p>
+                <p className="text-lg text-gray-600">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <footer className="bg-[--bg-primary] px-4 py-8 text-center text-sm text-[--text-secondary]">
+        <div className="mx-auto max-w-6xl">
+          <p>&copy; {new Date().getFullYear()} InstantHPI. Tous droits réservés.</p>
+        </div>
+      </footer>
     </div>
   );
-}
+};
+
+export default Landing;

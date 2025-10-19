@@ -1,16 +1,22 @@
 const axios = require("axios");
+const { createClient } = require("@supabase/supabase-js");
 
 // Spruce API configuration
-const SPRUCE_BEARER_TOKEN =
-  process.env.SPRUCE_BEARER_TOKEN ||
-  "YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0=";
 const SPRUCE_API_URL = "https://api.sprucehealth.com/v1";
+
+// Supabase client
+function getSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+}
 
 exports.handler = async (event, context) => {
   // Enable CORS
   const headers = {
     "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Headers": "Content-Type, X-Spruce-Access-Id, X-Spruce-Api-Key",
     "Content-Type": "application/json",
   };
 
@@ -33,6 +39,46 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // 1) Load doctor credentials (currently using default doctor id)
+    const doctorId = "default-doctor";
+    let spruceAccessId = null;
+    let spruceApiKey = null;
+
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data: physician, error: physicianErr } = await supabase
+        .from("physicians")
+        .select("spruce_access_id, spruce_api_key")
+        .eq("id", doctorId)
+        .single();
+
+      if (physicianErr) {
+        console.error("Supabase physicians read error:", physicianErr);
+      }
+
+      spruceAccessId = physician?.spruce_access_id;
+      spruceApiKey = physician?.spruce_api_key;
+    }
+
+    // Fallback to headers if provided (direct test without persistence)
+    if (!spruceAccessId && (event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"])) {
+      spruceAccessId = event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"]; 
+    }
+    if (!spruceApiKey && (event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"])) {
+      spruceApiKey = event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"]; 
+    }
+
+    if (!spruceAccessId || !spruceApiKey) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          error: "Spruce credentials not configured",
+          message: "Please add Spruce Access ID and API Key in Doctor Profile → API Integrations, then try again.",
+        }),
+      };
+    }
+
     console.log("Fetching ALL conversations from Spruce API with pagination...");
 
     let allConversations = [];
@@ -53,9 +99,13 @@ exports.handler = async (event, context) => {
         params.paginationToken = paginationToken;
       }
 
+      // Build Basic auth token from aid:api_key per Spruce API
+      const basicToken = /^YWlk/.test(spruceApiKey)
+        ? spruceApiKey
+        : Buffer.from(`${spruceAccessId}:${spruceApiKey}`).toString("base64");
       const response = await axios.get(`${SPRUCE_API_URL}/conversations`, {
         headers: {
-          Authorization: `Bearer ${SPRUCE_BEARER_TOKEN}`,
+          Authorization: `Basic ${basicToken}`,
           Accept: "application/json",
         },
         params,
@@ -104,12 +154,14 @@ exports.handler = async (event, context) => {
         lastMessageTime = conv.lastMessage.timestamp || lastMessageTime;
       }
 
+      // Align field names with frontend expectations (doctor-dashboard-new.tsx):
+      // patient_name, last_message, updated_at
       return {
         id: conv.id,
-        patientName: patientName,
-        lastMessage: lastMessage,
-        lastMessageTime: lastMessageTime,
-        unreadCount: conv.unreadCount || 0,
+        patient_name: patientName,
+        last_message: lastMessage,
+        updated_at: lastMessageTime,
+        unread_count: conv.unreadCount || 0,
       };
     });
 

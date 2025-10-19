@@ -1,24 +1,33 @@
-import React, { useState } from "react";
-import { supabase } from "../../lib/supabase";
+import React, { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
+import { startGoogleLogin } from "@/lib/auth";
 import { useLocation } from "wouter";
 
 export function LoginPage() {
+  const [, navigate] = useLocation();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
+  useEffect(() => {
+    const checkSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/doctor-dashboard");
+      }
+    };
+
+    checkSession();
+  }, [navigate]);
+
   const handleGoogleLogin = async () => {
     setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `https://instanthpi.ca/doctor-dashboard`,
-        },
-      });
-      if (error) throw error;
-    } catch (error: any) {
-      setMessage(error.message);
-    } finally {
+    setMessage("");
+
+    const { error } = await startGoogleLogin("/doctor-dashboard");
+    if (error) {
+      setMessage(error);
       setLoading(false);
     }
   };

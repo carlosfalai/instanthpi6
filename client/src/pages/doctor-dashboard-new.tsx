@@ -9,14 +9,56 @@ import { Input } from "../components/ui/input";
 import { Search, LogOut, User, Activity, Clock, AlertTriangle, CheckCircle, Copy, Brain, Stethoscope, FileText, Users, Heart, TrendingUp, BarChart3, PieChart, LineChart, RefreshCw, Trash2, Eye, Edit, Download, Phone, Calendar, Settings, Bell, Home, Users2, FileText as FileTextIcon, MessageSquare, Database, Zap } from "lucide-react";
 import { format } from "date-fns";
 import { createClient } from "@supabase/supabase-js";
+import { AIPromptBox } from "../components/ai/AIPromptBox";
+
+// Environment check with fallback
+const SUPABASE_URL = (import.meta as any).env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = (import.meta as any).env.VITE_SUPABASE_ANON_KEY;
 
 const supabase = createClient(
-  (import.meta as any).env.VITE_SUPABASE_URL || "",
-  (import.meta as any).env.VITE_SUPABASE_ANON_KEY || ""
+  SUPABASE_URL || "",
+  SUPABASE_ANON_KEY || ""
 );
 
 export default function DoctorDashboardNew() {
   const [, navigate] = useLocation();
+  
+  // Check for missing environment variables
+  const [envError, setEnvError] = React.useState<string | null>(null);
+  
+  React.useEffect(() => {
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      setEnvError("Missing Supabase configuration. Please check your environment variables (VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY).");
+    }
+  }, []);
+  
+  // Show error message if environment is not configured
+  if (envError) {
+    return (
+      <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-[#1a1a1a] border border-red-500/30 rounded-xl p-8 text-center">
+          <div className="w-16 h-16 bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertTriangle className="w-8 h-8 text-red-500" />
+          </div>
+          <h2 className="text-xl font-bold text-[#e6e6e6] mb-3">Configuration Error</h2>
+          <p className="text-[#999] mb-6">{envError}</p>
+          <div className="bg-[#0d0d0d] border border-[#333] rounded-lg p-4 text-left">
+            <p className="text-xs text-[#666] mb-2">Required environment variables:</p>
+            <ul className="text-xs text-[#999] space-y-1 font-mono">
+              <li>• VITE_SUPABASE_URL</li>
+              <li>• VITE_SUPABASE_ANON_KEY</li>
+            </ul>
+          </div>
+          <Button
+            onClick={() => window.location.href = "/"}
+            className="mt-6 bg-[#222] hover:bg-[#2a2a2a] text-[#e6e6e6] w-full"
+          >
+            Return to Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
   // State management
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -34,11 +76,172 @@ export default function DoctorDashboardNew() {
   const [loadingReports, setLoadingReports] = React.useState(false);
   const [authLoading, setAuthLoading] = React.useState(false);
   const [copiedSections, setCopiedSections] = React.useState<Set<string>>(new Set());
+  const [doctorApiKey, setDoctorApiKey] = React.useState<string>("");
+  const [doctorApiProvider, setDoctorApiProvider] = React.useState<'claude' | 'openai'>('claude');
   const [docHeader, setDocHeader] = React.useState({
     name: "Dr. Carlos Faviel Font",
     specialty: "Médecine Générale",
-    avatarUrl: null
+    avatarUrl: null,
+    clinicName: "",
+    license: "",
+    clinicLocation: "",
+    signature: ""
   });
+
+  // Load doctor profile on mount
+  React.useEffect(() => {
+    const loadDoctorProfile = () => {
+      try {
+        const savedProfile = localStorage.getItem('doctor_profile');
+        if (savedProfile) {
+          const profile = JSON.parse(savedProfile);
+          setDocHeader({
+            name: profile.name || "Dr. Carlos Faviel Font",
+            specialty: profile.specialty || "Médecine Générale",
+            avatarUrl: profile.avatarUrl || null,
+            clinicName: profile.clinicName || "",
+            license: profile.license || "",
+            clinicLocation: profile.address || "",
+            signature: profile.signature || ""
+          });
+          // Load AI credentials
+          if (profile.ai_api_key) {
+            setDoctorApiKey(profile.ai_api_key);
+          }
+          if (profile.ai_provider) {
+            setDoctorApiProvider(profile.ai_provider);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading doctor profile:', error);
+      }
+    };
+    loadDoctorProfile();
+  }, []);
+
+  // PIN modal for PDF signing
+  const [showPinModal, setShowPinModal] = React.useState(false);
+  const [pinInput, setPinInput] = React.useState("");
+  const [pendingPdf, setPendingPdf] = React.useState<{ title: string; content: string } | null>(null);
+
+  // PIN Modal Component
+  const PinModal = () => {
+    if (!showPinModal) return null;
+    
+    return (
+      <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowPinModal(false)}>
+        <div className="bg-[#1a1a1a] border border-[#333] rounded-xl p-8 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
+          <h3 className="text-xl font-bold text-[#e6e6e6] mb-2">Enter PIN to Sign</h3>
+          <p className="text-sm text-[#999] mb-6">Enter your 4-digit PIN to electronically sign this document.</p>
+          <Input
+            type="password"
+            maxLength={4}
+            value={pinInput}
+            onChange={(e) => setPinInput(e.target.value.replace(/\D/g, ''))}
+            placeholder="Enter 4-digit PIN"
+            className="bg-[#2a2a2a] border-[#333] text-[#e6e6e6] text-center text-2xl tracking-widest mb-6"
+            autoFocus
+            onKeyPress={(e) => {
+              if (e.key === 'Enter' && pinInput.length === 4) {
+                handleGeneratePdfApproved();
+              }
+            }}
+          />
+          <div className="flex gap-3">
+            <Button
+              onClick={() => {
+                setShowPinModal(false);
+                setPinInput("");
+                setPendingPdf(null);
+              }}
+              variant="outline"
+              className="flex-1 border-[#333] text-[#999] hover:bg-[#2a2a2a]"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleGeneratePdfApproved}
+              disabled={pinInput.length !== 4}
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+            >
+              Sign & Print
+            </Button>
+          </div>
+          <p className="text-xs text-[#666] mt-4 text-center">
+            First time? Your PIN will be set with this entry.
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  const validatePin = () => {
+    // Fetch saved pin from localStorage as a temporary store until profile stores it
+    const saved = localStorage.getItem("doctor_signature_pin");
+    if (!saved) {
+      // If no PIN saved, first entry sets it (default to "1234" for first use)
+      if (pinInput.length === 4) {
+        localStorage.setItem("doctor_signature_pin", pinInput);
+        return true;
+      }
+      return false;
+    }
+    return saved === pinInput;
+  };
+
+  const handleGeneratePdfApproved = () => {
+    if (!pendingPdf) return;
+    if (!validatePin()) {
+      alert("Incorrect PIN. Please try again.");
+      setPinInput("");
+      return;
+    }
+    // Build print-ready HTML
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${pendingPdf.title}</title>
+    <style>
+      body{font-family:Arial,sans-serif;line-height:1.6;color:#111;max-width:860px;margin:0 auto;padding:24px;background:#fff}
+      .hdr{background:#0d0d0d;color:#e6e6e6;padding:16px 20px;border-radius:10px;margin-bottom:24px}
+      .hdr h2{margin:0 0 6px 0;font-size:20px}
+      .meta{font-size:12px;color:#bbb}
+      .sec{font-size:14px;color:#374151;border-bottom:2px solid #e5e7eb;padding-bottom:6px;margin-top:18px;margin-bottom:8px}
+      pre{white-space:pre-wrap;font-family:inherit}
+      .sig{margin-top:24px;padding-top:12px;border-top:1px solid #e5e7eb}
+      .print{margin-top:16px}
+      @media print{.print{display:none}}
+    </style></head><body>
+      <div class="hdr">
+        <h2>${docHeader.name} — ${docHeader.specialty || ''}</h2>
+        <div class="meta">${docHeader.clinicName || ''} ${docHeader.clinicLocation ? '· ' + docHeader.clinicLocation : ''} ${docHeader.license ? '· ' + docHeader.license : ''}</div>
+        <div class="meta">${dateStr}</div>
+      </div>
+      <div class="sec">${pendingPdf.title}</div>
+      <pre>${pendingPdf.content || ''}</pre>
+      <div class="sig">
+        <div><strong>Signature:</strong> ${docHeader.signature || docHeader.name}</div>
+        <div class="meta">${docHeader.name} ${docHeader.specialty ? '· ' + docHeader.specialty : ''}</div>
+        <div class="meta">${docHeader.clinicName || ''} ${docHeader.clinicLocation ? '· ' + docHeader.clinicLocation : ''}</div>
+        <div class="meta">${docHeader.license ? 'License: ' + docHeader.license : ''}</div>
+        <div class="meta">Signed electronically on ${dateStr}</div>
+      </div>
+      <div class="print"><button onclick="window.print()">Print</button></div>
+    </body></html>`;
+    const w = window.open("", "_blank");
+    if (w) {
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+    }
+    setShowPinModal(false);
+    setPinInput("");
+    setPendingPdf(null);
+  };
+
+  const requestPdf = (title: string, content?: string) => {
+    setPendingPdf({ title, content: content || "" });
+    setShowPinModal(true);
+  };
   
   // Spruce search state
   const [spruceSearchQuery, setSpruceSearchQuery] = React.useState("");
@@ -748,62 +951,65 @@ export default function DoctorDashboardNew() {
     : spruceCases;
 
   return (
-    <div className="min-h-screen bg-[#0d0d0d] flex">
-      {/* Sidebar - Elegant, Minimal, Consistent */}
-      <aside className="w-64 bg-[#1a1a1a] border-r border-[#333]">
+    <>
+      <PinModal />
+      <div className="min-h-screen bg-[#0d0d0d] flex">
+        {/* Sidebar - Linear Style */}
+        <aside className="w-64 bg-[#1a1a1a] border-r border-[#333]">
         <div className="p-6">
-          {/* Logo - Elegant branding */}
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-[#222] rounded-lg flex items-center justify-center border border-[#2a2a2a]">
-              <Stethoscope className="w-6 h-6 text-[#999]" />
-            </div>
-            <div>
-              <h1 className="text-lg font-semibold text-[#e6e6e6]">InstantHPI</h1>
-              <p className="text-xs text-[#666]">Medical Platform</p>
+          {/* Logo */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-[#8b5cf6] rounded-lg flex items-center justify-center">
+                <Stethoscope className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold text-[#e6e6e6]">InstantHPI</h1>
+                <p className="text-xs text-[#666]">Medical Platform</p>
+              </div>
             </div>
           </div>
 
-          {/* Navigation - Consistent, elegant styling */}
+          {/* Navigation - Linear Style */}
           <nav className="space-y-1">
-            <button onClick={() => navigate("/doctor-dashboard")} className="flex items-center gap-3 px-3 py-2.5 bg-[#222] text-[#e6e6e6] rounded-md w-full text-left transition-all hover:bg-slate-750 border border-[#2a2a2a]">
+            <button onClick={() => navigate("/doctor-dashboard")} className="flex items-center gap-3 px-3 py-2.5 bg-[#222] text-[#e6e6e6] rounded-md w-full text-left transition-colors border border-[#2a2a2a]">
               <Home className="w-4 h-4" />
               <span className="text-sm font-medium">Dashboard</span>
             </button>
-            <button onClick={() => navigate("/patients")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/patients")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
               <Users2 className="w-4 h-4" />
               <span className="text-sm">Patients</span>
             </button>
-            <button onClick={() => navigate("/documents")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/documents")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
               <FileTextIcon className="w-4 h-4" />
               <span className="text-sm">Reports</span>
             </button>
-            <button onClick={() => navigate("/messages")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/messages")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
               <MessageSquare className="w-4 h-4" />
               <span className="text-sm">Messages</span>
             </button>
-            <button onClick={() => navigate("/ai-billing")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/ai-billing")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
               <Database className="w-4 h-4" />
               <span className="text-sm">Analytics</span>
             </button>
-            <button onClick={() => navigate("/doctor-profile")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
+            <button onClick={() => navigate("/doctor-profile")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
               <Settings className="w-4 h-4" />
               <span className="text-sm">Settings</span>
             </button>
           </nav>
 
-          {/* Association Section - Separator */}
-          <div className="my-6 border-t border-[#333]"></div>
-          
-          <div className="mb-3">
-            <p className="text-xs font-medium text-[#666] uppercase tracking-wider px-3">Collaboration</p>
+          {/* Collaboration Section - Linear Style Separator */}
+          <div className="border-t border-[#333] pt-6 mt-6">
+            <p className="text-xs font-medium text-[#666] uppercase tracking-wider mb-3 px-3">
+              Collaboration
+            </p>
+            <nav className="space-y-1">
+              <button onClick={() => navigate("/association")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
+                <Users className="w-4 h-4" />
+                <span className="text-sm">Association</span>
+              </button>
+            </nav>
           </div>
-          
-          <nav className="space-y-1">
-            <button onClick={() => navigate("/association")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-all">
-              <Users className="w-4 h-4" />
-              <span className="text-sm">Association</span>
-            </button>
-          </nav>
         </div>
       </aside>
 
@@ -815,11 +1021,11 @@ export default function DoctorDashboardNew() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Left Column - Search and Spruce (3/4 width) */}
             <div className="lg:col-span-3 space-y-6">
-              {/* Patient Search - Elegant, minimal */}
-              <Card className="bg-[#1a1a1a]/50 border-[#333] shadow-sm">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-[#e6e6e6] text-base font-medium flex items-center gap-2">
-                    <Search className="w-4 h-4 text-[#999]" />
+              {/* Patient Search - Linear Style */}
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a] shadow-none">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                    <Search className="w-5 h-5 text-[#999]" />
                     Search Patients
                   </CardTitle>
                 </CardHeader>
@@ -829,12 +1035,12 @@ export default function DoctorDashboardNew() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       placeholder="Enter patient ID..."
-                      className="bg-[#2a2a2a] border-[#333] text-[#e6e6e6]"
+                      className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
                     />
                     <Button
                       onClick={searchPatients}
                       disabled={loading}
-                      className="bg-[#222] hover:bg-slate-750"
+                      className="bg-[#1a1a1a] border border-[#333] hover:bg-[#222] text-[#e6e6e6]"
                     >
                       {loading ? <Activity className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                     </Button>
@@ -846,14 +1052,14 @@ export default function DoctorDashboardNew() {
                         <div
                           key={patient.id}
                           onClick={() => openPatientDetails(patient.patient_id)}
-                          className="p-3 bg-[#2a2a2a] rounded-lg hover:bg-[#333] cursor-pointer"
+                          className="p-3 bg-[#0d0d0d] rounded-md hover:bg-[#222] cursor-pointer transition-colors border border-[#2a2a2a]"
                         >
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="font-semibold text-[#e6e6e6]">{patient.patient_id}</p>
-                              <p className="text-sm text-[#999]">{patient.chief_complaint}</p>
+                              <p className="font-medium text-[#e6e6e6] text-sm">{patient.patient_id}</p>
+                              <p className="text-xs text-[#999] mt-0.5">{patient.chief_complaint}</p>
                             </div>
-                            <Badge className="bg-[#222] text-[#e6e6e6]">
+                            <Badge className="bg-[#222] text-[#999] border border-[#2a2a2a] text-xs">
                               {patient.triage_level}
                             </Badge>
                           </div>
@@ -865,10 +1071,10 @@ export default function DoctorDashboardNew() {
               </Card>
 
               {/* Spruce Integration */}
-              <Card className="bg-[#222] border-[#2a2a2a]">
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
-                    <Phone className="w-5 h-5 text-blue-500" />
+                  <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                    <Phone className="w-5 h-5 text-[#999]" />
                     Spruce Integration
                   </CardTitle>
                 </CardHeader>
@@ -882,7 +1088,7 @@ export default function DoctorDashboardNew() {
                         placeholder="Search conversations..."
                         value={spruceSearchQuery}
                         onChange={(e) => setSpruceSearchQuery(e.target.value)}
-                        className="pl-9 bg-[#2a2a2a] border-[#333] text-[#e6e6e6]"
+                        className="pl-9 bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -944,13 +1150,13 @@ export default function DoctorDashboardNew() {
               </Card>
 
               {/* Quick Diagnosis Templates */}
-              <Card className="bg-[#222] border-[#2a2a2a]">
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-yellow-500" />
+                  <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-[#999]" />
                     Quick Diagnosis Templates
                   </CardTitle>
-                  <CardDescription className="text-[#999]">
+                  <CardDescription className="text-[#999] text-sm">
                     Pre-built protocols for common conditions
                   </CardDescription>
                 </CardHeader>
@@ -964,7 +1170,7 @@ export default function DoctorDashboardNew() {
                         placeholder="Search diagnoses..."
                         value={templateSearchQuery}
                         onChange={(e) => setTemplateSearchQuery(e.target.value)}
-                        className="pl-9 bg-[#2a2a2a] border-[#333] text-[#e6e6e6]"
+                        className="pl-9 bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -1004,7 +1210,7 @@ export default function DoctorDashboardNew() {
                   
                   <Button
                     onClick={() => navigate("/knowledge-base")}
-                    className="w-full mt-4 bg-[#222] hover:bg-yellow-700"
+                    className="w-full mt-4 bg-[#1a1a1a] border border-[#333] hover:bg-[#222] text-[#e6e6e6]"
                   >
                     <Zap className="w-4 h-4 mr-2" />
                     View All Templates
@@ -1014,11 +1220,11 @@ export default function DoctorDashboardNew() {
 
               {/* Template Detail Builder */}
               {showTemplateLibrary && selectedDiagnosis && (
-                <Card className="bg-[#222] border-[#2a2a2a] border-2 border-yellow-500">
+                <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
-                        <Brain className="w-5 h-5 text-yellow-500" />
+                      <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                        <Brain className="w-5 h-5 text-[#8b5cf6]" />
                         Plan Builder: {diagnosisTemplates.find(d => d.id === selectedDiagnosis)?.name}
                       </CardTitle>
                       <Button
@@ -1131,7 +1337,7 @@ export default function DoctorDashboardNew() {
                       {/* Apply Button */}
                       <Button
                         onClick={applyPlanToSAP}
-                        className="w-full bg-[#222] hover:bg-yellow-700"
+                        className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
                         disabled={!frenchDoc}
                       >
                         <CheckCircle className="w-4 h-4 mr-2" />
@@ -1143,11 +1349,11 @@ export default function DoctorDashboardNew() {
               )}
 
               {/* File Management */}
-              <Card className="bg-[#222] border-[#2a2a2a]">
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardHeader>
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-green-500" />
+                    <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-[#999]" />
                       File Management
                     </CardTitle>
                     <div className="flex gap-2">
@@ -1242,10 +1448,10 @@ export default function DoctorDashboardNew() {
             {/* Right Column - Recent Consultations and Medical Report (1/4 width) */}
             <div className="space-y-6">
               {/* Recent Consultations */}
-              <Card className="bg-[#222] border-[#2a2a2a]">
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="text-[#e6e6e6] flex items-center gap-2">
-                    <Clock className="w-5 h-5" />
+                  <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                    <Clock className="w-5 h-5 text-[#999]" />
                     Recent Consultations
                   </CardTitle>
                 </CardHeader>
@@ -1268,13 +1474,13 @@ export default function DoctorDashboardNew() {
               </Card>
 
               {/* Patient Details & Medical Report Generation */}
-              <Card className="bg-[#222] border-[#2a2a2a]">
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
-                    <Brain className="w-5 h-5 text-purple-500" />
+                  <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-[#999]" />
                     Patient Details & Medical Report
                   </CardTitle>
-                  <CardDescription className="text-[#999]">
+                  <CardDescription className="text-[#999] text-sm">
                     Complete patient information and AI-powered documentation
                   </CardDescription>
                 </CardHeader>
@@ -1346,7 +1552,7 @@ export default function DoctorDashboardNew() {
                       <Button
                         onClick={generateMedicalReport}
                         disabled={generating}
-                        className="w-full bg-[#222] hover:bg-slate-750 text-[#e6e6e6]"
+                        className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white disabled:opacity-50"
                       >
                         {generating ? (
                           <>
@@ -1488,10 +1694,10 @@ export default function DoctorDashboardNew() {
 
               {/* Medical Report Sections */}
               {frenchDoc && (
-                <Card className="bg-[#222] border-[#2a2a2a]">
+                <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                   <CardHeader>
-                    <CardTitle className="text-[#e6e6e6] text-lg flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-green-500" />
+                    <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-[#999]" />
                       Medical Report
                     </CardTitle>
                   </CardHeader>
@@ -1501,97 +1707,181 @@ export default function DoctorDashboardNew() {
                         title="HPI Summary"
                         content={frenchDoc.hpiSummary}
                         onCopy={() => copyToClipboard(frenchDoc.hpiSummary || "", "hpiSummary")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, hpiSummary: text})}
+                        onPdf={requestPdf}
                         icon={<FileText className="w-4 h-4" />}
                         color="blue"
                         copyCount={copiedSections.has("hpiSummary") ? 1 : 0}
+                        sectionName="HPI Summary"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Super Spartan SAP"
                         content={frenchDoc.superSpartanSAP}
                         onCopy={() => copyToClipboard(frenchDoc.superSpartanSAP || "", "superSpartanSAP")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, superSpartanSAP: text})}
+                        onPdf={requestPdf}
                         icon={<Stethoscope className="w-4 h-4" />}
                         color="green"
                         copyCount={copiedSections.has("superSpartanSAP") ? 1 : 0}
+                        sectionName="Super Spartan SAP"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Medications Ready to Use"
                         content={frenchDoc.medicationsReadyToUse}
                         onCopy={() => copyToClipboard(frenchDoc.medicationsReadyToUse || "", "medicationsReadyToUse")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, medicationsReadyToUse: text})}
+                        onPdf={requestPdf}
                         icon={<Heart className="w-4 h-4" />}
                         color="purple"
                         copyCount={copiedSections.has("medicationsReadyToUse") ? 1 : 0}
+                        sectionName="Medications Ready to Use"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Lab Works"
                         content={frenchDoc.labWorks}
                         onCopy={() => copyToClipboard(frenchDoc.labWorks || "", "labWorks")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, labWorks: text})}
+                        onPdf={requestPdf}
                         icon={<Activity className="w-4 h-4" />}
                         color="orange"
                         copyCount={copiedSections.has("labWorks") ? 1 : 0}
+                        sectionName="Lab Works"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Imagerie Médicale"
                         content={frenchDoc.imagerieMedicale}
                         onCopy={() => copyToClipboard(frenchDoc.imagerieMedicale || "", "imagerieMedicale")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, imagerieMedicale: text})}
+                        onPdf={requestPdf}
                         icon={<AlertTriangle className="w-4 h-4" />}
                         color="red"
                         copyCount={copiedSections.has("imagerieMedicale") ? 1 : 0}
+                        sectionName="Imagerie Médicale"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Référence Spécialistes"
                         content={frenchDoc.referenceSpecialistes}
                         onCopy={() => copyToClipboard(frenchDoc.referenceSpecialistes || "", "referenceSpecialistes")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, referenceSpecialistes: text})}
+                        onPdf={requestPdf}
                         icon={<Users className="w-4 h-4" />}
                         color="cyan"
                         copyCount={copiedSections.has("referenceSpecialistes") ? 1 : 0}
+                        sectionName="Référence Spécialistes"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Questions de Suivi"
                         content={frenchDoc.followUpQuestions}
                         onCopy={() => copyToClipboard(frenchDoc.followUpQuestions || "", "followUpQuestions")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, followUpQuestions: text})}
+                        onPdf={requestPdf}
                         icon={<MessageSquare className="w-4 h-4" />}
                         color="blue"
                         copyCount={copiedSections.has("followUpQuestions") ? 1 : 0}
+                        sectionName="Questions de Suivi"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Certificat d'Arrêt de Travail"
                         content={frenchDoc.workLeaveCertificate}
                         onCopy={() => copyToClipboard(frenchDoc.workLeaveCertificate || "", "workLeaveCertificate")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, workLeaveCertificate: text})}
+                        onPdf={requestPdf}
                         icon={<FileText className="w-4 h-4" />}
                         color="orange"
                         copyCount={copiedSections.has("workLeaveCertificate") ? 1 : 0}
+                        sectionName="Certificat d'Arrêt de Travail"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Modifications au Travail"
                         content={frenchDoc.workplaceModifications}
                         onCopy={() => copyToClipboard(frenchDoc.workplaceModifications || "", "workplaceModifications")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, workplaceModifications: text})}
+                        onPdf={requestPdf}
                         icon={<Settings className="w-4 h-4" />}
                         color="purple"
                         copyCount={copiedSections.has("workplaceModifications") ? 1 : 0}
+                        sectionName="Modifications au Travail"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Documentation Assurance"
                         content={frenchDoc.insuranceDocumentation}
                         onCopy={() => copyToClipboard(frenchDoc.insuranceDocumentation || "", "insuranceDocumentation")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, insuranceDocumentation: text})}
+                        onPdf={requestPdf}
                         icon={<FileText className="w-4 h-4" />}
                         color="green"
                         copyCount={copiedSections.has("insuranceDocumentation") ? 1 : 0}
+                        sectionName="Documentation Assurance"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Télémédecine vs En Personne"
                         content={frenchDoc.telemedicineNeedsInPerson}
                         onCopy={() => copyToClipboard(frenchDoc.telemedicineNeedsInPerson || "", "telemedicineNeedsInPerson")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, telemedicineNeedsInPerson: text})}
+                        onPdf={requestPdf}
                         icon={<AlertTriangle className="w-4 h-4" />}
                         color="red"
                         copyCount={copiedSections.has("telemedicineNeedsInPerson") ? 1 : 0}
+                        sectionName="Télémédecine vs En Personne"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       <MedicalSection
                         title="Message au Patient"
                         content={frenchDoc.patientMessage}
                         onCopy={() => copyToClipboard(frenchDoc.patientMessage || "", "patientMessage")}
+                        onAIGenerate={(text) => setFrenchDoc({...frenchDoc, patientMessage: text})}
+                        onPdf={requestPdf}
                         icon={<MessageSquare className="w-4 h-4" />}
                         color="cyan"
                         copyCount={copiedSections.has("patientMessage") ? 1 : 0}
+                        sectionName="Message au Patient"
+                        patientData={selectedPatientData}
+                        writingStyleTemplate={{template_name: "Default"}}
+                        doctorApiKey={doctorApiKey}
+                        doctorApiProvider={doctorApiProvider}
                       />
                       
                       {/* Savings Summary */}
@@ -1634,13 +1924,14 @@ export default function DoctorDashboardNew() {
         </div>
       </main>
 
-      {/* Copy Toast */}
-      {copyToast && (
-        <div className="fixed bottom-4 right-4 bg-green-600 text-[#e6e6e6] px-4 py-2 rounded-lg shadow-lg">
-          {copyToast}
-        </div>
-      )}
-    </div>
+        {/* Copy Toast */}
+        {copyToast && (
+          <div className="fixed bottom-4 right-4 bg-green-600 text-[#e6e6e6] px-4 py-2 rounded-lg shadow-lg">
+            {copyToast}
+          </div>
+        )}
+      </div>
+    </>
   );
 }
 
@@ -1665,7 +1956,7 @@ function EnhancedPatientCard({
   };
 
   return (
-    <Card className="bg-[#2a2a2a] border-[#333] hover:bg-[#333] transition-all duration-200">
+    <Card className="bg-[#0d0d0d] border-[#2a2a2a] hover:bg-[#1a1a1a] transition-colors">
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -1684,7 +1975,7 @@ function EnhancedPatientCard({
           </div>
           <div className="flex items-center gap-2">
             {getStatusIcon(patient.triage_level)}
-            <Badge className={`${getTriageColor(patient.triage_level)}`}>
+            <Badge className="bg-[#222] text-[#999] border border-[#2a2a2a] text-xs">
               {patient.triage_level}
             </Badge>
           </div>
@@ -1711,7 +2002,7 @@ function EnhancedPatientCard({
           <Button
             onClick={onView}
             size="sm"
-            className="flex-1 bg-[#333] hover:bg-[#2a2a2a] text-[#e6e6e6]"
+            className="flex-1 bg-[#1a1a1a] border border-[#333] hover:bg-[#222] text-[#e6e6e6]"
           >
             <Eye className="w-4 h-4 mr-2" />
             View
@@ -1719,14 +2010,14 @@ function EnhancedPatientCard({
           <Button
             onClick={onEdit}
             size="sm"
-            className="bg-[#333] hover:bg-[#2a2a2a] text-[#e6e6e6]"
+            className="bg-[#1a1a1a] border border-[#333] hover:bg-[#222] text-[#e6e6e6]"
           >
             <Edit className="w-4 h-4" />
           </Button>
           <Button
             onClick={onGenerateReport}
             size="sm"
-            className="bg-[#333] hover:bg-[#2a2a2a] text-[#e6e6e6]"
+            className="bg-[#1a1a1a] border border-[#333] hover:bg-[#222] text-[#e6e6e6]"
           >
             <Brain className="w-4 h-4" />
           </Button>
@@ -1741,16 +2032,30 @@ function MedicalSection({
   title,
   content,
   onCopy,
+  onPdf,
+  onAIGenerate,
   icon,
   color = "blue",
-  copyCount = 0
+  copyCount = 0,
+  sectionName,
+  patientData,
+  writingStyleTemplate,
+  doctorApiKey,
+  doctorApiProvider
 }: {
   title: string;
   content?: string;
   onCopy: () => void;
+  onPdf?: (title: string, content?: string) => void;
+  onAIGenerate?: (generatedText: string) => void;
   icon: React.ReactNode;
   color?: string;
   copyCount?: number;
+  sectionName?: string;
+  patientData?: any;
+  writingStyleTemplate?: any;
+  doctorApiKey?: string;
+  doctorApiProvider?: 'claude' | 'openai';
 }) {
   const [copied, setCopied] = React.useState(false);
 
@@ -1771,7 +2076,7 @@ function MedicalSection({
   };
 
   return (
-    <div className="bg-[#2a2a2a] rounded-lg border border-[#333] p-4 hover:bg-[#333] transition-all duration-200">
+    <div className="bg-[#0d0d0d] rounded-md border border-[#2a2a2a] p-4 hover:bg-[#1a1a1a] transition-colors">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <div className={`p-1.5 rounded-lg ${colorClasses[color as keyof typeof colorClasses]}`}>
@@ -1784,31 +2089,52 @@ function MedicalSection({
             </Badge>
           )}
         </div>
-        <Button
-          onClick={handleCopy}
-          disabled={!content}
-          size="sm"
-          variant="ghost"
-          className={`text-xs ${
-            copied 
-              ? 'bg-emerald-800/20 text-green-300' 
-              : content 
-                ? 'text-[#e6e6e6] hover:bg-[#333]' 
-                : 'text-[#666] cursor-not-allowed'
-          }`}
-        >
-          {copied ? (
-            <>
-              <CheckCircle className="w-3 h-3 mr-1" />
-              Copied
-            </>
-          ) : (
-            <>
-              <Copy className="w-3 h-3 mr-1" />
-              Copy
-            </>
+        <div className="flex items-center gap-1.5">
+          {sectionName && onAIGenerate && (
+            <AIPromptBox
+              sectionName={sectionName}
+              patientData={patientData}
+              writingStyleTemplate={writingStyleTemplate}
+              onGenerate={onAIGenerate}
+              doctorApiKey={doctorApiKey}
+              doctorApiProvider={doctorApiProvider}
+            />
           )}
-        </Button>
+          <Button
+            onClick={handleCopy}
+            disabled={!content}
+            size="sm"
+            variant="ghost"
+            className={`text-xs ${
+              copied 
+                ? 'bg-emerald-800/20 text-green-300' 
+                : content 
+                  ? 'text-[#e6e6e6] hover:bg-[#333]' 
+                  : 'text-[#666] cursor-not-allowed'
+            }`}
+          >
+            {copied ? (
+              <>
+                <CheckCircle className="w-3 h-3 mr-1" />
+                Copied
+              </>
+            ) : (
+              <>
+                <Copy className="w-3 h-3 mr-1" />
+                Copy
+              </>
+            )}
+          </Button>
+          <Button
+            onClick={() => onPdf?.(title, content)}
+            disabled={!content}
+            size="sm"
+            variant="outline"
+            className="text-xs border-[#444] text-[#e6e6e6] hover:bg-[#333]"
+          >
+            PDF
+          </Button>
+        </div>
       </div>
       
       <div className="min-h-[80px]">

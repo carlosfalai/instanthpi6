@@ -59,12 +59,9 @@ const NotificationBadge: React.FC<{ count: number }> = ({ count }) => {
   if (count === 0) return null;
 
   return (
-    <Badge
-      variant="destructive"
-      className="ml-auto text-xs min-w-[1.5rem] h-5 flex items-center justify-center rounded-full"
-    >
+    <span className="ml-auto inline-flex items-center justify-center w-5 h-5 bg-[#8b5cf6] rounded-full text-xs font-medium text-white">
       {count > 99 ? "99+" : count}
-    </Badge>
+    </span>
   );
 };
 
@@ -227,29 +224,28 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
   const currentActiveSection = determineActiveSection();
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex relative">
-      {/* Background with subtle gradient */}
-      <div className="absolute top-0 z-0 h-screen w-screen bg-gradient-to-br from-blue-50/20 to-purple-50/20 dark:from-gray-900 dark:to-gray-800" />
-
-      {/* Sidebar */}
-      <div className="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex-shrink-0 relative z-10">
+    <div className="min-h-screen bg-[#0d0d0d] flex">
+      {/* Sidebar - Linear Style */}
+      <aside className="w-64 bg-[#1a1a1a] border-r border-[#333] flex-shrink-0">
         <div className="p-6">
-          {/* Header with InstantHPI in Purple */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-2">
-              <span className="text-lg font-semibold text-purple-600">InstantHPI</span>
-              <span className="text-sm text-muted-foreground">Centre Médical Font</span>
+          {/* Logo - Linear Style */}
+          <div className="mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-[#8b5cf6] rounded-lg flex items-center justify-center">
+                <Stethoscope className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-semibold text-[#e6e6e6]">InstantHPI</h1>
+                <p className="text-xs text-[#666]">Medical Platform</p>
+              </div>
             </div>
-            <Button variant="ghost" size="sm" className="p-1 h-6 w-6">
-              <Plus className="h-4 w-4" />
-            </Button>
           </div>
 
           {/* Navigation */}
           <nav className="space-y-6">
-            {mainNavSections.map((section) => (
-              <div key={section.id} className="space-y-2">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            {mainNavSections.map((section, idx) => (
+              <div key={section.id} className={idx > 0 ? "border-t border-[#333] pt-6 mt-6" : ""}>
+                <h3 className="text-xs font-medium text-[#666] uppercase tracking-wider mb-3 px-3">
                   {section.title}
                 </h3>
                 <div className="space-y-1">
@@ -260,13 +256,13 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
                     return (
                       <Link key={item.id} href={item.path}>
                         <div
-                          className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
                             isActive
-                              ? "bg-blue-600 text-white"
-                              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                              ? "bg-[#222] text-[#e6e6e6] border border-[#2a2a2a] font-medium"
+                              : "text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50"
                           }`}
                         >
-                          <Icon className="h-4 w-4" />
+                          <Icon className="w-4 h-4" />
                           <span className="flex-1">{item.label}</span>
                           <NotificationBadge count={item.notificationCount || 0} />
                         </div>
@@ -278,13 +274,12 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
             ))}
           </nav>
         </div>
-      </div>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col relative z-10">
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-auto">{children}</main>
-      </div>
+      <main className="flex-1 bg-[#0d0d0d] overflow-auto">
+        {children}
+      </main>
     </div>
   );
 }

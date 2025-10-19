@@ -39,6 +39,21 @@
   status = 200
   
 [[redirects]]
+  from = "/api/spruce-conversations-all"
+  to = "/.netlify/functions/api-spruce-conversations-all"
+  status = 200
+
+[[redirects]]
+  from = "/api-doctor-credentials"
+  to = "/.netlify/functions/api-doctor-credentials"
+  status = 200
+
+[[redirects]]
+  from = "/api-doctor-credentials/*"
+  to = "/.netlify/functions/api-doctor-credentials/:splat"
+  status = 200
+
+[[redirects]]
   from = "/api/spruce/webhook"
   to = "/.netlify/functions/spruce-webhook"
   status = 200
@@ -78,6 +93,36 @@
 [[redirects]]
   from = "/api/patient-data"
   to = "/.netlify/functions/api-patient-data"
+  status = 200
+
+[[redirects]]
+  from = "/api/patient-hpi-print"
+  to = "/.netlify/functions/patient-hpi-print"
+  status = 200
+
+[[redirects]]
+  from = "/api/ai-template-generation"
+  to = "/.netlify/functions/ai-template-generation"
+  status = 200
+
+[[redirects]]
+  from = "/api/file-management"
+  to = "/.netlify/functions/file-management"
+  status = 200
+
+[[redirects]]
+  from = "/api/file-management/*"
+  to = "/.netlify/functions/file-management/:splat"
+  status = 200
+
+[[redirects]]
+  from = "/api/patient-profile"
+  to = "/.netlify/functions/patient-profile"
+  status = 200
+
+[[redirects]]
+  from = "/api/triage-enhanced-output"
+  to = "/.netlify/functions/triage-enhanced-output"
   status = 200
 
 # Redirect all routes to index.html for client-side routing (must be last)

@@ -16,13 +16,16 @@ import MessagesPage from "@/pages/messages-page";
 import AIBillingPage from "@/pages/ai-billing-page";
 import KnowledgeBasePage from "@/pages/knowledge-base-page";
 import TierAssociationPage from "@/pages/tier-association-page";
+import AuthCallback from "@/pages/auth-callback";
 
 export default function App() {
   const [location, setLocation] = useLocation();
 
   useEffect(() => {
     // Check auth state on mount
-    supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
         // Redirect based on the login page
         if (location === "/doctor-login") {
@@ -35,6 +38,10 @@ export default function App() {
         setLocation("/");
       }
     });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, [location, setLocation]);
 
   return (
@@ -55,6 +62,7 @@ export default function App() {
         <Route path="/knowledge-base" component={KnowledgeBasePage} />
         <Route path="/association" component={TierAssociationPage} />
         <Route path="/tier-35" component={TierAssociationPage} />
+        <Route path="/auth/callback" component={AuthCallback} />
         <Route path="/webhook-setup" component={WebhookSetupPage} />
         <Route>
           <div className="min-h-screen flex items-center justify-center">

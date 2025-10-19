@@ -169,7 +169,7 @@ export default function AiBillingPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <h1 className="text-2xl font-bold mb-1">AI Billing Assistant</h1>
-                <p className="text-gray-400">
+                <p className="text-[#999]">
                   Organize and process billing information with AI assistance
                 </p>
               </div>
@@ -182,7 +182,7 @@ export default function AiBillingPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-              <Card className="bg-[#1e1e1e] border-gray-800">
+              <Card className="bg-[#1e1e1e] border-[#2a2a2a]">
                 <CardContent className="flex items-start p-4">
                   <div className="mr-3 mt-1">
                     <div className="p-2 bg-blue-900/20 border border-blue-800/30 rounded-md">
@@ -193,17 +193,17 @@ export default function AiBillingPage() {
                     <h3 className="text-md font-semibold mb-1">Pending Entries</h3>
                     <div className="text-2xl font-bold">
                       {isLoading ? (
-                        <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
+                        <div className="h-7 w-12 bg-[#1a1a1a] rounded animate-pulse"></div>
                       ) : (
                         billingEntries.filter((e) => e.status === "pending").length || 0
                       )}
                     </div>
-                    <p className="text-sm text-gray-400">Entries awaiting processing</p>
+                    <p className="text-sm text-[#999]">Entries awaiting processing</p>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#1e1e1e] border-gray-800">
+              <Card className="bg-[#1e1e1e] border-[#2a2a2a]">
                 <CardContent className="flex items-start p-4">
                   <div className="mr-3 mt-1">
                     <div className="p-2 bg-green-900/20 border border-green-800/30 rounded-md">
@@ -214,7 +214,7 @@ export default function AiBillingPage() {
                     <h3 className="text-md font-semibold mb-1">Today's Encounters</h3>
                     <div className="text-2xl font-bold">
                       {isLoading ? (
-                        <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
+                        <div className="h-7 w-12 bg-[#1a1a1a] rounded animate-pulse"></div>
                       ) : (
                         // Count today's entries
                         billingEntries.filter((e) => {
@@ -223,12 +223,12 @@ export default function AiBillingPage() {
                         }).length || 0
                       )}
                     </div>
-                    <p className="text-sm text-gray-400">New patient encounters today</p>
+                    <p className="text-sm text-[#999]">New patient encounters today</p>
                   </div>
                 </CardContent>
               </Card>
 
-              <Card className="bg-[#1e1e1e] border-gray-800">
+              <Card className="bg-[#1e1e1e] border-[#2a2a2a]">
                 <CardContent className="flex items-start p-4">
                   <div className="mr-3 mt-1">
                     <div className="p-2 bg-purple-900/20 border border-purple-800/30 rounded-md">
@@ -239,12 +239,12 @@ export default function AiBillingPage() {
                     <h3 className="text-md font-semibold mb-1">Processed This Month</h3>
                     <div className="text-2xl font-bold">
                       {isLoading ? (
-                        <div className="h-7 w-12 bg-gray-800 rounded animate-pulse"></div>
+                        <div className="h-7 w-12 bg-[#1a1a1a] rounded animate-pulse"></div>
                       ) : (
                         billingEntries.filter((e) => e.status === "processed").length || 0
                       )}
                     </div>
-                    <p className="text-sm text-gray-400">Billing entries processed</p>
+                    <p className="text-sm text-[#999]">Billing entries processed</p>
                   </div>
                 </CardContent>
               </Card>
@@ -363,10 +363,10 @@ export default function AiBillingPage() {
           </header>
 
           <main>
-            <Card className="bg-[#1e1e1e] border-gray-800">
+            <Card className="bg-[#1e1e1e] border-[#2a2a2a]">
               <CardHeader className="pb-0">
                 <CardTitle>Billing Entries</CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-[#999]">
                   {aiEnabled
                     ? "AI-assisted billing code suggestions enabled"
                     : "AI suggestions disabled"}
@@ -378,10 +378,10 @@ export default function AiBillingPage() {
                     <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
                   </div>
                 ) : filteredEntries.length > 0 ? (
-                  <div className="rounded-md border border-gray-800">
+                  <div className="rounded-md border border-[#2a2a2a]">
                     <Table>
                       <TableHeader>
-                        <TableRow className="border-gray-800">
+                        <TableRow className="border-[#2a2a2a]">
                           <TableHead className="w-12">
                             <Checkbox
                               checked={
@@ -407,7 +407,7 @@ export default function AiBillingPage() {
                       </TableHeader>
                       <TableBody>
                         {filteredEntries.map((entry) => (
-                          <TableRow key={entry.id} className="border-gray-800">
+                          <TableRow key={entry.id} className="border-[#2a2a2a]">
                             <TableCell>
                               <Checkbox
                                 checked={selectedEntries.includes(entry.id)}
@@ -452,7 +452,7 @@ export default function AiBillingPage() {
                   <div className="flex flex-col items-center justify-center py-10 text-center">
                     <FileText className="h-12 w-12 text-gray-500 mb-4" />
                     <p className="text-xl font-semibold mb-2">No billing entries found</p>
-                    <p className="text-gray-400 mb-4">
+                    <p className="text-[#999] mb-4">
                       {searchTerm || filterStatus !== "all"
                         ? "Try adjusting your filters to find what you're looking for"
                         : "Create your first billing entry to get started"}
@@ -484,8 +484,8 @@ export default function AiBillingPage() {
                   </div>
                 )}
               </CardContent>
-              <CardFooter className="flex justify-between border-t border-gray-800 pt-4">
-                <div className="text-sm text-gray-400">
+              <CardFooter className="flex justify-between border-t border-[#2a2a2a] pt-4">
+                <div className="text-sm text-[#999]">
                   {filteredEntries.length > 0
                     ? `Showing ${filteredEntries.length} billing entries`
                     : "No billing entries found"}

@@ -8,9 +8,7 @@ export default function PublicPatientIntake() {
   const [, navigate] = useLocation();
   const [loading, setLoading] = useState(false);
 
-  const handleDoctorLogin = () => {
-    navigate("/doctor-login");
-  };
+  const handleDoctorLogin = () => {};
 
   useEffect(() => {
     // Load Google Translate script
@@ -63,54 +61,79 @@ export default function PublicPatientIntake() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header with Doctor Login Button */}
+      {/* Header (patient-only) */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
               <h1 className="text-xl font-semibold text-gray-900">InstantHPI</h1>
-              <span className="ml-2 text-sm text-gray-500">Medical Platform</span>
+              <span className="ml-2 text-sm text-gray-500">Patient Intake</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                onClick={handleDoctorLogin}
-                variant="outline"
-                size="sm"
-                className="whitespace-nowrap"
-                aria-label="Doctor login"
-              >
-                Doctor Login
-              </Button>
-            </div>
+            <div className="flex items-center gap-2" />
           </div>
         </div>
       </header>
 
-      {/* Clean, professional hero (no busy image) */}
+      {/* Clean, professional hero with patient mode options */}
       <section className="bg-gradient-to-r from-white to-blue-50 border-b">
         <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl">
+          <div className="max-w-3xl">
             <h2 className="text-4xl font-bold tracking-tight text-slate-900">
               Trusted care, simple intake
             </h2>
             <p className="mt-3 text-slate-700 text-lg">
               Secure patient onboarding with AI assistance. Available in English and French.
             </p>
-            <div className="mt-8 flex gap-3">
-              <Button
-                onClick={handleDoctorLogin}
-                className="bg-blue-600 hover:bg-blue-700"
-                aria-label="Doctor login CTA"
-              >
-                Doctor Login
-              </Button>
-              <a
-                href="#patient-form"
-                className="inline-flex items-center text-blue-700 hover:text-blue-800 underline underline-offset-2"
-                aria-label="Jump to patient form"
-              >
-                Fill patient form
-              </a>
+            
+            {/* Patient Entry Modes */}
+            <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 transition-all hover:shadow-lg">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">
+                      Just use InstantHPI
+                    </h3>
+                    <p className="text-sm text-slate-600 mb-4">
+                      Quick, anonymous intake. No account needed. Fill the form and print your medical summary.
+                    </p>
+                    <a
+                      href="#patient-form"
+                      className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors w-full text-center font-medium"
+                    >
+                      Start Now →
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-slate-400 transition-all hover:shadow-lg">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">
+                      Sign in to save & access later
+                    </h3>
+                    <p className="text-sm text-slate-600 mb-4">
+                      Create an account to save your intake, track history, and access your documents anytime.
+                    </p>
+                    <button
+                      onClick={() => alert('Patient account feature coming soon! For now, use "Just use InstantHPI" mode.')}
+                      className="inline-flex items-center justify-center px-4 py-2 bg-slate-100 text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-200 transition-colors w-full text-center font-medium"
+                    >
+                      Coming Soon
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

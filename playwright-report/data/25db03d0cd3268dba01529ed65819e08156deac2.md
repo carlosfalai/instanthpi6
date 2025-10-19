@@ -1,0 +1,268 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e7]:
+        - img [ref=e9]
+        - generic [ref=e13]:
+          - heading "InstantHPI" [level=1] [ref=e14]
+          - paragraph [ref=e15]: Medical Platform
+      - navigation [ref=e16]:
+        - generic [ref=e17]:
+          - heading "Main" [level=3] [ref=e18]
+          - generic [ref=e19]:
+            - link "Home" [ref=e20] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e21] [cursor=pointer]:
+                - img [ref=e22] [cursor=pointer]
+                - generic [ref=e25] [cursor=pointer]: Home
+            - link "Inbox 7" [ref=e26] [cursor=pointer]:
+              - /url: /inbox
+              - generic [ref=e27] [cursor=pointer]:
+                - img [ref=e28] [cursor=pointer]
+                - generic [ref=e30] [cursor=pointer]: Inbox
+                - generic [ref=e31] [cursor=pointer]: "7"
+            - link "Priority AI 4" [ref=e32] [cursor=pointer]:
+              - /url: /priority-tasks
+              - generic [ref=e33] [cursor=pointer]:
+                - img [ref=e34] [cursor=pointer]
+                - generic [ref=e46] [cursor=pointer]: Priority AI
+                - generic [ref=e47] [cursor=pointer]: "4"
+        - generic [ref=e48]:
+          - heading "Patients" [level=3] [ref=e49]
+          - generic [ref=e50]:
+            - link "Patients 12" [ref=e51] [cursor=pointer]:
+              - /url: /patients
+              - generic [ref=e52] [cursor=pointer]:
+                - img [ref=e53] [cursor=pointer]
+                - generic [ref=e58] [cursor=pointer]: Patients
+                - generic [ref=e59] [cursor=pointer]: "12"
+            - link "Chronic Conditions" [ref=e60] [cursor=pointer]:
+              - /url: /chronic-conditions
+              - generic [ref=e61] [cursor=pointer]:
+                - img [ref=e62] [cursor=pointer]
+                - generic [ref=e64] [cursor=pointer]: Chronic Conditions
+            - link "Medication Refills" [ref=e65] [cursor=pointer]:
+              - /url: /medication-refills
+              - generic [ref=e66] [cursor=pointer]:
+                - img [ref=e67] [cursor=pointer]
+                - generic [ref=e70] [cursor=pointer]: Medication Refills
+            - link "Urgent Care" [ref=e71] [cursor=pointer]:
+              - /url: /urgent-care
+              - generic [ref=e72] [cursor=pointer]:
+                - img [ref=e73] [cursor=pointer]
+                - generic [ref=e75] [cursor=pointer]: Urgent Care
+        - generic [ref=e76]:
+          - heading "Documents" [level=3] [ref=e77]
+          - generic [ref=e78]:
+            - link "Documents" [ref=e79] [cursor=pointer]:
+              - /url: /documents
+              - generic [ref=e80] [cursor=pointer]:
+                - img [ref=e81] [cursor=pointer]
+                - generic [ref=e84] [cursor=pointer]: Documents
+            - link "Insurance Paperwork" [ref=e85] [cursor=pointer]:
+              - /url: /insurance-paperwork
+              - generic [ref=e86] [cursor=pointer]:
+                - img [ref=e87] [cursor=pointer]
+                - generic [ref=e91] [cursor=pointer]: Insurance Paperwork
+        - generic [ref=e92]:
+          - heading "Tools & AI" [level=3] [ref=e93]
+          - generic [ref=e94]:
+            - link "Knowledge Base" [ref=e95] [cursor=pointer]:
+              - /url: /knowledge-base
+              - generic [ref=e96] [cursor=pointer]:
+                - img [ref=e97] [cursor=pointer]
+                - generic [ref=e100] [cursor=pointer]: Knowledge Base
+            - link "AI Billing" [ref=e101] [cursor=pointer]:
+              - /url: /ai-billing
+              - generic [ref=e102] [cursor=pointer]:
+                - img [ref=e103] [cursor=pointer]
+                - generic [ref=e105] [cursor=pointer]: AI Billing
+            - link "Claude AI" [ref=e106] [cursor=pointer]:
+              - /url: /claude-ai
+              - generic [ref=e107] [cursor=pointer]:
+                - img [ref=e108] [cursor=pointer]
+                - generic [ref=e118] [cursor=pointer]: Claude AI
+        - generic [ref=e119]:
+          - heading "Tier 3.5 (The Association)" [level=3] [ref=e120]
+          - link "Association" [ref=e122] [cursor=pointer]:
+            - /url: /tier-association
+            - generic [ref=e123] [cursor=pointer]:
+              - img [ref=e124] [cursor=pointer]
+              - generic [ref=e136] [cursor=pointer]: Association
+        - generic [ref=e137]:
+          - heading "Leadership" [level=3] [ref=e138]
+          - link "Leadership" [ref=e140] [cursor=pointer]:
+            - /url: /leadership-association
+            - generic [ref=e141] [cursor=pointer]:
+              - img [ref=e142] [cursor=pointer]
+              - generic [ref=e154] [cursor=pointer]: Leadership
+        - generic [ref=e155]:
+          - heading "Settings" [level=3] [ref=e156]
+          - generic [ref=e157]:
+            - link "Settings" [ref=e158] [cursor=pointer]:
+              - /url: /settings
+              - generic [ref=e159] [cursor=pointer]:
+                - img [ref=e160] [cursor=pointer]
+                - generic [ref=e163] [cursor=pointer]: Settings
+            - link "Organization Profile" [ref=e164] [cursor=pointer]:
+              - /url: /organization-profile
+              - generic [ref=e165] [cursor=pointer]:
+                - img [ref=e166] [cursor=pointer]
+                - generic [ref=e169] [cursor=pointer]: Organization Profile
+            - link "Teammates" [ref=e170] [cursor=pointer]:
+              - /url: /teammates
+              - generic [ref=e171] [cursor=pointer]:
+                - img [ref=e172] [cursor=pointer]
+                - generic [ref=e177] [cursor=pointer]: Teammates
+  - main [ref=e178]:
+    - generic [ref=e179]:
+      - generic [ref=e180]:
+        - heading "Tier 3.5 (The Association)" [level=1] [ref=e181]
+        - paragraph [ref=e182]: A collaborative community platform for healthcare professionals to share resources, templates, and best practices.
+      - generic [ref=e183]:
+        - generic [ref=e184]:
+          - tablist [ref=e185]:
+            - tab "Forum" [selected] [ref=e186] [cursor=pointer]:
+              - img [ref=e187] [cursor=pointer]
+              - text: Forum
+            - tab "Doctor Messages" [ref=e192] [cursor=pointer]:
+              - img [ref=e193] [cursor=pointer]
+              - text: Doctor Messages
+            - tab "My Resources" [ref=e195] [cursor=pointer]:
+              - img [ref=e196] [cursor=pointer]
+              - text: My Resources
+            - tab "Settings" [ref=e199] [cursor=pointer]:
+              - img [ref=e200] [cursor=pointer]
+              - text: Settings
+          - button "New Resource" [ref=e203] [cursor=pointer]:
+            - img
+            - text: New Resource
+        - tabpanel "Forum" [ref=e204]:
+          - generic [ref=e205]:
+            - generic [ref=e206]:
+              - generic [ref=e207]:
+                - img [ref=e208]
+                - textbox "Search resources..." [ref=e211]
+              - generic [ref=e212]:
+                - combobox [ref=e213] [cursor=pointer]:
+                  - generic: All Categories
+                  - img [ref=e214] [cursor=pointer]
+                - combobox [ref=e216] [cursor=pointer]:
+                  - generic:
+                    - generic: All Settings
+                  - img [ref=e217] [cursor=pointer]
+            - generic [ref=e219]:
+              - generic [ref=e220]:
+                - generic [ref=e222]:
+                  - generic [ref=e223]:
+                    - generic [ref=e224]:
+                      - generic [ref=e226]: DSC
+                      - generic [ref=e227]: Dr. Sarah Chen
+                      - generic [ref=e228]: • 2 days ago
+                    - generic [ref=e229]: Comprehensive SOAP template for routine follow-ups
+                  - generic [ref=e230]:
+                    - generic [ref=e231]: Templates
+                    - generic [ref=e232]: Outpatient
+                - generic [ref=e233]:
+                  - generic [ref=e234]: "Here's a template I've been using for routine follow-ups that has saved me significant time: **Subjective:** Patient reports [symptoms]. Medication compliance: [Good/Poor]. Side effects: [None/Specify]. **Objective:** Vital signs: BP [x/y], HR [z], RR [w], Temp [t], O2 Sat [s]% Physical exam: - General: [findings] - Cardiac: [findings] ..."
+                  - button "Show more" [ref=e235] [cursor=pointer]
+                - generic [ref=e236]:
+                  - generic [ref=e237]:
+                    - generic [ref=e238]:
+                      - button [ref=e239] [cursor=pointer]:
+                        - img
+                      - generic [ref=e240]: "24"
+                      - button [ref=e241] [cursor=pointer]:
+                        - img
+                    - button "5" [ref=e243] [cursor=pointer]:
+                      - img
+                      - generic [ref=e244] [cursor=pointer]: "5"
+                  - button "Copy" [ref=e246] [cursor=pointer]:
+                    - img
+                    - generic [ref=e247] [cursor=pointer]: Copy
+              - generic [ref=e248]:
+                - generic [ref=e250]:
+                  - generic [ref=e251]:
+                    - generic [ref=e252]:
+                      - generic [ref=e254]: DMR
+                      - generic [ref=e255]: Dr. Michael Rodriguez
+                      - generic [ref=e256]: • 1 week ago
+                    - generic [ref=e257]: FormSite questionnaire for new chronic pain patients
+                  - generic [ref=e258]:
+                    - generic [ref=e259]: FormSite
+                    - generic [ref=e260]: Outpatient
+                - generic [ref=e261]:
+                  - generic [ref=e262]: This FormSite questionnaire helps me gather comprehensive information before the first visit with chronic pain patients. It includes pain scales, medication history, functional impact assessment, and psychological screening questions. This has improved my first visits significantly. I've attached the template that you can copy directly to your FormSite account.
+                  - button "Show more" [ref=e263] [cursor=pointer]
+                - generic [ref=e264]:
+                  - generic [ref=e265]:
+                    - generic [ref=e266]:
+                      - button [ref=e267] [cursor=pointer]:
+                        - img
+                      - generic [ref=e268]: "18"
+                      - button [ref=e269] [cursor=pointer]:
+                        - img
+                    - button "7" [ref=e271] [cursor=pointer]:
+                      - img
+                      - generic [ref=e272] [cursor=pointer]: "7"
+                  - button "Copy" [ref=e274] [cursor=pointer]:
+                    - img
+                    - generic [ref=e275] [cursor=pointer]: Copy
+              - generic [ref=e276]:
+                - generic [ref=e278]:
+                  - generic [ref=e279]:
+                    - generic [ref=e280]:
+                      - generic [ref=e282]: DJW
+                      - generic [ref=e283]: Dr. James Wilson
+                      - generic [ref=e284]: • 3 days ago
+                    - generic [ref=e285]: AI prompt for generating discharge instructions
+                  - generic [ref=e286]:
+                    - generic [ref=e287]: AI Prompts
+                    - generic [ref=e288]: Emergency Department
+                - generic [ref=e289]:
+                  - generic [ref=e290]: "I've been using this AI prompt with Claude to generate detailed discharge instructions for common conditions. Just fill in the specifics for your patient: \"Generate discharge instructions for a [age] [gender] diagnosed with [condition]. Include medication dosing for [medication], activity restrictions, follow-up timing, and warning signs that require immediate attention. The patient has [comorbidities] and their health literacy is [basic/moderate/advanced].\""
+                  - button "Show more" [ref=e291] [cursor=pointer]
+                - generic [ref=e292]:
+                  - generic [ref=e293]:
+                    - generic [ref=e294]:
+                      - button [ref=e295] [cursor=pointer]:
+                        - img
+                      - generic [ref=e296]: "32"
+                      - button [ref=e297] [cursor=pointer]:
+                        - img
+                    - button "12" [ref=e299] [cursor=pointer]:
+                      - img
+                      - generic [ref=e300] [cursor=pointer]: "12"
+                  - button "Copy" [ref=e302] [cursor=pointer]:
+                    - img
+                    - generic [ref=e303] [cursor=pointer]: Copy
+              - generic [ref=e304]:
+                - generic [ref=e306]:
+                  - generic [ref=e307]:
+                    - generic [ref=e308]:
+                      - generic [ref=e310]: DPJ
+                      - generic [ref=e311]: Dr. Patricia Johnson
+                      - generic [ref=e312]: • 2 weeks ago
+                    - generic [ref=e313]: Nursing home initial assessment template
+                  - generic [ref=e314]:
+                    - generic [ref=e315]: Templates
+                    - generic [ref=e316]: Skilled Nursing
+                - generic [ref=e318]: This comprehensive template helps standardize initial assessments for new SNF patients. It includes sections for cognitive assessment, fall risk, skin integrity, nutritional status, and advance directives. Our facility has seen improved documentation quality since implementing this.
+                - generic [ref=e319]:
+                  - generic [ref=e320]:
+                    - generic [ref=e321]:
+                      - button [ref=e322] [cursor=pointer]:
+                        - img
+                      - generic [ref=e323]: "15"
+                      - button [ref=e324] [cursor=pointer]:
+                        - img
+                    - button "3" [ref=e326] [cursor=pointer]:
+                      - img
+                      - generic [ref=e327] [cursor=pointer]: "3"
+                  - button "Copy" [ref=e329] [cursor=pointer]:
+                    - img
+                    - generic [ref=e330] [cursor=pointer]: Copy
+```

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { supabase } from "@/lib/supabase";
+import { startGoogleLogin } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, ArrowLeft, Stethoscope } from "lucide-react";
@@ -49,19 +50,13 @@ export default function PatientLogin() {
       setLoading(true);
       setMessage("");
 
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/patient-dashboard`
-        }
-      });
-
+      const { error } = await startGoogleLogin("/patient-dashboard");
       if (error) {
-        setMessage(`Erreur de connexion: ${error.message}`);
+        setMessage(`Erreur de connexion: ${error}`);
+        setLoading(false);
       }
     } catch (error) {
       setMessage("Erreur de connexion. Veuillez réessayer.");
-    } finally {
       setLoading(false);
     }
   };
