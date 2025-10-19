@@ -1027,6 +1027,11 @@ export default function DoctorDashboardNew() {
     };
 
     // Filter Spruce conversations based on search
+    console.log('[DASHBOARD] About to filter spruceCases:', { 
+      spruceCases, 
+      isArray: Array.isArray(spruceCases), 
+      spruceSearchQuery 
+    });
     const filteredSpruceCases = (spruceCases && Array.isArray(spruceCases)) 
       ? (spruceSearchQuery
           ? spruceCases.filter((conv) =>
@@ -1034,6 +1039,11 @@ export default function DoctorDashboardNew() {
             )
           : spruceCases)
       : [];
+    console.log('[DASHBOARD] After filteredSpruceCases calculation:', { 
+      filteredSpruceCases, 
+      isArray: Array.isArray(filteredSpruceCases),
+      length: filteredSpruceCases?.length 
+    });
 
     // Show initial loading skeleton
     const isInitializing = loading && searchResults.length === 0 && searchQuery === "";
@@ -1494,7 +1504,7 @@ export default function DoctorDashboardNew() {
                             <Activity className="w-12 h-12 text-[#999] mx-auto mb-4 animate-spin" />
                             <p className="text-[#999]">Loading reports...</p>
                           </div>
-                        ) : (!reports || !Array.isArray(reports) || reports.length === 0) ? (
+                        ) : reports.length === 0 ? (
                           <div className="text-center py-8">
                             <FileText className="w-12 h-12 text-[#999] mx-auto mb-4" />
                             <p className="text-[#999]">No reports found</p>
@@ -1502,7 +1512,7 @@ export default function DoctorDashboardNew() {
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {(reports || []).map((report) => (
+                            {reports.map((report) => (
                               <div
                                 key={report.filename}
                                 className="p-3 bg-[#2a2a2a] rounded-lg hover:bg-[#333] transition-colors"
