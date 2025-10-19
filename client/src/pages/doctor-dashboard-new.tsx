@@ -1027,11 +1027,6 @@ export default function DoctorDashboardNew() {
     };
 
     // Filter Spruce conversations based on search
-    console.log('[DASHBOARD] About to filter spruceCases:', { 
-      spruceCases, 
-      isArray: Array.isArray(spruceCases), 
-      spruceSearchQuery 
-    });
     const filteredSpruceCases = (spruceCases && Array.isArray(spruceCases)) 
       ? (spruceSearchQuery
           ? spruceCases.filter((conv) =>
@@ -1039,11 +1034,6 @@ export default function DoctorDashboardNew() {
             )
           : spruceCases)
       : [];
-    console.log('[DASHBOARD] After filteredSpruceCases calculation:', { 
-      filteredSpruceCases, 
-      isArray: Array.isArray(filteredSpruceCases),
-      length: filteredSpruceCases?.length 
-    });
 
     // Show initial loading skeleton
     const isInitializing = loading && searchResults.length === 0 && searchQuery === "";
