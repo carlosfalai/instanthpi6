@@ -2135,3 +2135,76 @@ The fact that it shows `"<!doctype"` in the error suggests some components are f
 
 **Recommend:** Start SESSION 14 with Option A or B above - either simplify the dashboard component or investigate bundle contents to identify the "sg.slice" variable collision.
 
+
+---
+
+## 🧭 SESSION 14: IMPLEMENTING PHASE 1 - DEBUGGING & RESOLUTION
+**Date:** October 19, 2025  
+**Status:** 🔧 IN PROGRESS - Testing diagnostic components  
+**Goal:** Fix production white screen by isolating the rendering issue
+
+### ACTIONS TAKEN
+
+**1. Created Simple Dashboard Component** ✓
+- File: `client/src/pages/doctor-dashboard-simple.tsx` (120 lines)
+- Minimal version: Just sidebar + loading spinner
+- No complex state management, no API calls
+- Designed to test if basic rendering works
+
+**2. Added Test Route** ✓
+- Route: `/doctor-dashboard-simple` (no ProtectedRoute wrapping)
+- Can be accessed directly to test rendering
+- Import added to App.tsx
+
+**3. Build Verification** ✓
+- Build successful: 2656 modules, 2.40s
+- No errors or warnings
+- Production bundle ready
+
+**4. Deployment** ✓
+- Commit: `2a807f1` - Phase 1: Add simple dashboard component
+- Pushed to GitHub
+- Netlify auto-deployment triggered
+
+### TESTING STRATEGY
+
+**Step 1: Test Simple Dashboard Route**
+- Go to: https://instanthpi.ca/doctor-dashboard-simple
+- Expected: See sidebar + spinner (no authentication required)
+- This confirms basic rendering path works
+
+**Step 2: If Simple Works**
+- Incrementally add back complex features from doctor-dashboard-new.tsx
+- Find which component/import causes the "sg.slice" error
+- Isolate the problematic code
+
+**Step 3: If Simple Fails**
+- The issue is in App.tsx, ProtectedRoute, or core dependencies
+- Check RootErrorBoundary error UI
+- Review console logs for specific errors
+
+### DEPLOYMENT STATUS
+
+**Production URLs to Test:**
+- Simple dashboard: https://instanthpi.ca/doctor-dashboard-simple
+- Regular dashboard: https://instanthpi.ca/doctor-dashboard
+
+**Expected in 2-3 minutes:**
+- Netlify build completes
+- New bundle deployed
+- Test routes available
+
+### NEXT IMMEDIATE ACTIONS
+
+1. Wait ~3 minutes for Netlify deployment
+2. Test: https://instanthpi.ca/doctor-dashboard-simple in browser
+3. Open browser DevTools console to see logs
+4. Check if simple dashboard renders OR shows error
+5. Based on result, decide next debugging step
+
+### COMMITS PROGRESS
+
+- Session 13: 1 commit (diagnostics)
+- Session 14: 1 commit (simple component)
+- **Ready to test in ~2-3 minutes**
+
