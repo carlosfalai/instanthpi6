@@ -31,9 +31,6 @@ export default function App() {
         if (location === "/patient-login") {
           setLocation("/patient-dashboard");
         }
-      } else if (event === "SIGNED_OUT") {
-        // Redirect to landing page on logout
-        setLocation("/");
       }
     });
 
