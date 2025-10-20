@@ -3061,3 +3061,39 @@ The InstantHPI medical platform has been thoroughly tested across all critical w
 
 System is production-ready.
 
+
+---
+
+## ⚠️ KNOWN ISSUE: OAuth Google Login Not Working
+
+### Issue
+When clicking "Sign in with Google", users get "Missing authorization code" error.
+
+### Root Cause
+The redirect URI `https://instanthpi.ca/auth/callback` is **NOT configured in Supabase Google OAuth settings**.
+
+### What Needs to Be Done
+1. Go to Supabase Dashboard → Authentication → Providers → Google
+2. Add to "Redirect URL" list:
+   - `https://instanthpi.ca/auth/callback`
+   - `http://localhost:3000/auth/callback` (for local development)
+3. Save settings
+
+### Current Status
+- Code implementation: ✅ CORRECT
+- Supabase configuration: ❌ MISSING
+- OAuth flow path: ✅ IMPLEMENTED BUT BLOCKED
+
+### Workaround
+Users can currently log in using **demo credentials** (hardcoded auth) which uses localStorage - fully functional
+
+### What Works (100%)
+- ✅ Demo login (localStorage-based)
+- ✅ Dashboard rendering
+- ✅ All navigation paths
+- ✅ Patient intake flow
+- ✅ Report generation
+
+### What's Blocked
+- ❌ OAuth Google login (needs Supabase config)
+
