@@ -97,7 +97,7 @@ export default function DoctorLogin() {
           navigate("/doctor-dashboard?auth=demo");
         }, 500);
       } else {
-        setMessage("Invalid credentials. Use doctor@instanthpi.ca / medical123");
+        setMessage("Invalid credentials. Please try again.");
       }
     } catch (error: any) {
       console.error('[DoctorLogin] Login error:', error);
@@ -212,9 +212,9 @@ export default function DoctorLogin() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="doctor@instanthpi.ca"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Email address"
                   required
                   className="!bg-white !border-gray-300 !text-gray-900 !placeholder:text-gray-400 focus:!ring-purple-500 focus:!border-purple-500"
                 />
@@ -250,11 +250,6 @@ export default function DoctorLogin() {
                 {loading ? "Signing in..." : "Sign in"}
               </Button>
             </form>
-
-            <div className="text-center text-sm text-gray-600">
-              <p>Demo Credentials:</p>
-              <p className="font-mono text-xs mt-1">doctor@instanthpi.ca / medical123</p>
-            </div>
           </div>
         </CardContent>
       </Card>
