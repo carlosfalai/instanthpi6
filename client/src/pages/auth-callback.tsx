@@ -81,23 +81,53 @@ export default function AuthCallback() {
       if (accessToken) {
         console.log('[AuthCallback] Tokens found in hash fragment, processing...');
         try {
-          // Supabase client automatically parses hash fragments, but we need to wait for it
-          // Give Supabase a moment to process the hash, then check for session
-          await new Promise(resolve => setTimeout(resolve, 100));
+          // Supabase client with detectSessionInUrl: true should automatically process hash fragments
+          // Wait a bit for Supabase to process the hash, then check for session
+          await new Promise(resolve => setTimeout(resolve, 500));
           
           // Check for session - Supabase should have processed the hash by now
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          let { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          
+          // If still no session, try refreshing to trigger hash processing
+          if (!session && !sessionError) {
+            console.log('[AuthCallback] No session yet, triggering auth state change...');
+            // Trigger a refresh by calling getSession again after a short delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            const sessionResult = await supabase.auth.getSession();
+            session = sessionResult.data?.session || null;
+            sessionError = sessionResult.error || null;
+          }
           
           if (sessionError) {
             console.error('[AuthCallback] Failed to get session from hash tokens:', sessionError);
-            setError(`Failed to process authentication: ${sessionError.message}`);
-            setDebugInfo({
-              timestamp: callbackStartTime,
-              step: 'hash_token_error',
-              errorMessage: sessionError.message,
-            });
-            setProcessing(false);
-            return;
+            // If it's a JWT error, the token might be invalid - try manual setSession as fallback
+            if (sessionError.message?.includes('JWT') || sessionError.message?.includes('Invalid')) {
+              console.log('[AuthCallback] JWT error detected, attempting manual setSession...');
+              try {
+                const { data: { session: manualSession }, error: manualError } = await supabase.auth.setSession({
+                  access_token: accessToken,
+                  refresh_token: refreshToken || '',
+                });
+                
+                if (!manualError && manualSession) {
+                  session = manualSession;
+                  sessionError = null;
+                }
+              } catch (manualErr) {
+                // Fall through to error handling
+              }
+            }
+            
+            if (sessionError) {
+              setError(`Failed to process authentication: ${sessionError.message}`);
+              setDebugInfo({
+                timestamp: callbackStartTime,
+                step: 'hash_token_error',
+                errorMessage: sessionError.message,
+              });
+              setProcessing(false);
+              return;
+            }
           }
           
           if (session && session.user) {
@@ -111,25 +141,29 @@ export default function AuthCallback() {
             navigate(next);
             return;
           } else {
-            // If no session yet, try to set it manually from hash params
-            console.log('[AuthCallback] No session found, attempting to set from hash tokens...');
+            // Last resort: try to set session manually
+            console.log('[AuthCallback] No session found, attempting manual setSession...');
             try {
               const { data: { session: newSession }, error: setError } = await supabase.auth.setSession({
                 access_token: accessToken,
                 refresh_token: refreshToken || '',
               });
               
-              if (setError || !newSession) {
-                throw setError || new Error('Failed to set session');
+              if (setError) {
+                throw setError;
               }
               
-              console.log('[AuthCallback] ✓ Session set from hash tokens', {
-                userEmail: newSession.user?.email,
-              });
-              // Clear the hash from URL
-              window.history.replaceState(null, '', window.location.pathname + window.location.search);
-              navigate(next);
-              return;
+              if (newSession && newSession.user) {
+                console.log('[AuthCallback] ✓ Session set from hash tokens', {
+                  userEmail: newSession.user?.email,
+                });
+                // Clear the hash from URL
+                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                navigate(next);
+                return;
+              } else {
+                throw new Error('Session created but no user found');
+              }
             } catch (setErr: any) {
               console.error('[AuthCallback] Failed to set session from hash tokens:', setErr);
               setError(`Failed to create session: ${setErr?.message || 'Unknown error'}`);
@@ -137,6 +171,8 @@ export default function AuthCallback() {
                 timestamp: callbackStartTime,
                 step: 'hash_set_session_error',
                 errorMessage: setErr?.message,
+                accessTokenPresent: !!accessToken,
+                refreshTokenPresent: !!refreshToken,
               });
               setProcessing(false);
               return;
