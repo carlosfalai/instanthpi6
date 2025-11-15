@@ -16,6 +16,7 @@
 /api-doctor-credentials /.netlify/functions/api-doctor-credentials 200
 /api-doctor-credentials/* /.netlify/functions/api-doctor-credentials/:splat 200
 /api/spruce-conversations-all /.netlify/functions/api-spruce-conversations-all 200
+/api/gmail/* /.netlify/functions/api-gmail 200
 # Ollama endpoints removed - using OpenAI/Anthropic APIs only
 
 # Redirect all routes to index.html for client-side routing (must be last)

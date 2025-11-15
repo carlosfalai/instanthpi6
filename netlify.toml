@@ -122,6 +122,11 @@
   to = "/.netlify/functions/triage-enhanced-output"
   status = 200
 
+[[redirects]]
+  from = "/api/gmail/*"
+  to = "/.netlify/functions/api-gmail"
+  status = 200
+
 # Redirect all routes to index.html for client-side routing (must be last)
 [[redirects]]
   from = "/*"

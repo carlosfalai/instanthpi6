@@ -29,6 +29,7 @@ import {
   UserCog,
   ChevronDown,
   BrainCircuit,
+  Mail,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -86,6 +87,12 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
           path: "/inbox",
           icon: MessageSquare,
           notificationCount: notificationCounts.inbox,
+        },
+        {
+          id: "gmailInbox",
+          label: "Gmail Inbox",
+          path: "/gmail-inbox",
+          icon: Mail,
         },
         {
           id: "priorityAI",
