@@ -85,13 +85,14 @@ exports.handler = async (event, context) => {
     let paginationToken = null;
     let hasMore = true;
     let pageCount = 0;
-    const maxPages = 10; // Safety limit to prevent infinite loops
+    const maxPages = 50; // Increased limit to fetch more conversations (old and new)
+    const maxConversations = 10000; // Absolute maximum to prevent excessive memory usage
 
     // Keep fetching pages until we have all conversations
-    while (hasMore && pageCount < maxPages) {
+    while (hasMore && pageCount < maxPages && allConversations.length < maxConversations) {
       const params = {
         orderBy: "lastActivity",
-        limit: 200,
+        limit: 200, // Max per page per Spruce API
       };
 
       // Add pagination token if we have one
@@ -103,30 +104,52 @@ exports.handler = async (event, context) => {
       const basicToken = /^YWlk/.test(spruceApiKey)
         ? spruceApiKey
         : Buffer.from(`${spruceAccessId}:${spruceApiKey}`).toString("base64");
-      const response = await axios.get(`${SPRUCE_API_URL}/conversations`, {
-        headers: {
-          Authorization: `Basic ${basicToken}`,
-          Accept: "application/json",
-        },
-        params,
-      });
+      
+      try {
+        const response = await axios.get(`${SPRUCE_API_URL}/conversations`, {
+          headers: {
+            Authorization: `Basic ${basicToken}`,
+            Accept: "application/json",
+          },
+          params,
+        });
 
-      const conversations = response.data.conversations || [];
-      allConversations = allConversations.concat(conversations);
+        const conversations = response.data.conversations || [];
+        
+        // Avoid duplicates by checking conversation IDs
+        const existingIds = new Set(allConversations.map(c => c.id));
+        const newConversations = conversations.filter(c => !existingIds.has(c.id));
+        
+        allConversations = allConversations.concat(newConversations);
 
-      // Check if there are more pages
-      hasMore = response.data.hasMore || false;
-      paginationToken = response.data.paginationToken;
-      pageCount++;
+        // Check if there are more pages
+        hasMore = response.data.hasMore || false;
+        paginationToken = response.data.paginationToken || response.data.nextPageToken;
+        pageCount++;
 
-      console.log(
-        `Page ${pageCount}: fetched ${conversations.length} conversations. Total so far: ${allConversations.length}`
-      );
+        console.log(
+          `Page ${pageCount}: fetched ${conversations.length} conversations (${newConversations.length} new). Total: ${allConversations.length}`
+        );
 
-      // Break if no pagination token even though hasMore is true
-      if (hasMore && !paginationToken) {
-        console.log("Has more conversations but no pagination token provided");
-        break;
+        // Break if no pagination token even though hasMore is true
+        if (hasMore && !paginationToken) {
+          console.log("⚠️ Has more conversations but no pagination token provided - stopping pagination");
+          break;
+        }
+
+        // Break if we got fewer conversations than requested (likely last page)
+        if (conversations.length < 200) {
+          console.log(`Reached last page (got ${conversations.length} conversations)`);
+          break;
+        }
+      } catch (pageError) {
+        console.error(`Error fetching page ${pageCount + 1}:`, pageError.response?.data || pageError.message);
+        // Continue with what we have if we've already fetched some conversations
+        if (allConversations.length > 0) {
+          console.log(`Continuing with ${allConversations.length} conversations already fetched`);
+          break;
+        }
+        throw pageError;
       }
     }
 
@@ -140,18 +163,23 @@ exports.handler = async (event, context) => {
       let patientName = "Unknown Patient";
 
       if (conv.externalParticipants && conv.externalParticipants.length > 0) {
-        patientName = conv.externalParticipants[0].displayName || "Unknown Patient";
-      } else if (conv.title) {
+        const participant = conv.externalParticipants[0];
+        patientName = participant.displayName || participant.name || participant.contact || "Unknown Patient";
+      } else if (conv.title && conv.title !== "Centre Médical Font") {
         patientName = conv.title;
+      } else if (conv.participants && conv.participants.length > 0) {
+        patientName = conv.participants[0].displayName || conv.participants[0].name || "Unknown Patient";
       }
 
-      // Get last message info
+      // Get last message info - check multiple possible fields
       let lastMessage = "Click to view conversation";
-      let lastMessageTime = conv.lastActivity || conv.createdAt || new Date().toISOString();
+      let lastMessageTime = conv.lastActivity || conv.lastMessageAt || conv.updatedAt || conv.createdAt || new Date().toISOString();
 
       if (conv.lastMessage) {
-        lastMessage = conv.lastMessage.content || conv.lastMessage.text || lastMessage;
-        lastMessageTime = conv.lastMessage.timestamp || lastMessageTime;
+        lastMessage = conv.lastMessage.content || conv.lastMessage.text || conv.lastMessage.body || lastMessage;
+        lastMessageTime = conv.lastMessage.timestamp || conv.lastMessage.createdAt || lastMessageTime;
+      } else if (conv.subtitle) {
+        lastMessage = conv.subtitle;
       }
 
       // Align field names with frontend expectations (doctor-dashboard-new.tsx):
@@ -161,8 +189,19 @@ exports.handler = async (event, context) => {
         patient_name: patientName,
         last_message: lastMessage,
         updated_at: lastMessageTime,
-        unread_count: conv.unreadCount || 0,
+        unread_count: conv.unreadCount || conv.unread_count || 0,
+        // Include additional fields that might be useful
+        title: conv.title,
+        createdAt: conv.createdAt,
+        lastActivity: conv.lastActivity,
       };
+    });
+
+    // Sort by last activity (most recent first)
+    transformedConversations.sort((a, b) => {
+      const timeA = new Date(a.updated_at).getTime();
+      const timeB = new Date(b.updated_at).getTime();
+      return timeB - timeA;
     });
 
     return {
