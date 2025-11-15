@@ -288,7 +288,7 @@ export default function GmailInboxPage() {
                     <div
                       className="text-gray-900 dark:text-white whitespace-pre-wrap"
                       dangerouslySetInnerHTML={{
-                        __html: selectedEmail.body || selectedEmail.snippet,
+                        __html: selectedEmail.body || selectedEmail.snippet || "No content",
                       }}
                     />
                   </div>
