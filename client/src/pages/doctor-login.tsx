@@ -1,32 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
 import { startGoogleLogin } from "@/lib/auth";
-import { setDemoAuth, hasLocalAuth, logAuthDecision } from "@/lib/auth-utils";
 
 export default function DoctorLogin() {
   const [, navigate] = useLocation();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    const checkSession = async () => {
-      // Check localStorage FIRST (demo login has priority)
-      const isLocalAuth = localStorage.getItem("doctor_authenticated") === "true";
-      if (isLocalAuth) {
-        // Already logged in via demo - show banner, do not auto-redirect
-        setMessage("You are already signed in. Continue to dashboard or sign out.");
-        return;
-      }
+  // Check if running locally (development mode)
+  const isLocalDev = window.location.hostname === 'localhost' || 
+                     window.location.hostname === '127.0.0.1' ||
+                     import.meta.env.DEV;
 
-      // Only check Supabase for VALID OAuth sessions
+  useEffect(() => {
+    // For local development, bypass login and go straight to dashboard
+    if (isLocalDev) {
+      console.log('🔧 Local development mode detected - bypassing authentication');
+      // Set local auth flag for ProtectedRoute
+      localStorage.setItem('doctor_authenticated', 'true');
+      localStorage.setItem('doctor_info', JSON.stringify({
+        name: 'Carlos Faviel Font',
+        email: 'cff@centremedicalfont.ca',
+        specialty: 'Médecine Générale'
+      }));
+      // Redirect to dashboard
+      setTimeout(() => {
+        navigate('/doctor-dashboard');
+      }, 100);
+      return;
+    }
+
+    // Production: Check Supabase session and auto-redirect if valid
+    const checkSession = async () => {
       try {
         const {
           data: { session },
@@ -38,28 +46,37 @@ export default function DoctorLogin() {
           return;
         }
 
-        // Only show banner if we have a valid Supabase session
-        // AND it hasn't been more than 1 hour (session is fresh)
         if (session && session.user) {
-          const sessionAge = Date.now() - (session.created_at ? new Date(session.created_at).getTime() : 0);
-          const oneHour = 60 * 60 * 1000;
+          console.log('[DoctorLogin] Valid session found, redirecting to dashboard', {
+            email: session.user.email,
+            expiresAt: session.expires_at
+          });
           
-          if (sessionAge < oneHour) {
-            // Fresh OAuth session - show banner, do not auto-redirect
-            setMessage("You are already signed in. Continue to dashboard or sign out.");
+          // Check if session is still valid (not expired)
+          const now = Math.floor(Date.now() / 1000);
+          if (session.expires_at && session.expires_at > now) {
+            // Valid session - redirect immediately
+            navigate('/doctor-dashboard');
+            return;
           } else {
-            // Stale session - allow user to login again
-            console.log("Stale Supabase session detected, showing login form");
+            // Session expired - try to refresh it
+            console.log('[DoctorLogin] Session expired, attempting refresh...');
+            const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+            
+            if (!refreshError && refreshedSession?.user) {
+              console.log('[DoctorLogin] Session refreshed, redirecting...');
+              navigate('/doctor-dashboard');
+              return;
+            }
           }
         }
       } catch (error) {
         console.error("Session check failed:", error);
-        // Show login form if check fails
       }
     };
 
     checkSession();
-  }, [navigate]);
+  }, [navigate, isLocalDev]);
 
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
@@ -68,42 +85,6 @@ export default function DoctorLogin() {
     if (error) {
       setMessage(error);
       setGoogleLoading(false);
-    }
-  };
-
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
-
-    try {
-      // For demo purposes, using a simple check
-      // In production, this would be a proper authentication
-      if (email === "doctor@instanthpi.ca" && password === "medical123") {
-        logAuthDecision('local', { email });
-        
-        // Use consolidated auth utility
-        const authSuccess = setDemoAuth(email, "Doctor", "General Medicine");
-        
-        if (!authSuccess) {
-          setMessage("Failed to set authentication. Please try again.");
-          setLoading(false);
-          return;
-        }
-        
-        console.log('[DoctorLogin] Navigating to /doctor-dashboard in 500ms');
-        // Delay to ensure both storage systems are propagated
-        setTimeout(() => {
-          navigate("/doctor-dashboard?auth=demo");
-        }, 500);
-      } else {
-        setMessage("Invalid credentials. Please try again.");
-      }
-    } catch (error: any) {
-      console.error('[DoctorLogin] Login error:', error);
-      setMessage("Login failed. Please try again.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -125,6 +106,22 @@ export default function DoctorLogin() {
     const randomIndex = Math.floor(Math.random() * backgroundImages.length);
     setCurrentBg(backgroundImages[randomIndex]);
   }, []);
+
+  // In local dev, show a loading message while redirecting
+  if (isLocalDev) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${currentBg}`}>
+        <Card className="w-full max-w-md bg-white shadow-xl border-0">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-4">
+              <div className="w-10 h-10 rounded-full border-2 border-purple-600 border-t-transparent animate-spin mx-auto" />
+              <p className="text-gray-600">Local development mode - Redirecting to dashboard...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen flex items-center justify-center ${currentBg}`}>
@@ -154,8 +151,6 @@ export default function DoctorLogin() {
                     className="border-gray-300"
                     onClick={async () => {
                       try {
-                        localStorage.removeItem("doctor_authenticated");
-                        localStorage.removeItem("doctor_info");
                         await supabase.auth.signOut();
                         setMessage("");
                       } catch (e) {
@@ -197,59 +192,15 @@ export default function DoctorLogin() {
               {googleLoading ? "Redirecting to Google..." : "Sign in with Google"}
             </Button>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-300" />
+            {message && !message.toLowerCase().includes("already signed") && (
+              <div className={`p-3 rounded-md text-sm ${
+                message.includes("error") || message.includes("failed")
+                  ? "bg-red-50 text-red-800 border border-red-200" 
+                  : "bg-blue-50 text-blue-800 border border-blue-200"
+              }`}>
+                {message}
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">Or continue with</span>
-              </div>
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-900">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email address"
-                  required
-                  className="!bg-white !border-gray-300 !text-gray-900 !placeholder:text-gray-400 focus:!ring-purple-500 focus:!border-purple-500"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-900">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="!bg-white !border-gray-300 !text-gray-900 !placeholder:text-gray-400 focus:!ring-purple-500 focus:!border-purple-500"
-                />
-              </div>
-
-              {message && (
-                <div className={`p-3 rounded-md text-sm ${
-                  message.includes("Invalid") 
-                    ? "bg-red-50 text-red-800 border border-red-200" 
-                    : "bg-green-50 text-green-800 border border-green-200"
-                }`}>
-                  {message}
-                </div>
-              )}
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-6"
-              >
-                {loading ? "Signing in..." : "Sign in"}
-              </Button>
-            </form>
+            )}
           </div>
         </CardContent>
       </Card>
