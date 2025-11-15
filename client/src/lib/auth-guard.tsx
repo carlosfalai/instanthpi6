@@ -99,25 +99,38 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         
         const hasSession = Boolean(session?.user);
         
-        // Check if session is valid (not expired) - Supabase handles refresh automatically
+        // Check if session is valid (not expired) - must have valid expires_at
         let isValid = false;
         if (hasSession && session.expires_at) {
           const now = Math.floor(Date.now() / 1000);
-          isValid = session.expires_at > now;
+          const expiresAt = session.expires_at;
           
-          // If expired but close, try to refresh
-          if (!isValid && session.expires_at > now - 300) { // Within 5 minutes of expiry
+          // Session is valid if expires_at is in the future
+          isValid = expiresAt > now;
+          
+          // If expired but within refresh window (5 minutes), try to refresh
+          if (!isValid && expiresAt > now - 300) {
             console.log('[ProtectedRoute] Session expired, attempting refresh...');
-            const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
-            if (!refreshError && refreshedSession?.user) {
-              console.log('[ProtectedRoute] Session refreshed successfully');
-              isValid = true;
+            try {
+              const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+              if (!refreshError && refreshedSession?.user && refreshedSession.expires_at) {
+                const newExpiresAt = refreshedSession.expires_at;
+                if (newExpiresAt > now) {
+                  console.log('[ProtectedRoute] Session refreshed successfully');
+                  isValid = true;
+                } else {
+                  console.log('[ProtectedRoute] Refreshed session also expired');
+                }
+              } else {
+                console.log('[ProtectedRoute] Session refresh failed:', refreshError?.message);
+              }
+            } catch (refreshErr) {
+              console.error('[ProtectedRoute] Session refresh error:', refreshErr);
             }
           }
-        } else if (hasSession) {
-          // Session exists but no expires_at - assume valid (Supabase will handle refresh)
-          isValid = true;
         }
+        // If session exists but no expires_at, reject it (security: require explicit expiration)
+        // This prevents accepting invalid or malformed sessions
         
         const isFresh = hasSession ? isSupabaseSessionFresh(session, 60) : false;
         
