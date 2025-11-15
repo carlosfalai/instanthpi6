@@ -92,7 +92,7 @@ export default function GmailInboxPage() {
                 Gmail Not Connected
               </h2>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Connect your Gmail account to view emails from the "Instanthpi" folder.
+                Connect your Gmail account to view emails from the "Karma Clinic" folder.
               </p>
               <Button
                 onClick={async () => {
@@ -138,7 +138,7 @@ export default function GmailInboxPage() {
               </Button>
             </div>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Folder: Instanthpi • {emails.length} emails
+              Folder: Karma Clinic • {emails.length} emails
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
               {gmailStatus?.email || "cff@centremedicalfont.ca"}
@@ -163,7 +163,7 @@ export default function GmailInboxPage() {
             ) : emails.length === 0 ? (
               <div className="p-4 text-center">
                 <Mail className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground">No emails in Instanthpi folder</p>
+                <p className="text-sm text-muted-foreground">No emails in Karma Clinic folder</p>
               </div>
             ) : (
               <div className="p-2">

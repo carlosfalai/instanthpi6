@@ -190,24 +190,24 @@ exports.handler = async (event, context) => {
       oauth2Client.setCredentials({ access_token: accessToken });
       const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
-      // First, get the "instanthpi" label ID
+      // First, get the "karma clinic" label ID (case-insensitive)
       const labelsResponse = await gmail.users.labels.list({
         userId: "me",
       });
 
-      const instanthpiLabel = labelsResponse.data.labels?.find(
-        (label) => label.name?.toLowerCase() === "instanthpi"
+      const karmaClinicLabel = labelsResponse.data.labels?.find(
+        (label) => label.name?.toLowerCase() === "karma clinic" || label.name?.toLowerCase() === "karmaclinic"
       );
 
-      if (!instanthpiLabel || !instanthpiLabel.id) {
+      if (!karmaClinicLabel || !karmaClinicLabel.id) {
         return {
           statusCode: 200,
           headers,
-          body: JSON.stringify({ emails: [], message: "No 'instanthpi' label found in Gmail" }),
+          body: JSON.stringify({ emails: [], message: "No 'Karma Clinic' label found in Gmail" }),
         };
       }
 
-      // Get messages with the "instanthpi" label - fetch more pages for old emails
+      // Get messages with the "karma clinic" label - fetch more pages for old emails
       let allMessageIds = [];
       let pageToken = null;
       let pageCount = 0;
@@ -216,10 +216,10 @@ exports.handler = async (event, context) => {
       do {
         const messagesResponse = await gmail.users.messages.list({
           userId: "me",
-          labelIds: [instanthpiLabel.id],
+          labelIds: [karmaClinicLabel.id],
           maxResults: 200,
           pageToken: pageToken,
-          q: "in:instanthpi",
+          q: `label:${karmaClinicLabel.name}`,
         });
 
         const messageIds = messagesResponse.data.messages?.map((m) => m.id) || [];
@@ -232,7 +232,7 @@ exports.handler = async (event, context) => {
         if (!pageToken || pageCount >= maxPages) break;
       } while (pageToken);
 
-      console.log(`Fetched total of ${allMessageIds.length} messages from Instanthpi folder`);
+      console.log(`Fetched total of ${allMessageIds.length} messages from Karma Clinic folder`);
 
       // Fetch full message details (limit to 100 for performance)
       const emails = await Promise.all(
