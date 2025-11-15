@@ -174,9 +174,9 @@ const ClaudeAIInterface = () => {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Claude 3.7 Sonnet AI Interface</CardTitle>
+        <CardTitle>Claude Haiku 4.5 Interface</CardTitle>
         <CardDescription>
-          Interact with Claude AI to generate text, analyze images, summarize content, and more.
+          Interact with Claude Haiku 4.5 to generate text, analyze images, summarize content, and more.
         </CardDescription>
       </CardHeader>
       <CardContent>

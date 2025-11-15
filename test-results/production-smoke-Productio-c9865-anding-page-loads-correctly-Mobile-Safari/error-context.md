@@ -1,0 +1,51 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - 'heading "InstantHPI : l''avenir de l''anamnèse médicale instantanée" [level=1] [ref=e5]'
+    - paragraph [ref=e6]: Optimisez les diagnostics et renforcez la relation patient-médecin. InstantHPI simplifie la collecte d'informations et accélère chaque consultation.
+    - generic [ref=e7]:
+      - button "Connexion Médecin" [ref=e8] [cursor=pointer]:
+        - img
+        - text: Connexion Médecin
+      - button "Connexion Patient" [ref=e9] [cursor=pointer]:
+        - img
+        - text: Connexion Patient
+  - generic [ref=e11]:
+    - heading "Pourquoi choisir InstantHPI ?" [level=2] [ref=e12]
+    - generic [ref=e13]:
+      - generic [ref=e15]:
+        - img [ref=e16]
+        - heading "Anamnèse Intelligente" [level=3] [ref=e26]
+        - paragraph [ref=e27]: Capturez des antécédents médicaux précis et complets grâce à notre IA intuitive.
+      - generic [ref=e29]:
+        - img [ref=e30]
+        - heading "Gain de Temps Précieux" [level=3] [ref=e33]
+        - paragraph [ref=e34]: Automatisez la collecte d'informations pour vous concentrer sur le diagnostic et les soins.
+      - generic [ref=e36]:
+        - img [ref=e37]
+        - heading "Sécurité et Conformité" [level=3] [ref=e40]
+        - paragraph [ref=e41]: Cryptage de bout en bout conforme aux réglementations de santé les plus exigeantes.
+      - generic [ref=e43]:
+        - img [ref=e44]
+        - heading "Décisions Éclairées" [level=3] [ref=e47]
+        - paragraph [ref=e48]: Accédez à des dossiers structurés pour faciliter la prise de décision clinique.
+  - generic [ref=e50]:
+    - heading "Des soins améliorés, en toute confiance." [level=2] [ref=e51]
+    - generic [ref=e52]:
+      - generic [ref=e53]:
+        - img [ref=e54]
+        - paragraph [ref=e56]: +30%
+        - paragraph [ref=e57]: de temps gagné par consultation
+      - generic [ref=e58]:
+        - img [ref=e59]
+        - paragraph [ref=e62]: 100%
+        - paragraph [ref=e63]: conforme RGPD & normes de santé
+      - generic [ref=e64]:
+        - img [ref=e65]
+        - paragraph [ref=e75]: IA avancée
+        - paragraph [ref=e76]: pour des diagnostics plus précis
+  - contentinfo [ref=e77]:
+    - paragraph [ref=e79]: © 2025 InstantHPI. Tous droits réservés.
+```

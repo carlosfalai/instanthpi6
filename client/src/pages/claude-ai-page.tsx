@@ -13,15 +13,15 @@ const ClaudeAIPage = () => {
       <div className="p-6">
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">Claude 3.7 Sonnet AI</CardTitle>
+            <CardTitle className="text-xl font-semibold">Claude Haiku 4.5</CardTitle>
             <CardDescription>
-              Leverage the power of Claude 3.7 Sonnet for advanced medical AI capabilities and
+              Leverage the power of Claude Haiku 4.5 for advanced medical AI capabilities and
               development assistance.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p>
-              Claude 3.7 Sonnet is a state-of-the-art language model that can assist with a wide
+              Claude Haiku 4.5 is a fast and efficient language model that can assist with a wide
               range of tasks, including medical documentation, treatment plans, sentiment analysis,
               image recognition, and code generation.
             </p>
