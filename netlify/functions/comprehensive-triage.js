@@ -9,7 +9,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const COMPREHENSIVE_TRIAGE_PROMPT = `You are an expert emergency medicine physician performing comprehensive medical triage and documentation. Based on the patient information provided, generate a complete medical report with all 12 sections.
+const COMPREHENSIVE_TRIAGE_PROMPT = `You are an expert emergency medicine physician performing comprehensive medical triage and documentation. Based on the patient information provided, generate a complete medical report with all 13 sections.
 
 Use the Canadian Triage and Acuity Scale (CTAS) levels:
 1. EMERGENCY (Resuscitation) - Life-threatening, requires immediate intervention
@@ -18,7 +18,7 @@ Use the Canadian Triage and Acuity Scale (CTAS) levels:
 4. NON-URGENT (Less Urgent) - Conditions that are not expected to deteriorate, can wait 1-2 hours
 5. SELF-CARE (Not Urgent) - May not require physician intervention, appropriate for clinic or self-care
 
-CRITICAL: Generate ALL 12 comprehensive medical sections in French:
+CRITICAL: Generate ALL 13 comprehensive medical sections in French:
 
 1. HPI_SUMMARY: "Juste pour confirmer avec vous avant de continuer; vous êtes [gender] de [age] qui présente [chief_complaint]. [detailed_symptoms]. [location]. [severity]. [chronic_conditions]. [medication_allergies]. Est-ce que ce résumé est exact ?"
 
@@ -44,6 +44,8 @@ CRITICAL: Generate ALL 12 comprehensive medical sections in French:
 
 12. EMERGENCY_REFERRAL: Emergency department referral with triage level
 
+13. STEPWISE_STRATEGY: (NOTE: This section will be generated later by analyzing the Enhanced SOAP note that combines HPI + Q&A. For now, return an empty string or placeholder indicating it will be generated after Enhanced SOAP note is created.)
+
 Return JSON with these exact fields:
 - triage_level: (EMERGENCY/URGENT/SEMI-URGENT/NON-URGENT/SELF-CARE)
 - urgency_score: (1-10)
@@ -61,6 +63,7 @@ Return JSON with these exact fields:
 - insurance_documentation: (insurance documentation text)
 - telemedicine_limitations: (telemedicine limitations text)
 - emergency_referral: (emergency referral text)
+- stepwise_strategy: (Stepwise Strategy discussion in Spartan Format with 6 subsections as specified above)
 
 Patient Information:`;
 
@@ -92,13 +95,15 @@ exports.handler = async (event) => {
 
   try {
     const patientData = JSON.parse(event.body);
-    console.log('Processing comprehensive triage for patient:', patientData.patient_id);
+    const patientId = patientData.patient_id || 'unknown';
+    console.log('Processing comprehensive triage for patient:', patientId);
 
     let aiResponse = null;
+    let aiError = null;
 
-    // Try OpenAI first
+    // Try OpenAI first with timeout protection
     try {
-      const openaiResponse = await openai.chat.completions.create({
+      const openaiPromise = openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
           {
@@ -114,15 +119,21 @@ exports.handler = async (event) => {
         max_tokens: 4000
       });
 
+      // Add timeout wrapper (Netlify functions have 10s default, 26s max for free tier)
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('OpenAI request timeout')), 25000)
+      );
+
+      const openaiResponse = await Promise.race([openaiPromise, timeoutPromise]);
       aiResponse = openaiResponse.choices[0].message.content;
-      console.log("OpenAI response received");
-      console.log("OpenAI Full Response:", JSON.stringify(openaiResponse, null, 2));
+      console.log("OpenAI response received for patient:", patientId);
     } catch (openaiError) {
-      console.log("OpenAI failed:", openaiError.message);
+      console.error("OpenAI failed for patient:", patientId, openaiError.message);
+      aiError = openaiError;
       
       // Try Anthropic as fallback
       try {
-        const anthropicResponse = await anthropic.messages.create({
+        const anthropicPromise = anthropic.messages.create({
           model: "claude-3-5-sonnet-20241022",
           max_tokens: 4000,
           temperature: 0.3,
@@ -134,10 +145,17 @@ exports.handler = async (event) => {
           ]
         });
 
+        // Add timeout wrapper
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Anthropic request timeout')), 25000)
+        );
+
+        const anthropicResponse = await Promise.race([anthropicPromise, timeoutPromise]);
         aiResponse = anthropicResponse.content[0].text;
-        console.log("Anthropic response received");
+        console.log("Anthropic response received for patient:", patientId);
       } catch (anthropicError) {
-        console.log("Anthropic failed:", anthropicError.message);
+        console.error("Anthropic failed for patient:", patientId, anthropicError.message);
+        aiError = anthropicError;
       }
     }
 
@@ -171,24 +189,30 @@ exports.handler = async (event) => {
       }
     }
 
-    // AI service unavailable - return error instead of hardcoded fallback
-    console.log("AI failed - returning error");
+    // AI service unavailable - return error with details
+    console.error("AI failed for patient:", patientId, "Error:", aiError?.message || 'Unknown error');
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         error: "AI service unavailable",
-        message: "Please try again later or contact support"
+        message: aiError?.message || "Please try again later or contact support",
+        patient_id: patientId
       })
     };
 
 
   } catch (error) {
     console.error('Error in comprehensive triage:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Internal server error' })
+      body: JSON.stringify({ 
+        error: 'Internal server error',
+        message: errorMessage,
+        timestamp: new Date().toISOString()
+      })
     };
   }
 };

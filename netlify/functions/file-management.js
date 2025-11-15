@@ -129,13 +129,20 @@ exports.handler = async (event, context) => {
     }
 
   } catch (error) {
-    console.error('File management error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error('File management error:', {
+      message: errorMessage,
+      action: event.path.split('/').pop(),
+      timestamp: new Date().toISOString()
+    });
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         success: false,
-        error: `File management error: ${error.message}`
+        error: 'File management operation failed',
+        message: 'Please try again or contact support if the problem persists.',
+        timestamp: new Date().toISOString()
       })
     };
   }

@@ -17,7 +17,9 @@ import MessagesPage from "@/pages/messages-page";
 import AIBillingPage from "@/pages/ai-billing-page";
 import KnowledgeBasePage from "@/pages/knowledge-base-page";
 import TierAssociationPage from "@/pages/tier-association-page";
+import InboxPage from "@/pages/inbox-page";
 import AuthCallback from "@/pages/auth-callback";
+import LoginDiagnostics from "@/pages/login-diagnostics";
 import { ProtectedRoute } from "@/lib/auth-guard";
 
 class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
@@ -30,18 +32,41 @@ class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, {
   }
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error("Root Error Boundary caught:", error, info);
+    
+    // Log to production monitoring (without sensitive data)
+    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
+      try {
+        // Send error to monitoring endpoint (if available)
+        fetch('/api/error-log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            error: error.message,
+            stack: error.stack?.substring(0, 500), // Limit stack trace
+            componentStack: info.componentStack?.substring(0, 500),
+            timestamp: new Date().toISOString(),
+            url: window.location.href,
+            userAgent: navigator.userAgent.substring(0, 200)
+          })
+        }).catch(() => {
+          // Silently fail if error logging endpoint is unavailable
+        });
+      } catch (e) {
+        // Silently fail if error logging fails
+      }
+    }
   }
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center p-6">
-          <div className="max-w-md w-full bg-[#1a1a1a] border border-red-500/30 rounded-xl p-8 text-center">
-            <div className="w-16 h-16 bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+        <div className="min-h-screen bg-background flex items-center justify-center p-6">
+          <div className="max-w-md w-full bg-card border border-destructive/30 rounded-xl p-8 text-center">
+            <div className="w-16 h-16 bg-destructive/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-3xl">⚠️</span>
             </div>
-            <h2 className="text-xl font-bold text-[#e6e6e6] mb-3">Application Error</h2>
-            <p className="text-[#999] mb-6 text-sm break-words">{this.state.error?.message || 'An unknown error occurred'}</p>
-            <a href="/doctor-login" className="inline-block bg-[#8b5cf6] hover:bg-[#7c3aed] text-white py-2 px-4 rounded-md">Back to Login</a>
+            <h2 className="text-xl font-bold text-foreground mb-3">Application Error</h2>
+            <p className="text-muted-foreground mb-6 text-sm break-words">{this.state.error?.message || 'An unknown error occurred'}</p>
+            <a href="/doctor-login" className="inline-block bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-4 rounded-md">Back to Login</a>
           </div>
         </div>
       );
@@ -80,6 +105,7 @@ export default function App() {
           <Route path="/patient-login" component={PatientLogin} />
           <Route path="/patient-dashboard" component={PatientDashboard} />
           <Route path="/login" component={LoginPage} />
+          <Route path="/login-diagnostics" component={LoginDiagnostics} />
           <Route path="/doctor-login" component={DoctorLogin} />
           <Route path="/doctor-dashboard">
             <ProtectedRoute>
@@ -115,6 +141,11 @@ export default function App() {
           <Route path="/knowledge-base">
             <ProtectedRoute>
               <KnowledgeBasePage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/inbox">
+            <ProtectedRoute>
+              <InboxPage />
             </ProtectedRoute>
           </Route>
           <Route path="/association">

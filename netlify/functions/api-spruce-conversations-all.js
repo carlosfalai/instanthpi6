@@ -171,15 +171,28 @@ exports.handler = async (event, context) => {
       body: JSON.stringify(transformedConversations),
     };
   } catch (error) {
-    console.error("Error fetching conversations:", error.response?.data || error.message);
+    const errorMessage = error.message || 'Unknown error';
+    const errorStatus = error.response?.status || 500;
+    const errorDetails = error.response?.data;
+    
+    console.error("Error fetching conversations:", {
+      message: errorMessage,
+      status: errorStatus,
+      details: errorDetails,
+      timestamp: new Date().toISOString()
+    });
 
+    // Return user-safe error message (don't expose internal details)
     return {
-      statusCode: error.response?.status || 500,
+      statusCode: errorStatus,
       headers,
       body: JSON.stringify({
         error: "Failed to fetch conversations",
-        message: error.message,
-        details: error.response?.data,
+        message: errorStatus === 401 ? "Authentication failed. Please check your Spruce API credentials." :
+                 errorStatus === 403 ? "Access denied. Please verify your Spruce API permissions." :
+                 errorStatus === 429 ? "Rate limit exceeded. Please try again later." :
+                 "Please try again later or contact support if the problem persists.",
+        timestamp: new Date().toISOString()
       }),
     };
   }

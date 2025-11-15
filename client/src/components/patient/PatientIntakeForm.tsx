@@ -194,31 +194,52 @@ export function PatientIntakeForm() {
         severity: 5, // Default severity
       };
 
-      // Call comprehensive triage API
-      const triageResponse = await fetch('/api/comprehensive-triage', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(patientData),
-      });
+      // Call comprehensive triage API with timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
-      if (triageResponse.ok) {
-        const triageData = await triageResponse.json();
-        setTriageResult(triageData);
-        
-        // Store comprehensive report for doctor
-        setComprehensiveReport(triageData);
-        
-        // Save comprehensive report to database for doctor access
-        await saveComprehensiveReportToDatabase(triageData);
-        
-      setSubmitted(true);
-          } else {
-        console.error('Triage API failed');
+      try {
+        const triageResponse = await fetch('/api/comprehensive-triage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(patientData),
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        if (triageResponse.ok) {
+          const triageData = await triageResponse.json();
+          setTriageResult(triageData);
+          
+          // Store comprehensive report for doctor
+          setComprehensiveReport(triageData);
+          
+          // Save comprehensive report to database for doctor access
+          await saveComprehensiveReportToDatabase(triageData);
+          
+          setSubmitted(true);
+        } else {
+          const errorText = await triageResponse.text();
+          console.error('Triage API failed:', triageResponse.status, errorText);
+          alert('Failed to process your intake form. Please try again or contact support.');
+        }
+      } catch (fetchError: any) {
+        clearTimeout(timeoutId);
+        if (fetchError.name === 'AbortError') {
+          console.error('Triage API timeout');
+          alert('The request took too long. Please try again or contact support if the problem persists.');
+        } else {
+          console.error('Error submitting form:', fetchError);
+          alert('An error occurred while submitting your form. Please try again.');
+        }
+        throw fetchError;
       }
     } catch (error) {
       console.error('Error submitting form:', error);
+      // Error already handled in the fetch block above
     } finally {
       setLoading(false);
     }

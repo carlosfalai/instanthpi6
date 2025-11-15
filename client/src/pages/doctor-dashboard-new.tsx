@@ -10,6 +10,7 @@ import { Search, LogOut, User, Activity, Clock, AlertTriangle, CheckCircle, Copy
 import { format } from "date-fns";
 import { createClient } from "@supabase/supabase-js";
 import { AIPromptBox } from "../components/ai/AIPromptBox";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 
 // Environment check with fallback
 const SUPABASE_URL = (import.meta as any).env.VITE_SUPABASE_URL;
@@ -50,7 +51,7 @@ class ErrorBoundary extends React.Component<
             <p className="text-[#999] mb-6 text-sm break-words">{this.state.error?.message || 'An unknown error occurred'}</p>
             <button
               onClick={() => window.location.href = "/doctor-login"}
-              className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white py-2 rounded-md"
+              className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-md"
             >
               Back to Login
             </button>
@@ -329,6 +330,16 @@ export default function DoctorDashboardNew() {
       loadReports();
     }, []);
 
+    // Auto-refresh Spruce conversations every 30 seconds
+    React.useEffect(() => {
+      const interval = setInterval(() => {
+        console.log('[Dashboard] Auto-refreshing Spruce conversations...');
+        loadSpruceCases();
+      }, 30000); // 30 seconds
+
+      return () => clearInterval(interval);
+    }, []);
+
     // Load templates when diagnosis is selected
     React.useEffect(() => {
       if (selectedDiagnosis) {
@@ -374,11 +385,15 @@ export default function DoctorDashboardNew() {
     const loadSpruceCases = async () => {
       setLoadingSpruce(true);
       try {
+        console.log('[Dashboard] Fetching Spruce conversations...');
+        const startTime = performance.now();
+        
         const response = await fetch('/api/spruce-conversations-all');
         console.log('[Dashboard] spruce-conversations-all response status:', response.status);
         
         if (!response.ok) {
-          console.error('[Dashboard] spruce-conversations-all returned status:', response.status);
+          const errorText = await response.text();
+          console.error('[Dashboard] spruce-conversations-all returned status:', response.status, errorText);
           setSpruceCases([]);
           return;
         }
@@ -391,7 +406,26 @@ export default function DoctorDashboardNew() {
         }
         
         const data = await response.json();
-        setSpruceCases(data || []);
+        const endTime = performance.now();
+        const duration = ((endTime - startTime) / 1000).toFixed(2);
+        
+        console.log(`[Dashboard] ✅ Loaded ${data?.length || 0} Spruce conversations in ${duration}s`);
+        
+        if (data && Array.isArray(data)) {
+          setSpruceCases(data);
+          // Log sample of conversations for debugging
+          if (data.length > 0) {
+            console.log('[Dashboard] Sample conversations:', data.slice(0, 3).map(c => ({
+              id: c.id,
+              patient_name: c.patient_name,
+              last_message: c.last_message?.substring(0, 50),
+              updated_at: c.updated_at
+            })));
+          }
+        } else {
+          console.warn('[Dashboard] Received non-array data:', typeof data, data);
+          setSpruceCases([]);
+        }
       } catch (error) {
         console.error("[Dashboard] Error loading Spruce cases:", error);
         setSpruceCases([]);
@@ -1054,85 +1088,26 @@ export default function DoctorDashboardNew() {
       <ErrorBoundary>
         <>
           <PinModal />
-          <div className="min-h-screen bg-[#0d0d0d] flex">
-            {/* Sidebar - Linear Style */}
-            <aside className="w-64 bg-[#1a1a1a] border-r border-[#333]">
-            <div className="p-6">
-              {/* Logo */}
-              <div className="mb-8">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-[#8b5cf6] rounded-lg flex items-center justify-center">
-                    <Stethoscope className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-lg font-semibold text-[#e6e6e6]">InstantHPI</h1>
-                    <p className="text-xs text-[#666]">Medical Platform</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Navigation - Linear Style */}
-              <nav className="space-y-1">
-                <button onClick={() => navigate("/doctor-dashboard")} className="flex items-center gap-3 px-3 py-2.5 bg-[#222] text-[#e6e6e6] rounded-md w-full text-left transition-colors border border-[#2a2a2a]">
-                  <Home className="w-4 h-4" />
-                  <span className="text-sm font-medium">Dashboard</span>
-                </button>
-                <button onClick={() => navigate("/patients")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
-                  <Users2 className="w-4 h-4" />
-                  <span className="text-sm">Patients</span>
-                </button>
-                <button onClick={() => navigate("/documents")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
-                  <FileTextIcon className="w-4 h-4" />
-                  <span className="text-sm">Reports</span>
-                </button>
-                <button onClick={() => navigate("/messages")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
-                  <MessageSquare className="w-4 h-4" />
-                  <span className="text-sm">Messages</span>
-                </button>
-                <button onClick={() => navigate("/ai-billing")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
-                  <Database className="w-4 h-4" />
-                  <span className="text-sm">Analytics</span>
-                </button>
-                <button onClick={() => navigate("/doctor-profile")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
-                  <Settings className="w-4 h-4" />
-                  <span className="text-sm">Settings</span>
-                </button>
-              </nav>
-
-              {/* Collaboration Section - Linear Style Separator */}
-              <div className="border-t border-[#333] pt-6 mt-6">
-                <p className="text-xs font-medium text-[#666] uppercase tracking-wider mb-3 px-3">
-                  Collaboration
-                </p>
-                <nav className="space-y-1">
-                  <button onClick={() => navigate("/association")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
-                    <Users className="w-4 h-4" />
-                    <span className="text-sm">Association</span>
-                  </button>
-                </nav>
-              </div>
-            </div>
-          </aside>
-
-          {/* Main Content */}
-          <main className="flex-1 bg-[#0d0d0d]" data-testid="dashboard-root">
-            {isInitializing ? (
-              // Loading skeleton
-              <div className="flex items-center justify-center min-h-screen">
-                <div className="text-center space-y-4">
-                  <div className="w-12 h-12 mx-auto">
-                    <div className="animate-spin">
-                      <Activity className="w-12 h-12 text-[#8b5cf6]" />
+          <AppLayoutSpruce>
+            {/* Main Content */}
+            <div className="p-6 bg-[#0d0d0d]" data-testid="dashboard-root">
+              {isInitializing ? (
+                // Loading skeleton
+                <div className="flex items-center justify-center min-h-screen">
+                  <div className="text-center space-y-4">
+                    <div className="w-12 h-12 mx-auto">
+                      <div className="animate-spin">
+                        <Activity className="w-12 h-12 text-[#8b5cf6]" />
+                      </div>
                     </div>
+                    <p className="text-[#999]">Loading dashboard...</p>
                   </div>
-                  <p className="text-[#999]">Loading dashboard...</p>
                 </div>
-              </div>
-            ) : (
-              <div className="p-6">
-                <div className="mb-6">
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              ) : (
+                <div className="p-6">
+                  <div className="mb-6">
+                  </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                   {/* Left Column - Search and Spruce (3/4 width) */}
                   <div className="lg:col-span-3 space-y-6">
                     {/* Patient Search - Linear Style */}
@@ -1187,10 +1162,27 @@ export default function DoctorDashboardNew() {
                     {/* Spruce Integration */}
                     <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                       <CardHeader>
-                        <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
-                          <Phone className="w-5 h-5 text-[#999]" />
-                          Spruce Integration
-                        </CardTitle>
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                            <Phone className="w-5 h-5 text-[#999]" />
+                            Spruce Integration
+                            {spruceCases.length > 0 && (
+                              <span className="text-[#999] text-sm font-normal ml-2">
+                                ({spruceCases.length} conversations)
+                              </span>
+                            )}
+                          </CardTitle>
+                          <Button
+                            onClick={loadSpruceCases}
+                            disabled={loadingSpruce}
+                            variant="ghost"
+                            size="sm"
+                            className="text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
+                            title="Refresh conversations"
+                          >
+                            <RefreshCw className={`w-4 h-4 ${loadingSpruce ? 'animate-spin' : ''}`} />
+                          </Button>
+                        </div>
                       </CardHeader>
                       <CardContent>
                         {/* Spruce Search */}
@@ -1451,7 +1443,7 @@ export default function DoctorDashboardNew() {
                             {/* Apply Button */}
                             <Button
                               onClick={applyPlanToSAP}
-                              className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
+                              className="w-full bg-primary hover:bg-primary/90 text-white"
                               disabled={!frenchDoc}
                             >
                               <CheckCircle className="w-4 h-4 mr-2" />
@@ -1504,7 +1496,7 @@ export default function DoctorDashboardNew() {
                             <Activity className="w-12 h-12 text-[#999] mx-auto mb-4 animate-spin" />
                             <p className="text-[#999]">Loading reports...</p>
                           </div>
-                        ) : reports.length === 0 ? (
+                        ) : (!reports || !Array.isArray(reports) || reports.length === 0) ? (
                           <div className="text-center py-8">
                             <FileText className="w-12 h-12 text-[#999] mx-auto mb-4" />
                             <p className="text-[#999]">No reports found</p>
@@ -1512,7 +1504,7 @@ export default function DoctorDashboardNew() {
                           </div>
                         ) : (
                           <div className="space-y-3">
-                            {reports.map((report) => (
+                            {(reports || []).map((report) => (
                               <div
                                 key={report.filename}
                                 className="p-3 bg-[#2a2a2a] rounded-lg hover:bg-[#333] transition-colors"
@@ -1666,7 +1658,7 @@ export default function DoctorDashboardNew() {
                             <Button
                               onClick={generateMedicalReport}
                               disabled={generating}
-                              className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white disabled:opacity-50"
+                              className="w-full bg-primary hover:bg-primary/90 text-white disabled:opacity-50"
                             >
                               {generating ? (
                                 <>
@@ -1997,6 +1989,21 @@ export default function DoctorDashboardNew() {
                               doctorApiKey={doctorApiKey}
                               doctorApiProvider={doctorApiProvider}
                             />
+                            <MedicalSection
+                              title="Stepwise Strategy"
+                              content={frenchDoc.stepwiseStrategy}
+                              onCopy={() => copyToClipboard(frenchDoc.stepwiseStrategy || "", "stepwiseStrategy")}
+                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, stepwiseStrategy: text})}
+                              onPdf={requestPdf}
+                              icon={<FileText className="w-4 h-4" />}
+                              color="blue"
+                              copyCount={copiedSections.has("stepwiseStrategy") ? 1 : 0}
+                              sectionName="Stepwise Strategy"
+                              patientData={selectedPatientData}
+                              writingStyleTemplate={{template_name: "Default"}}
+                              doctorApiKey={doctorApiKey}
+                              doctorApiProvider={doctorApiProvider}
+                            />
                             
                             {/* Savings Summary */}
                             {(() => {
@@ -2037,15 +2044,15 @@ export default function DoctorDashboardNew() {
                 </div>
               </div>
             )}
-          </main>
+            </div>
 
             {/* Copy Toast */}
             {copyToast && (
-              <div className="fixed bottom-4 right-4 bg-green-600 text-[#e6e6e6] px-4 py-2 rounded-lg shadow-lg">
+              <div className="fixed bottom-4 right-4 bg-green-600 text-[#e6e6e6] px-4 py-2 rounded-lg shadow-lg z-50">
                 {copyToast}
               </div>
             )}
-          </div>
+          </AppLayoutSpruce>
         </>
       </ErrorBoundary>
     );
@@ -2061,7 +2068,7 @@ export default function DoctorDashboardNew() {
           <p className="text-[#999] mb-6 text-sm break-words">{error.message || 'An unknown error occurred'}</p>
           <button
             onClick={() => window.location.href = "/doctor-login"}
-            className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white py-2 rounded-md"
+            className="w-full bg-primary hover:bg-primary/90 text-white py-2 rounded-md"
           >
             Back to Login
           </button>

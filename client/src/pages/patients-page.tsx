@@ -532,9 +532,9 @@ export default function PatientsPage() {
                   <div className="flex items-center justify-center h-24">
                     <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
                   </div>
-                ) : patientMessages && patientMessages.length > 0 ? (
+                ) : (patientMessages && Array.isArray(patientMessages) && patientMessages.length > 0) ? (
                   <div className="space-y-3 max-h-48 overflow-y-auto border border-[#333] rounded-md p-3 bg-[#1e1e1e]">
-                    {patientMessages.slice(-5).map((message) => (
+                    {(patientMessages || []).slice(-5).map((message) => (
                       <div key={message.id} className="flex items-start">
                         {message.isFromPatient ? (
                           <div
@@ -756,9 +756,9 @@ export default function PatientsPage() {
                   <div className="flex items-center justify-center h-full">
                     <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
                   </div>
-                ) : patientMessages.length > 0 ? (
+                ) : (patientMessages && Array.isArray(patientMessages) && patientMessages.length > 0) ? (
                   <div className="space-y-3">
-                    {patientMessages.map((message) => (
+                    {(patientMessages || []).map((message) => (
                       <div
                         key={message.id}
                         className="border-b border-[#333] pb-2 mb-2 last:border-b-0 last:mb-0 last:pb-0"
