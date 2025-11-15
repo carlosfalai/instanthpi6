@@ -22,6 +22,30 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         const checkStartTime = performance.now();
         console.log(`[ProtectedRoute] Auth check starting at ${new Date().toISOString()}`);
         
+        // LOCAL DEVELOPMENT: Auto-authenticate, bypass all checks
+        const isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (isLocalDev) {
+          console.log('[ProtectedRoute] Local dev detected - auto-authenticating');
+          // Set local auth if not already set
+          if (!localStorage.getItem("doctor_authenticated")) {
+            localStorage.setItem("doctor_authenticated", "true");
+            localStorage.setItem("doctor_info", JSON.stringify({
+              name: "Carlos Faviel Font",
+              email: "cff@centremedicalfont.ca",
+              specialty: "Médecine Générale"
+            }));
+          }
+          if (isMounted) {
+            setDebugInfo({ 
+              timestamp: new Date().toISOString(),
+              result: 'LOCAL_DEV_AUTO_AUTH'
+            });
+            setIsAuthed(true);
+            setIsChecking(false);
+          }
+          return;
+        }
+        
         // Check URL query parameter first (for testing/debugging)
         const urlParams = new URLSearchParams(window.location.search);
         const authParam = urlParams.get('auth');
@@ -65,7 +89,7 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           return;
         }
 
-        // Supabase session - only accept if fresh (less than 1 hour old)
+        // Supabase session - check if valid (not expired)
         const checkTime2 = performance.now();
         const {
           data: { session },
@@ -74,32 +98,58 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         const checkTime3 = performance.now();
         
         const hasSession = Boolean(session?.user);
+        
+        // Check if session is valid (not expired) - Supabase handles refresh automatically
+        let isValid = false;
+        if (hasSession && session.expires_at) {
+          const now = Math.floor(Date.now() / 1000);
+          isValid = session.expires_at > now;
+          
+          // If expired but close, try to refresh
+          if (!isValid && session.expires_at > now - 300) { // Within 5 minutes of expiry
+            console.log('[ProtectedRoute] Session expired, attempting refresh...');
+            const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+            if (!refreshError && refreshedSession?.user) {
+              console.log('[ProtectedRoute] Session refreshed successfully');
+              isValid = true;
+            }
+          }
+        } else if (hasSession) {
+          // Session exists but no expires_at - assume valid (Supabase will handle refresh)
+          isValid = true;
+        }
+        
         const isFresh = hasSession ? isSupabaseSessionFresh(session, 60) : false;
         
         debugData.supabaseCheckMs = (checkTime3 - checkTime2).toFixed(2);
         debugData.supabaseSessionExists = hasSession;
         debugData.supabaseSessionFresh = isFresh;
+        debugData.supabaseSessionValid = isValid;
         debugData.supabaseUserEmail = session?.user?.email || 'none';
         debugData.supabaseError = sessionError?.message || 'none';
+        debugData.supabaseExpiresAt = session?.expires_at || 'none';
         
         console.log('[ProtectedRoute] Supabase session check:', { 
           hasSession,
+          isValid,
           isFresh,
           userEmail: session?.user?.email,
+          expiresAt: session?.expires_at,
           error: sessionError?.message,
           timingMs: (checkTime3 - checkTime2).toFixed(2)
         });
         
         if (isMounted) {
           setDebugInfo(debugData);
-          setIsAuthed(isFresh);
+          // Accept session if it's valid (not expired), even if not "fresh"
+          setIsAuthed(isValid);
           setIsChecking(false);
         }
         
-        if (isFresh) {
-          logAuthDecision('supabase', { email: session?.user?.email, fresh: true });
+        if (isValid) {
+          logAuthDecision('supabase', { email: session?.user?.email, valid: true, fresh: isFresh });
         } else if (hasSession) {
-          logAuthDecision('supabase', { email: session?.user?.email, fresh: false, rejected: 'stale' });
+          logAuthDecision('supabase', { email: session?.user?.email, valid: false, rejected: 'expired' });
         } else {
           logAuthDecision('none', { sessionError: sessionError?.message });
         }
