@@ -88,7 +88,7 @@ export default function ChatPage() {
 
   return (
     <AppLayoutSpruce>
-      <div className="flex flex-col h-full bg-[#121212] text-white">
+      <div className="flex flex-col h-full bg-background text-white">
         {/* Header */}
         <header className="flex justify-between items-center p-4 border-b border-gray-800">
           <div className="flex items-center gap-3">

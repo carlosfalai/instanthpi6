@@ -122,715 +122,2271 @@
   },
   "suites": [
     {
-      "title": "auth-flow.spec.ts",
-      "file": "auth-flow.spec.ts",
+      "title": "button-functionality.spec.ts",
+      "file": "button-functionality.spec.ts",
       "column": 0,
       "line": 0,
-      "specs": [
+      "specs": [],
+      "suites": [
         {
-          "title": "Demo login lands on dashboard without blank screen",
-          "ok": true,
-          "tags": [],
-          "tests": [
+          "title": "Button Functionality Tests",
+          "file": "button-functionality.spec.ts",
+          "line": 5,
+          "column": 6,
+          "specs": [
             {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "chromium",
-              "projectName": "chromium",
-              "results": [
+              "title": "1. Dashboard refresh buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
                 {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5737,
-                  "errors": [],
-                  "stdout": [
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
                     {
-                      "text": "[Browser Console] [warning] Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth decision: local {timestamp: 2025-10-20T00:21:27.830Z, email: doctor@instanthpi.ca}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Setting demo auth at 2025-10-20T00:21:27.831Z {email: doctor@instanthpi.ca}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth flags verified: {localStorage: true, sessionStorage: true, timestamp: 2025-10-20T00:21:27.831Z}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DoctorLogin] Navigating to /doctor-dashboard in 500ms\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] Rendering skeleton (checking)\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] Auth check starting at 2025-10-20T00:21:28.334Z\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] URL auth parameter check: {authParam: demo, hasAuthParam: true}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth decision: url_param {timestamp: 2025-10-20T00:21:28.334Z, param: demo}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] ✓ Authenticated, rendering children\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Checking environment variables\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Environment variables OK\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [Dashboard] file-management response status: 200\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Browser Console] [error] Failed to load resource: the server responded with a status of 400 ()\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [Dashboard] spruce-conversations-all response status: 400\n"
-                    },
-                    {
-                      "text": "[Browser Console] [error] [Dashboard] spruce-conversations-all returned status: 400\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Test] Final URL: https://instanthpi.ca/doctor-dashboard?auth=demo\n"
-                    },
-                    {
-                      "text": "[Test] All console logs captured: [\n  {\n    type: \u001b[32m'warning'\u001b[39m,\n    text: \u001b[32m'Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth decision: local {timestamp: 2025-10-20T00:21:27.830Z, email: doctor@instanthpi.ca}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Setting demo auth at 2025-10-20T00:21:27.831Z {email: doctor@instanthpi.ca}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth flags verified: {localStorage: true, sessionStorage: true, timestamp: 2025-10-20T00:21:27.831Z}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DoctorLogin] Navigating to /doctor-dashboard in 500ms'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] Rendering skeleton (checking)'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] Auth check starting at 2025-10-20T00:21:28.334Z'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] URL auth parameter check: {authParam: demo, hasAuthParam: true}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth decision: url_param {timestamp: 2025-10-20T00:21:28.334Z, param: demo}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] ✓ Authenticated, rendering children'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Checking environment variables'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Environment variables OK'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[Dashboard] file-management response status: 200'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  },\n  {\n    type: \u001b[32m'error'\u001b[39m,\n    text: \u001b[32m'Failed to load resource: the server responded with a status of 400 ()'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[Dashboard] spruce-conversations-all response status: 400'\u001b[39m\n  },\n  {\n    type: \u001b[32m'error'\u001b[39m,\n    text: \u001b[32m'[Dashboard] spruce-conversations-all returned status: 400'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  }\n]\n"
-                    },
-                    {
-                      "text": "[Test] Body text length: 861\n"
-                    },
-                    {
-                      "text": "[Test] Body text full content (JSON):\n"
-                    },
-                    {
-                      "text": "\"\\n    InstantHPIMedical PlatformDashboardPatientsReportsMessagesAnalyticsSettingsCollaborationAssociationSearch PatientsSpruce IntegrationNo Spruce conversations foundQuick Diagnosis TemplatesPre-built protocols for common conditionsAcute Low Back PainacuteBronchitisacuteAsthmachronicCOPDchronicHerpes Zoster (Shingles)acuteOral HerpesacuteUrinary Tract InfectionacutePharyngitis (Strep throat)acutePneumoniaacuteInfluenzaacuteAnxietymentalDepressionmentalADHD in AdultsmentalHypertensionchronicDiabetes Type 2chronicGERDchronicMigraine HeadachechronicTension HeadacheacuteEczemachronicConjunctivitisacuteView All TemplatesFile ManagementNo reports foundGenerate medical reports to see them hereRecent ConsultationsPatient Details & Medical ReportComplete patient information and AI-powered documentationSelect a patient to view details and generate report\\n  \\n\\n\"\n"
-                    },
-                    {
-                      "text": "[Test] Body text preview: \n    InstantHPIMedical PlatformDashboardPatientsReportsMessagesAnalyticsSettingsCollaborationAssocia\n"
-                    },
-                    {
-                      "text": "[Test] Element counts - sidebar: 1, main: 1, dashboard-root: 1\n"
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4556,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Refresh button clicked\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:48:54.609Z",
+                      "annotations": [],
+                      "attachments": []
                     }
                   ],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2025-10-20T00:21:23.221Z",
-                  "annotations": [],
-                  "attachments": []
+                  "status": "expected"
                 }
               ],
-              "status": "expected"
-            }
-          ],
-          "id": "df6b40174562c70df515-16316c076931cc4d99b3",
-          "file": "auth-flow.spec.ts",
-          "line": 5,
-          "column": 1
-        },
-        {
-          "title": "Demo login lands on dashboard without blank screen",
-          "ok": true,
-          "tags": [],
-          "tests": [
+              "id": "0a835dd66e001b21791e-9cc1df4673acffeabede",
+              "file": "button-functionality.spec.ts",
+              "line": 13,
+              "column": 3
+            },
             {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "firefox",
-              "projectName": "firefox",
-              "results": [
+              "title": "2. Navigation sidebar buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
                 {
-                  "workerIndex": 1,
-                  "parallelIndex": 1,
-                  "status": "passed",
-                  "duration": 5358,
-                  "errors": [],
-                  "stdout": [
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
                     {
-                      "text": "[Browser Console] [warning] Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth decision: local JSHandle@object\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Setting demo auth at 2025-10-20T00:21:27.966Z JSHandle@object\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth flags verified: JSHandle@object\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DoctorLogin] Navigating to /doctor-dashboard in 500ms\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] Rendering skeleton (checking)\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] Auth check starting at 2025-10-20T00:21:28.475Z\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] URL auth parameter check: JSHandle@object\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth decision: url_param JSHandle@object\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] ✓ Authenticated, rendering children\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: JSHandle@object\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Checking environment variables\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Environment variables OK\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: JSHandle@object\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [Dashboard] file-management response status: 200\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: JSHandle@object\n"
-                    },
-                    {
-                      "text": "[Test] Final URL: https://instanthpi.ca/doctor-dashboard?auth=demo\n"
-                    },
-                    {
-                      "text": "[Test] All console logs captured: [\n  {\n    type: \u001b[32m'warning'\u001b[39m,\n    text: \u001b[32m'Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth decision: local JSHandle@object'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Setting demo auth at 2025-10-20T00:21:27.966Z JSHandle@object'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth flags verified: JSHandle@object'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DoctorLogin] Navigating to /doctor-dashboard in 500ms'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] Rendering skeleton (checking)'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] Auth check starting at 2025-10-20T00:21:28.475Z'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] URL auth parameter check: JSHandle@object'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth decision: url_param JSHandle@object'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] ✓ Authenticated, rendering children'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render state: JSHandle@object'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Checking environment variables'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Environment variables OK'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render state: JSHandle@object'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[Dashboard] file-management response status: 200'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render state: JSHandle@object'\u001b[39m }\n]\n"
-                    },
-                    {
-                      "text": "[Test] Body text length: 855\n"
-                    },
-                    {
-                      "text": "[Test] Body text full content (JSON):\n"
-                    },
-                    {
-                      "text": "\"\\n    InstantHPIMedical PlatformDashboardPatientsReportsMessagesAnalyticsSettingsCollaborationAssociationSearch PatientsSpruce IntegrationLoading Spruce cases...Quick Diagnosis TemplatesPre-built protocols for common conditionsAcute Low Back PainacuteBronchitisacuteAsthmachronicCOPDchronicHerpes Zoster (Shingles)acuteOral HerpesacuteUrinary Tract InfectionacutePharyngitis (Strep throat)acutePneumoniaacuteInfluenzaacuteAnxietymentalDepressionmentalADHD in AdultsmentalHypertensionchronicDiabetes Type 2chronicGERDchronicMigraine HeadachechronicTension HeadacheacuteEczemachronicConjunctivitisacuteView All TemplatesFile ManagementNo reports foundGenerate medical reports to see them hereRecent ConsultationsPatient Details & Medical ReportComplete patient information and AI-powered documentationSelect a patient to view details and generate report\\n  \\n\\n\"\n"
-                    },
-                    {
-                      "text": "[Test] Body text preview: \n    InstantHPIMedical PlatformDashboardPatientsReportsMessagesAnalyticsSettingsCollaborationAssocia\n"
-                    },
-                    {
-                      "text": "[Test] Element counts - sidebar: 1, main: 1, dashboard-root: 1\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [Dashboard] spruce-conversations-all response status: 400\n"
-                    },
-                    {
-                      "text": "[Browser Console] [error] [Dashboard] spruce-conversations-all returned status: 400\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: JSHandle@object\n"
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3644,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 sidebar links\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:48:54.612Z",
+                      "annotations": [],
+                      "attachments": []
                     }
                   ],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2025-10-20T00:21:23.219Z",
-                  "annotations": [],
-                  "attachments": []
+                  "status": "expected"
                 }
               ],
-              "status": "expected"
-            }
-          ],
-          "id": "df6b40174562c70df515-ae13dff6a0f1e9e72e4e",
-          "file": "auth-flow.spec.ts",
-          "line": 5,
-          "column": 1
-        },
-        {
-          "title": "Demo login lands on dashboard without blank screen",
-          "ok": true,
-          "tags": [],
-          "tests": [
+              "id": "0a835dd66e001b21791e-87dd8242e6dfe2fa94b2",
+              "file": "button-functionality.spec.ts",
+              "line": 30,
+              "column": 3
+            },
             {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "webkit",
-              "projectName": "webkit",
-              "results": [
+              "title": "3. Copy buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
                 {
-                  "workerIndex": 2,
-                  "parallelIndex": 2,
-                  "status": "passed",
-                  "duration": 4899,
-                  "errors": [],
-                  "stdout": [
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
                     {
-                      "text": "[Browser Console] [warning] Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth decision: local {timestamp: 2025-10-20T00:21:27.046Z, email: doctor@instanthpi.ca}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Setting demo auth at 2025-10-20T00:21:27.046Z {email: doctor@instanthpi.ca}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth flags verified: {localStorage: true, sessionStorage: true, timestamp: 2025-10-20T00:21:27.046Z}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DoctorLogin] Navigating to /doctor-dashboard in 500ms\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] Rendering skeleton (checking)\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] Auth check starting at 2025-10-20T00:21:27.550Z\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] URL auth parameter check: {authParam: demo, hasAuthParam: true}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth decision: url_param {timestamp: 2025-10-20T00:21:27.550Z, param: demo}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] ✓ Authenticated, rendering children\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Checking environment variables\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Environment variables OK\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Browser Console] [error] Failed to load resource: the server responded with a status of 400 ()\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [Dashboard] spruce-conversations-all response status: 400\n"
-                    },
-                    {
-                      "text": "[Browser Console] [error] [Dashboard] spruce-conversations-all returned status: 400\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Test] Final URL: https://instanthpi.ca/doctor-dashboard?auth=demo\n"
-                    },
-                    {
-                      "text": "[Test] All console logs captured: [\n  {\n    type: \u001b[32m'warning'\u001b[39m,\n    text: \u001b[32m'Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth decision: local {timestamp: 2025-10-20T00:21:27.046Z, email: doctor@instanthpi.ca}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Setting demo auth at 2025-10-20T00:21:27.046Z {email: doctor@instanthpi.ca}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth flags verified: {localStorage: true, sessionStorage: true, timestamp: 2025-10-20T00:21:27.046Z}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DoctorLogin] Navigating to /doctor-dashboard in 500ms'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] Rendering skeleton (checking)'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] Auth check starting at 2025-10-20T00:21:27.550Z'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] URL auth parameter check: {authParam: demo, hasAuthParam: true}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth decision: url_param {timestamp: 2025-10-20T00:21:27.550Z, param: demo}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] ✓ Authenticated, rendering children'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Checking environment variables'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Environment variables OK'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  },\n  {\n    type: \u001b[32m'error'\u001b[39m,\n    text: \u001b[32m'Failed to load resource: the server responded with a status of 400 ()'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[Dashboard] spruce-conversations-all response status: 400'\u001b[39m\n  },\n  {\n    type: \u001b[32m'error'\u001b[39m,\n    text: \u001b[32m'[Dashboard] spruce-conversations-all returned status: 400'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  }\n]\n"
-                    },
-                    {
-                      "text": "[Test] Body text length: 822\n"
-                    },
-                    {
-                      "text": "[Test] Body text full content (JSON):\n"
-                    },
-                    {
-                      "text": "\"\\n    InstantHPIMedical PlatformDashboardPatientsReportsMessagesAnalyticsSettingsCollaborationAssociationSearch PatientsSpruce IntegrationNo Spruce conversations foundQuick Diagnosis TemplatesPre-built protocols for common conditionsAcute Low Back PainacuteBronchitisacuteAsthmachronicCOPDchronicHerpes Zoster (Shingles)acuteOral HerpesacuteUrinary Tract InfectionacutePharyngitis (Strep throat)acutePneumoniaacuteInfluenzaacuteAnxietymentalDepressionmentalADHD in AdultsmentalHypertensionchronicDiabetes Type 2chronicGERDchronicMigraine HeadachechronicTension HeadacheacuteEczemachronicConjunctivitisacuteView All TemplatesFile ManagementLoading reports...Recent ConsultationsPatient Details & Medical ReportComplete patient information and AI-powered documentationSelect a patient to view details and generate report\\n  \\n\\n\"\n"
-                    },
-                    {
-                      "text": "[Test] Body text preview: \n    InstantHPIMedical PlatformDashboardPatientsReportsMessagesAnalyticsSettingsCollaborationAssocia\n"
-                    },
-                    {
-                      "text": "[Test] Element counts - sidebar: 1, main: 1, dashboard-root: 1\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [Dashboard] file-management response status: 200\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 3451,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 copy buttons\n"
+                        },
+                        {
+                          "text": "⚠️ No copy buttons found\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:48:54.608Z",
+                      "annotations": [],
+                      "attachments": []
                     }
                   ],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2025-10-20T00:21:23.228Z",
-                  "annotations": [],
-                  "attachments": []
+                  "status": "expected"
                 }
               ],
-              "status": "expected"
-            }
-          ],
-          "id": "df6b40174562c70df515-f52bdf135a7c3b7ada33",
-          "file": "auth-flow.spec.ts",
-          "line": 5,
-          "column": 1
-        },
-        {
-          "title": "Demo login lands on dashboard without blank screen",
-          "ok": true,
-          "tags": [],
-          "tests": [
+              "id": "0a835dd66e001b21791e-d94ecda0c40c65836661",
+              "file": "button-functionality.spec.ts",
+              "line": 60,
+              "column": 3
+            },
             {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "Mobile Chrome",
-              "projectName": "Mobile Chrome",
-              "results": [
+              "title": "4. Search functionality works",
+              "ok": true,
+              "tags": [],
+              "tests": [
                 {
-                  "workerIndex": 3,
-                  "parallelIndex": 3,
-                  "status": "passed",
-                  "duration": 5894,
-                  "errors": [],
-                  "stdout": [
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
                     {
-                      "text": "[Browser Console] [warning] Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth decision: local {timestamp: 2025-10-20T00:21:27.946Z, email: doctor@instanthpi.ca}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Setting demo auth at 2025-10-20T00:21:27.946Z {email: doctor@instanthpi.ca}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth flags verified: {localStorage: true, sessionStorage: true, timestamp: 2025-10-20T00:21:27.946Z}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DoctorLogin] Navigating to /doctor-dashboard in 500ms\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] Rendering skeleton (checking)\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] Auth check starting at 2025-10-20T00:21:28.450Z\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] URL auth parameter check: {authParam: demo, hasAuthParam: true}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth decision: url_param {timestamp: 2025-10-20T00:21:28.450Z, param: demo}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] ✓ Authenticated, rendering children\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Checking environment variables\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Environment variables OK\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Test] Final URL: https://instanthpi.ca/doctor-dashboard?auth=demo\n"
-                    },
-                    {
-                      "text": "[Test] All console logs captured: [\n  {\n    type: \u001b[32m'warning'\u001b[39m,\n    text: \u001b[32m'Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth decision: local {timestamp: 2025-10-20T00:21:27.946Z, email: doctor@instanthpi.ca}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Setting demo auth at 2025-10-20T00:21:27.946Z {email: doctor@instanthpi.ca}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth flags verified: {localStorage: true, sessionStorage: true, timestamp: 2025-10-20T00:21:27.946Z}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DoctorLogin] Navigating to /doctor-dashboard in 500ms'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] Rendering skeleton (checking)'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] Auth check starting at 2025-10-20T00:21:28.450Z'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] URL auth parameter check: {authParam: demo, hasAuthParam: true}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth decision: url_param {timestamp: 2025-10-20T00:21:28.450Z, param: demo}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] ✓ Authenticated, rendering children'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Checking environment variables'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Environment variables OK'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  }\n]\n"
-                    },
-                    {
-                      "text": "[Test] Body text length: 816\n"
-                    },
-                    {
-                      "text": "[Test] Body text full content (JSON):\n"
-                    },
-                    {
-                      "text": "\"\\n    InstantHPIMedical PlatformDashboardPatientsReportsMessagesAnalyticsSettingsCollaborationAssociationSearch PatientsSpruce IntegrationLoading Spruce cases...Quick Diagnosis TemplatesPre-built protocols for common conditionsAcute Low Back PainacuteBronchitisacuteAsthmachronicCOPDchronicHerpes Zoster (Shingles)acuteOral HerpesacuteUrinary Tract InfectionacutePharyngitis (Strep throat)acutePneumoniaacuteInfluenzaacuteAnxietymentalDepressionmentalADHD in AdultsmentalHypertensionchronicDiabetes Type 2chronicGERDchronicMigraine HeadachechronicTension HeadacheacuteEczemachronicConjunctivitisacuteView All TemplatesFile ManagementLoading reports...Recent ConsultationsPatient Details & Medical ReportComplete patient information and AI-powered documentationSelect a patient to view details and generate report\\n  \\n\\n\"\n"
-                    },
-                    {
-                      "text": "[Test] Body text preview: \n    InstantHPIMedical PlatformDashboardPatientsReportsMessagesAnalyticsSettingsCollaborationAssocia\n"
-                    },
-                    {
-                      "text": "[Test] Element counts - sidebar: 1, main: 1, dashboard-root: 1\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [Dashboard] file-management response status: 200\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 4464,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 2 search inputs\n"
+                        },
+                        {
+                          "text": "✅ Search input works\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:48:54.608Z",
+                      "annotations": [],
+                      "attachments": []
                     }
                   ],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2025-10-20T00:21:23.226Z",
-                  "annotations": [],
-                  "attachments": []
+                  "status": "expected"
                 }
               ],
-              "status": "expected"
-            }
-          ],
-          "id": "df6b40174562c70df515-4430df012872312028b1",
-          "file": "auth-flow.spec.ts",
-          "line": 5,
-          "column": 1
-        },
-        {
-          "title": "Demo login lands on dashboard without blank screen",
-          "ok": true,
-          "tags": [],
-          "tests": [
+              "id": "0a835dd66e001b21791e-d1a8966f870d6b1fe6e4",
+              "file": "button-functionality.spec.ts",
+              "line": 81,
+              "column": 3
+            },
             {
-              "timeout": 30000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "Mobile Safari",
-              "projectName": "Mobile Safari",
-              "results": [
+              "title": "5. Modal/Dialog buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
                 {
-                  "workerIndex": 4,
-                  "parallelIndex": 2,
-                  "status": "passed",
-                  "duration": 4835,
-                  "errors": [],
-                  "stdout": [
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
                     {
-                      "text": "[Browser Console] [warning] Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth decision: local {timestamp: 2025-10-20T00:21:32.496Z, email: doctor@instanthpi.ca}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Setting demo auth at 2025-10-20T00:21:32.497Z {email: doctor@instanthpi.ca}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth flags verified: {localStorage: true, sessionStorage: true, timestamp: 2025-10-20T00:21:32.497Z}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DoctorLogin] Navigating to /doctor-dashboard in 500ms\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] Rendering skeleton (checking)\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] Auth check starting at 2025-10-20T00:21:33.001Z\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] URL auth parameter check: {authParam: demo, hasAuthParam: true}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [AuthUtils] Auth decision: url_param {timestamp: 2025-10-20T00:21:33.001Z, param: demo}\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [ProtectedRoute] ✓ Authenticated, rendering children\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Checking environment variables\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Environment variables OK\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [Dashboard] file-management response status: 200\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Browser Console] [error] Failed to load resource: the server responded with a status of 400 ()\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [Dashboard] spruce-conversations-all response status: 400\n"
-                    },
-                    {
-                      "text": "[Browser Console] [error] [Dashboard] spruce-conversations-all returned status: 400\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render starting\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Component mounted\n"
-                    },
-                    {
-                      "text": "[Browser Console] [log] [DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }\n"
-                    },
-                    {
-                      "text": "[Test] Final URL: https://instanthpi.ca/doctor-dashboard?auth=demo\n"
-                    },
-                    {
-                      "text": "[Test] All console logs captured: [\n  {\n    type: \u001b[32m'warning'\u001b[39m,\n    text: \u001b[32m'Multiple GoTrueClient instances detected in the same browser context. It is not an error, but this should be avoided as it may produce undefined behavior when used concurrently under the same storage key.'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth decision: local {timestamp: 2025-10-20T00:21:32.496Z, email: doctor@instanthpi.ca}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Setting demo auth at 2025-10-20T00:21:32.497Z {email: doctor@instanthpi.ca}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth flags verified: {localStorage: true, sessionStorage: true, timestamp: 2025-10-20T00:21:32.497Z}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DoctorLogin] Navigating to /doctor-dashboard in 500ms'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] Rendering skeleton (checking)'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] Auth check starting at 2025-10-20T00:21:33.001Z'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] URL auth parameter check: {authParam: demo, hasAuthParam: true}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[AuthUtils] Auth decision: url_param {timestamp: 2025-10-20T00:21:33.001Z, param: demo}'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[ProtectedRoute] ✓ Authenticated, rendering children'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Checking environment variables'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Environment variables OK'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[Dashboard] file-management response status: 200'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  },\n  {\n    type: \u001b[32m'error'\u001b[39m,\n    text: \u001b[32m'Failed to load resource: the server responded with a status of 400 ()'\u001b[39m\n  },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[Dashboard] spruce-conversations-all response status: 400'\u001b[39m\n  },\n  {\n    type: \u001b[32m'error'\u001b[39m,\n    text: \u001b[32m'[Dashboard] spruce-conversations-all returned status: 400'\u001b[39m\n  },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Render starting'\u001b[39m },\n  { type: \u001b[32m'log'\u001b[39m, text: \u001b[32m'[DASHBOARD] Component mounted'\u001b[39m },\n  {\n    type: \u001b[32m'log'\u001b[39m,\n    text: \u001b[32m'[DASHBOARD] Render state: {isInitializing: false, loading: false, searchResultsLength: 0, searchQuery: }'\u001b[39m\n  }\n]\n"
-                    },
-                    {
-                      "text": "[Test] Body text length: 861\n"
-                    },
-                    {
-                      "text": "[Test] Body text full content (JSON):\n"
-                    },
-                    {
-                      "text": "\"\\n    InstantHPIMedical PlatformDashboardPatientsReportsMessagesAnalyticsSettingsCollaborationAssociationSearch PatientsSpruce IntegrationNo Spruce conversations foundQuick Diagnosis TemplatesPre-built protocols for common conditionsAcute Low Back PainacuteBronchitisacuteAsthmachronicCOPDchronicHerpes Zoster (Shingles)acuteOral HerpesacuteUrinary Tract InfectionacutePharyngitis (Strep throat)acutePneumoniaacuteInfluenzaacuteAnxietymentalDepressionmentalADHD in AdultsmentalHypertensionchronicDiabetes Type 2chronicGERDchronicMigraine HeadachechronicTension HeadacheacuteEczemachronicConjunctivitisacuteView All TemplatesFile ManagementNo reports foundGenerate medical reports to see them hereRecent ConsultationsPatient Details & Medical ReportComplete patient information and AI-powered documentationSelect a patient to view details and generate report\\n  \\n\\n\"\n"
-                    },
-                    {
-                      "text": "[Test] Body text preview: \n    InstantHPIMedical PlatformDashboardPatientsReportsMessagesAnalyticsSettingsCollaborationAssocia\n"
-                    },
-                    {
-                      "text": "[Test] Element counts - sidebar: 1, main: 1, dashboard-root: 1\n"
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2152,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 potential modal trigger buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:48:59.090Z",
+                      "annotations": [],
+                      "attachments": []
                     }
                   ],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2025-10-20T00:21:28.745Z",
-                  "annotations": [],
-                  "attachments": []
+                  "status": "expected"
                 }
               ],
-              "status": "expected"
+              "id": "0a835dd66e001b21791e-e8ca3567f7d9bd1e61d0",
+              "file": "button-functionality.spec.ts",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "6. Form submission buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2325,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 submit buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:48:59.282Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-9d90f6c5d0a6e3f4c522",
+              "file": "button-functionality.spec.ts",
+              "line": 134,
+              "column": 3
+            },
+            {
+              "title": "7. Delete buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2182,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 delete buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:00.107Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-70bcb6d2fde1b59b3458",
+              "file": "button-functionality.spec.ts",
+              "line": 153,
+              "column": 3
+            },
+            {
+              "title": "8. Tab/Switch buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2375,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 tab buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:00.198Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-6b87f58fd0f85836a24c",
+              "file": "button-functionality.spec.ts",
+              "line": 172,
+              "column": 3
+            },
+            {
+              "title": "9. All interactive buttons are accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2015,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Total buttons found: 17\n"
+                        },
+                        {
+                          "text": "Accessible buttons: 17, Disabled: 0\n"
+                        },
+                        {
+                          "text": "✅ Button accessibility verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:01.251Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-246e19ff0f86e19ae5ee",
+              "file": "button-functionality.spec.ts",
+              "line": 196,
+              "column": 3
+            },
+            {
+              "title": "10. Button click handlers execute",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 3937,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts:259:27",
+                        "location": {
+                          "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                          "column": 27,
+                          "line": 259
+                        },
+                        "snippet": "  257 |     \n  258 |     console.log(`Console errors: ${errors.length}`);\n> 259 |     expect(errors.length).toBe(0);\n      |                           ^\n  260 |     \n  261 |     console.log('✅ Button click handlers work correctly');\n  262 |   });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                            "column": 27,
+                            "line": 259
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  257 |     \n  258 |     console.log(`Console errors: ${errors.length}`);\n> 259 |     expect(errors.length).toBe(0);\n      |                           ^\n  260 |     \n  261 |     console.log('✅ Button click handlers work correctly');\n  262 |   });\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts:259:27"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Clicking 5 buttons to test handlers\n"
+                        },
+                        {
+                          "text": "Clicked: Dashboard\n"
+                        },
+                        {
+                          "text": "Clicked: Patients\n"
+                        },
+                        {
+                          "text": "Clicked: \n"
+                        },
+                        {
+                          "text": "Clicked: Refresh\n"
+                        },
+                        {
+                          "text": "Clicked: Add Patient\n"
+                        },
+                        {
+                          "text": "Console errors: 1\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:01.619Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-chromium/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-chromium/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-chromium/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                        "column": 27,
+                        "line": 259
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-6705a703f54e0eb0e5a2",
+              "file": "button-functionality.spec.ts",
+              "line": 228,
+              "column": 3
+            },
+            {
+              "title": "1. Dashboard refresh buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 5819,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Refresh button clicked\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:03.115Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-3c9a23ac540d0dc62e60",
+              "file": "button-functionality.spec.ts",
+              "line": 13,
+              "column": 3
+            },
+            {
+              "title": "2. Navigation sidebar buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4932,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 sidebar links\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:03.359Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-445944f869375ad33c2e",
+              "file": "button-functionality.spec.ts",
+              "line": 30,
+              "column": 3
+            },
+            {
+              "title": "3. Copy buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 5057,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 copy buttons\n"
+                        },
+                        {
+                          "text": "⚠️ No copy buttons found\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:03.774Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-1a2ef9d53078f8eaca69",
+              "file": "button-functionality.spec.ts",
+              "line": 60,
+              "column": 3
+            },
+            {
+              "title": "4. Search functionality works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 4539,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 2 search inputs\n"
+                        },
+                        {
+                          "text": "✅ Search input works\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:06.515Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-9eb66ae9e400e5d06785",
+              "file": "button-functionality.spec.ts",
+              "line": 81,
+              "column": 3
+            },
+            {
+              "title": "5. Modal/Dialog buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2534,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 potential modal trigger buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:09.100Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-06d6db2870aefd74e6e2",
+              "file": "button-functionality.spec.ts",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "6. Form submission buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2764,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 submit buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:10.118Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-b5401fec4932f3e7e037",
+              "file": "button-functionality.spec.ts",
+              "line": 134,
+              "column": 3
+            },
+            {
+              "title": "7. Delete buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2845,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 delete buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:10.365Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-4d57f38de2aba5ad0ef3",
+              "file": "button-functionality.spec.ts",
+              "line": 153,
+              "column": 3
+            },
+            {
+              "title": "8. Tab/Switch buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2955,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 tab buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:11.693Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-8ad1ebaa9bbb4ce6a9ba",
+              "file": "button-functionality.spec.ts",
+              "line": 172,
+              "column": 3
+            },
+            {
+              "title": "9. All interactive buttons are accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3138,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Total buttons found: 17\n"
+                        },
+                        {
+                          "text": "Accessible buttons: 17, Disabled: 0\n"
+                        },
+                        {
+                          "text": "✅ Button accessibility verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:11.710Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-e4e703396f2eec77d96b",
+              "file": "button-functionality.spec.ts",
+              "line": 196,
+              "column": 3
+            },
+            {
+              "title": "10. Button click handlers execute",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "firefox",
+                  "projectName": "firefox",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 4925,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Clicking 5 buttons to test handlers\n"
+                        },
+                        {
+                          "text": "Clicked: Dashboard\n"
+                        },
+                        {
+                          "text": "Clicked: Patients\n"
+                        },
+                        {
+                          "text": "Clicked: \n"
+                        },
+                        {
+                          "text": "Clicked: Refresh\n"
+                        },
+                        {
+                          "text": "Clicked: Add Patient\n"
+                        },
+                        {
+                          "text": "Console errors: 0\n"
+                        },
+                        {
+                          "text": "✅ Button click handlers work correctly\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:12.895Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-1c47eca4b6cd5309803e",
+              "file": "button-functionality.spec.ts",
+              "line": 228,
+              "column": 3
+            },
+            {
+              "title": "1. Dashboard refresh buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 3580,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Refresh button clicked\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:14.334Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-1ce391283eb993b9cb9c",
+              "file": "button-functionality.spec.ts",
+              "line": 13,
+              "column": 3
+            },
+            {
+              "title": "2. Navigation sidebar buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2221,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 sidebar links\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:15.664Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-38417f53f69fc121c5ce",
+              "file": "button-functionality.spec.ts",
+              "line": 30,
+              "column": 3
+            },
+            {
+              "title": "3. Copy buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2169,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 copy buttons\n"
+                        },
+                        {
+                          "text": "⚠️ No copy buttons found\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:15.872Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-c084927af4325ff1b850",
+              "file": "button-functionality.spec.ts",
+              "line": 60,
+              "column": 3
+            },
+            {
+              "title": "4. Search functionality works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2850,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 2 search inputs\n"
+                        },
+                        {
+                          "text": "✅ Search input works\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:18.955Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-64cbb4731dba235f80b8",
+              "file": "button-functionality.spec.ts",
+              "line": 81,
+              "column": 3
+            },
+            {
+              "title": "5. Modal/Dialog buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1943,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 potential modal trigger buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:18.138Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-6bec62c8b2890539347a",
+              "file": "button-functionality.spec.ts",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "6. Form submission buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2008,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 submit buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:18.341Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-27db0886887800b75f0c",
+              "file": "button-functionality.spec.ts",
+              "line": 134,
+              "column": 3
+            },
+            {
+              "title": "7. Delete buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1873,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 delete buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:18.618Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-1c9341b0ff902dd95bf7",
+              "file": "button-functionality.spec.ts",
+              "line": 153,
+              "column": 3
+            },
+            {
+              "title": "8. Tab/Switch buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1791,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 tab buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:20.092Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-183b28d216d86f13c78d",
+              "file": "button-functionality.spec.ts",
+              "line": 172,
+              "column": 3
+            },
+            {
+              "title": "9. All interactive buttons are accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1967,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Total buttons found: 17\n"
+                        },
+                        {
+                          "text": "Accessible buttons: 17, Disabled: 0\n"
+                        },
+                        {
+                          "text": "✅ Button accessibility verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:20.365Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-4e4c7a27aaa125d16238",
+              "file": "button-functionality.spec.ts",
+              "line": 196,
+              "column": 3
+            },
+            {
+              "title": "10. Button click handlers execute",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "webkit",
+                  "projectName": "webkit",
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 3685,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts:259:27",
+                        "location": {
+                          "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                          "column": 27,
+                          "line": 259
+                        },
+                        "snippet": "  257 |     \n  258 |     console.log(`Console errors: ${errors.length}`);\n> 259 |     expect(errors.length).toBe(0);\n      |                           ^\n  260 |     \n  261 |     console.log('✅ Button click handlers work correctly');\n  262 |   });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                            "column": 27,
+                            "line": 259
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  257 |     \n  258 |     console.log(`Console errors: ${errors.length}`);\n> 259 |     expect(errors.length).toBe(0);\n      |                           ^\n  260 |     \n  261 |     console.log('✅ Button click handlers work correctly');\n  262 |   });\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts:259:27"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Clicking 5 buttons to test handlers\n"
+                        },
+                        {
+                          "text": "Clicked: Dashboard\n"
+                        },
+                        {
+                          "text": "Clicked: Patients\n"
+                        },
+                        {
+                          "text": "Clicked: \n"
+                        },
+                        {
+                          "text": "Clicked: Refresh\n"
+                        },
+                        {
+                          "text": "Clicked: Add Patient\n"
+                        },
+                        {
+                          "text": "Console errors: 1\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:20.509Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-webkit/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-webkit/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-webkit/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                        "column": 27,
+                        "line": 259
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-c4d50350bbad6e8246aa",
+              "file": "button-functionality.spec.ts",
+              "line": 228,
+              "column": 3
+            },
+            {
+              "title": "1. Dashboard refresh buttons work",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 12,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30139,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
+                        {
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                        },
+                        {
+                          "location": {
+                            "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                            "column": 36,
+                            "line": 22
+                          },
+                          "message": "Error: locator.click: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('button:has([class*=\"RefreshCw\"]), button[title*=\"refresh\" i]').first()\u001b[22m\n\u001b[2m    - locator resolved to <button title=\"Refresh conversations\" class=\"inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 h-9 rounded-md px-3 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <div class=\"rounded-lg border text-card-foreground shadow-sm bg-[#1a1a1a] border-[#2a2a2a]\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <div class=\"tracking-tight text-[#e6e6e6] text-lg font-medium flex items-center gap-2\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m    - element is visible, enabled and stable\u001b[22m\n\u001b[2m    - scrolling into view if needed\u001b[22m\n\u001b[2m    - done scrolling\u001b[22m\n\u001b[2m    - <div class=\"rounded-lg border text-card-foreground shadow-sm bg-[#1a1a1a] border-[#2a2a2a]\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m  2 × retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m      - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <div class=\"p-6\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m  13 × retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"tracking-tight text-[#e6e6e6] text-lg font-medium flex items-center gap-2\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"rounded-lg border text-card-foreground shadow-sm bg-[#1a1a1a] border-[#2a2a2a]\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"p-6\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m     - retrying click action\u001b[22m\n\u001b[2m       - waiting 500ms\u001b[22m\n\u001b[2m       - waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m       - element is visible, enabled and stable\u001b[22m\n\u001b[2m       - scrolling into view if needed\u001b[22m\n\u001b[2m       - done scrolling\u001b[22m\n\u001b[2m       - <div class=\"p-6\">…</div> intercepts pointer events\u001b[22m\n\u001b[2m  - retrying click action\u001b[22m\n\u001b[2m    - waiting 500ms\u001b[22m\n\n\n  20 |     if (refreshCount > 0) {\n  21 |       // Click first refresh button\n> 22 |       await refreshButtons.first().click();\n     |                                    ^\n  23 |       await page.waitForTimeout(1000);\n  24 |       console.log('✅ Refresh button clicked');\n  25 |     } else {\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts:22:36"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:22.312Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-f2ec2-hboard-refresh-buttons-work-Mobile-Chrome/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-f2ec2-hboard-refresh-buttons-work-Mobile-Chrome/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-f2ec2-hboard-refresh-buttons-work-Mobile-Chrome/error-context.md"
+                        }
+                      ]
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-cc073726a3075fb2bfe2",
+              "file": "button-functionality.spec.ts",
+              "line": 13,
+              "column": 3
+            },
+            {
+              "title": "2. Navigation sidebar buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2385,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 sidebar links\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:22.405Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-78ffab25f99223979fa0",
+              "file": "button-functionality.spec.ts",
+              "line": 30,
+              "column": 3
+            },
+            {
+              "title": "3. Copy buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2417,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 copy buttons\n"
+                        },
+                        {
+                          "text": "⚠️ No copy buttons found\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:22.756Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-313397ef7c6468305c4f",
+              "file": "button-functionality.spec.ts",
+              "line": 60,
+              "column": 3
+            },
+            {
+              "title": "4. Search functionality works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2775,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 2 search inputs\n"
+                        },
+                        {
+                          "text": "✅ Search input works\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:24.556Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-00f661a0854f1e7f37d4",
+              "file": "button-functionality.spec.ts",
+              "line": 81,
+              "column": 3
+            },
+            {
+              "title": "5. Modal/Dialog buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2149,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 potential modal trigger buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:25.392Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-215eeaa81036059e79bd",
+              "file": "button-functionality.spec.ts",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "6. Form submission buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2118,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 submit buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:25.562Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-a154d128d5df80460ef1",
+              "file": "button-functionality.spec.ts",
+              "line": 134,
+              "column": 3
+            },
+            {
+              "title": "7. Delete buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1950,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 delete buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:27.558Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-0f6bc821f4baf8f253dd",
+              "file": "button-functionality.spec.ts",
+              "line": 153,
+              "column": 3
+            },
+            {
+              "title": "8. Tab/Switch buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2052,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 tab buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:27.689Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-859f99410d6f95b223ab",
+              "file": "button-functionality.spec.ts",
+              "line": 172,
+              "column": 3
+            },
+            {
+              "title": "9. All interactive buttons are accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2138,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Total buttons found: 17\n"
+                        },
+                        {
+                          "text": "Accessible buttons: 17, Disabled: 0\n"
+                        },
+                        {
+                          "text": "✅ Button accessibility verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:27.702Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-b5a4f13d44f051cdcb05",
+              "file": "button-functionality.spec.ts",
+              "line": 196,
+              "column": 3
+            },
+            {
+              "title": "10. Button click handlers execute",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Chrome",
+                  "projectName": "Mobile Chrome",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 2,
+                      "status": "failed",
+                      "duration": 4230,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts:259:27",
+                        "location": {
+                          "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                          "column": 27,
+                          "line": 259
+                        },
+                        "snippet": "  257 |     \n  258 |     console.log(`Console errors: ${errors.length}`);\n> 259 |     expect(errors.length).toBe(0);\n      |                           ^\n  260 |     \n  261 |     console.log('✅ Button click handlers work correctly');\n  262 |   });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                            "column": 27,
+                            "line": 259
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  257 |     \n  258 |     console.log(`Console errors: ${errors.length}`);\n> 259 |     expect(errors.length).toBe(0);\n      |                           ^\n  260 |     \n  261 |     console.log('✅ Button click handlers work correctly');\n  262 |   });\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts:259:27"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Clicking 5 buttons to test handlers\n"
+                        },
+                        {
+                          "text": "Clicked: Dashboard\n"
+                        },
+                        {
+                          "text": "Clicked: Patients\n"
+                        },
+                        {
+                          "text": "Clicked: \n"
+                        },
+                        {
+                          "text": "Clicked: Refresh\n"
+                        },
+                        {
+                          "text": "Clicked: Add Patient\n"
+                        },
+                        {
+                          "text": "Console errors: 1\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:29.521Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-Mobile-Chrome/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-Mobile-Chrome/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-Mobile-Chrome/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                        "column": 27,
+                        "line": 259
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-2734873d30ec26170fb8",
+              "file": "button-functionality.spec.ts",
+              "line": 228,
+              "column": 3
+            },
+            {
+              "title": "1. Dashboard refresh buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3110,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Refresh button clicked\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:30.318Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-e3c42335a5c3595b4e4a",
+              "file": "button-functionality.spec.ts",
+              "line": 13,
+              "column": 3
+            },
+            {
+              "title": "2. Navigation sidebar buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2058,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 sidebar links\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:30.324Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-957e910d140e859675fd",
+              "file": "button-functionality.spec.ts",
+              "line": 30,
+              "column": 3
+            },
+            {
+              "title": "3. Copy buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1710,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 copy buttons\n"
+                        },
+                        {
+                          "text": "⚠️ No copy buttons found\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:32.570Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-a6e595b4684b9c534cbf",
+              "file": "button-functionality.spec.ts",
+              "line": 60,
+              "column": 3
+            },
+            {
+              "title": "4. Search functionality works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2265,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 2 search inputs\n"
+                        },
+                        {
+                          "text": "✅ Search input works\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:33.626Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-84f20aff444d61a3086b",
+              "file": "button-functionality.spec.ts",
+              "line": 81,
+              "column": 3
+            },
+            {
+              "title": "5. Modal/Dialog buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1935,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 potential modal trigger buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:34.264Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-ed96473042d0ce0dd2c7",
+              "file": "button-functionality.spec.ts",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "6. Form submission buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1755,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 submit buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:34.286Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-8c843aaeedaf94d5ae74",
+              "file": "button-functionality.spec.ts",
+              "line": 134,
+              "column": 3
+            },
+            {
+              "title": "7. Delete buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1743,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 delete buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:35.901Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-bd27266ac977fea3f91e",
+              "file": "button-functionality.spec.ts",
+              "line": 153,
+              "column": 3
+            },
+            {
+              "title": "8. Tab/Switch buttons work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1724,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Found 0 tab buttons\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:36.050Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-346a0ff7dc51d256214c",
+              "file": "button-functionality.spec.ts",
+              "line": 172,
+              "column": 3
+            },
+            {
+              "title": "9. All interactive buttons are accessible",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1809,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "Total buttons found: 17\n"
+                        },
+                        {
+                          "text": "Accessible buttons: 17, Disabled: 0\n"
+                        },
+                        {
+                          "text": "✅ Button accessibility verified\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:36.388Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-7fcdab2729fd4eb060ec",
+              "file": "button-functionality.spec.ts",
+              "line": 196,
+              "column": 3
+            },
+            {
+              "title": "10. Button click handlers execute",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "Mobile Safari",
+                  "projectName": "Mobile Safari",
+                  "results": [
+                    {
+                      "workerIndex": 16,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 3354,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts:259:27",
+                        "location": {
+                          "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                          "column": 27,
+                          "line": 259
+                        },
+                        "snippet": "  257 |     \n  258 |     console.log(`Console errors: ${errors.length}`);\n> 259 |     expect(errors.length).toBe(0);\n      |                           ^\n  260 |     \n  261 |     console.log('✅ Button click handlers work correctly');\n  262 |   });"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                            "column": 27,
+                            "line": 259
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\n\n  257 |     \n  258 |     console.log(`Console errors: ${errors.length}`);\n> 259 |     expect(errors.length).toBe(0);\n      |                           ^\n  260 |     \n  261 |     console.log('✅ Button click handlers work correctly');\n  262 |   });\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts:259:27"
+                        }
+                      ],
+                      "stdout": [
+                        {
+                          "text": "Clicking 5 buttons to test handlers\n"
+                        },
+                        {
+                          "text": "Clicked: Dashboard\n"
+                        },
+                        {
+                          "text": "Clicked: Patients\n"
+                        },
+                        {
+                          "text": "Clicked: \n"
+                        },
+                        {
+                          "text": "Clicked: Refresh\n"
+                        },
+                        {
+                          "text": "Clicked: Add Patient\n"
+                        },
+                        {
+                          "text": "Console errors: 1\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-04T15:49:37.653Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-Mobile-Safari/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-Mobile-Safari/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/button-functionality-Butto-b9d3b-tton-click-handlers-execute-Mobile-Safari/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/button-functionality.spec.ts",
+                        "column": 27,
+                        "line": 259
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "0a835dd66e001b21791e-8d7f7c0934f7a29fb69c",
+              "file": "button-functionality.spec.ts",
+              "line": 228,
+              "column": 3
             }
-          ],
-          "id": "df6b40174562c70df515-e6b3dda8ca85e8aeb0e7",
-          "file": "auth-flow.spec.ts",
-          "line": 5,
-          "column": 1
+          ]
         }
       ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-10-20T00:21:22.848Z",
-    "duration": 10952.323999999999,
-    "expected": 5,
+    "startTime": "2025-11-04T15:48:54.039Z",
+    "duration": 59200.344,
+    "expected": 45,
     "skipped": 0,
-    "unexpected": 0,
+    "unexpected": 5,
     "flaky": 0
   }
 }

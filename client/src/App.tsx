@@ -32,6 +32,7 @@ import SettingsPage from "@/pages/settings-page";
 import LeadershipAssociationPage from "@/pages/leadership-association-page";
 import PrioritizedTasksPage from "@/pages/prioritized-tasks-page";
 import InsurancePaperworkPage from "@/pages/insurance-paperwork-page";
+import ClaudeAIPage from "@/pages/claude-ai-page";
 import { ProtectedRoute } from "@/lib/auth-guard";
 
 class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
@@ -230,6 +231,11 @@ export default function App() {
           <Route path="/insurance-paperwork">
             <ProtectedRoute>
               <InsurancePaperworkPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/claude-ai">
+            <ProtectedRoute>
+              <ClaudeAIPage />
             </ProtectedRoute>
           </Route>
           <Route>

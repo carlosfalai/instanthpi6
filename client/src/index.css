@@ -135,6 +135,52 @@
   --color-3: 210 100% 63%;
   --color-4: 195 100% 63%;
   --color-5: 90 100% 63%;
+  
+  /* Dark Theme Color Variables - Based on Linear Design System */
+  --background: 0 0% 5%;           /* #0d0d0d - Main background */
+  --foreground: 0 0% 90%;          /* #e6e6e6 - Primary text */
+  
+  --card: 0 0% 10%;                /* #1a1a1a - Cards, sidebar */
+  --card-foreground: 0 0% 90%;     /* #e6e6e6 - Card text */
+  
+  --popover: 0 0% 10%;             /* #1a1a1a - Popover background */
+  --popover-foreground: 0 0% 90%;  /* #e6e6e6 - Popover text */
+  
+  --primary: 270 100% 63%;         /* #8b5cf6 - Purple accent */
+  --primary-foreground: 0 0% 100%; /* White text on primary */
+  
+  --secondary: 0 0% 13%;           /* #222222 - Secondary background */
+  --secondary-foreground: 0 0% 90%; /* #e6e6e6 - Secondary text */
+  
+  --muted: 0 0% 13%;               /* #222222 - Muted background */
+  --muted-foreground: 0 0% 60%;    /* #999999 - Muted text */
+  
+  --accent: 0 0% 16%;              /* #2a2a2a - Accent background */
+  --accent-foreground: 0 0% 90%;   /* #e6e6e6 - Accent text */
+  
+  --destructive: 0 84% 60%;        /* #ef4444 - Red for errors */
+  --destructive-foreground: 0 0% 100%; /* White text on destructive */
+  
+  --border: 0 0% 20%;              /* #333333 - Default borders */
+  --input: 0 0% 10%;               /* #1a1a1a - Input background */
+  --ring: 270 100% 63%;            /* #8b5cf6 - Focus ring */
+  
+  --chart-1: 0 100% 63%;
+  --chart-2: 270 100% 63%;
+  --chart-3: 210 100% 63%;
+  --chart-4: 195 100% 63%;
+  --chart-5: 90 100% 63%;
+  
+  --sidebar-background: 0 0% 10%;   /* #1a1a1a - Sidebar background */
+  --sidebar-foreground: 0 0% 90%;  /* #e6e6e6 - Sidebar text */
+  --sidebar-primary: 270 100% 63%; /* #8b5cf6 - Sidebar primary */
+  --sidebar-primary-foreground: 0 0% 100%; /* White on sidebar primary */
+  --sidebar-accent: 0 0% 16%;      /* #2a2a2a - Sidebar accent */
+  --sidebar-accent-foreground: 0 0% 90%; /* #e6e6e6 - Sidebar accent text */
+  --sidebar-border: 0 0% 16%;      /* #2a2a2a - Sidebar border */
+  --sidebar-ring: 270 100% 63%;    /* #8b5cf6 - Sidebar focus ring */
+  
+  --radius: 0.5rem;
 }
 
 @keyframes tilt {

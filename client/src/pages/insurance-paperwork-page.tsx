@@ -39,7 +39,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Mail, AlertCircle, CheckCircle, FileText, RefreshCw } from "lucide-react";
-import BaseLayout from "@/components/layout/BaseLayout";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -215,7 +215,7 @@ export default function InsurancePaperworkPage() {
   const needsInfoDocuments = documents?.filter((doc) => doc.status === "needs_info") || [];
 
   return (
-    <BaseLayout>
+    <AppLayoutSpruce>
       <div className="container mx-auto px-6 py-8">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -659,6 +659,6 @@ export default function InsurancePaperworkPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </BaseLayout>
+    </AppLayoutSpruce>
   );
 }

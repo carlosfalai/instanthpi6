@@ -6,7 +6,7 @@ import NavigationBar from "@/components/navigation/NavigationBar";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#121212] text-white">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Always include the navigation bar */}
       <NavigationBar />
 

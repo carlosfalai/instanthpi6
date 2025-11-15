@@ -130,9 +130,9 @@ router.post("/generate", async (req, res) => {
           apiKey: process.env.ANTHROPIC_API_KEY,
         });
 
-        // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
+        // Using Claude 3.5 Haiku as default (fast and cost-effective)
         const response = await anthropic.messages.create({
-          model: "claude-3-7-sonnet-20250219",
+          model: "claude-3-5-haiku-20241022",
           system: systemMessage,
           max_tokens: 1024,
           messages: [{ role: "user", content: prompt }],

@@ -103,7 +103,7 @@ export async function getUserAIConfig(userId: number): Promise<AIClientConfig | 
       }
       return {
         provider: 'claude',
-        model: userSettings.claudeModel || 'claude-3-5-sonnet-20241022',
+        model: userSettings.claudeModel || 'claude-3-5-haiku-20241022',
         apiKey: userSettings.claudeApiKey
       };
     }
@@ -128,7 +128,7 @@ export async function createUserAIClient(userId: number): Promise<AIClient | nul
       if (openaiKey) {
         return new OpenAIClient(openaiKey, 'gpt-4o');
       } else if (claudeKey) {
-        return new ClaudeClient(claudeKey, 'claude-3-5-sonnet-20241022');
+        return new ClaudeClient(claudeKey, 'claude-3-5-haiku-20241022');
       }
       
       throw new Error("No AI configuration found for user and no fallback environment variables");

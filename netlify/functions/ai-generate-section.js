@@ -68,7 +68,7 @@ Be concise, clinically appropriate, and match the requested tone and style exact
       const anthropic = new Anthropic({ apiKey: api_key });
       
       const message = await anthropic.messages.create({
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-3-5-haiku-20241022",
         max_tokens: 2048,
         messages: [{
           role: "user",

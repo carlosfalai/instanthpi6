@@ -48,7 +48,7 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
     openaiApiKey: '',
     claudeApiKey: '',
     openaiModel: 'gpt-4o',
-    claudeModel: 'claude-3-5-sonnet-20241022',
+    claudeModel: 'claude-3-5-haiku-20241022',
   });
 
   useEffect(() => {

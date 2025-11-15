@@ -5,8 +5,9 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-// The newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
-const DEFAULT_MODEL = "claude-3-7-sonnet-20250219";
+// Default model: Claude 3.5 Haiku (fast and cost-effective)
+// For Haiku 4.5, use: "claude-3-5-haiku-20241022"
+const DEFAULT_MODEL = "claude-3-5-haiku-20241022";
 
 // Example protocol to use as a template
 const PROTOCOL_TEMPLATE = `🩺 Chronic Abdominal Pain

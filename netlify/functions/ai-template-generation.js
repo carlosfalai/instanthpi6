@@ -79,7 +79,7 @@ Return ONLY a JSON object with this exact format:
 Be specific, evidence-based, and clinically appropriate. Include 8-15 relevant plan items.`;
 
     const message = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-3-5-haiku-20241022",
       max_tokens: 2048,
       messages: [
         {

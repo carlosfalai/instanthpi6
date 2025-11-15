@@ -162,7 +162,7 @@ exports.handler = async (event) => {
         
         try {
           const anthropicResponse = await anthropic.messages.create({
-            model: "claude-3-5-sonnet-20241022",
+            model: "claude-3-5-haiku-20241022",
             max_tokens: 1000,
             messages: [
               {

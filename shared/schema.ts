@@ -241,7 +241,7 @@ export const aiSettings = pgTable("ai_settings", {
   openaiApiKey: text("openai_api_key"), // Doctor's OpenAI API key
   claudeApiKey: text("claude_api_key"), // Doctor's Claude API key
   openaiModel: text("openai_model").default("gpt-4o"), // OpenAI model to use
-  claudeModel: text("claude_model").default("claude-3-5-sonnet-20241022"), // Claude model to use
+  claudeModel: text("claude_model").default("claude-3-5-haiku-20241022"), // Claude model to use (default: Haiku 4.5)
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 

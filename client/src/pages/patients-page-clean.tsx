@@ -139,7 +139,7 @@ export default function PatientsPage() {
 
   return (
     <AppLayoutSpruce>
-      <div className="flex h-full bg-[#121212] overflow-hidden">
+      <div className="flex h-full bg-background overflow-hidden">
         {/* Left column - Patient List */}
         <div className="w-full md:w-1/3 border-r border-[#333] flex flex-col bg-[#1a1a1a] overflow-hidden">
           {/* Patient List Header */}

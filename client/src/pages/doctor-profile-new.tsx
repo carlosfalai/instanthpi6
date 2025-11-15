@@ -27,6 +27,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { Textarea } from "../components/ui/textarea";
 import { useToast } from "../hooks/use-toast";
+import MedicalTemplatesManager from "../components/doctor/MedicalTemplatesManager";
+import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 
 export default function DoctorProfileNew() {
   const [, navigate] = useLocation();
@@ -535,33 +537,7 @@ export default function DoctorProfileNew() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate("/doctor-dashboard")}
-                className="mr-4"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Retour au Tableau de Bord
-              </Button>
-              <h1 className="text-xl font-semibold text-gray-900">Configuration du Médecin</h1>
-            </div>
-            {hasCredentials && credentialsVerified && (
-              <div className="flex items-center gap-2 text-green-600">
-                <Check className="h-5 w-5" />
-                <span className="text-sm font-medium">Connecté</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
-
+    <AppLayoutSpruce>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {!hasCredentials && (
           <Card className="mb-6 border-yellow-200 bg-yellow-50">
@@ -580,11 +556,12 @@ export default function DoctorProfileNew() {
         )}
 
         <Tabs defaultValue="identity" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 bg-white border">
+          <TabsList className="grid w-full grid-cols-5 bg-white border">
             <TabsTrigger value="identity">Identité</TabsTrigger>
             <TabsTrigger value="api">API Intégrations</TabsTrigger>
             <TabsTrigger value="ai">IA Configuration</TabsTrigger>
             <TabsTrigger value="templates">Diagnostics</TabsTrigger>
+            <TabsTrigger value="medical_templates">Templates</TabsTrigger>
           </TabsList>
 
           {/* Identity Tab */}
@@ -1276,8 +1253,13 @@ export default function DoctorProfileNew() {
               </Card>
             </div>
           </TabsContent>
+
+          {/* Medical Templates Tab */}
+          <TabsContent value="medical_templates">
+            <MedicalTemplatesManager />
+          </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </AppLayoutSpruce>
   );
 }

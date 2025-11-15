@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import { Link, useLocation } from "wouter";
+import UnifiedLayout from "./UnifiedLayout";
 import {
   Users,
   FileText,
@@ -223,63 +224,60 @@ export default function AppLayoutSpruce({ children }: AppLayoutSpruceProps) {
 
   const currentActiveSection = determineActiveSection();
 
-  return (
-    <div className="min-h-screen bg-[#0d0d0d] flex">
-      {/* Sidebar - Linear Style */}
-      <aside className="w-64 bg-[#1a1a1a] border-r border-[#333] flex-shrink-0">
-        <div className="p-6">
-          {/* Logo - Linear Style */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#8b5cf6] rounded-lg flex items-center justify-center">
-                <Stethoscope className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-semibold text-[#e6e6e6]">InstantHPI</h1>
-                <p className="text-xs text-[#666]">Medical Platform</p>
-              </div>
+  // Sidebar content
+  const sidebarContent = (
+    <div className="p-6 h-full">
+      {/* Logo */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-[#8b5cf6] rounded-lg flex items-center justify-center">
+            <Stethoscope className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold text-[#e6e6e6]">InstantHPI</h1>
+            <p className="text-xs text-[#666]">Medical Platform</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="space-y-6">
+        {mainNavSections.map((section, idx) => (
+          <div key={section.id} className={idx > 0 ? "border-t border-[#333] pt-6 mt-6" : ""}>
+            <h3 className="text-xs font-medium text-[#666] uppercase tracking-wider mb-3 px-3">
+              {section.title}
+            </h3>
+            <div className="space-y-1">
+              {section.items.map((item) => {
+                const isActive = currentActiveSection === item.id;
+                const Icon = item.icon;
+
+                return (
+                  <Link key={item.id} href={item.path}>
+                    <div
+                      className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors cursor-pointer ${
+                        isActive
+                          ? "bg-[#222] text-[#e6e6e6] border border-[#2a2a2a] font-medium"
+                          : "text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50"
+                      }`}
+                    >
+                      <Icon className="w-4 h-4" />
+                      <span className="flex-1">{item.label}</span>
+                      <NotificationBadge count={item.notificationCount || 0} />
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
-
-          {/* Navigation */}
-          <nav className="space-y-6">
-            {mainNavSections.map((section, idx) => (
-              <div key={section.id} className={idx > 0 ? "border-t border-[#333] pt-6 mt-6" : ""}>
-                <h3 className="text-xs font-medium text-[#666] uppercase tracking-wider mb-3 px-3">
-                  {section.title}
-                </h3>
-                <div className="space-y-1">
-                  {section.items.map((item) => {
-                    const isActive = currentActiveSection === item.id;
-                    const Icon = item.icon;
-
-                    return (
-                      <Link key={item.id} href={item.path}>
-                        <div
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-md text-sm transition-colors ${
-                            isActive
-                              ? "bg-[#222] text-[#e6e6e6] border border-[#2a2a2a] font-medium"
-                              : "text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50"
-                          }`}
-                        >
-                          <Icon className="w-4 h-4" />
-                          <span className="flex-1">{item.label}</span>
-                          <NotificationBadge count={item.notificationCount || 0} />
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </nav>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 bg-[#0d0d0d] overflow-auto">
-        {children}
-      </main>
+        ))}
+      </nav>
     </div>
+  );
+
+  return (
+    <UnifiedLayout navigationMode="sidebar" sidebarContent={sidebarContent} maxWidth="full">
+      {children}
+    </UnifiedLayout>
   );
 }

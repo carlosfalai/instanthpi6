@@ -27,7 +27,7 @@ router.get("/:userId", async (req, res) => {
         userId,
         preferredAiProvider: "openai",
         openaiModel: "gpt-4o",
-        claudeModel: "claude-3-5-sonnet-20241022",
+        claudeModel: "claude-3-5-haiku-20241022",
         openaiApiKey: null, // Don't return the actual key for security
         claudeApiKey: null, // Don't return the actual key for security
         hasOpenaiKey: false,

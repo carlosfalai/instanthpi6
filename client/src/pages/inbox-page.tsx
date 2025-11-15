@@ -36,7 +36,7 @@ export default function InboxPage() {
   } = useQuery({
     queryKey: ["/api/spruce/conversations"],
     queryFn: async () => {
-      const response = await fetch("http://localhost:3002/api/spruce/conversations/all");
+      const response = await fetch("/api/spruce-conversations-all");
       if (!response.ok) {
         throw new Error("Failed to fetch conversations");
       }
@@ -45,13 +45,13 @@ export default function InboxPage() {
       return data.map((conv: any) => ({
         id: conv.id,
         entityId: conv.id, // Use conversation ID
-        displayName: conv.title || conv.externalParticipants?.[0]?.displayName || "Unknown",
-        lastActivity: conv.lastMessageAt || conv.createdAt,
-        unreadCount: 0, // Spruce API doesn't provide this
-        lastMessage: conv.subtitle
+        displayName: conv.patient_name || conv.title || "Unknown Patient",
+        lastActivity: conv.updated_at || conv.lastActivity || conv.createdAt,
+        unreadCount: conv.unread_count || 0,
+        lastMessage: conv.last_message
           ? {
-              content: conv.subtitle,
-              timestamp: conv.lastMessageAt,
+              content: conv.last_message,
+              timestamp: conv.updated_at || conv.lastActivity,
               isFromPatient: true,
             }
           : undefined,
@@ -62,17 +62,17 @@ export default function InboxPage() {
 
   // Fetch messages for selected conversation
   const { data: messages, isLoading: isLoadingMessages } = useQuery({
-    queryKey: ["/api/spruce/patients", selectedConversation, "messages"],
+    queryKey: ["/api/spruce/conversation", selectedConversation, "messages"],
     queryFn: async () => {
       if (!selectedConversation) return [];
       const response = await fetch(
-        `http://localhost:3002/api/spruce/conversation/history/${selectedConversation}`
+        `/api/spruce/conversation/history/${selectedConversation}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch messages");
       }
       const data = await response.json();
-      return data.messages || [];
+      return data.messages || data || [];
     },
     enabled: !!selectedConversation,
   });

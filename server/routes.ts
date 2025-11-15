@@ -49,6 +49,11 @@ import consultationsSearchRouter from "./routes/consultations-search";
 import unifiedMedicalProcessingRouter from "./routes/unified-medical-processing";
 import aiSettingsRouter from "./routes/ai-settings";
 import { router as doctorCredentialsRouter } from "./routes/doctor-credentials";
+import fileManagementRouter from "./routes/file-management";
+import spruceConversationsAllRouter from "./routes/spruce-conversations-all";
+import spruceConversationHistoryRouter from "./routes/spruce-conversation-history";
+import gmailRouter from "./routes/gmail";
+import medicalTemplatesRouter from "./routes/medical-templates";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -124,6 +129,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/ai-settings", aiSettingsRouter);
   // Doctor credentials API for managing encrypted API keys
   app.use("/api/doctor", doctorCredentialsRouter);
+  // File management API for listing/deleting reports
+  app.use("/api/file-management", fileManagementRouter);
+  // Spruce conversations all API endpoint
+  app.use("/api/spruce-conversations-all", spruceConversationsAllRouter);
+  // Spruce conversation history API endpoint
+  app.use("/api/spruce/conversation", spruceConversationHistoryRouter);
+  // Gmail API endpoint
+  app.use("/api/gmail", gmailRouter);
+  // Medical templates API endpoint
+  app.use("/api/medical-templates", medicalTemplatesRouter);
 
   // Error handling middleware for Zod validation errors
   const handleZodError = (error: unknown, res: Response) => {
@@ -548,9 +563,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             apiKey: process.env.ANTHROPIC_API_KEY,
           });
 
-          // the newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
+          // Using Claude 3.5 Haiku as default (fast and cost-effective)
           const response = await anthropic.messages.create({
-            model: "claude-3-7-sonnet-20250219",
+            model: "claude-3-5-haiku-20241022",
             system: systemMessage,
             max_tokens: 1024,
             messages: [{ role: "user", content: prompt }],
