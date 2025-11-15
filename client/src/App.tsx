@@ -20,6 +20,18 @@ import TierAssociationPage from "@/pages/tier-association-page";
 import InboxPage from "@/pages/inbox-page";
 import AuthCallback from "@/pages/auth-callback";
 import LoginDiagnostics from "@/pages/login-diagnostics";
+import SchedulerPage from "@/pages/scheduler-page";
+import FormsitePage from "@/pages/formsite-page";
+import FormsPage from "@/pages/forms-page";
+import ChronicConditionsPage from "@/pages/chronic-conditions-page";
+import MedicationRefillsPage from "@/pages/medication-refills-page";
+import UrgentCarePage from "@/pages/urgent-care-page";
+import EducationPage from "@/pages/education-page";
+import SubscriptionPage from "@/pages/subscription-page";
+import SettingsPage from "@/pages/settings-page";
+import LeadershipAssociationPage from "@/pages/leadership-association-page";
+import PrioritizedTasksPage from "@/pages/prioritized-tasks-page";
+import InsurancePaperworkPage from "@/pages/insurance-paperwork-page";
 import { ProtectedRoute } from "@/lib/auth-guard";
 
 class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
@@ -160,6 +172,66 @@ export default function App() {
           </Route>
           <Route path="/auth/callback" component={AuthCallback} />
           <Route path="/webhook-setup" component={WebhookSetupPage} />
+          <Route path="/scheduler">
+            <ProtectedRoute>
+              <SchedulerPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/formsite">
+            <ProtectedRoute>
+              <FormsitePage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/forms">
+            <ProtectedRoute>
+              <FormsPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/chronic-conditions">
+            <ProtectedRoute>
+              <ChronicConditionsPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/medication-refills">
+            <ProtectedRoute>
+              <MedicationRefillsPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/urgent-care">
+            <ProtectedRoute>
+              <UrgentCarePage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/education">
+            <ProtectedRoute>
+              <EducationPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/subscription">
+            <ProtectedRoute>
+              <SubscriptionPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/settings">
+            <ProtectedRoute>
+              <SettingsPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/leadership-association">
+            <ProtectedRoute>
+              <LeadershipAssociationPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/priority-tasks">
+            <ProtectedRoute>
+              <PrioritizedTasksPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/insurance-paperwork">
+            <ProtectedRoute>
+              <InsurancePaperworkPage />
+            </ProtectedRoute>
+          </Route>
           <Route>
             <div className="min-h-screen flex items-center justify-center">
               <div className="text-center">

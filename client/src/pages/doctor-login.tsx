@@ -33,7 +33,9 @@ export default function DoctorLogin() {
       return;
     }
 
-    // Production: Check Supabase session and auto-redirect if valid
+    // Production: Check Supabase session - but DON'T auto-redirect from login page
+    // Users must explicitly click "Sign in" button for security
+    // Only show a message if they're already logged in
     const checkSession = async () => {
       try {
         const {
@@ -47,19 +49,14 @@ export default function DoctorLogin() {
         }
 
         if (session && session.user) {
-          // Security: Only auto-redirect if session is valid and not expired
+          // Check if session is valid
           const now = Math.floor(Date.now() / 1000);
           
-          // Require expires_at to be present and valid
+          // Only show message if session is valid - but don't auto-redirect
           if (session.expires_at && session.expires_at > now) {
-            console.log('[DoctorLogin] Valid session found, redirecting to dashboard', {
-              email: session.user.email,
-              expiresAt: session.expires_at
-            });
-            navigate('/doctor-dashboard');
-            return;
+            setMessage("You are already signed in. Click 'Continue' to go to dashboard or sign out to use a different account.");
           } else if (session.expires_at) {
-            // Session expired - only try refresh if within 5 minute window
+            // Session expired - try refresh silently, but don't auto-redirect
             const expiredBy = now - session.expires_at;
             if (expiredBy < 300) { // Within 5 minutes
               console.log('[DoctorLogin] Session expired, attempting refresh...');
@@ -68,17 +65,10 @@ export default function DoctorLogin() {
               if (!refreshError && refreshedSession?.user && refreshedSession.expires_at) {
                 const newExpiresAt = refreshedSession.expires_at;
                 if (newExpiresAt > now) {
-                  console.log('[DoctorLogin] Session refreshed, redirecting...');
-                  navigate('/doctor-dashboard');
-                  return;
+                  setMessage("Session refreshed. Click 'Continue' to go to dashboard.");
                 }
               }
             }
-            // If refresh failed or too old, show login form
-            console.log('[DoctorLogin] Session expired, showing login form');
-          } else {
-            // No expires_at - security: don't auto-redirect, require explicit login
-            console.log('[DoctorLogin] Session missing expires_at, requiring explicit login');
           }
         }
       } catch (error) {
