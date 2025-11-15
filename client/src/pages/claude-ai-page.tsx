@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 import ClaudeAIInterface from "@/components/ai/ClaudeAIInterface";
 import ClaudeDevAssistant from "@/components/ai/ClaudeDevAssistant";
+import ClaudeProfileAssistant from "@/components/ai/ClaudeProfileAssistant";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const ClaudeAIPage = () => {
-  const [activeTab, setActiveTab] = useState("features");
+  const [activeTab, setActiveTab] = useState("profile");
 
   return (
     <AppLayoutSpruce>
@@ -26,21 +27,26 @@ const ClaudeAIPage = () => {
               image recognition, and code generation.
             </p>
             <p className="mt-2">
-              Use the interfaces below to interact with Claude and explore its capabilities.
+              Use the interfaces below to interact with Claude and explore its capabilities. The Profile Assistant can help you manage your doctor profile through conversation.
             </p>
           </CardContent>
         </Card>
 
         <Tabs
-          defaultValue="features"
+          defaultValue="profile"
           value={activeTab}
           onValueChange={setActiveTab}
           className="mb-6"
         >
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="profile">Profile Assistant</TabsTrigger>
             <TabsTrigger value="features">AI Features</TabsTrigger>
             <TabsTrigger value="development">Development Assistant</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="profile" className="mt-4">
+            <ClaudeProfileAssistant />
+          </TabsContent>
 
           <TabsContent value="features" className="mt-4">
             <ClaudeAIInterface />
