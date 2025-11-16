@@ -194,12 +194,23 @@ export default function DoctorLogin() {
             </Button>
 
             {message && !message.toLowerCase().includes("already signed") && (
-              <div className={`p-3 rounded-md text-sm ${
-                message.includes("error") || message.includes("failed")
+              <div className={`p-3 rounded-md text-sm whitespace-pre-line ${
+                message.includes("error") || message.includes("failed") || message.includes("not configured")
                   ? "bg-red-50 text-red-800 border border-red-200" 
                   : "bg-blue-50 text-blue-800 border border-blue-200"
               }`}>
                 {message}
+                {message.includes("not configured") && (
+                  <div className="mt-3 pt-3 border-t border-red-300">
+                    <p className="font-semibold mb-2">Quick Fix:</p>
+                    <ol className="list-decimal list-inside space-y-1 text-xs">
+                      <li>Go to <a href="https://supabase.com/dashboard/project/uoahrhroyqsqixusewwe/auth/providers" target="_blank" rel="noopener noreferrer" className="underline">Supabase Dashboard → Auth → Providers</a></li>
+                      <li>Click on "Google" provider</li>
+                      <li>Enable it and add your Google OAuth credentials</li>
+                      <li>Get credentials from <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Console</a></li>
+                    </ol>
+                  </div>
+                )}
               </div>
             )}
           </div>
