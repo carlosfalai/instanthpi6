@@ -1,10 +1,16 @@
 const axios = require("axios");
+const { createClient } = require("@supabase/supabase-js");
 
 // Spruce API configuration
-const SPRUCE_BEARER_TOKEN =
-  process.env.SPRUCE_BEARER_TOKEN ||
-  "YWlkX0x4WEZaNXBCYktwTU1KbjA3a0hHU2Q0d0UrST06c2tfVkNxZGxFWWNtSHFhcjN1TGs3NkZQa2ZoWm9JSEsyVy80bTVJRUpSQWhCY25lSEpPV3hqd2JBPT0=";
 const SPRUCE_API_URL = "https://api.sprucehealth.com/v1";
+
+// Supabase client
+function getSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key);
+}
 
 // Mock messages for demonstration - in production, these would come from Spruce API
 const mockMessages = {
@@ -138,51 +144,142 @@ exports.handler = async (event, context) => {
   }
 
   // Extract conversation ID from path
-  const pathParts = event.path.split("/");
-  const conversationId = pathParts[pathParts.length - 1];
+  // Path format: /api/spruce/conversations/{id}/history
+  const pathParts = event.path.split("/").filter(p => p);
+  let conversationId = null;
+  
+  // Find the conversation ID (should be before "history")
+  const historyIndex = pathParts.indexOf("history");
+  if (historyIndex > 0) {
+    conversationId = pathParts[historyIndex - 1];
+  } else {
+    // Fallback: try last part if no "history" found
+    conversationId = pathParts[pathParts.length - 1];
+  }
 
-  if (!conversationId || conversationId === "history") {
+  if (!conversationId || conversationId === "history" || conversationId === "conversations") {
+    console.error("Invalid conversation ID from path:", event.path, "parts:", pathParts);
     return {
       statusCode: 400,
       headers,
-      body: JSON.stringify({ error: "Conversation ID is required" }),
+      body: JSON.stringify({ 
+        error: "Conversation ID is required",
+        path: event.path,
+        parts: pathParts
+      }),
     };
   }
 
   try {
     console.log(`Fetching message history for conversation ${conversationId}...`);
 
-    // Check if we have mock messages for this conversation
-    let messages = mockMessages[conversationId];
+    // 1) Load doctor credentials from Supabase
+    const doctorId = "default-doctor";
+    let spruceAccessId = null;
+    let spruceApiKey = null;
 
-    if (!messages) {
-      // Try to get conversation details from Spruce to get patient name
-      try {
-        const convResponse = await axios.get(`${SPRUCE_API_URL}/conversations/${conversationId}`, {
-          headers: {
-            Authorization: `Bearer ${SPRUCE_BEARER_TOKEN}`,
-            Accept: "application/json",
-          },
-        });
+    const supabase = getSupabase();
+    if (supabase) {
+      const { data: physician, error: physicianErr } = await supabase
+        .from("physicians")
+        .select("spruce_access_id, spruce_api_key")
+        .eq("id", doctorId)
+        .single();
 
-        const conversation = convResponse.data.conversation || convResponse.data;
-        const patientName =
-          conversation.title || conversation.externalParticipants?.[0]?.displayName || "Patient";
-
-        // Generate mock messages for this conversation
-        messages = generateMockMessages(conversationId, patientName);
-      } catch (error) {
-        console.log("Could not fetch conversation details, using generic messages");
-        messages = generateMockMessages(conversationId, "Patient");
+      if (physicianErr) {
+        console.error("Supabase physicians read error:", physicianErr);
       }
+
+      spruceAccessId = physician?.spruce_access_id;
+      spruceApiKey = physician?.spruce_api_key;
     }
 
-    return {
-      statusCode: 200,
-      headers,
-      body: JSON.stringify(messages),
-    };
-  } catch (error) {
+    // Fallback to headers if provided
+    if (!spruceAccessId && (event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"])) {
+      spruceAccessId = event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"]; 
+    }
+    if (!spruceApiKey && (event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"])) {
+      spruceApiKey = event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"]; 
+    }
+
+    if (!spruceAccessId || !spruceApiKey) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          error: "Spruce credentials not configured",
+          message: "Please add Spruce Access ID and API Key in Doctor Profile → API Integrations, then try again.",
+        }),
+      };
+    }
+
+    // Build Basic auth token from aid:api_key per Spruce API
+    const basicToken = /^YWlk/.test(spruceApiKey)
+      ? spruceApiKey
+      : Buffer.from(`${spruceAccessId}:${spruceApiKey}`).toString("base64");
+
+    // Fetch real messages from Spruce API
+    try {
+      const messagesResponse = await axios.get(
+        `${SPRUCE_API_URL}/conversations/${conversationId}/messages`,
+        {
+          headers: {
+            Authorization: `Basic ${basicToken}`,
+            Accept: "application/json",
+          },
+          params: {
+            limit: 100, // Fetch up to 100 messages
+          },
+        }
+      );
+
+      const spruceMessages = messagesResponse.data.messages || messagesResponse.data || [];
+      
+      // Transform Spruce messages to inbox format
+      const transformedMessages = spruceMessages.map((msg: any) => {
+        // Determine if message is from patient (external participant)
+        const isFromPatient = msg.sender?.type === "external" || 
+                             msg.sender?.isExternal === true ||
+                             !msg.sender?.isInternal;
+
+        return {
+          id: msg.id || msg.messageId,
+          content: msg.content || msg.text || msg.body || "",
+          timestamp: msg.timestamp || msg.createdAt || msg.sentAt || new Date().toISOString(),
+          isFromPatient: isFromPatient,
+          senderName: msg.sender?.displayName || msg.sender?.name || (isFromPatient ? "Patient" : "Dr. Font"),
+        };
+      });
+
+      // Sort by timestamp (oldest first)
+      transformedMessages.sort((a: any, b: any) => {
+        return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+      });
+
+      console.log(`Fetched ${transformedMessages.length} messages for conversation ${conversationId}`);
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(transformedMessages),
+      };
+    } catch (spruceError: any) {
+      console.error("Error fetching messages from Spruce API:", spruceError.response?.data || spruceError.message);
+      
+      // Fallback to mock messages if Spruce API fails
+      console.log("Falling back to mock messages");
+      let messages = mockMessages[conversationId];
+      if (!messages) {
+        messages = generateMockMessages(conversationId, "Patient");
+      }
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify(messages),
+      };
+    }
+  } catch (error: any) {
     console.error("Error fetching message history:", error.message);
 
     return {
@@ -190,7 +287,8 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         error: "Failed to fetch message history",
-        message: error.message,
+        message: error.message || "Unknown error",
+        timestamp: new Date().toISOString()
       }),
     };
   }

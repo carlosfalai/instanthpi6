@@ -36,12 +36,29 @@ export default function InboxPage() {
   } = useQuery({
     queryKey: ["/api/spruce/conversations"],
     queryFn: async () => {
+      console.log("[Inbox] Fetching conversations from /api/spruce-conversations-all");
       const response = await fetch("/api/spruce-conversations-all");
+      
       if (!response.ok) {
-        throw new Error("Failed to fetch conversations");
+        const errorText = await response.text();
+        console.error("[Inbox] Failed to fetch conversations:", response.status, errorText);
+        throw new Error(`Failed to fetch conversations: ${response.status} ${errorText}`);
       }
+      
       const data = await response.json();
+      console.log(`[Inbox] Received ${data?.length || 0} conversations`);
+      
+      // Handle error response format
+      if (data.error) {
+        throw new Error(data.message || data.error);
+      }
+      
       // Transform Spruce API format to expected format
+      if (!Array.isArray(data)) {
+        console.error("[Inbox] Expected array but got:", typeof data, data);
+        return [];
+      }
+      
       return data.map((conv: any) => ({
         id: conv.id,
         entityId: conv.id, // Use conversation ID
@@ -58,6 +75,7 @@ export default function InboxPage() {
       }));
     },
     refetchInterval: 30000, // Refresh every 30 seconds
+    retry: 2, // Retry failed requests
   });
 
   // Fetch messages for selected conversation
@@ -65,16 +83,33 @@ export default function InboxPage() {
     queryKey: ["/api/spruce/conversation", selectedConversation, "messages"],
     queryFn: async () => {
       if (!selectedConversation) return [];
+      
+      console.log(`[Inbox] Fetching messages for conversation ${selectedConversation}`);
       const response = await fetch(
-        `/api/spruce/conversation/history/${selectedConversation}`
+        `/api/spruce/conversations/${selectedConversation}/history`
       );
+      
       if (!response.ok) {
-        throw new Error("Failed to fetch messages");
+        const errorText = await response.text();
+        console.error(`[Inbox] Failed to fetch messages:`, response.status, errorText);
+        throw new Error(`Failed to fetch messages: ${response.status}`);
       }
+      
       const data = await response.json();
-      return data.messages || data || [];
+      console.log(`[Inbox] Received ${Array.isArray(data) ? data.length : 0} messages`);
+      
+      // Handle both array and object with messages property
+      if (Array.isArray(data)) {
+        return data;
+      } else if (data.messages && Array.isArray(data.messages)) {
+        return data.messages;
+      } else {
+        console.warn("[Inbox] Unexpected message format:", data);
+        return [];
+      }
     },
     enabled: !!selectedConversation,
+    retry: 2,
   });
 
   // Send message mutation
@@ -171,7 +206,12 @@ export default function InboxPage() {
               </div>
             ) : error ? (
               <div className="p-4 text-center">
-                <p className="text-sm text-destructive">Failed to load conversations</p>
+                <p className="text-sm text-destructive mb-2">
+                  Failed to load conversations
+                </p>
+                <p className="text-xs text-muted-foreground mb-3">
+                  {(error as Error).message || "Unknown error"}
+                </p>
                 <Button
                   variant="outline"
                   size="sm"
@@ -180,6 +220,9 @@ export default function InboxPage() {
                 >
                   Retry
                 </Button>
+                <p className="text-xs text-muted-foreground mt-3">
+                  Make sure Spruce API credentials are configured in Doctor Profile → API Integrations
+                </p>
               </div>
             ) : conversations?.length === 0 ? (
               <div className="p-4 text-center">
