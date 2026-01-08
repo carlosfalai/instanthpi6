@@ -31,7 +31,7 @@ import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 export default function FormViewPage() {
   const [, params] = useRoute("/forms/:id");

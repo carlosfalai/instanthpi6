@@ -13,7 +13,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
 import { Badge } from "@/components/ui/badge";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 interface Patient {
   id: number;
@@ -154,7 +154,7 @@ export default function PatientsPage() {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Patients" description="Manage patient records">
       <div className="flex h-screen bg-background overflow-hidden">
       {/* Left column - Patient List */}
       <div className="w-full md:w-1/3 border-r border-border flex flex-col bg-card overflow-hidden">
@@ -442,7 +442,7 @@ export default function PatientsPage() {
         )}
       </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }
 

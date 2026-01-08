@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import ThreePanelLayout from "@/components/dashboard/ThreePanelLayout";
 import { loadDemoData } from "@/lib/mockApi";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 export default function Dashboard() {
   // Load mock data for demonstration purposes
@@ -10,8 +10,8 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Dashboard" description="Overview">
       <ThreePanelLayout />
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

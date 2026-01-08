@@ -1,5 +1,5 @@
 import React from "react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Building, Users, CreditCard, Settings } from "lucide-react";
@@ -7,7 +7,7 @@ import { Link } from "wouter";
 
 export default function SettingsPage() {
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Settings" description="Application settings">
       <div className="p-8">
         <h1 className="text-3xl font-bold mb-6">Settings</h1>
         <p className="text-gray-400 mb-8">Configure your organization and account settings</p>
@@ -105,6 +105,6 @@ export default function SettingsPage() {
           </p>
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

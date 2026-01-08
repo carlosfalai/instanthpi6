@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Check, ChevronDown, MessageSquare, Send, MoreVertical } from "lucide-react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 // Sample chat messages for the UI example
 const SAMPLE_MESSAGES = [
@@ -87,7 +88,7 @@ export default function ChatPage() {
   const today = new Date().toLocaleDateString();
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="AI Chat" description="Chat with AI assistant">
       <div className="flex flex-col h-full bg-background text-white">
         {/* Header */}
         <header className="flex justify-between items-center p-4 border-b border-gray-800">
@@ -256,6 +257,6 @@ export default function ChatPage() {
           </div>
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

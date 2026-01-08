@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -281,7 +281,7 @@ const FormsitePage: React.FC = () => {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Formsite Integration" description="Manage Formsite forms">
       {/* Header */}
       <div className="mb-6 flex justify-between items-center">
         <div className="flex items-center">
@@ -575,7 +575,7 @@ const FormsitePage: React.FC = () => {
           )}
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 };
 

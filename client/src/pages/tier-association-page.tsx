@@ -21,7 +21,7 @@ import {
   Home,
   HeartPulse,
 } from "lucide-react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import {
   Card,
   CardContent,
@@ -273,7 +273,7 @@ export default function TierAssociationPage() {
   });
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Tier Association" description="Manage tier associations">
       <div className="px-6 py-4">
         <header className="mb-6">
           <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
@@ -757,6 +757,6 @@ export default function TierAssociationPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

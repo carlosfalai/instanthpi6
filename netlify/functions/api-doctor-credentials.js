@@ -60,15 +60,13 @@ async function testSpruceConnection(event) {
     }
 
     // Test Spruce Health API connection
+    // Per Spruce API docs: Use Bearer token authentication
+    // https://developer.sprucehealth.com/docs/overview#authentication
     const spruceUrl = `https://api.sprucehealth.com/v1/conversations`;
-    const isAlreadyBase64 = /^YWlk/.test(spruce_api_key);
-    const basicToken = isAlreadyBase64
-      ? spruce_api_key
-      : Buffer.from(`${spruce_access_id}:${spruce_api_key}`).toString('base64');
     const response = await fetch(spruceUrl, {
       method: 'GET',
       headers: {
-        'Authorization': `Basic ${basicToken}`,
+        'Authorization': `Bearer ${spruce_api_key}`,
         'Accept': 'application/json'
       }
     });

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -156,7 +156,7 @@ export default function TeammatesPage() {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Teammates" description="Manage your team and collaborators">
       <div className="p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -465,6 +465,6 @@ export default function TeammatesPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

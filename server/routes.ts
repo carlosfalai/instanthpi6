@@ -54,6 +54,8 @@ import spruceConversationsAllRouter from "./routes/spruce-conversations-all";
 import spruceConversationHistoryRouter from "./routes/spruce-conversation-history";
 import gmailRouter from "./routes/gmail";
 import medicalTemplatesRouter from "./routes/medical-templates";
+import intakeFormsRouter from "./routes/intake-forms";
+import clinicianProfilesRouter from "./routes/clinician-profiles";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -139,6 +141,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/gmail", gmailRouter);
   // Medical templates API endpoint
   app.use("/api/medical-templates", medicalTemplatesRouter);
+  app.use("/api/intake-forms", intakeFormsRouter);
+  app.use("/api/clinician-profiles", clinicianProfilesRouter);
 
   // Error handling middleware for Zod validation errors
   const handleZodError = (error: unknown, res: Response) => {

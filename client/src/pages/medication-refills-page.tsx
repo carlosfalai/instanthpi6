@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -61,16 +61,26 @@ const MedicationRefillsPage: React.FC = () => {
   } = useQuery<RefillRequest[]>({
     queryKey: ["/api/medication-refills"],
     queryFn: async () => {
-      // We'll implement this API endpoint later
       try {
         const response = await fetch("/api/medication-refills");
-        if (!response.ok) throw new Error("Failed to fetch refill requests");
-        return await response.json();
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Error fetching refill requests:", response.status, errorText);
+          // Return empty array if endpoint doesn't exist yet
+          if (response.status === 404) {
+            return [];
+          }
+          throw new Error(`Failed to fetch refill requests: ${response.status}`);
+        }
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
       } catch (error) {
         console.error("Error fetching refill requests:", error);
-        throw error;
+        // Return empty array on error to prevent page crash
+        return [];
       }
     },
+    retry: 1,
   });
 
   // Process refill request mutation
@@ -210,7 +220,7 @@ const MedicationRefillsPage: React.FC = () => {
   });
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Medication Refills" description="Process prescription refill requests">
       {/* Header */}
       <div className="mb-6 flex justify-between items-center">
         <div>
@@ -475,7 +485,7 @@ const MedicationRefillsPage: React.FC = () => {
           )}
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 };
 

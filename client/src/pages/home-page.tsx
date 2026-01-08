@@ -1,5 +1,5 @@
 import React from "react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { GlowingBox } from "@/components/ui/glowing-box";
@@ -20,23 +20,23 @@ import {
 
 export default function HomePage() {
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Home" description="Welcome to InstantConsult">
       <div className="container mx-auto p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <GlowingBox>
             <div className="p-6">
               <div className="flex items-center mb-3">
                 <Users className="h-5 w-5 mr-2 text-muted-foreground" />
-                <h3 className="text-foreground font-semibold text-lg">Patients</h3>
+                <h3 className="text-foreground font-semibold text-lg">Clients</h3>
               </div>
               <p className="text-muted-foreground text-base font-medium mb-2">
-                View and manage patients
+                View and manage clients
               </p>
               <p className="text-muted-foreground/80 mb-4 leading-relaxed">
-                Access patient records, medical history, and documents
+                Access client records, engagement history, and documents
               </p>
               <Link href="/patients">
-                <RainbowButton className="w-full">View Patients</RainbowButton>
+                <RainbowButton className="w-full">View Clients</RainbowButton>
               </Link>
             </div>
           </GlowingBox>
@@ -136,9 +136,9 @@ export default function HomePage() {
               <Settings className="h-5 w-5 mr-2 text-gray-400" />
               <h3 className="text-white font-semibold text-lg">Settings</h3>
             </div>
-            <p className="text-white/90 text-base font-medium mb-2">Configure your practice</p>
+            <p className="text-white/90 text-base font-medium mb-2">Configure your SaaS</p>
             <p className="text-gray-300 mb-4 leading-relaxed">
-              Manage organization settings, teammates, and user preferences
+              Manage organization settings, team members, and user preferences
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/settings/organization-profile">
@@ -154,6 +154,6 @@ export default function HomePage() {
           </div>
         </GlowingBox>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

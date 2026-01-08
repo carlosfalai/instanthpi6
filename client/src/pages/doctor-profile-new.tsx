@@ -28,7 +28,7 @@ import { RadioGroup, RadioGroupItem } from "../components/ui/radio-group";
 import { Textarea } from "../components/ui/textarea";
 import { useToast } from "../hooks/use-toast";
 import MedicalTemplatesManager from "../components/doctor/MedicalTemplatesManager";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 export default function DoctorProfileNew() {
   const [, navigate] = useLocation();
@@ -530,23 +530,23 @@ export default function DoctorProfileNew() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
+      <div className="min-h-screen bg-[#0d0d0d] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-[#8b5cf6]" />
       </div>
     );
   }
 
   return (
-    <AppLayoutSpruce>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <ModernLayout title="Doctor Profile" description="Manage your profile and settings">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-[#0d0d0d] min-h-screen">
         {!hasCredentials && (
-          <Card className="mb-6 border-yellow-200 bg-yellow-50">
+          <Card className="mb-6 border-[#2a2a2a] bg-[#1a1a1a]">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
+                <AlertCircle className="h-5 w-5 text-[#8b5cf6] mt-0.5" />
                 <div>
-                  <p className="font-medium text-yellow-900">Configuration requise</p>
-                  <p className="text-sm text-yellow-700 mt-1">
+                  <p className="font-medium text-[#e6e6e6]">Configuration requise</p>
+                  <p className="text-sm text-[#999] mt-1">
                     Veuillez configurer vos identifiants API pour activer les fonctionnalités Spruce et IA.
                   </p>
                 </div>
@@ -556,38 +556,38 @@ export default function DoctorProfileNew() {
         )}
 
         <Tabs defaultValue="identity" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-white border">
-            <TabsTrigger value="identity">Identité</TabsTrigger>
-            <TabsTrigger value="api">API Intégrations</TabsTrigger>
-            <TabsTrigger value="ai">IA Configuration</TabsTrigger>
-            <TabsTrigger value="templates">Diagnostics</TabsTrigger>
-            <TabsTrigger value="medical_templates">Templates</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-5 bg-[#1a1a1a] border-[#2a2a2a]">
+            <TabsTrigger value="identity" className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]">Identité</TabsTrigger>
+            <TabsTrigger value="api" className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]">API Intégrations</TabsTrigger>
+            <TabsTrigger value="ai" className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]">IA Configuration</TabsTrigger>
+            <TabsTrigger value="templates" className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]">Diagnostics</TabsTrigger>
+            <TabsTrigger value="medical_templates" className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]">Writing Styles</TabsTrigger>
           </TabsList>
 
           {/* Identity Tab */}
           <TabsContent value="identity">
-            <Card>
+            <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-purple-600" />
+                <CardTitle className="flex items-center gap-2 text-[#e6e6e6]">
+                  <Settings className="h-5 w-5 text-[#8b5cf6]" />
                   Identité Professionnelle
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-[#999]">
                   Configurez votre spécialité pour personnaliser l'IA
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="specialty">Spécialité</Label>
+                  <Label htmlFor="specialty" className="text-[#e6e6e6]">Spécialité</Label>
                   <Input
                     id="specialty"
                     value={specialty}
                     onChange={(e) => setSpecialty(e.target.value)}
                     placeholder="Médecine Familiale, Cardiologie, etc."
-                    className="mt-1.5"
+                    className="mt-1.5 bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                   />
                 </div>
-                <Button onClick={handleSaveSpecialty} disabled={saving}>
+                <Button onClick={handleSaveSpecialty} disabled={saving} className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white">
                   {saving ? "Sauvegarde..." : "Sauvegarder"}
                 </Button>
               </CardContent>
@@ -597,19 +597,19 @@ export default function DoctorProfileNew() {
           {/* API Integrations Tab */}
           <TabsContent value="api" className="space-y-6">
             {/* Spruce Health */}
-            <Card>
+            <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="h-5 w-5 text-blue-600" />
+                <CardTitle className="flex items-center gap-2 text-[#e6e6e6]">
+                  <MessageSquare className="h-5 w-5 text-[#8b5cf6]" />
                   Spruce Health
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-[#999]">
                   Connectez votre compte Spruce Health pour gérer les messages patients
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="spruce-access">Access ID Spruce</Label>
+                  <Label htmlFor="spruce-access" className="text-[#e6e6e6]">Access ID Spruce</Label>
                   <div className="flex gap-2 mt-1.5">
                     <Input
                       id="spruce-access"
@@ -617,11 +617,13 @@ export default function DoctorProfileNew() {
                       value={spruceAccessId}
                       onChange={(e) => setSpruceAccessId(e.target.value)}
                       placeholder="aid_..."
+                      className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                     />
                     <Button
                       variant="outline"
                       size="icon"
                       onClick={() => setShowSpruceAccess(!showSpruceAccess)}
+                      className="bg-[#1a1a1a] border-[#333] text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
                     >
                       {showSpruceAccess ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
@@ -629,7 +631,7 @@ export default function DoctorProfileNew() {
                 </div>
 
                 <div>
-                  <Label htmlFor="spruce-api">Clé API Spruce</Label>
+                  <Label htmlFor="spruce-api" className="text-[#e6e6e6]">Clé API Spruce</Label>
                   <div className="flex gap-2 mt-1.5">
                     <Input
                       id="spruce-api"
@@ -637,11 +639,13 @@ export default function DoctorProfileNew() {
                       value={spruceApiKey}
                       onChange={(e) => setSpruceApiKey(e.target.value)}
                       placeholder="sk_..."
+                      className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                     />
                     <Button
                       variant="outline"
                       size="icon"
                       onClick={() => setShowSpruceApi(!showSpruceApi)}
+                      className="bg-[#1a1a1a] border-[#333] text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
                     >
                       {showSpruceApi ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
@@ -652,6 +656,7 @@ export default function DoctorProfileNew() {
                   variant="outline"
                   onClick={handleTestSpruce}
                   disabled={testing === "spruce" || !spruceAccessId || !spruceApiKey}
+                  className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                 >
                   {testing === "spruce" ? (
                     <>
@@ -660,7 +665,7 @@ export default function DoctorProfileNew() {
                     </>
                   ) : testResults.spruce === true ? (
                     <>
-                      <Check className="h-4 w-4 mr-2 text-green-500" />
+                      <Check className="h-4 w-4 mr-2 text-emerald-500" />
                       Connexion réussie
                     </>
                   ) : testResults.spruce === false ? (
@@ -679,13 +684,13 @@ export default function DoctorProfileNew() {
             </Card>
 
             {/* AI Provider */}
-            <Card>
+            <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Bot className="h-5 w-5 text-purple-600" />
+                <CardTitle className="flex items-center gap-2 text-[#e6e6e6]">
+                  <Bot className="h-5 w-5 text-[#8b5cf6]" />
                   Fournisseur IA
                 </CardTitle>
-                <CardDescription>
+                <CardDescription className="text-[#999]">
                   Choisissez votre fournisseur IA préféré et entrez votre clé API
                 </CardDescription>
               </CardHeader>
@@ -693,18 +698,18 @@ export default function DoctorProfileNew() {
                 <RadioGroup value={preferredAI} onValueChange={(value: any) => setPreferredAI(value)}>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="openai" id="openai" />
-                    <Label htmlFor="openai">OpenAI (GPT-4)</Label>
+                    <Label htmlFor="openai" className="text-[#e6e6e6]">OpenAI (GPT-4)</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="claude" id="claude" />
-                    <Label htmlFor="claude">Claude (Anthropic)</Label>
+                    <Label htmlFor="claude" className="text-[#e6e6e6]">Claude (Anthropic)</Label>
                   </div>
                 </RadioGroup>
 
                 {preferredAI === "openai" && (
                   <div className="space-y-4 mt-4">
                     <div>
-                      <Label htmlFor="openai-key">Clé API OpenAI</Label>
+                      <Label htmlFor="openai-key" className="text-[#e6e6e6]">Clé API OpenAI</Label>
                       <div className="flex gap-2 mt-1.5">
                         <Input
                           id="openai-key"
@@ -712,11 +717,13 @@ export default function DoctorProfileNew() {
                           value={openaiKey}
                           onChange={(e) => setOpenaiKey(e.target.value)}
                           placeholder="sk-..."
+                          className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                         />
                         <Button
                           variant="outline"
                           size="icon"
                           onClick={() => setShowOpenAI(!showOpenAI)}
+                          className="bg-[#1a1a1a] border-[#333] text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
                         >
                           {showOpenAI ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
@@ -726,6 +733,7 @@ export default function DoctorProfileNew() {
                   variant="outline"
                   onClick={() => handleTestAI("openai")}
                   disabled={testing === "openai" || !openaiKey}
+                  className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                 >
                   {testing === "openai" ? (
                     <>
@@ -734,7 +742,7 @@ export default function DoctorProfileNew() {
                     </>
                   ) : testResults.openai === true ? (
                     <>
-                      <Check className="h-4 w-4 mr-2 text-green-500" />
+                      <Check className="h-4 w-4 mr-2 text-emerald-500" />
                       Connexion réussie
                     </>
                   ) : testResults.openai === false ? (
@@ -755,7 +763,7 @@ export default function DoctorProfileNew() {
                 {preferredAI === "claude" && (
                   <div className="space-y-4 mt-4">
                     <div>
-                      <Label htmlFor="claude-key">Clé API Claude</Label>
+                      <Label htmlFor="claude-key" className="text-[#e6e6e6]">Clé API Claude</Label>
                       <div className="flex gap-2 mt-1.5">
                         <Input
                           id="claude-key"
@@ -763,11 +771,13 @@ export default function DoctorProfileNew() {
                           value={claudeKey}
                           onChange={(e) => setClaudeKey(e.target.value)}
                           placeholder="sk-ant-..."
+                          className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                         />
                         <Button
                           variant="outline"
                           size="icon"
                           onClick={() => setShowClaude(!showClaude)}
+                          className="bg-[#1a1a1a] border-[#333] text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
                         >
                           {showClaude ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
@@ -777,6 +787,7 @@ export default function DoctorProfileNew() {
                   variant="outline"
                   onClick={() => handleTestAI("claude")}
                   disabled={testing === "claude" || !claudeKey}
+                  className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                 >
                   {testing === "claude" ? (
                     <>
@@ -785,7 +796,7 @@ export default function DoctorProfileNew() {
                     </>
                   ) : testResults.claude === true ? (
                     <>
-                      <Check className="h-4 w-4 mr-2 text-green-500" />
+                      <Check className="h-4 w-4 mr-2 text-emerald-500" />
                       Connexion réussie
                     </>
                   ) : testResults.claude === false ? (
@@ -808,7 +819,7 @@ export default function DoctorProfileNew() {
             <Button
               onClick={handleSaveCredentials}
               disabled={saving}
-              className="w-full"
+              className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
               size="lg"
             >
               {saving ? (
@@ -829,13 +840,13 @@ export default function DoctorProfileNew() {
           <TabsContent value="ai">
             <div className="space-y-6">
               {/* Test All APIs Button */}
-              <Card>
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TestTube className="h-5 w-5 text-purple-600" />
+                  <CardTitle className="flex items-center gap-2 text-[#e6e6e6]">
+                    <TestTube className="h-5 w-5 text-[#8b5cf6]" />
                     Test des APIs
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-[#999]">
                     Testez la connectivité de tous vos services API configurés
                   </CardDescription>
                 </CardHeader>
@@ -843,7 +854,7 @@ export default function DoctorProfileNew() {
                   <Button 
                     onClick={testAllAPIs}
                     disabled={testingAll || (!spruceAccessId && !openaiKey && !claudeKey)}
-                    className="w-full"
+                    className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
                   >
                     {testingAll ? (
                       <>
@@ -864,31 +875,31 @@ export default function DoctorProfileNew() {
               <div className="grid gap-4">
                 {/* Spruce Health Status */}
                 {spruceAccessId && spruceApiKey && (
-                  <Card>
+                  <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <MessageSquare className="h-5 w-5 text-blue-600" />
+                          <MessageSquare className="h-5 w-5 text-[#8b5cf6]" />
                           <div>
-                            <h3 className="font-semibold">Spruce Health</h3>
-                            <p className="text-sm text-gray-600">Gestion des patients</p>
+                            <h3 className="font-semibold text-[#e6e6e6]">Spruce Health</h3>
+                            <p className="text-sm text-[#999]">Gestion des patients</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           {apiStatus.spruce === 'working' && (
-                            <div className="flex items-center gap-1 text-green-600">
+                            <div className="flex items-center gap-1 text-emerald-500">
                               <Check className="h-4 w-4" />
                               <span className="text-sm">Fonctionnel</span>
                             </div>
                           )}
                           {apiStatus.spruce === 'broken' && (
-                            <div className="flex items-center gap-1 text-red-600">
+                            <div className="flex items-center gap-1 text-red-500">
                               <AlertCircle className="h-4 w-4" />
                               <span className="text-sm">Erreur</span>
                             </div>
                           )}
                           {apiStatus.spruce === 'unknown' && (
-                            <div className="flex items-center gap-1 text-gray-500">
+                            <div className="flex items-center gap-1 text-[#999]">
                               <span className="text-sm">Non testé</span>
                             </div>
                           )}
@@ -897,6 +908,7 @@ export default function DoctorProfileNew() {
                             variant="outline"
                             onClick={() => testAPI('spruce')}
                             disabled={testing === 'spruce'}
+                            className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                           >
                             {testing === 'spruce' ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -907,7 +919,7 @@ export default function DoctorProfileNew() {
                         </div>
                       </div>
                       {testResults.spruce && (
-                        <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                        <div className="mt-2 p-2 bg-[#0d0d0d] border border-[#333] rounded text-sm text-[#999]">
                           {testResults.spruce}
                         </div>
                       )}
@@ -917,31 +929,31 @@ export default function DoctorProfileNew() {
 
                 {/* OpenAI Status */}
                 {openaiKey && (
-                  <Card>
+                  <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <Bot className="h-5 w-5 text-green-600" />
+                          <Bot className="h-5 w-5 text-[#8b5cf6]" />
                           <div>
-                            <h3 className="font-semibold">OpenAI</h3>
-                            <p className="text-sm text-gray-600">GPT-4, GPT-3.5</p>
+                            <h3 className="font-semibold text-[#e6e6e6]">OpenAI</h3>
+                            <p className="text-sm text-[#999]">GPT-4, GPT-3.5</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           {apiStatus.openai === 'working' && (
-                            <div className="flex items-center gap-1 text-green-600">
+                            <div className="flex items-center gap-1 text-emerald-500">
                               <Check className="h-4 w-4" />
                               <span className="text-sm">Fonctionnel</span>
                             </div>
                           )}
                           {apiStatus.openai === 'broken' && (
-                            <div className="flex items-center gap-1 text-red-600">
+                            <div className="flex items-center gap-1 text-red-500">
                               <AlertCircle className="h-4 w-4" />
                               <span className="text-sm">Erreur</span>
                             </div>
                           )}
                           {apiStatus.openai === 'unknown' && (
-                            <div className="flex items-center gap-1 text-gray-500">
+                            <div className="flex items-center gap-1 text-[#999]">
                               <span className="text-sm">Non testé</span>
                             </div>
                           )}
@@ -950,6 +962,7 @@ export default function DoctorProfileNew() {
                             variant="outline"
                             onClick={() => testAPI('openai')}
                             disabled={testing === 'openai'}
+                            className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                           >
                             {testing === 'openai' ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -960,7 +973,7 @@ export default function DoctorProfileNew() {
                         </div>
                       </div>
                       {testResults.openai && (
-                        <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                        <div className="mt-2 p-2 bg-[#0d0d0d] border border-[#333] rounded text-sm text-[#999]">
                           {testResults.openai}
                         </div>
                       )}
@@ -970,31 +983,31 @@ export default function DoctorProfileNew() {
 
                 {/* Claude Status */}
                 {claudeKey && (
-                  <Card>
+                  <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <Bot className="h-5 w-5 text-orange-600" />
+                          <Bot className="h-5 w-5 text-[#8b5cf6]" />
                           <div>
-                            <h3 className="font-semibold">Anthropic Claude</h3>
-                            <p className="text-sm text-gray-600">Claude-3 Opus, Sonnet</p>
+                            <h3 className="font-semibold text-[#e6e6e6]">Anthropic Claude</h3>
+                            <p className="text-sm text-[#999]">Claude-3 Opus, Sonnet</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           {apiStatus.claude === 'working' && (
-                            <div className="flex items-center gap-1 text-green-600">
+                            <div className="flex items-center gap-1 text-emerald-500">
                               <Check className="h-4 w-4" />
                               <span className="text-sm">Fonctionnel</span>
                             </div>
                           )}
                           {apiStatus.claude === 'broken' && (
-                            <div className="flex items-center gap-1 text-red-600">
+                            <div className="flex items-center gap-1 text-red-500">
                               <AlertCircle className="h-4 w-4" />
                               <span className="text-sm">Erreur</span>
                             </div>
                           )}
                           {apiStatus.claude === 'unknown' && (
-                            <div className="flex items-center gap-1 text-gray-500">
+                            <div className="flex items-center gap-1 text-[#999]">
                               <span className="text-sm">Non testé</span>
                             </div>
                           )}
@@ -1003,6 +1016,7 @@ export default function DoctorProfileNew() {
                             variant="outline"
                             onClick={() => testAPI('claude')}
                             disabled={testing === 'claude'}
+                            className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                           >
                             {testing === 'claude' ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -1013,7 +1027,7 @@ export default function DoctorProfileNew() {
                         </div>
                       </div>
                       {testResults.claude && (
-                        <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+                        <div className="mt-2 p-2 bg-[#0d0d0d] border border-[#333] rounded text-sm text-[#999]">
                           {testResults.claude}
                         </div>
                       )}
@@ -1023,11 +1037,11 @@ export default function DoctorProfileNew() {
 
                 {/* No APIs configured */}
                 {!spruceAccessId && !openaiKey && !claudeKey && (
-                  <Card>
+                  <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                     <CardContent className="p-8 text-center">
-                      <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="font-semibold text-gray-900 mb-2">Aucune API configurée</h3>
-                      <p className="text-gray-600 mb-4">
+                      <AlertCircle className="h-12 w-12 text-[#666] mx-auto mb-4" />
+                      <h3 className="font-semibold text-[#e6e6e6] mb-2">Aucune API configurée</h3>
+                      <p className="text-[#999] mb-4">
                         Configurez vos identifiants API dans l'onglet "API Intégrations" pour pouvoir les tester ici.
                       </p>
                     </CardContent>
@@ -1041,13 +1055,13 @@ export default function DoctorProfileNew() {
           <TabsContent value="templates">
             <div className="space-y-6">
               {/* Header Card */}
-              <Card>
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="w-5 h-5" />
+                  <CardTitle className="flex items-center gap-2 text-[#e6e6e6]">
+                    <FileText className="w-5 h-5 text-[#8b5cf6]" />
                     Templates de Plans de Traitement
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-[#999]">
                     Créez et gérez vos templates de plans pour différents diagnostics. 
                     Utilisez l'IA pour générer automatiquement des templates personnalisés.
                   </CardDescription>
@@ -1055,41 +1069,44 @@ export default function DoctorProfileNew() {
               </Card>
 
               {/* Create/Edit Template Card */}
-              <Card>
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="text-lg">
+                  <CardTitle className="text-lg text-[#e6e6e6]">
                     {editingTemplate?.id ? "Modifier le Template" : "Créer un Nouveau Template"}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="diagnosis">Nom du Diagnostic *</Label>
+                      <Label htmlFor="diagnosis" className="text-[#e6e6e6]">Nom du Diagnostic *</Label>
                       <Input
                         id="diagnosis"
                         value={newDiagnosisName}
                         onChange={(e) => setNewDiagnosisName(e.target.value)}
                         placeholder="ex: RSV, Appendicite, Pneumonie"
+                        className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="template-name">Nom du Template</Label>
+                      <Label htmlFor="template-name" className="text-[#e6e6e6]">Nom du Template</Label>
                       <Input
                         id="template-name"
                         value={newTemplateName}
                         onChange={(e) => setNewTemplateName(e.target.value)}
                         placeholder="ex: Plan RSV Pédiatrie"
+                        className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <Label htmlFor="specialty">Spécialité (optionnel)</Label>
+                    <Label htmlFor="specialty" className="text-[#e6e6e6]">Spécialité (optionnel)</Label>
                     <Input
                       id="specialty"
                       value={newTemplateSpecialty}
                       onChange={(e) => setNewTemplateSpecialty(e.target.value)}
                       placeholder={specialty || "ex: Pédiatrie, Cardiologie"}
+                      className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                     />
                   </div>
 
@@ -1097,7 +1114,7 @@ export default function DoctorProfileNew() {
                     <Button
                       onClick={generateTemplateWithAI}
                       disabled={!newDiagnosisName || !claudeKey || generatingTemplate}
-                      className="bg-gradient-to-r from-purple-600 to-indigo-600"
+                      className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
                     >
                       {generatingTemplate ? (
                         <>
@@ -1116,6 +1133,7 @@ export default function DoctorProfileNew() {
                       onClick={saveTemplate}
                       disabled={!newTemplateName || !newDiagnosisName || saving}
                       variant="default"
+                      className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
                     >
                       {saving ? (
                         <>
@@ -1139,6 +1157,7 @@ export default function DoctorProfileNew() {
                           setNewTemplateSpecialty("");
                         }}
                         variant="outline"
+                        className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                       >
                         Annuler
                       </Button>
@@ -1146,25 +1165,25 @@ export default function DoctorProfileNew() {
                   </div>
 
                   {!claudeKey && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <p className="text-sm text-yellow-800">
+                    <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4">
+                      <p className="text-sm text-[#999]">
                         💡 Configurez votre clé API Claude dans l'onglet "API Intégrations" pour utiliser la génération IA.
                       </p>
                     </div>
                   )}
 
                   {editingTemplate?.plan_items && editingTemplate.plan_items.length > 0 && (
-                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                      <h4 className="font-semibold mb-3 text-sm">Plan Items Preview:</h4>
+                    <div className="mt-4 p-4 bg-[#0d0d0d] border border-[#333] rounded-lg">
+                      <h4 className="font-semibold mb-3 text-sm text-[#e6e6e6]">Plan Items Preview:</h4>
                       <div className="space-y-2 max-h-60 overflow-y-auto">
                         {editingTemplate.plan_items.map((item: any, idx: number) => (
-                          <div key={idx} className="text-sm bg-white p-2 rounded border">
+                          <div key={idx} className="text-sm bg-[#1a1a1a] p-2 rounded border border-[#333]">
                             <div className="flex items-start gap-2">
-                              <span className="font-medium text-blue-600">{item.category}:</span>
-                              <span>{item.item}</span>
+                              <span className="font-medium text-[#8b5cf6]">{item.category}:</span>
+                              <span className="text-[#e6e6e6]">{item.item}</span>
                             </div>
                             {item.details && (
-                              <div className="text-xs text-gray-600 mt-1 ml-4">{item.details}</div>
+                              <div className="text-xs text-[#999] mt-1 ml-4">{item.details}</div>
                             )}
                           </div>
                         ))}
@@ -1175,15 +1194,16 @@ export default function DoctorProfileNew() {
               </Card>
 
               {/* Existing Templates List */}
-              <Card>
+              <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardHeader>
-                  <CardTitle className="text-lg flex items-center justify-between">
+                  <CardTitle className="text-lg flex items-center justify-between text-[#e6e6e6]">
                     <span>Mes Templates</span>
                     <Button
                       onClick={loadTemplates}
                       size="sm"
                       variant="outline"
                       disabled={loadingTemplates}
+                      className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                     >
                       {loadingTemplates ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -1196,10 +1216,10 @@ export default function DoctorProfileNew() {
                 <CardContent>
                   {loadingTemplates ? (
                     <div className="flex justify-center py-8">
-                      <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                      <Loader2 className="w-6 h-6 animate-spin text-[#999]" />
                     </div>
                   ) : templates.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-[#999]">
                       <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
                       <p>Aucun template créé pour le moment.</p>
                       <p className="text-sm mt-1">Créez votre premier template ci-dessus.</p>
@@ -1209,20 +1229,20 @@ export default function DoctorProfileNew() {
                       {templates.map((template) => (
                         <div
                           key={template.id}
-                          className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                          className="border border-[#2a2a2a] rounded-lg p-4 hover:bg-[#222] transition-colors bg-[#1a1a1a]"
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <h4 className="font-semibold text-gray-900">{template.template_name}</h4>
-                              <p className="text-sm text-gray-600 mt-1">
+                              <h4 className="font-semibold text-[#e6e6e6]">{template.template_name}</h4>
+                              <p className="text-sm text-[#999] mt-1">
                                 Diagnostic: <span className="font-medium">{template.diagnosis_name}</span>
                               </p>
                               {template.specialty && (
-                                <p className="text-xs text-gray-500 mt-1">
+                                <p className="text-xs text-[#666] mt-1">
                                   Spécialité: {template.specialty}
                                 </p>
                               )}
-                              <p className="text-xs text-gray-400 mt-2">
+                              <p className="text-xs text-[#666] mt-2">
                                 {template.plan_items?.length || 0} items • 
                                 Créé le {new Date(template.created_at).toLocaleDateString()}
                               </p>
@@ -1232,6 +1252,7 @@ export default function DoctorProfileNew() {
                                 onClick={() => editTemplate(template)}
                                 size="sm"
                                 variant="outline"
+                                className="bg-[#1a1a1a] border-[#333] text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
                               >
                                 <Edit className="w-4 h-4" />
                               </Button>
@@ -1239,7 +1260,7 @@ export default function DoctorProfileNew() {
                                 onClick={() => deleteTemplate(template.id)}
                                 size="sm"
                                 variant="outline"
-                                className="text-red-600 hover:bg-red-50"
+                                className="text-red-500 hover:bg-red-500/10 border-red-500/30"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </Button>
@@ -1260,6 +1281,6 @@ export default function DoctorProfileNew() {
           </TabsContent>
         </Tabs>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

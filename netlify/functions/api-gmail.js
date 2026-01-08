@@ -110,11 +110,28 @@ exports.handler = async (event, context) => {
 
     // Auth URL endpoint: /api/gmail/auth/url
     if (isAuthUrl && event.httpMethod === "GET") {
+      // Validate that Google OAuth credentials are configured
+      if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({ 
+            error: "Gmail OAuth not configured",
+            message: "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables are required. Please configure them in Netlify environment variables.",
+            details: {
+              hasClientId: !!process.env.GOOGLE_CLIENT_ID,
+              hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+            }
+          }),
+        };
+      }
+
       const scopes = [
         "https://www.googleapis.com/auth/gmail.readonly",
         "https://www.googleapis.com/auth/userinfo.email",
       ];
 
+      try {
       const authUrl = oauth2Client.generateAuthUrl({
         access_type: "offline",
         scope: scopes,
@@ -126,6 +143,17 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({ authUrl }),
       };
+      } catch (error) {
+        console.error("Error generating Gmail auth URL:", error);
+        return {
+          statusCode: 500,
+          headers,
+          body: JSON.stringify({ 
+            error: "Failed to generate auth URL",
+            message: error.message || "An error occurred while generating the Gmail OAuth URL",
+          }),
+        };
+      }
     }
 
     // Auth callback endpoint: /api/gmail/auth/callback
@@ -190,37 +218,52 @@ exports.handler = async (event, context) => {
       oauth2Client.setCredentials({ access_token: accessToken });
       const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
-      // First, get the "instanthpi" label ID (case-insensitive)
-      const labelsResponse = await gmail.users.labels.list({
-        userId: "me",
-      });
+      // First, try to get the "instanthpi" label ID (case-insensitive)
+      let labelFilter = null;
+      try {
+        const labelsResponse = await gmail.users.labels.list({
+          userId: "me",
+        });
 
-      const instanthpiLabel = labelsResponse.data.labels?.find(
-        (label) => label.name?.toLowerCase() === "instanthpi"
-      );
-
-      if (!instanthpiLabel || !instanthpiLabel.id) {
-        return {
-          statusCode: 200,
-          headers,
-          body: JSON.stringify({ emails: [], message: "No 'Instanthpi' label found in Gmail" }),
-        };
+        const instanthpiLabel = labelsResponse.data.labels?.find(
+          (label) => label.name?.toLowerCase() === "instanthpi"
+        );
+        
+        if (instanthpiLabel) {
+          labelFilter = [instanthpiLabel.id];
+          console.log(`Found Instanthpi label: ${instanthpiLabel.id}`);
+        } else {
+          console.log("No 'Instanthpi' label found, falling back to search query");
+        }
+      } catch (labelError) {
+        console.error("Error fetching labels:", labelError);
       }
 
-      // Get messages with the "instanthpi" label - fetch more pages for old emails
+      // Get messages - either by label or search query
       let allMessageIds = [];
       let pageToken = null;
       let pageCount = 0;
       const maxPages = 10; // Fetch up to 10 pages (2000 emails)
 
+      // Construct search query if label not found
+      const query = labelFilter 
+        ? `label:instanthpi` 
+        : `subject:instanthpi OR from:instanthpi`;
+
       do {
-        const messagesResponse = await gmail.users.messages.list({
+        const params = {
           userId: "me",
-          labelIds: [instanthpiLabel.id],
-          maxResults: 200,
+          maxResults: 50, // Reduced batch size for better reliability
           pageToken: pageToken,
-          q: `label:${instanthpiLabel.name}`,
-        });
+          q: query
+        };
+        
+        // Only add labelIds if we found the label
+        if (labelFilter) {
+          params.labelIds = labelFilter;
+        }
+
+        const messagesResponse = await gmail.users.messages.list(params);
 
         const messageIds = messagesResponse.data.messages?.map((m) => m.id) || [];
         allMessageIds = allMessageIds.concat(messageIds);

@@ -100,15 +100,16 @@ exports.handler = async (event, context) => {
         params.paginationToken = paginationToken;
       }
 
-      // Build Basic auth token from aid:api_key per Spruce API
-      const basicToken = /^YWlk/.test(spruceApiKey)
-        ? spruceApiKey
-        : Buffer.from(`${spruceAccessId}:${spruceApiKey}`).toString("base64");
+      // Use Bearer token authentication per Spruce API documentation
+      // The API token should be used directly as Bearer token
+      // If the token is already base64 encoded (starts with YWlk), use it directly
+      // Otherwise, it should be the token provided by Spruce
+      const bearerToken = spruceApiKey;
       
       try {
         const response = await axios.get(`${SPRUCE_API_URL}/conversations`, {
           headers: {
-            Authorization: `Basic ${basicToken}`,
+            Authorization: `Bearer ${bearerToken}`,
             Accept: "application/json",
           },
           params,

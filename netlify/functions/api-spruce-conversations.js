@@ -35,7 +35,9 @@ exports.handler = async (event, context) => {
   try {
     console.log("Fetching conversations from Spruce API for messages page...");
 
-    // Fetch conversations from Spruce API - get ALL conversations
+    // Fetch conversations from Spruce API
+    // Per Spruce API docs: Use Bearer token authentication
+    // https://developer.sprucehealth.com/docs/overview#authentication
     const response = await axios.get(`${SPRUCE_API_URL}/conversations`, {
       headers: {
         Authorization: `Bearer ${SPRUCE_BEARER_TOKEN}`,

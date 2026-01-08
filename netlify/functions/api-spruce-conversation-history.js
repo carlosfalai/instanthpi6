@@ -213,10 +213,8 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Build Basic auth token from aid:api_key per Spruce API
-    const basicToken = /^YWlk/.test(spruceApiKey)
-      ? spruceApiKey
-      : Buffer.from(`${spruceAccessId}:${spruceApiKey}`).toString("base64");
+    // Use Bearer token authentication per Spruce API documentation
+    const bearerToken = spruceApiKey;
 
     // Fetch real messages from Spruce API
     try {
@@ -224,7 +222,7 @@ exports.handler = async (event, context) => {
         `${SPRUCE_API_URL}/conversations/${conversationId}/messages`,
         {
           headers: {
-            Authorization: `Basic ${basicToken}`,
+            Authorization: `Bearer ${bearerToken}`,
             Accept: "application/json",
           },
           params: {

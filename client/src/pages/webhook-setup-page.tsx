@@ -1,6 +1,6 @@
 import React from "react";
 import { Webhook } from "lucide-react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -276,7 +276,7 @@ function testColumnMapping() {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Webhook Setup" description="Configure webhooks">
       <div className="container mx-auto p-6 max-w-5xl">
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-foreground mb-2">
@@ -311,6 +311,6 @@ function testColumnMapping() {
           </CardContent>
         </Card>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

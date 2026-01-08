@@ -11,9 +11,9 @@ export default function DoctorLogin() {
   const [message, setMessage] = useState("");
 
   // Check if running locally (development mode)
-  const isLocalDev = window.location.hostname === 'localhost' || 
-                     window.location.hostname === '127.0.0.1' ||
-                     import.meta.env.DEV;
+  const isLocalDev = window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    import.meta.env.DEV;
 
   useEffect(() => {
     // For local development, bypass login and go straight to dashboard
@@ -51,7 +51,7 @@ export default function DoctorLogin() {
         if (session && session.user) {
           // Check if session is valid
           const now = Math.floor(Date.now() / 1000);
-          
+
           // Only show message if session is valid - but don't auto-redirect
           if (session.expires_at && session.expires_at > now) {
             setMessage("You are already signed in. Click 'Continue' to go to dashboard or sign out to use a different account.");
@@ -61,7 +61,7 @@ export default function DoctorLogin() {
             if (expiredBy < 300) { // Within 5 minutes
               console.log('[DoctorLogin] Session expired, attempting refresh...');
               const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
-              
+
               if (!refreshError && refreshedSession?.user && refreshedSession.expires_at) {
                 const newExpiresAt = refreshedSession.expires_at;
                 if (newExpiresAt > now) {
@@ -97,8 +97,8 @@ export default function DoctorLogin() {
     "bg-gradient-to-br from-indigo-50 to-purple-100",
     "bg-gradient-to-br from-purple-100 to-violet-200"
   ];
-  
-  const [currentBg, setCurrentBg] = React.useState(() => 
+
+  const [currentBg, setCurrentBg] = React.useState(() =>
     backgroundImages[Math.floor(Math.random() * backgroundImages.length)]
   );
 
@@ -128,9 +128,9 @@ export default function DoctorLogin() {
     <div className={`min-h-screen flex items-center justify-center ${currentBg}`}>
       <Card className="w-full max-w-md bg-white shadow-xl border-0">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center text-gray-900">Medical Dashboard</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center text-gray-900">Consultant Dashboard</CardTitle>
           <CardDescription className="text-center text-gray-600">
-            Access the InstantHPI Medical Platform
+            Access the InstantConsult SaaS Platform
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -194,11 +194,10 @@ export default function DoctorLogin() {
             </Button>
 
             {message && !message.toLowerCase().includes("already signed") && (
-              <div className={`p-3 rounded-md text-sm whitespace-pre-line ${
-                message.includes("error") || message.includes("failed") || message.includes("not configured")
-                  ? "bg-red-50 text-red-800 border border-red-200" 
+              <div className={`p-3 rounded-md text-sm whitespace-pre-line ${message.includes("error") || message.includes("failed") || message.includes("not configured")
+                  ? "bg-red-50 text-red-800 border border-red-200"
                   : "bg-blue-50 text-blue-800 border border-blue-200"
-              }`}>
+                }`}>
                 {message}
                 {message.includes("not configured") && (
                   <div className="mt-3 pt-3 border-t border-red-300">

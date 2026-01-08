@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import {
   Table,
   TableBody,
@@ -51,7 +51,7 @@ export default function ChronicConditionsPage() {
   const resolved = conditions?.filter((c) => c.status === "resolved").length || 0;
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Chronic Conditions" description="Manage chronic conditions">
       <div className="container mx-auto py-6">
         <h1 className="text-3xl font-bold mb-6">Chronic Conditions</h1>
 
@@ -164,7 +164,7 @@ export default function ChronicConditionsPage() {
           </>
         )}
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }
 

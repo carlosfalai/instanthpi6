@@ -20,6 +20,9 @@ import TierAssociationPage from "@/pages/tier-association-page";
 import InboxPage from "@/pages/inbox-page";
 import AuthCallback from "@/pages/auth-callback";
 import LoginDiagnostics from "@/pages/login-diagnostics";
+import Onboarding from "@/pages/onboarding";
+import FormBuilder from "@/pages/form-builder";
+import PublicFormPage from "@/pages/public-form";
 import SchedulerPage from "@/pages/scheduler-page";
 import FormsitePage from "@/pages/formsite-page";
 import FormsPage from "@/pages/forms-page";
@@ -46,7 +49,7 @@ class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, {
   }
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error("Root Error Boundary caught:", error, info);
-    
+
     // Log to production monitoring (without sensitive data)
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
       try {
@@ -116,10 +119,17 @@ export default function App() {
         <Switch>
           <Route path="/" component={Landing} />
           <Route path="/patient-intake" component={PublicPatientIntake} />
+          <Route path="/f/:slug" component={PublicFormPage} />
           <Route path="/patient-login" component={PatientLogin} />
           <Route path="/patient-dashboard" component={PatientDashboard} />
           <Route path="/login" component={LoginPage} />
           <Route path="/login-diagnostics" component={LoginDiagnostics} />
+          <Route path="/onboarding" component={Onboarding} />
+          <Route path="/form-builder">
+            <ProtectedRoute>
+              <FormBuilder />
+            </ProtectedRoute>
+          </Route>
           <Route path="/doctor-login" component={DoctorLogin} />
           <Route path="/doctor-dashboard">
             <ProtectedRoute>

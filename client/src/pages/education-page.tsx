@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { queryClient } from "@/lib/queryClient";
 import { Book, CheckCircle, Clock, Lock, Video } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 interface EducationModule {
   id: number;
@@ -194,7 +194,7 @@ export default function EducationPage() {
   }
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Education" description="Patient education materials">
       <div className="container mx-auto max-w-6xl px-6 py-8">
         <div className="flex flex-col space-y-8">
           {/* Header and Progress Overview */}
@@ -355,6 +355,6 @@ export default function EducationPage() {
           )}
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

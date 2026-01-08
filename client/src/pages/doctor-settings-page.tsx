@@ -442,6 +442,8 @@ export default function DoctorSettingsPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [saving, setSaving] = useState<boolean>(false);
   const [activeTemplate, setActiveTemplate] = useState<string>("create");
+  const [anthropicApiKey, setAnthropicApiKey] = useState<string>("");
+  const [showAnthropicKey, setShowAnthropicKey] = useState<boolean>(false);
 
   const [doctorSettings, setDoctorSettings] = useState<DoctorSettings>({
     id: 1,
@@ -455,6 +457,12 @@ export default function DoctorSettingsPage() {
   });
 
   useEffect(() => {
+    // Load Anthropic API key from localStorage
+    const savedKey = localStorage.getItem("anthropic_api_key");
+    if (savedKey) {
+      setAnthropicApiKey(savedKey);
+    }
+
     // Simulate loading doctor settings data
     setTimeout(() => {
       setLoading(false);
@@ -597,11 +605,12 @@ export default function DoctorSettingsPage() {
         </div>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid grid-cols-4 w-full max-w-md bg-[#262626]">
+          <TabsList className="grid grid-cols-5 w-full max-w-2xl bg-[#262626]">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="license">License</TabsTrigger>
             <TabsTrigger value="signature">Signature</TabsTrigger>
             <TabsTrigger value="templates">Templates</TabsTrigger>
+            <TabsTrigger value="preferences">Personal Preferences</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile" className="mt-6">
@@ -870,6 +879,97 @@ export default function DoctorSettingsPage() {
                       initialData={getActiveTemplateData()}
                       onSave={handleSaveTemplate}
                     />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="preferences" className="mt-6">
+            <Card className="bg-[#1e1e1e] border-gray-800">
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <ShieldCheck className="mr-2 h-5 w-5" />
+                  Personal Preferences
+                </CardTitle>
+                <CardDescription>
+                  Configure your API keys and preferences for AI services
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="anthropic-api-key" className="text-base font-semibold">
+                      Anthropic API Key (for Claude calls)
+                    </Label>
+                    <p className="text-sm text-gray-400 mb-2">
+                      This API key will be used for all Claude AI calls throughout the application.
+                      Get your key from{" "}
+                      <a
+                        href="https://console.anthropic.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-400 hover:underline"
+                      >
+                        Anthropic Console
+                      </a>
+                    </p>
+                    <div className="flex gap-2">
+                      <Input
+                        id="anthropic-api-key"
+                        type={showAnthropicKey ? "text" : "password"}
+                        value={anthropicApiKey}
+                        onChange={(e) => setAnthropicApiKey(e.target.value)}
+                        placeholder="sk-ant-..."
+                        className="bg-[#262626] border-gray-700 flex-1"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setShowAnthropicKey(!showAnthropicKey)}
+                        className="border-gray-700"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-700">
+                    <Button
+                      onClick={async () => {
+                        setSaving(true);
+                        try {
+                          // Save to localStorage for now (can be moved to backend later)
+                          localStorage.setItem("anthropic_api_key", anthropicApiKey);
+                          toast({
+                            title: "API key saved",
+                            description: "Your Anthropic API key has been saved successfully.",
+                          });
+                        } catch (error) {
+                          toast({
+                            title: "Error",
+                            description: "Failed to save API key. Please try again.",
+                            variant: "destructive",
+                          });
+                        } finally {
+                          setSaving(false);
+                        }
+                      }}
+                      disabled={saving || !anthropicApiKey}
+                      className="bg-blue-600 hover:bg-blue-700"
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          Save API Key
+                        </>
+                      )}
+                    </Button>
                   </div>
                 </div>
               </CardContent>

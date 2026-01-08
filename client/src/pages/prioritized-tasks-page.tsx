@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest, getQueryFn } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import {
   Card,
@@ -33,7 +33,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { format, formatDistanceToNow } from "date-fns";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 // Type for prioritized tasks
 interface PrioritizedTask {
@@ -74,12 +74,14 @@ const PrioritizedTasksPage: React.FC = () => {
     error,
   } = useQuery<{ tasks: PrioritizedTask[] }>({
     queryKey: ["/api/priority-ai/priority/tasks"],
+    queryFn: getQueryFn(),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Fetch model info
   const { data: modelInfo } = useQuery<ModelInfo>({
     queryKey: ["/api/priority-ai/priority/model"],
+    queryFn: getQueryFn(),
     staleTime: 1000 * 60 * 15, // 15 minutes
   });
 

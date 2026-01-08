@@ -358,26 +358,30 @@ export default function MedicalTemplatesManager() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+      <div className="flex items-center justify-center p-8 bg-[#0d0d0d]">
+        <Loader2 className="h-6 w-6 animate-spin text-[#999]" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-6 bg-[#0d0d0d] min-h-screen p-6">
+      <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
         <CardHeader>
-          <CardTitle>Medical Templates Management</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-[#e6e6e6]">Medical Templates Management</CardTitle>
+          <CardDescription className="text-[#999]">
             Enable or disable templates for different case types. Templates are used when generating medical documentation.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
-            <TabsList className="grid w-full grid-cols-6">
+            <TabsList className="grid w-full grid-cols-6 bg-[#0d0d0d] border-[#2a2a2a]">
               {categories.map((cat) => (
-                <TabsTrigger key={cat.value} value={cat.value}>
+                <TabsTrigger 
+                  key={cat.value} 
+                  value={cat.value}
+                  className="data-[state=active]:bg-[#1a1a1a] data-[state=active]:text-[#e6e6e6] text-[#999]"
+                >
                   {cat.label}
                 </TabsTrigger>
               ))}
@@ -387,25 +391,25 @@ export default function MedicalTemplatesManager() {
               <TabsContent key={cat.value} value={cat.value} className="mt-6">
                 <div className="space-y-4">
                   {filteredTemplates.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-[#999]">
                       <p>No templates in this category yet.</p>
                     </div>
                   ) : (
                     filteredTemplates.map((template) => (
-                      <Card key={template.id} className="border">
+                      <Card key={template.id} className="border-[#2a2a2a] bg-[#1a1a1a]">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
                               <div className="flex items-center gap-3 mb-2">
-                                <h4 className="font-semibold">{template.template_name}</h4>
+                                <h4 className="font-semibold text-[#e6e6e6]">{template.template_name}</h4>
                                 {template.is_default && (
-                                  <Badge variant="secondary">Default</Badge>
+                                  <Badge variant="secondary" className="bg-[#8b5cf6]/20 text-[#8b5cf6] border-[#8b5cf6]/30">Default</Badge>
                                 )}
                                 {template.case_type && (
-                                  <Badge variant="outline">{template.case_type}</Badge>
+                                  <Badge variant="outline" className="border-[#333] text-[#999]">{template.case_type}</Badge>
                                 )}
                               </div>
-                              <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                              <p className="text-sm text-[#999] mb-3 line-clamp-2">
                                 {template.template_content.substring(0, 200)}...
                               </p>
                               <div className="flex items-center gap-4">
@@ -414,7 +418,7 @@ export default function MedicalTemplatesManager() {
                                     checked={template.is_enabled}
                                     onCheckedChange={(checked) => toggleTemplate(template.id, checked)}
                                   />
-                                  <Label className="text-sm">
+                                  <Label className="text-sm text-[#999]">
                                     {template.is_enabled ? "Enabled" : "Disabled"}
                                   </Label>
                                 </div>
@@ -424,6 +428,7 @@ export default function MedicalTemplatesManager() {
                                     variant="outline"
                                     onClick={() => setDefaultTemplate(template.id, template.template_category, template.case_type)}
                                     disabled={template.is_default}
+                                    className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222] disabled:opacity-50"
                                   >
                                     {template.is_default ? "Default" : "Set as Default"}
                                   </Button>
@@ -432,6 +437,7 @@ export default function MedicalTemplatesManager() {
                                   size="sm"
                                   variant="ghost"
                                   onClick={() => setEditingTemplate(template)}
+                                  className="text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
                                 >
                                   <Eye className="w-4 h-4" />
                                 </Button>
@@ -451,13 +457,15 @@ export default function MedicalTemplatesManager() {
 
       {/* Template Preview/Edit Modal */}
       {editingTemplate && (
-        <Card className="fixed inset-0 z-50 bg-white m-4 max-w-4xl mx-auto max-h-[90vh] overflow-auto">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <Card className="bg-[#1a1a1a] border-[#2a2a2a] max-w-4xl w-full max-h-[90vh] overflow-auto">
           <CardHeader>
-            <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between text-[#e6e6e6]">
               <span>{editingTemplate.template_name}</span>
               <Button
                 variant="ghost"
                 onClick={() => setEditingTemplate(null)}
+                  className="text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
               >
                 ×
               </Button>
@@ -466,14 +474,14 @@ export default function MedicalTemplatesManager() {
           <CardContent>
             <div className="space-y-4">
               <div>
-                <Label>Template Content</Label>
+                  <Label className="text-[#e6e6e6]">Template Content</Label>
                 <Textarea
                   value={editingTemplate.template_content}
                   onChange={(e) => setEditingTemplate({
                     ...editingTemplate,
                     template_content: e.target.value
                   })}
-                  className="min-h-[400px] font-mono text-sm"
+                    className="min-h-[400px] font-mono text-sm bg-[#0d0d0d] border-[#333] text-[#e6e6e6]"
                   readOnly
                 />
               </div>
@@ -504,6 +512,7 @@ export default function MedicalTemplatesManager() {
                       });
                     }
                   }}
+                    className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   Save Changes
@@ -511,6 +520,7 @@ export default function MedicalTemplatesManager() {
                 <Button
                   variant="outline"
                   onClick={() => setEditingTemplate(null)}
+                    className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                 >
                   Close
                 </Button>
@@ -518,6 +528,7 @@ export default function MedicalTemplatesManager() {
             </div>
           </CardContent>
         </Card>
+        </div>
       )}
     </div>
   );

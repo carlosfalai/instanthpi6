@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users } from "lucide-react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 export default function LeadershipAssociationPage() {
   const leadershipMembers = [
@@ -38,7 +38,7 @@ export default function LeadershipAssociationPage() {
   ];
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Leadership Association" description="Leadership team and structure">
       <div className="p-6">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-blue-500">InstantHPI</h1>
@@ -83,6 +83,6 @@ export default function LeadershipAssociationPage() {
           </div>
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

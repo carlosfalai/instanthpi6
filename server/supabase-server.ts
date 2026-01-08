@@ -187,7 +187,9 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 InstantHPI Server running on port ${PORT}`);
-  console.log(`🔐 Connected to Supabase: ${process.env.SUPABASE_URL}`);
-});
+if (process.argv[1] && process.argv[1].endsWith('supabase-server.ts')) {
+  app.listen(PORT, () => {
+    console.log(`🚀 InstantHPI Server running on port ${PORT}`);
+    console.log(`🔐 Connected to Supabase: ${process.env.SUPABASE_URL}`);
+  });
+}

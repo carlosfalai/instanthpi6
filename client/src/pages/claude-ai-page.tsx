@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import ClaudeAIInterface from "@/components/ai/ClaudeAIInterface";
 import ClaudeDevAssistant from "@/components/ai/ClaudeDevAssistant";
 import ClaudeProfileAssistant from "@/components/ai/ClaudeProfileAssistant";
@@ -10,7 +10,7 @@ const ClaudeAIPage = () => {
   const [activeTab, setActiveTab] = useState("profile");
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Claude AI Assistant" description="Advanced AI capabilities">
       <div className="p-6">
         <Card className="mb-6">
           <CardHeader>
@@ -57,7 +57,7 @@ const ClaudeAIPage = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 };
 

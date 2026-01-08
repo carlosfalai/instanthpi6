@@ -22,7 +22,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Edit, FileText, Save, X, ChevronDown, ChevronUp } from "lucide-react";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import {
   Dialog,
   DialogTrigger,
@@ -963,7 +963,7 @@ export default function FormsPage() {
   const [activeTab, setActiveTab] = useState("builder");
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Forms" description="Manage patient forms">
       <div className="container mx-auto py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="mb-6">
@@ -980,6 +980,6 @@ export default function FormsPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

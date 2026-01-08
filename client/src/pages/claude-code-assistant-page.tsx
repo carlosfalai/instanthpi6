@@ -1,11 +1,11 @@
 import React from "react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import ClaudeCodeAssistant from "@/components/ai/ClaudeCodeAssistant";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const ClaudeCodeAssistantPage = () => {
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Claude Code Assistant" description="AI-powered coding assistant">
       <div className="p-6">
         <Card className="mb-6">
           <CardHeader>
@@ -30,7 +30,7 @@ const ClaudeCodeAssistantPage = () => {
 
         <ClaudeCodeAssistant />
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 };
 

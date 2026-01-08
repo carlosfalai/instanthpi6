@@ -835,3 +835,156 @@ export const insertPseudonymLinkSchema = createInsertSchema(pseudonymLinks).pick
 
 export type PseudonymLink = typeof pseudonymLinks.$inferSelect;
 export type InsertPseudonymLink = z.infer<typeof insertPseudonymLinkSchema>;
+
+// Clinician profiles for onboarding data
+export const clinicianProfiles = pgTable("clinician_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .references(() => users.id)
+    .notNull(),
+  clinicName: text("clinic_name"),
+  specialty: text("specialty"),
+  professionalNumber: text("professional_number"),
+  locale: text("locale").default("fr-CA"),
+  onboardingCompleted: boolean("onboarding_completed").default(false),
+  preferences: jsonb("preferences").$type<Record<string, unknown>>().default({}),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertClinicianProfileSchema = createInsertSchema(clinicianProfiles).pick({
+  userId: true,
+  clinicName: true,
+  specialty: true,
+  professionalNumber: true,
+  locale: true,
+  onboardingCompleted: true,
+  preferences: true,
+});
+
+export type ClinicianProfile = typeof clinicianProfiles.$inferSelect;
+export type InsertClinicianProfile = z.infer<typeof insertClinicianProfileSchema>;
+
+export type FormQuestion = {
+  id: string;
+  type: string;
+  label: string;
+  placeholder?: string;
+  required?: boolean;
+  options?: string[];
+};
+
+export type IntakeFormSchema = {
+  questions: FormQuestion[];
+};
+
+export const intakeForms = pgTable("intake_forms", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  ownerId: integer("owner_id")
+    .references(() => users.id)
+    .notNull(),
+  profileId: integer("profile_id").references(() => clinicianProfiles.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  slug: text("slug").unique(),
+  status: text("status").default("draft").notNull(),
+  schema: jsonb("schema").$type<IntakeFormSchema>().notNull(),
+  settings: jsonb("settings").$type<Record<string, unknown>>().default({}),
+  publishedAt: timestamp("published_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertIntakeFormSchema = createInsertSchema(intakeForms).pick({
+  ownerId: true,
+  profileId: true,
+  title: true,
+  description: true,
+  slug: true,
+  status: true,
+  schema: true,
+  settings: true,
+  publishedAt: true,
+});
+
+export type IntakeForm = typeof intakeForms.$inferSelect;
+export type InsertIntakeForm = z.infer<typeof insertIntakeFormSchema>;
+
+export const intakeFormSubmissions = pgTable("intake_form_submissions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  formId: uuid("form_id")
+    .references(() => intakeForms.id)
+    .notNull(),
+  formTitleSnapshot: text("form_title_snapshot"),
+  patientName: text("patient_name"),
+  patientEmail: text("patient_email"),
+  patientPhone: text("patient_phone"),
+  answers: jsonb("answers").$type<Record<string, unknown>>().notNull(),
+  meta: jsonb("meta").$type<Record<string, unknown>>().default({}),
+  status: text("status").default("new").notNull(),
+  submittedAt: timestamp("submitted_at").defaultNow().notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const insertIntakeFormSubmissionSchema = createInsertSchema(intakeFormSubmissions).pick({
+  formId: true,
+  formTitleSnapshot: true,
+  patientName: true,
+  patientEmail: true,
+  patientPhone: true,
+  answers: true,
+  meta: true,
+  status: true,
+  submittedAt: true,
+});
+
+export type IntakeFormSubmission = typeof intakeFormSubmissions.$inferSelect;
+export type InsertIntakeFormSubmission = z.infer<typeof insertIntakeFormSubmissionSchema>;
+
+export const submissionOutputs = pgTable("submission_outputs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  submissionId: uuid("submission_id")
+    .references(() => intakeFormSubmissions.id)
+    .notNull(),
+  outputType: text("output_type").notNull(),
+  content: text("content"),
+  model: text("model"),
+  status: text("status").default("pending").notNull(),
+  error: text("error"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertSubmissionOutputSchema = createInsertSchema(submissionOutputs).pick({
+  submissionId: true,
+  outputType: true,
+  content: true,
+  model: true,
+  status: true,
+  error: true,
+});
+
+export type SubmissionOutput = typeof submissionOutputs.$inferSelect;
+export type InsertSubmissionOutput = z.infer<typeof insertSubmissionOutputSchema>;
+
+export const templatePreferences = pgTable("template_preferences", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: integer("user_id")
+    .references(() => users.id)
+    .notNull(),
+  category: text("category").notNull(),
+  templateId: text("template_id").notNull(),
+  overrides: jsonb("overrides").$type<Record<string, unknown>>().default({}),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const insertTemplatePreferenceSchema = createInsertSchema(templatePreferences).pick({
+  userId: true,
+  category: true,
+  templateId: true,
+  overrides: true,
+});
+
+export type TemplatePreference = typeof templatePreferences.$inferSelect;
+export type InsertTemplatePreference = z.infer<typeof insertTemplatePreferenceSchema>;

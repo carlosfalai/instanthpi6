@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 interface Patient {
   id: number;
@@ -20,7 +20,7 @@ interface Patient {
   ramqVerified?: boolean;
 }
 
-export default function PatientsPage() {
+export default function ClientsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { toast } = useToast();
@@ -71,21 +71,39 @@ export default function PatientsPage() {
   } = useQuery({
     queryKey: ["/api/spruce/search-patients", debouncedSearchTerm],
     queryFn: async () => {
-      let url = "/api/spruce/search-patients";
+      try {
+        let url = "/api/spruce/search-patients";
 
-      // Add query parameter if available
-      if (debouncedSearchTerm) {
-        url += `?query=${encodeURIComponent(debouncedSearchTerm)}`;
+        // Add query parameter if available
+        if (debouncedSearchTerm) {
+          url += `?query=${encodeURIComponent(debouncedSearchTerm)}`;
+        }
+
+        const res = await fetch(url);
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error("Error fetching patients:", res.status, errorText);
+          // Return empty patients array if endpoint fails
+          if (res.status === 404 || res.status === 500) {
+            return { patients: [], source: "spruce" };
+          }
+          throw new Error(`Failed to fetch patients: ${res.status}`);
+        }
+
+        const data = await res.json();
+        // Ensure we always return the expected format
+        if (Array.isArray(data)) {
+          return { patients: data, source: "spruce" };
+        }
+        return data || { patients: [], source: "spruce" };
+      } catch (error) {
+        console.error("Error fetching patients:", error);
+        // Return empty array on error to prevent page crash
+        return { patients: [], source: "spruce" };
       }
-
-      const res = await fetch(url);
-
-      if (!res.ok) {
-        throw new Error("Failed to fetch patients");
-      }
-
-      return res.json();
     },
+    retry: 1,
   });
 
   // Show error toast if patient fetching fails
@@ -169,9 +187,9 @@ export default function PatientsPage() {
             setSelectedPatient((prev) =>
               prev
                 ? {
-                    ...prev,
-                    ramqVerified: data.metadata.ramqVerified,
-                  }
+                  ...prev,
+                  ramqVerified: data.metadata.ramqVerified,
+                }
                 : null
             );
           }
@@ -194,12 +212,12 @@ export default function PatientsPage() {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Clients" description="Manage your client records">
       <div className="flex h-full bg-[#121212] overflow-hidden">
         {/* Left column - Patient Details (moved from right) */}
         <div className="hidden md:block md:w-1/4 border-r border-[#333] bg-[#1a1a1a]">
           <div className="p-4 border-b border-[#333]">
-            <h2 className="text-xl font-bold">Patient Orders & Commands</h2>
+            <h2 className="text-xl font-bold">Client Management & Commands</h2>
           </div>
           {selectedPatient ? (
             <div className="p-4">
@@ -245,15 +263,15 @@ export default function PatientsPage() {
                 <h3 className="text-md font-semibold mb-2 text-white">AI Commands</h3>
                 <div className="space-y-3">
                   <Button className="w-full justify-between" variant="outline">
-                    <span>Generate RAMQ Request</span>
+                    <span>Generate Service Request</span>
                     <span>→</span>
                   </Button>
                   <Button className="w-full justify-between" variant="outline">
-                    <span>Create Prescription</span>
+                    <span>Create Proposal</span>
                     <span>→</span>
                   </Button>
                   <Button className="w-full justify-between" variant="outline">
-                    <span>Draft Medical Note</span>
+                    <span>Draft Meeting Summary</span>
                     <span>→</span>
                   </Button>
                   <Button className="w-full justify-between" variant="outline">
@@ -280,7 +298,7 @@ export default function PatientsPage() {
                   className="flex items-center justify-between cursor-pointer bg-[#252525] p-2 rounded-md mb-2"
                   onClick={() => setIsTasksExpanded(!isTasksExpanded)}
                 >
-                  <h3 className="text-md font-semibold text-white">Patient Tasks</h3>
+                  <h3 className="text-md font-semibold text-white">Client Tasks</h3>
                   <ChevronDown
                     className={`h-5 w-5 transform transition-transform ${isTasksExpanded ? "rotate-180" : ""}`}
                   />
@@ -654,7 +672,7 @@ export default function PatientsPage() {
               {/* Patient List Header */}
               <div className="p-3 border-b border-[#333] flex items-center justify-between">
                 <div className="flex items-center">
-                  <h2 className="font-semibold text-white">All Patients</h2>
+                  <h2 className="font-semibold text-white">All Clients</h2>
                   <ChevronDown className="ml-1 h-4 w-4 text-gray-400" />
                 </div>
                 <div className="flex items-center">
@@ -682,7 +700,7 @@ export default function PatientsPage() {
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500" />
                   <Input
                     type="text"
-                    placeholder="Search patients..."
+                    placeholder="Search clients..."
                     className="pl-10 bg-[#252525] border-[#444] text-white w-full"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -870,6 +888,6 @@ export default function PatientsPage() {
           </div>
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

@@ -10,7 +10,8 @@ import { Search, LogOut, User, Activity, Clock, AlertTriangle, CheckCircle, Copy
 import { format } from "date-fns";
 import { createClient } from "@supabase/supabase-js";
 import { AIPromptBox } from "../components/ai/AIPromptBox";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
+import { HeroVideoDialog } from "@/components/ui/hero-video-dialog";
 
 // Environment check with fallback
 const SUPABASE_URL = (import.meta as any).env.VITE_SUPABASE_URL;
@@ -64,18 +65,18 @@ class ErrorBoundary extends React.Component<
   }
 }
 
-export default function DoctorDashboardNew() {
+export default function ConsultantDashboardNew() {
   const [, navigate] = useLocation();
-  
+
   // FIRST THING - log that we're starting to render
   console.log('[DASHBOARD] Render starting');
-  
+
   try {
     console.log('[DASHBOARD] Component mounted');
-    
+
     // Check for missing environment variables
     const [envError, setEnvError] = React.useState<string | null>(null);
-    
+
     React.useEffect(() => {
       console.log('[DASHBOARD] Checking environment variables');
       if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -85,7 +86,7 @@ export default function DoctorDashboardNew() {
         console.log('[DASHBOARD] Environment variables OK');
       }
     }, []);
-    
+
     // Show error message if environment is not configured
     if (envError) {
       return (
@@ -113,7 +114,7 @@ export default function DoctorDashboardNew() {
         </div>
       );
     }
-    
+
     // State management
     const [searchQuery, setSearchQuery] = React.useState("");
     const [searchResults, setSearchResults] = React.useState<any[]>([]);
@@ -181,7 +182,7 @@ export default function DoctorDashboardNew() {
     // PIN Modal Component
     const PinModal = () => {
       if (!showPinModal) return null;
-      
+
       return (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50" onClick={() => setShowPinModal(false)}>
           <div className="bg-[#1a1a1a] border border-[#333] rounded-xl p-8 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
@@ -296,18 +297,18 @@ export default function DoctorDashboardNew() {
       setPendingPdf({ title, content: content || "" });
       setShowPinModal(true);
     };
-    
+
     // Spruce search state
     const [spruceSearchQuery, setSpruceSearchQuery] = React.useState("");
     const [selectedSpruceConversation, setSelectedSpruceConversation] = React.useState<any>(null);
-    
+
     // Template library state
     const [showTemplateLibrary, setShowTemplateLibrary] = React.useState(false);
     const [selectedDiagnosis, setSelectedDiagnosis] = React.useState<string | null>(null);
     const [templateSearchQuery, setTemplateSearchQuery] = React.useState("");
     const [availableTemplates, setAvailableTemplates] = React.useState<any[]>([]);
     const [selectedTemplate, setSelectedTemplate] = React.useState<any>(null);
-    
+
     // Plan builder state - tracks selected items from templates
     const [selectedPlanItems, setSelectedPlanItems] = React.useState<{
       medications: string[];
@@ -320,7 +321,7 @@ export default function DoctorDashboardNew() {
       referrals: [],
       lifestyle: []
     });
-    
+
     const [customPlanText, setCustomPlanText] = React.useState("");
 
     // Load initial data
@@ -367,7 +368,7 @@ export default function DoctorDashboardNew() {
               triage_level: "Urgent"
             },
             {
-              id: "2", 
+              id: "2",
               patient_id: "P002",
               chief_complaint: "Headache",
               created_at: new Date().toISOString(),
@@ -387,30 +388,30 @@ export default function DoctorDashboardNew() {
       try {
         console.log('[Dashboard] Fetching Spruce conversations...');
         const startTime = performance.now();
-        
+
         const response = await fetch('/api/spruce-conversations-all');
         console.log('[Dashboard] spruce-conversations-all response status:', response.status);
-        
+
         if (!response.ok) {
           const errorText = await response.text();
           console.error('[Dashboard] spruce-conversations-all returned status:', response.status, errorText);
           setSpruceCases([]);
           return;
         }
-        
+
         const contentType = response.headers.get('content-type');
         if (!contentType?.includes('application/json')) {
           console.error('[Dashboard] spruce-conversations-all returned non-JSON:', contentType);
           setSpruceCases([]);
           return;
         }
-        
+
         const data = await response.json();
         const endTime = performance.now();
         const duration = ((endTime - startTime) / 1000).toFixed(2);
-        
+
         console.log(`[Dashboard] ✅ Loaded ${data?.length || 0} Spruce conversations in ${duration}s`);
-        
+
         if (data && Array.isArray(data)) {
           setSpruceCases(data);
           // Log sample of conversations for debugging
@@ -439,20 +440,20 @@ export default function DoctorDashboardNew() {
       try {
         const response = await fetch('/api/file-management/list');
         console.log('[Dashboard] file-management response status:', response.status);
-        
+
         if (!response.ok) {
           console.error('[Dashboard] file-management returned status:', response.status);
           setReports([]);
           return;
         }
-        
+
         const contentType = response.headers.get('content-type');
         if (!contentType?.includes('application/json')) {
           console.error('[Dashboard] file-management returned non-JSON:', contentType);
           setReports([]);
           return;
         }
-        
+
         const data = await response.json();
         setReports(data || []);
       } catch (error) {
@@ -465,7 +466,7 @@ export default function DoctorDashboardNew() {
 
     const searchPatients = async () => {
       if (!searchQuery.trim()) return;
-      
+
       setLoading(true);
       try {
         const { data, error } = await supabase
@@ -489,7 +490,7 @@ export default function DoctorDashboardNew() {
 
     const generateMedicalReport = async () => {
       if (!selectedPatient) return;
-      
+
       setGenerating(true);
       try {
         const response = await fetch('/api/medical-transcription', {
@@ -500,10 +501,10 @@ export default function DoctorDashboardNew() {
             variables: selectedPatientData
           })
         });
-        
+
         const data = await response.json();
         setFrenchDoc(data);
-        
+
         // Save report to Supabase database
         await saveReportToDatabase(selectedPatient, data);
       } catch (error) {
@@ -523,7 +524,7 @@ export default function DoctorDashboardNew() {
             generated_at: new Date().toISOString(),
             report_type: 'comprehensive'
           });
-        
+
         if (error) {
           console.error('Error saving report to database:', error);
         } else {
@@ -540,16 +541,16 @@ export default function DoctorDashboardNew() {
         // SAP format: "A: 1) Primary diagnosis 2) Diff diagnosis 2..."
         const assessmentMatch = sapNote.match(/A:\s*(.+?)(?:\nP:|$)/s);
         if (!assessmentMatch) return [];
-        
+
         const assessmentLine = assessmentMatch[1];
         const diagnosisMatches = assessmentLine.match(/\d+\)\s*([^()]+?)(?:\s*\(|,|\s*\d+\)|$)/g);
-        
+
         if (!diagnosisMatches) return [];
-        
-        return diagnosisMatches.map(d => 
+
+        return diagnosisMatches.map(d =>
           d.replace(/^\d+\)\s*/, '')
-           .replace(/\s*\(.*?\)\s*$/, '')
-           .trim()
+            .replace(/\s*\(.*?\)\s*$/, '')
+            .trim()
         );
       } catch (error) {
         console.error("Error parsing SAP diagnosis:", error);
@@ -593,7 +594,7 @@ export default function DoctorDashboardNew() {
       setSelectedPlanItems((prev) => {
         const categoryItems = prev[category as keyof typeof prev] || [];
         const isSelected = categoryItems.includes(item);
-        
+
         return {
           ...prev,
           [category]: isSelected
@@ -605,52 +606,52 @@ export default function DoctorDashboardNew() {
 
     const applyTemplateToReport = () => {
       if (!frenchDoc || !selectedTemplate) return;
-      
+
       // Get selected items from template
       const updatedReport = { ...frenchDoc };
-      
+
       // Add selected medications to report
       if (selectedPlanItems.medications && selectedPlanItems.medications.length > 0) {
         const additionalMeds = selectedTemplate.plan_items
-          .filter((item: any) => 
-            item.category?.toLowerCase() === 'medications' && 
+          .filter((item: any) =>
+            item.category?.toLowerCase() === 'medications' &&
             selectedPlanItems.medications.includes(item.item)
           )
           .map((item: any) => `\n\n${item.item}${item.details ? `\n${item.details}` : ''}`)
           .join('');
-        
+
         updatedReport.medications = (updatedReport.medications || '') + additionalMeds;
       }
-      
+
       // Add selected lab tests
       if (selectedPlanItems.tests && selectedPlanItems.tests.length > 0) {
         const additionalTests = selectedTemplate.plan_items
-          .filter((item: any) => 
-            (item.category?.toLowerCase() === 'laboratory' || item.category?.toLowerCase() === 'tests') && 
+          .filter((item: any) =>
+            (item.category?.toLowerCase() === 'laboratory' || item.category?.toLowerCase() === 'tests') &&
             selectedPlanItems.tests.includes(item.item)
           )
           .map((item: any) => item.item)
           .join('\n');
-        
+
         updatedReport.lab_tests = (updatedReport.lab_tests || '') + '\n' + additionalTests;
       }
-      
+
       // Add selected referrals  
       if (selectedPlanItems.referrals && selectedPlanItems.referrals.length > 0) {
         const additionalReferrals = selectedTemplate.plan_items
-          .filter((item: any) => 
-            (item.category?.toLowerCase() === 'referrals' || item.category?.toLowerCase() === 'specialist') && 
+          .filter((item: any) =>
+            (item.category?.toLowerCase() === 'referrals' || item.category?.toLowerCase() === 'specialist') &&
             selectedPlanItems.referrals.includes(item.item)
           )
           .map((item: any) => `${item.item}${item.details ? ` - ${item.details}` : ''}`)
           .join('\n\n');
-        
+
         updatedReport.referrals = (updatedReport.referrals || '') + '\n\n' + additionalReferrals;
       }
-      
+
       // Update the report
       setFrenchDoc(updatedReport);
-      
+
       // Close modal and reset
       setShowTemplateLibrary(false);
       setSelectedTemplate(null);
@@ -696,7 +697,7 @@ export default function DoctorDashboardNew() {
         };
 
         setSelectedPatientData(combinedData);
-        
+
         // If there's a saved report, load it automatically
         if (reports && reports.length > 0 && reports[0].report_data) {
           setFrenchDoc(reports[0].report_data);
@@ -710,7 +711,7 @@ export default function DoctorDashboardNew() {
       navigator.clipboard.writeText(text);
       setCopyToast("Copied to clipboard!");
       setTimeout(() => setCopyToast(null), 2000);
-      
+
       setCopiedSections(prev => new Set([...prev, section]));
     };
 
@@ -720,7 +721,7 @@ export default function DoctorDashboardNew() {
       const totalTimeSaved = totalCopies * timeSavedPerCopy;
       const hourlyRate = 150;
       const moneySaved = (totalTimeSaved / 60) * hourlyRate;
-      
+
       return {
         totalCopies,
         totalTimeSaved,
@@ -734,14 +735,14 @@ export default function DoctorDashboardNew() {
 
     const handleDeleteReport = async (filename: string) => {
       if (!confirm(`Delete report ${filename}?`)) return;
-      
+
       try {
         const response = await fetch('/api/file-management/delete', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ filename })
         });
-        
+
         if (response.ok) {
           // Reload reports after deletion
           loadReports();
@@ -756,13 +757,13 @@ export default function DoctorDashboardNew() {
 
     const handleDeleteAllReports = async () => {
       if (!confirm('Delete ALL reports? This cannot be undone!')) return;
-      
+
       try {
         const response = await fetch('/api/file-management/cleanup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' }
         });
-        
+
         if (response.ok) {
           // Reload reports after cleanup
           loadReports();
@@ -811,36 +812,36 @@ export default function DoctorDashboardNew() {
       setSelectedDiagnosis(templateId);
       setShowTemplateLibrary(true);
     };
-    
+
     const buildPlanFromSelections = () => {
       let plan = "";
-      
+
       if (selectedPlanItems.medications.length > 0) {
         plan += "Rx: " + selectedPlanItems.medications.join(", ") + ". ";
       }
-      
+
       if (selectedPlanItems.tests.length > 0) {
         plan += "Labs: " + selectedPlanItems.tests.join(", ") + ". ";
       }
-      
+
       if (selectedPlanItems.referrals.length > 0) {
         plan += "Ref: " + selectedPlanItems.referrals.join(", ") + ". ";
       }
-      
+
       if (selectedPlanItems.lifestyle.length > 0) {
         plan += "Lifestyle: " + selectedPlanItems.lifestyle.join(", ") + ". ";
       }
-      
+
       if (customPlanText) {
         plan += customPlanText;
       }
-      
+
       return plan;
     };
-    
+
     const applyPlanToSAP = () => {
       const builtPlan = buildPlanFromSelections();
-      
+
       if (frenchDoc && frenchDoc.superSpartanSAP) {
         // Update the P: section in the SAP note
         const sapLines = frenchDoc.superSpartanSAP.split('\n');
@@ -850,7 +851,7 @@ export default function DoctorDashboardNew() {
           }
           return line;
         }).join('\n');
-        
+
         setFrenchDoc({
           ...frenchDoc,
           superSpartanSAP: updatedSap
@@ -859,9 +860,9 @@ export default function DoctorDashboardNew() {
     };
 
     const filteredTemplates = templateSearchQuery
-      ? diagnosisTemplates.filter(t => 
-          t.name.toLowerCase().includes(templateSearchQuery.toLowerCase())
-        )
+      ? diagnosisTemplates.filter(t =>
+        t.name.toLowerCase().includes(templateSearchQuery.toLowerCase())
+      )
       : diagnosisTemplates;
 
     // Get template options based on diagnosis and category
@@ -1061,22 +1062,22 @@ export default function DoctorDashboardNew() {
     };
 
     // Filter Spruce conversations based on search
-    console.log('[DASHBOARD] About to filter spruceCases:', { 
-      spruceCases, 
-      isArray: Array.isArray(spruceCases), 
-      spruceSearchQuery 
+    console.log('[DASHBOARD] About to filter spruceCases:', {
+      spruceCases,
+      isArray: Array.isArray(spruceCases),
+      spruceSearchQuery
     });
-    const filteredSpruceCases = (spruceCases && Array.isArray(spruceCases)) 
+    const filteredSpruceCases = (spruceCases && Array.isArray(spruceCases))
       ? (spruceSearchQuery
-          ? spruceCases.filter((conv) =>
-              (conv.patient_name || `Conversation ${conv.id}`).toLowerCase().includes(spruceSearchQuery.toLowerCase())
-            )
-          : spruceCases)
+        ? spruceCases.filter((conv) =>
+          (conv.patient_name || `Conversation ${conv.id}`).toLowerCase().includes(spruceSearchQuery.toLowerCase())
+        )
+        : spruceCases)
       : [];
-    console.log('[DASHBOARD] After filteredSpruceCases calculation:', { 
-      filteredSpruceCases, 
+    console.log('[DASHBOARD] After filteredSpruceCases calculation:', {
+      filteredSpruceCases,
       isArray: Array.isArray(filteredSpruceCases),
-      length: filteredSpruceCases?.length 
+      length: filteredSpruceCases?.length
     });
 
     // Show initial loading skeleton
@@ -1088,7 +1089,7 @@ export default function DoctorDashboardNew() {
       <ErrorBoundary>
         <>
           <PinModal />
-          <AppLayoutSpruce>
+          <ModernLayout title="Dashboard" description="Overview of your consultation practice">
             {/* Main Content */}
             <div className="p-6 bg-[#0d0d0d]" data-testid="dashboard-root">
               {isInitializing ? (
@@ -1108,942 +1109,950 @@ export default function DoctorDashboardNew() {
                   <div className="mb-6">
                   </div>
                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                  {/* Left Column - Search and Spruce (3/4 width) */}
-                  <div className="lg:col-span-3 space-y-6">
-                    {/* Patient Search - Linear Style */}
-                    <Card className="bg-[#1a1a1a] border-[#2a2a2a] shadow-none">
-                      <CardHeader className="pb-4">
-                        <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
-                          <Search className="w-5 h-5 text-[#999]" />
-                          Search Patients
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex gap-2">
-                          <Input
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder="Enter patient ID..."
-                            className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
-                          />
-                          <Button
-                            onClick={searchPatients}
-                            disabled={loading}
-                            className="bg-[#1a1a1a] border border-[#333] hover:bg-[#222] text-[#e6e6e6]"
-                          >
-                            {loading ? <Activity className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                          </Button>
-                        </div>
-                        
-                        {searchResults.length > 0 && (
-                          <div className="mt-4 space-y-2">
-                            {searchResults.map((patient) => (
-                              <div
-                                key={patient.id}
-                                onClick={() => openPatientDetails(patient.patient_id)}
-                                className="p-3 bg-[#0d0d0d] rounded-md hover:bg-[#222] cursor-pointer transition-colors border border-[#2a2a2a]"
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div>
-                                    <p className="font-medium text-[#e6e6e6] text-sm">{patient.patient_id}</p>
-                                    <p className="text-xs text-[#999] mt-0.5">{patient.chief_complaint}</p>
-                                  </div>
-                                  <Badge className="bg-[#222] text-[#999] border border-[#2a2a2a] text-xs">
-                                    {patient.triage_level}
-                                  </Badge>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    {/* Spruce Integration */}
-                    <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
-                            <Phone className="w-5 h-5 text-[#999]" />
-                            Spruce Integration
-                            {spruceCases.length > 0 && (
-                              <span className="text-[#999] text-sm font-normal ml-2">
-                                ({spruceCases.length} conversations)
-                              </span>
-                            )}
+                    {/* Left Column - Search and Spruce (3/4 width) */}
+                    <div className="lg:col-span-3 space-y-6">
+                      {/* Patient Search - Enhanced Style */}
+                      <Card className="group relative bg-[#1a1a1a] border-[#2a2a2a] shadow-lg hover:shadow-xl transition-all duration-300 hover:border-[#333]">
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-purple-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:via-purple-500/5 group-hover:to-purple-500/5 transition-all duration-300 rounded-lg" />
+                        <CardHeader className="relative pb-4">
+                          <CardTitle className="text-[#e6e6e6] text-lg font-semibold flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-purple-600/20 flex items-center justify-center">
+                              <Search className="w-4 h-4 text-[#8b5cf6]" />
+                            </div>
+                            Search Clients
                           </CardTitle>
-                          <Button
-                            onClick={loadSpruceCases}
-                            disabled={loadingSpruce}
-                            variant="ghost"
-                            size="sm"
-                            className="text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
-                            title="Refresh conversations"
-                          >
-                            <RefreshCw className={`w-4 h-4 ${loadingSpruce ? 'animate-spin' : ''}`} />
-                          </Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        {/* Spruce Search */}
-                        <div className="mb-4">
-                          <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#999] h-4 w-4" />
+                        </CardHeader>
+                        <CardContent className="relative">
+                          <div className="flex gap-2">
                             <Input
-                              type="text"
-                              placeholder="Search conversations..."
-                              value={spruceSearchQuery}
-                              onChange={(e) => setSpruceSearchQuery(e.target.value)}
-                              className="pl-9 bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
+                              value={searchQuery}
+                              onChange={(e) => setSearchQuery(e.target.value)}
+                              placeholder="Enter client ID..."
+                              className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
                             />
+                            <Button
+                              onClick={searchPatients}
+                              disabled={loading}
+                              className="bg-[#1a1a1a] border border-[#333] hover:bg-[#222] text-[#e6e6e6]"
+                            >
+                              {loading ? <Activity className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                            </Button>
                           </div>
-                        </div>
 
-                        {loadingSpruce ? (
-                          <div className="text-center py-8">
-                            <Activity className="w-12 h-12 text-[#999] mx-auto mb-4 animate-spin" />
-                            <p className="text-[#999]">Loading Spruce cases...</p>
-                          </div>
-                        ) : filteredSpruceCases.length === 0 ? (
-                          <div className="text-center py-8">
-                            <Phone className="w-12 h-12 text-[#999] mx-auto mb-4" />
-                            <p className="text-[#999]">No Spruce conversations found</p>
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {filteredSpruceCases.slice(0, 5).map((conversation) => (
-                              <div
-                                key={conversation.id}
-                                onClick={() => setSelectedSpruceConversation(conversation)}
-                                className={`p-3 rounded-lg transition-colors cursor-pointer ${
-                                  selectedSpruceConversation?.id === conversation.id
-                                    ? 'bg-[#222] hover:bg-slate-750'
-                                    : 'bg-[#2a2a2a] hover:bg-[#333]'
-                                }`}
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-[#222] rounded-lg flex items-center justify-center">
-                                      <Phone className="w-4 h-4 text-[#e6e6e6]" />
-                                    </div>
+                          {searchResults.length > 0 && (
+                            <div className="mt-4 space-y-2">
+                              {searchResults.map((patient) => (
+                                <div
+                                  key={patient.id}
+                                  onClick={() => openPatientDetails(patient.patient_id)}
+                                  className="group/item p-4 bg-[#0d0d0d] rounded-lg hover:bg-[#222] cursor-pointer transition-all duration-200 border border-[#2a2a2a] hover:border-[#333] hover:shadow-md hover:scale-[1.01]"
+                                >
+                                  <div className="flex items-center justify-between">
                                     <div>
-                                      <p className="font-semibold text-[#e6e6e6] text-sm">
-                                        {conversation.patient_name || `Conversation ${conversation.id}`}
-                                      </p>
+                                      <p className="font-medium text-[#e6e6e6] text-sm">{patient.patient_id}</p>
+                                      <p className="text-xs text-[#999] mt-0.5">{patient.chief_complaint}</p>
+                                    </div>
+                                    <Badge className="bg-[#222] text-[#999] border border-[#2a2a2a] text-xs">
+                                      {patient.triage_level}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      {/* Spruce Integration */}
+                      <Card className="group relative bg-[#1a1a1a] border-[#2a2a2a] shadow-lg hover:shadow-xl transition-all duration-300 hover:border-[#333]">
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-purple-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:via-purple-500/5 group-hover:to-purple-500/5 transition-all duration-300 rounded-lg" />
+                        <CardHeader className="relative">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-[#e6e6e6] text-lg font-semibold flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-purple-600/20 flex items-center justify-center">
+                                <Phone className="w-4 h-4 text-[#8b5cf6]" />
+                              </div>
+                              Spruce Integration
+                              {spruceCases.length > 0 && (
+                                <span className="text-[#999] text-sm font-normal ml-2">
+                                  ({spruceCases.length} conversations)
+                                </span>
+                              )}
+                            </CardTitle>
+                            <Button
+                              onClick={loadSpruceCases}
+                              disabled={loadingSpruce}
+                              variant="ghost"
+                              size="sm"
+                              className="text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
+                              title="Refresh conversations"
+                            >
+                              <RefreshCw className={`w-4 h-4 ${loadingSpruce ? 'animate-spin' : ''}`} />
+                            </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="relative">
+                          {/* Spruce Search */}
+                          <div className="mb-4">
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#999] h-4 w-4" />
+                              <Input
+                                type="text"
+                                placeholder="Search conversations..."
+                                value={spruceSearchQuery}
+                                onChange={(e) => setSpruceSearchQuery(e.target.value)}
+                                className="pl-9 bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
+                              />
+                            </div>
+                          </div>
+
+                          {loadingSpruce ? (
+                            <div className="text-center py-8">
+                              <Activity className="w-12 h-12 text-[#999] mx-auto mb-4 animate-spin" />
+                              <p className="text-[#999]">Loading Spruce cases...</p>
+                            </div>
+                          ) : filteredSpruceCases.length === 0 ? (
+                            <div className="text-center py-8">
+                              <Phone className="w-12 h-12 text-[#999] mx-auto mb-4" />
+                              <p className="text-[#999]">No Spruce conversations found</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              {filteredSpruceCases.slice(0, 5).map((conversation) => (
+                                <div
+                                  key={conversation.id}
+                                  onClick={() => setSelectedSpruceConversation(conversation)}
+                                  className={`group/item p-4 rounded-lg transition-all duration-200 cursor-pointer ${selectedSpruceConversation?.id === conversation.id
+                                    ? 'bg-[#222] border border-[#8b5cf6]/30 shadow-md shadow-purple-500/10'
+                                    : 'bg-[#2a2a2a] hover:bg-[#333] border border-transparent hover:border-[#333] hover:shadow-md hover:scale-[1.01]'
+                                    }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-8 h-8 bg-[#222] rounded-lg flex items-center justify-center">
+                                        <Phone className="w-4 h-4 text-[#e6e6e6]" />
+                                      </div>
+                                      <div>
+                                        <p className="font-semibold text-[#e6e6e6] text-sm">
+                                          {conversation.patient_name || `Conversation ${conversation.id}`}
+                                        </p>
+                                        <p className="text-[#999] text-xs">
+                                          {conversation.last_message || 'No messages yet'}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="text-right">
                                       <p className="text-[#999] text-xs">
-                                        {conversation.last_message || 'No messages yet'}
+                                        {conversation.updated_at ?
+                                          format(new Date(conversation.updated_at), 'MMM d, HH:mm') :
+                                          'Unknown time'
+                                        }
                                       </p>
-                                    </div>
-                                  </div>
-                                  <div className="text-right">
-                                    <p className="text-[#999] text-xs">
-                                      {conversation.updated_at ? 
-                                        format(new Date(conversation.updated_at), 'MMM d, HH:mm') : 
-                                        'Unknown time'
-                                      }
-                                    </p>
-                                    <div className="flex items-center gap-1 mt-1">
-                                      <div className="w-2 h-2 bg-emerald-800 rounded-full"></div>
-                                      <span className="text-green-400 text-xs">Active</span>
+                                      <div className="flex items-center gap-1 mt-1">
+                                        <div className="w-2 h-2 bg-emerald-800 rounded-full"></div>
+                                        <span className="text-green-400 text-xs">Active</span>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
+                              ))}
+                            </div>
+                          )}
 
-                    {/* Quick Diagnosis Templates */}
-                    <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
-                      <CardHeader>
-                        <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
-                          <Zap className="w-5 h-5 text-[#999]" />
-                          Quick Diagnosis Templates
-                        </CardTitle>
-                        <CardDescription className="text-[#999] text-sm">
-                          Pre-built protocols for common conditions
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        {/* Template Search */}
-                        <div className="mb-4">
-                          <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#999] h-4 w-4" />
-                            <Input
-                              type="text"
-                              placeholder="Search diagnoses..."
-                              value={templateSearchQuery}
-                              onChange={(e) => setTemplateSearchQuery(e.target.value)}
-                              className="pl-9 bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
-                            />
-                          </div>
-                        </div>
+                        </CardContent>
+                      </Card>
 
-                        {/* Template Categories */}
-                        <div className="space-y-3 max-h-96 overflow-y-auto">
-                          {filteredTemplates.map((template) => {
-                            const categoryColors = {
-                              acute: "bg-red-900/20 border-red-500/30 hover:bg-red-900/30",
-                              chronic: "bg-blue-900/20 border-blue-500/30 hover:bg-blue-900/30",
-                              mental: "bg-purple-900/20 border-purple-500/30 hover:bg-purple-900/30"
-                            };
-                            
-                            return (
-                              <div
-                                key={template.id}
-                                onClick={() => handleUseTemplate(template.id)}
-                                className={`p-3 rounded-lg cursor-pointer transition-all ${categoryColors[template.category as keyof typeof categoryColors]}`}
+                      {/* Quick Diagnosis Templates */}
+                      <Card className="group relative bg-[#1a1a1a] border-[#2a2a2a] shadow-lg hover:shadow-xl transition-all duration-300 hover:border-[#333]">
+                        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-purple-500/0 to-purple-500/0 group-hover:from-purple-500/5 group-hover:via-purple-500/5 group-hover:to-purple-500/5 transition-all duration-300 rounded-lg" />
+                        <CardHeader className="relative">
+                          <CardTitle className="text-[#e6e6e6] text-lg font-semibold flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-purple-600/20 flex items-center justify-center">
+                              <Zap className="w-4 h-4 text-[#8b5cf6]" />
+                            </div>
+                            Quick Diagnosis Templates
+                          </CardTitle>
+                          <CardDescription className="text-[#999] text-sm">
+                            Pre-built protocols for common conditions
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent className="relative">
+                          {/* Template Search */}
+                          <div className="mb-4">
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#999] h-4 w-4" />
+                              <Input
+                                type="text"
+                                placeholder="Search diagnoses..."
+                                value={templateSearchQuery}
+                                onChange={(e) => setTemplateSearchQuery(e.target.value)}
+                                className="pl-9 bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666] focus:ring-2 focus:ring-[#8b5cf6] focus:border-transparent"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Template Categories */}
+                          <div className="space-y-3 max-h-96 overflow-y-auto">
+                            {filteredTemplates.map((template) => {
+                              const categoryColors = {
+                                acute: "bg-red-900/20 border-red-500/30 hover:bg-red-900/30",
+                                chronic: "bg-blue-900/20 border-blue-500/30 hover:bg-blue-900/30",
+                                mental: "bg-purple-900/20 border-purple-500/30 hover:bg-purple-900/30"
+                              };
+
+                              return (
+                                <div
+                                  key={template.id}
+                                  onClick={() => handleUseTemplate(template.id)}
+                                  className={`p-3 rounded-lg cursor-pointer transition-all ${categoryColors[template.category as keyof typeof categoryColors]}`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <Stethoscope className="w-4 h-4 text-[#e6e6e6]" />
+                                      <span className="text-[#e6e6e6] text-sm font-medium">{template.name}</span>
+                                    </div>
+                                    <Badge className={
+                                      template.category === 'acute' ? 'bg-red-600' :
+                                        template.category === 'chronic' ? 'bg-[#222]' :
+                                          'bg-[#222]'
+                                    }>
+                                      {template.category}
+                                    </Badge>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          <Button
+                            onClick={() => navigate("/knowledge-base")}
+                            className="w-full mt-4 bg-[#1a1a1a] border border-[#333] hover:bg-[#222] text-[#e6e6e6]"
+                          >
+                            <Zap className="w-4 h-4 mr-2" />
+                            View All Templates
+                          </Button>
+                        </CardContent>
+                      </Card>
+
+                      {/* Template Detail Builder */}
+                      {showTemplateLibrary && selectedDiagnosis && (
+                        <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
+                          <CardHeader>
+                            <div className="flex items-center justify-between">
+                              <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                                <Brain className="w-5 h-5 text-[#8b5cf6]" />
+                                Plan Builder: {diagnosisTemplates.find(d => d.id === selectedDiagnosis)?.name}
+                              </CardTitle>
+                              <Button
+                                onClick={() => setShowTemplateLibrary(false)}
+                                size="sm"
+                                variant="ghost"
+                                className="text-[#999]"
                               >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <Stethoscope className="w-4 h-4 text-[#e6e6e6]" />
-                                    <span className="text-[#e6e6e6] text-sm font-medium">{template.name}</span>
-                                  </div>
-                                  <Badge className={
-                                    template.category === 'acute' ? 'bg-red-600' :
-                                    template.category === 'chronic' ? 'bg-[#222]' :
-                                    'bg-[#222]'
-                                  }>
-                                    {template.category}
-                                  </Badge>
+                                ✕
+                              </Button>
+                            </div>
+                            <CardDescription className="text-[#999]">
+                              Click items to add to your SAP Plan section
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              {/* Medications */}
+                              <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3">
+                                <h4 className="text-green-300 font-semibold mb-2 flex items-center gap-2">
+                                  <Heart className="w-4 h-4" />
+                                  Medications
+                                </h4>
+                                <div className="space-y-1">
+                                  {getTemplateOptions(selectedDiagnosis, 'medication').map((med) => (
+                                    <label key={med} className="flex items-center gap-2 text-sm text-green-200 cursor-pointer hover:bg-green-900/30 p-1 rounded">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedPlanItems.medications.includes(med)}
+                                        onChange={() => togglePlanItem('medications', med)}
+                                        className="w-4 h-4"
+                                      />
+                                      <span>{med}</span>
+                                    </label>
+                                  ))}
                                 </div>
                               </div>
-                            );
-                          })}
-                        </div>
-                        
-                        <Button
-                          onClick={() => navigate("/knowledge-base")}
-                          className="w-full mt-4 bg-[#1a1a1a] border border-[#333] hover:bg-[#222] text-[#e6e6e6]"
-                        >
-                          <Zap className="w-4 h-4 mr-2" />
-                          View All Templates
-                        </Button>
-                      </CardContent>
-                    </Card>
 
-                    {/* Template Detail Builder */}
-                    {showTemplateLibrary && selectedDiagnosis && (
+                              {/* Tests/Labs */}
+                              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3">
+                                <h4 className="text-blue-300 font-semibold mb-2 flex items-center gap-2">
+                                  <Activity className="w-4 h-4" />
+                                  Tests & Labs
+                                </h4>
+                                <div className="space-y-1">
+                                  {getTemplateOptions(selectedDiagnosis, 'testing').map((test) => (
+                                    <label key={test} className="flex items-center gap-2 text-sm text-blue-200 cursor-pointer hover:bg-blue-900/30 p-1 rounded">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedPlanItems.tests.includes(test)}
+                                        onChange={() => togglePlanItem('tests', test)}
+                                        className="w-4 h-4"
+                                      />
+                                      <span>{test}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Referrals */}
+                              <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3">
+                                <h4 className="text-purple-300 font-semibold mb-2 flex items-center gap-2">
+                                  <Users className="w-4 h-4" />
+                                  Referrals
+                                </h4>
+                                <div className="space-y-1">
+                                  {getTemplateOptions(selectedDiagnosis, 'referral').map((ref) => (
+                                    <label key={ref} className="flex items-center gap-2 text-sm text-purple-200 cursor-pointer hover:bg-purple-900/30 p-1 rounded">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedPlanItems.referrals.includes(ref)}
+                                        onChange={() => togglePlanItem('referrals', ref)}
+                                        className="w-4 h-4"
+                                      />
+                                      <span>{ref}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Lifestyle */}
+                              <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-3">
+                                <h4 className="text-orange-300 font-semibold mb-2 flex items-center gap-2">
+                                  <Heart className="w-4 h-4" />
+                                  Lifestyle & Counseling
+                                </h4>
+                                <div className="space-y-1">
+                                  {getTemplateOptions(selectedDiagnosis, 'lifestyle').map((item) => (
+                                    <label key={item} className="flex items-center gap-2 text-sm text-orange-200 cursor-pointer hover:bg-orange-900/30 p-1 rounded">
+                                      <input
+                                        type="checkbox"
+                                        checked={selectedPlanItems.lifestyle.includes(item)}
+                                        onChange={() => togglePlanItem('lifestyle', item)}
+                                        className="w-4 h-4"
+                                      />
+                                      <span>{item}</span>
+                                    </label>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Plan Preview */}
+                              <div className="bg-[#2a2a2a] border border-[#333] rounded-lg p-3">
+                                <h4 className="text-[#e6e6e6] font-semibold mb-2">📝 Plan Preview:</h4>
+                                <p className="text-[#999] text-sm whitespace-pre-wrap">
+                                  {buildPlanFromSelections() || "Select items above to build your plan..."}
+                                </p>
+                              </div>
+
+                              {/* Apply Button */}
+                              <Button
+                                onClick={applyPlanToSAP}
+                                className="w-full bg-primary hover:bg-primary/90 text-white"
+                                disabled={!frenchDoc}
+                              >
+                                <CheckCircle className="w-4 h-4 mr-2" />
+                                Apply to SAP Plan Section
+                              </Button>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {/* File Management */}
                       <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                         <CardHeader>
                           <div className="flex items-center justify-between">
                             <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
-                              <Brain className="w-5 h-5 text-[#8b5cf6]" />
-                              Plan Builder: {diagnosisTemplates.find(d => d.id === selectedDiagnosis)?.name}
+                              <FileText className="w-5 h-5 text-[#999]" />
+                              File Management
                             </CardTitle>
-                            <Button
-                              onClick={() => setShowTemplateLibrary(false)}
-                              size="sm"
-                              variant="ghost"
-                              className="text-[#999]"
-                            >
-                              ✕
-                            </Button>
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={loadReports}
+                                disabled={loadingReports}
+                                size="sm"
+                                variant="outline"
+                                className="text-[#e6e6e6] border-[#333] hover:bg-[#2a2a2a]"
+                              >
+                                {loadingReports ? (
+                                  <Activity className="w-4 h-4 animate-spin" />
+                                ) : (
+                                  <RefreshCw className="w-4 h-4" />
+                                )}
+                              </Button>
+                              {reports.length > 0 && (
+                                <Button
+                                  onClick={handleDeleteAllReports}
+                                  size="sm"
+                                  variant="outline"
+                                  className="text-red-300 border-red-600 hover:bg-red-900/20"
+                                >
+                                  <Trash2 className="w-4 h-4 mr-1" />
+                                  Clean All
+                                </Button>
+                              )}
+                            </div>
                           </div>
-                          <CardDescription className="text-[#999]">
-                            Click items to add to your SAP Plan section
-                          </CardDescription>
                         </CardHeader>
                         <CardContent>
-                          <div className="space-y-4">
-                            {/* Medications */}
-                            <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3">
-                              <h4 className="text-green-300 font-semibold mb-2 flex items-center gap-2">
-                                <Heart className="w-4 h-4" />
-                                Medications
-                              </h4>
-                              <div className="space-y-1">
-                                {getTemplateOptions(selectedDiagnosis, 'medication').map((med) => (
-                                  <label key={med} className="flex items-center gap-2 text-sm text-green-200 cursor-pointer hover:bg-green-900/30 p-1 rounded">
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedPlanItems.medications.includes(med)}
-                                      onChange={() => togglePlanItem('medications', med)}
-                                      className="w-4 h-4"
-                                    />
-                                    <span>{med}</span>
-                                  </label>
-                                ))}
-                              </div>
+                          {loadingReports ? (
+                            <div className="text-center py-8">
+                              <Activity className="w-12 h-12 text-[#999] mx-auto mb-4 animate-spin" />
+                              <p className="text-[#999]">Loading reports...</p>
                             </div>
-
-                            {/* Tests/Labs */}
-                            <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3">
-                              <h4 className="text-blue-300 font-semibold mb-2 flex items-center gap-2">
-                                <Activity className="w-4 h-4" />
-                                Tests & Labs
-                              </h4>
-                              <div className="space-y-1">
-                                {getTemplateOptions(selectedDiagnosis, 'testing').map((test) => (
-                                  <label key={test} className="flex items-center gap-2 text-sm text-blue-200 cursor-pointer hover:bg-blue-900/30 p-1 rounded">
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedPlanItems.tests.includes(test)}
-                                      onChange={() => togglePlanItem('tests', test)}
-                                      className="w-4 h-4"
-                                    />
-                                    <span>{test}</span>
-                                  </label>
-                                ))}
-                              </div>
+                          ) : (!reports || !Array.isArray(reports) || reports.length === 0) ? (
+                            <div className="text-center py-8">
+                              <FileText className="w-12 h-12 text-[#999] mx-auto mb-4" />
+                              <p className="text-[#999]">No reports found</p>
+                              <p className="text-[#666] text-sm">Generate medical reports to see them here</p>
                             </div>
-
-                            {/* Referrals */}
-                            <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3">
-                              <h4 className="text-purple-300 font-semibold mb-2 flex items-center gap-2">
-                                <Users className="w-4 h-4" />
-                                Referrals
-                              </h4>
-                              <div className="space-y-1">
-                                {getTemplateOptions(selectedDiagnosis, 'referral').map((ref) => (
-                                  <label key={ref} className="flex items-center gap-2 text-sm text-purple-200 cursor-pointer hover:bg-purple-900/30 p-1 rounded">
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedPlanItems.referrals.includes(ref)}
-                                      onChange={() => togglePlanItem('referrals', ref)}
-                                      className="w-4 h-4"
-                                    />
-                                    <span>{ref}</span>
-                                  </label>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Lifestyle */}
-                            <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-3">
-                              <h4 className="text-orange-300 font-semibold mb-2 flex items-center gap-2">
-                                <Heart className="w-4 h-4" />
-                                Lifestyle & Counseling
-                              </h4>
-                              <div className="space-y-1">
-                                {getTemplateOptions(selectedDiagnosis, 'lifestyle').map((item) => (
-                                  <label key={item} className="flex items-center gap-2 text-sm text-orange-200 cursor-pointer hover:bg-orange-900/30 p-1 rounded">
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedPlanItems.lifestyle.includes(item)}
-                                      onChange={() => togglePlanItem('lifestyle', item)}
-                                      className="w-4 h-4"
-                                    />
-                                    <span>{item}</span>
-                                  </label>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Plan Preview */}
-                            <div className="bg-[#2a2a2a] border border-[#333] rounded-lg p-3">
-                              <h4 className="text-[#e6e6e6] font-semibold mb-2">📝 Plan Preview:</h4>
-                              <p className="text-[#999] text-sm whitespace-pre-wrap">
-                                {buildPlanFromSelections() || "Select items above to build your plan..."}
-                              </p>
-                            </div>
-
-                            {/* Apply Button */}
-                            <Button
-                              onClick={applyPlanToSAP}
-                              className="w-full bg-primary hover:bg-primary/90 text-white"
-                              disabled={!frenchDoc}
-                            >
-                              <CheckCircle className="w-4 h-4 mr-2" />
-                              Apply to SAP Plan Section
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-
-                    {/* File Management */}
-                    <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
-                      <CardHeader>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-[#999]" />
-                            File Management
-                          </CardTitle>
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={loadReports}
-                              disabled={loadingReports}
-                              size="sm"
-                              variant="outline"
-                              className="text-[#e6e6e6] border-[#333] hover:bg-[#2a2a2a]"
-                            >
-                              {loadingReports ? (
-                                <Activity className="w-4 h-4 animate-spin" />
-                              ) : (
-                                <RefreshCw className="w-4 h-4" />
-                              )}
-                            </Button>
-                            {reports.length > 0 && (
-                            <Button
-                              onClick={handleDeleteAllReports}
-                              size="sm"
-                              variant="outline"
-                              className="text-red-300 border-red-600 hover:bg-red-900/20"
-                            >
-                              <Trash2 className="w-4 h-4 mr-1" />
-                              Clean All
-                            </Button>
-                            )}
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        {loadingReports ? (
-                          <div className="text-center py-8">
-                            <Activity className="w-12 h-12 text-[#999] mx-auto mb-4 animate-spin" />
-                            <p className="text-[#999]">Loading reports...</p>
-                          </div>
-                        ) : (!reports || !Array.isArray(reports) || reports.length === 0) ? (
-                          <div className="text-center py-8">
-                            <FileText className="w-12 h-12 text-[#999] mx-auto mb-4" />
-                            <p className="text-[#999]">No reports found</p>
-                            <p className="text-[#666] text-sm">Generate medical reports to see them here</p>
-                          </div>
-                        ) : (
-                          <div className="space-y-3">
-                            {(reports || []).map((report) => (
-                              <div
-                                key={report.filename}
-                                className="p-3 bg-[#2a2a2a] rounded-lg hover:bg-[#333] transition-colors"
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
-                                      <FileText className="w-4 h-4 text-[#e6e6e6]" />
-                                    </div>
-                                    <div>
-                                      <p className="font-semibold text-[#e6e6e6] text-sm">
-                                        {report.filename}
-                                      </p>
-                                      <p className="text-[#999] text-xs">
-                                        Created: {new Date(report.created).toLocaleDateString()} • Size: {report.size}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      onClick={() => window.open(report.url, '_blank')}
-                                      size="sm"
-                                      variant="outline"
-                                      className="text-blue-300 border-[#2a2a2a] hover:bg-blue-900/20"
-                                    >
-                                      <Eye className="w-4 h-4 mr-1" />
-                                      View
-                                    </Button>
-                                    <Button
-                                      onClick={() => handleDeleteReport(report.filename)}
-                                      size="sm"
-                                      variant="outline"
-                                      className="text-red-300 border-red-600 hover:bg-red-900/20"
-                                    >
-                                      <Trash2 className="w-4 h-4" />
-                                    </Button>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Right Column - Recent Consultations and Medical Report (1/4 width) */}
-                  <div className="space-y-6">
-                    {/* Recent Consultations */}
-                    <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
-                      <CardHeader>
-                        <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
-                          <Clock className="w-5 h-5 text-[#999]" />
-                          Recent Consultations
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          {recentPatients.map((patient) => (
-                            <EnhancedPatientCard
-                              key={patient.id}
-                              patient={patient}
-                              onView={() => openPatientDetails(patient.patient_id)}
-                              onEdit={() => handleEditPatient(patient.id)}
-                              onGenerateReport={() => {
-                                openPatientDetails(patient.patient_id);
-                                generateMedicalReport();
-                              }}
-                            />
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Patient Details & Medical Report Generation */}
-                    <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
-                      <CardHeader>
-                        <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
-                          <Brain className="w-5 h-5 text-[#999]" />
-                          Patient Details & Medical Report
-                        </CardTitle>
-                        <CardDescription className="text-[#999] text-sm">
-                          Complete patient information and AI-powered documentation
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        {selectedPatient ? (
-                          <div className="space-y-4">
-                            {/* Patient Identifier */}
-                            <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3">
-                              <p className="text-blue-300 text-sm">
-                                <strong>Patient ID:</strong> {selectedPatient}
-                              </p>
-                            </div>
-
-                            {/* Patient Data Display */}
-                            {selectedPatientData && (
-                              <div className="space-y-3">
-                                {/* Initial HPI Confirmation Summary */}
-                                {selectedPatientData.consultation?.hpi_summary && (
-                                  <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-3">
-                                    <h4 className="text-cyan-300 text-sm font-semibold mb-2">📋 Initial HPI Summary:</h4>
-                                    <p className="text-cyan-200 text-xs whitespace-pre-wrap">
-                                      {selectedPatientData.consultation.hpi_summary}
-                                    </p>
-                                  </div>
-                                )}
-
-                                {/* 10 Follow-Up Questions & Answers */}
-                                {selectedPatientData.answers && Object.keys(selectedPatientData.answers).length > 0 && (
-                                  <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3 max-h-60 overflow-y-auto">
-                                    <h4 className="text-green-300 text-sm font-semibold mb-2">❓ Follow-Up Questions & Answers:</h4>
-                                    <div className="space-y-2">
-                                      {Object.entries(selectedPatientData.answers).map(([index, answer]) => (
-                                        <div key={index} className="text-xs">
-                                          <p className="text-green-300 font-medium">Q{parseInt(index) + 1}:</p>
-                                          <p className="text-green-200 ml-3">{String(answer)}</p>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-
-                                {/* Enhanced HPI for Physician */}
-                                {(selectedPatientData.doctor_hpi_summary || selectedPatientData.enhanced_soap_note) && (
-                                  <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3">
-                                    <h4 className="text-purple-300 text-sm font-semibold mb-2">🩺 Enhanced HPI Summary:</h4>
-                                    <p className="text-purple-200 text-xs whitespace-pre-wrap">
-                                      {selectedPatientData.doctor_hpi_summary || selectedPatientData.enhanced_soap_note}
-                                    </p>
-                                  </div>
-                                )}
-
-                                {/* Original Form Data */}
-                                {selectedPatientData.consultation?.form_data && (
-                                  <div className="bg-[#2a2a2a] border border-[#333] rounded-lg p-3 max-h-40 overflow-y-auto">
-                                    <h4 className="text-[#e6e6e6] text-sm font-semibold mb-2">📝 Form Data:</h4>
-                                    <div className="text-xs text-[#999] space-y-1">
-                                      {Object.entries(selectedPatientData.consultation.form_data).map(([key, value]) => (
-                                        <div key={key}>
-                                          <strong>{key}:</strong> {String(value)}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                            
-                            {/* Generate Report Button */}
-                            <Button
-                              onClick={generateMedicalReport}
-                              disabled={generating}
-                              className="w-full bg-primary hover:bg-primary/90 text-white disabled:opacity-50"
-                            >
-                              {generating ? (
-                                <>
-                                  <Activity className="w-4 h-4 mr-2 animate-spin" />
-                                  Generating 12-Section Report...
-                                </>
-                              ) : (
-                                <>
-                                  <Brain className="w-4 h-4 mr-2" />
-                                  Generate Complete Medical Report
-                                </>
-                              )}
-                            </Button>
-
-                            {/* Template Selection Button */}
-                            {frenchDoc && frenchDoc.sap_note && (
-                              <Dialog open={showTemplateLibrary} onOpenChange={setShowTemplateLibrary}>
-                                <DialogTrigger asChild>
-                                  <Button
-                                    onClick={() => {
-                                      const diagnoses = parseDiagnosisFromSAP(frenchDoc.sap_note || "");
-                                      setSelectedDiagnosis(diagnoses[0] || "");
-                                      setShowTemplateLibrary(true);
-                                    }}
-                                    variant="outline"
-                                    className="w-full border-[#2a2a2a] text-[#999] hover:bg-purple-50"
-                                  >
-                                    <FileText className="w-4 h-4 mr-2" />
-                                    Select Plan Template
-                                  </Button>
-                                </DialogTrigger>
-                                <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                                  <DialogHeader>
-                                    <DialogTitle>Select Treatment Plan Template</DialogTitle>
-                                    <DialogDescription>
-                                      Choose a template for {selectedDiagnosis} and customize the plan items
-                                    </DialogDescription>
-                                  </DialogHeader>
-
-                                  {/* Templates List */}
-                                  <div className="space-y-4 mt-4">
-                                    {availableTemplates.length === 0 ? (
-                                      <div className="text-center py-8 text-[#666]">
-                                        <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                                        <p>No templates found for this diagnosis.</p>
-                                        <p className="text-sm mt-2">
-                                          Create one in your <a href="/doctor-profile" className="text-[#999] underline">Profile Settings</a>
+                          ) : (
+                            <div className="space-y-3">
+                              {(reports || []).map((report) => (
+                                <div
+                                  key={report.filename}
+                                  className="p-3 bg-[#2a2a2a] rounded-lg hover:bg-[#333] transition-colors"
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center">
+                                        <FileText className="w-4 h-4 text-[#e6e6e6]" />
+                                      </div>
+                                      <div>
+                                        <p className="font-semibold text-[#e6e6e6] text-sm">
+                                          {report.filename}
+                                        </p>
+                                        <p className="text-[#999] text-xs">
+                                          Created: {new Date(report.created).toLocaleDateString()} • Size: {report.size}
                                         </p>
                                       </div>
-                                    ) : (
-                                      availableTemplates.map((template) => (
-                                        <Card
-                                          key={template.id}
-                                          className={`cursor-pointer transition-all ${
-                                            selectedTemplate?.id === template.id
-                                              ? "ring-2 ring-purple-600 bg-purple-50"
-                                              : "hover:bg-gray-50"
-                                          }`}
-                                          onClick={() => applyTemplate(template)}
-                                        >
-                                          <CardContent className="p-4">
-                                            <div className="flex justify-between items-start mb-2">
-                                              <div>
-                                                <h4 className="font-semibold">{template.template_name}</h4>
-                                                <p className="text-sm text-gray-600">
-                                                  {template.diagnosis_name} • {template.plan_items?.length || 0} items
-                                                </p>
-                                              </div>
-                                              {selectedTemplate?.id === template.id && (
-                                                <CheckCircle className="w-5 h-5 text-[#999]" />
-                                              )}
-                                            </div>
-
-                                            {/* Plan Items with Checkboxes */}
-                                            {selectedTemplate?.id === template.id && template.plan_items && (
-                                              <div className="mt-4 space-y-2 border-t pt-4">
-                                                <p className="text-sm font-medium mb-2">Select items to include:</p>
-                                                {template.plan_items.map((item: any, idx: number) => {
-                                                  const category = item.category?.toLowerCase() || "other";
-                                                  const isSelected = selectedPlanItems[category as keyof typeof selectedPlanItems]?.includes(item.item) || false;
-                                                  
-                                                  return (
-                                                    <div key={idx} className="flex items-start gap-2 p-2 hover:bg-gray-50 rounded">
-                                                      <Checkbox
-                                                        checked={isSelected}
-                                                        onCheckedChange={() => togglePlanItem(category, item.item)}
-                                                        id={`item-${idx}`}
-                                                      />
-                                                      <label htmlFor={`item-${idx}`} className="flex-1 text-sm cursor-pointer">
-                                                        <span className="font-medium text-[#999]">{item.category}:</span>{" "}
-                                                        {item.item}
-                                                        {item.details && (
-                                                          <div className="text-xs text-gray-600 mt-1">{item.details}</div>
-                                                        )}
-                                                      </label>
-                                                    </div>
-                                                  );
-                                                })}
-                                              </div>
-                                            )}
-                                          </CardContent>
-                                        </Card>
-                                      ))
-                                    )}
-                                  </div>
-
-                                  {/* Apply Button */}
-                                  {selectedTemplate && (
-                                    <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
+                                    </div>
+                                    <div className="flex items-center gap-2">
                                       <Button
+                                        onClick={() => window.open(report.url, '_blank')}
+                                        size="sm"
                                         variant="outline"
-                                        onClick={() => {
-                                          setShowTemplateLibrary(false);
-                                          setSelectedTemplate(null);
-                                        }}
+                                        className="text-blue-300 border-[#2a2a2a] hover:bg-blue-900/20"
                                       >
-                                        Cancel
+                                        <Eye className="w-4 h-4 mr-1" />
+                                        View
                                       </Button>
                                       <Button
-                                        onClick={applyTemplateToReport}
-                                        className="bg-[#222] hover:bg-slate-750"
+                                        onClick={() => handleDeleteReport(report.filename)}
+                                        size="sm"
+                                        variant="outline"
+                                        className="text-red-300 border-red-600 hover:bg-red-900/20"
                                       >
-                                        Apply Template to Report
+                                        <Trash2 className="w-4 h-4" />
                                       </Button>
                                     </div>
-                                  )}
-                                </DialogContent>
-                              </Dialog>
-                            )}
-                          </div>
-                        ) : (
-                          <div className="text-center py-8">
-                            <User className="w-12 h-12 text-[#999] mx-auto mb-4" />
-                            <p className="text-[#999]">Select a patient to view details and generate report</p>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    </div>
 
-                    {/* Medical Report Sections */}
-                    {frenchDoc && (
+                    {/* Right Column - Recent Consultations and Medical Report (1/4 width) */}
+                    <div className="space-y-6">
+                      {/* Recent Consultations */}
                       <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                         <CardHeader>
                           <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-[#999]" />
-                            Medical Report
+                            <Clock className="w-5 h-5 text-[#999]" />
+                            Recent Consultations
                           </CardTitle>
                         </CardHeader>
                         <CardContent>
-                          <div className="space-y-4">
-                            <MedicalSection
-                              title="HPI Summary"
-                              content={frenchDoc.hpiSummary}
-                              onCopy={() => copyToClipboard(frenchDoc.hpiSummary || "", "hpiSummary")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, hpiSummary: text})}
-                              onPdf={requestPdf}
-                              icon={<FileText className="w-4 h-4" />}
-                              color="blue"
-                              copyCount={copiedSections.has("hpiSummary") ? 1 : 0}
-                              sectionName="HPI Summary"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Super Spartan SAP"
-                              content={frenchDoc.superSpartanSAP}
-                              onCopy={() => copyToClipboard(frenchDoc.superSpartanSAP || "", "superSpartanSAP")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, superSpartanSAP: text})}
-                              onPdf={requestPdf}
-                              icon={<Stethoscope className="w-4 h-4" />}
-                              color="green"
-                              copyCount={copiedSections.has("superSpartanSAP") ? 1 : 0}
-                              sectionName="Super Spartan SAP"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Medications Ready to Use"
-                              content={frenchDoc.medicationsReadyToUse}
-                              onCopy={() => copyToClipboard(frenchDoc.medicationsReadyToUse || "", "medicationsReadyToUse")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, medicationsReadyToUse: text})}
-                              onPdf={requestPdf}
-                              icon={<Heart className="w-4 h-4" />}
-                              color="purple"
-                              copyCount={copiedSections.has("medicationsReadyToUse") ? 1 : 0}
-                              sectionName="Medications Ready to Use"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Lab Works"
-                              content={frenchDoc.labWorks}
-                              onCopy={() => copyToClipboard(frenchDoc.labWorks || "", "labWorks")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, labWorks: text})}
-                              onPdf={requestPdf}
-                              icon={<Activity className="w-4 h-4" />}
-                              color="orange"
-                              copyCount={copiedSections.has("labWorks") ? 1 : 0}
-                              sectionName="Lab Works"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Imagerie Médicale"
-                              content={frenchDoc.imagerieMedicale}
-                              onCopy={() => copyToClipboard(frenchDoc.imagerieMedicale || "", "imagerieMedicale")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, imagerieMedicale: text})}
-                              onPdf={requestPdf}
-                              icon={<AlertTriangle className="w-4 h-4" />}
-                              color="red"
-                              copyCount={copiedSections.has("imagerieMedicale") ? 1 : 0}
-                              sectionName="Imagerie Médicale"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Référence Spécialistes"
-                              content={frenchDoc.referenceSpecialistes}
-                              onCopy={() => copyToClipboard(frenchDoc.referenceSpecialistes || "", "referenceSpecialistes")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, referenceSpecialistes: text})}
-                              onPdf={requestPdf}
-                              icon={<Users className="w-4 h-4" />}
-                              color="cyan"
-                              copyCount={copiedSections.has("referenceSpecialistes") ? 1 : 0}
-                              sectionName="Référence Spécialistes"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Questions de Suivi"
-                              content={frenchDoc.followUpQuestions}
-                              onCopy={() => copyToClipboard(frenchDoc.followUpQuestions || "", "followUpQuestions")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, followUpQuestions: text})}
-                              onPdf={requestPdf}
-                              icon={<MessageSquare className="w-4 h-4" />}
-                              color="blue"
-                              copyCount={copiedSections.has("followUpQuestions") ? 1 : 0}
-                              sectionName="Questions de Suivi"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Certificat d'Arrêt de Travail"
-                              content={frenchDoc.workLeaveCertificate}
-                              onCopy={() => copyToClipboard(frenchDoc.workLeaveCertificate || "", "workLeaveCertificate")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, workLeaveCertificate: text})}
-                              onPdf={requestPdf}
-                              icon={<FileText className="w-4 h-4" />}
-                              color="orange"
-                              copyCount={copiedSections.has("workLeaveCertificate") ? 1 : 0}
-                              sectionName="Certificat d'Arrêt de Travail"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Modifications au Travail"
-                              content={frenchDoc.workplaceModifications}
-                              onCopy={() => copyToClipboard(frenchDoc.workplaceModifications || "", "workplaceModifications")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, workplaceModifications: text})}
-                              onPdf={requestPdf}
-                              icon={<Settings className="w-4 h-4" />}
-                              color="purple"
-                              copyCount={copiedSections.has("workplaceModifications") ? 1 : 0}
-                              sectionName="Modifications au Travail"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Documentation Assurance"
-                              content={frenchDoc.insuranceDocumentation}
-                              onCopy={() => copyToClipboard(frenchDoc.insuranceDocumentation || "", "insuranceDocumentation")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, insuranceDocumentation: text})}
-                              onPdf={requestPdf}
-                              icon={<FileText className="w-4 h-4" />}
-                              color="green"
-                              copyCount={copiedSections.has("insuranceDocumentation") ? 1 : 0}
-                              sectionName="Documentation Assurance"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Télémédecine vs En Personne"
-                              content={frenchDoc.telemedicineNeedsInPerson}
-                              onCopy={() => copyToClipboard(frenchDoc.telemedicineNeedsInPerson || "", "telemedicineNeedsInPerson")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, telemedicineNeedsInPerson: text})}
-                              onPdf={requestPdf}
-                              icon={<AlertTriangle className="w-4 h-4" />}
-                              color="red"
-                              copyCount={copiedSections.has("telemedicineNeedsInPerson") ? 1 : 0}
-                              sectionName="Télémédecine vs En Personne"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Message au Patient"
-                              content={frenchDoc.patientMessage}
-                              onCopy={() => copyToClipboard(frenchDoc.patientMessage || "", "patientMessage")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, patientMessage: text})}
-                              onPdf={requestPdf}
-                              icon={<MessageSquare className="w-4 h-4" />}
-                              color="cyan"
-                              copyCount={copiedSections.has("patientMessage") ? 1 : 0}
-                              sectionName="Message au Patient"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            <MedicalSection
-                              title="Stepwise Strategy"
-                              content={frenchDoc.stepwiseStrategy}
-                              onCopy={() => copyToClipboard(frenchDoc.stepwiseStrategy || "", "stepwiseStrategy")}
-                              onAIGenerate={(text) => setFrenchDoc({...frenchDoc, stepwiseStrategy: text})}
-                              onPdf={requestPdf}
-                              icon={<FileText className="w-4 h-4" />}
-                              color="blue"
-                              copyCount={copiedSections.has("stepwiseStrategy") ? 1 : 0}
-                              sectionName="Stepwise Strategy"
-                              patientData={selectedPatientData}
-                              writingStyleTemplate={{template_name: "Default"}}
-                              doctorApiKey={doctorApiKey}
-                              doctorApiProvider={doctorApiProvider}
-                            />
-                            
-                            {/* Savings Summary */}
-                            {(() => {
-                              const savings = calculateSavings();
-                              return savings.totalCopies > 0 && (
-                                <div className="mt-6 bg-green-900/20 border border-green-500/30 rounded-lg p-4">
-                                  <div className="flex items-center justify-between mb-3">
-                                    <h4 className="font-semibold text-green-300 flex items-center gap-2">
-                                      <TrendingUp className="w-4 h-4" />
-                                      Time & Money Saved
-                                    </h4>
-                                    <Badge className="bg-emerald-900/30 text-emerald-300 border border-emerald-800/50">
-                                      {savings.totalCopies} copies
-                                    </Badge>
-                                  </div>
-                                  <div className="grid grid-cols-2 gap-4 text-sm">
-                                    <div>
-                                      <span className="text-[#999]">Time Saved:</span>
-                                      <span className="text-green-300 font-semibold ml-2">
-                                        {savings.totalTimeSaved} minutes
-                                      </span>
-                                    </div>
-                                    <div>
-                                      <span className="text-[#999]">Money Saved:</span>
-                                      <span className="text-green-300 font-semibold ml-2">
-                                        ${savings.moneySaved} CAD
-                                      </span>
-                                    </div>
-                                  </div>
-                                </div>
-                              );
-                            })()}
+                          <div className="space-y-3">
+                            {recentPatients.map((patient) => (
+                              <EnhancedPatientCard
+                                key={patient.id}
+                                patient={patient}
+                                onView={() => openPatientDetails(patient.patient_id)}
+                                onEdit={() => handleEditPatient(patient.id)}
+                                onGenerateReport={() => {
+                                  openPatientDetails(patient.patient_id);
+                                  generateMedicalReport();
+                                }}
+                              />
+                            ))}
                           </div>
                         </CardContent>
                       </Card>
-                    )}
+
+                      {/* Patient Details & Medical Report Generation */}
+                      <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
+                        <CardHeader>
+                          <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                            <Brain className="w-5 h-5 text-[#999]" />
+                            Patient Details & Medical Report
+                          </CardTitle>
+                          <CardDescription className="text-[#999] text-sm">
+                            Complete patient information and AI-powered documentation
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          {selectedPatient ? (
+                            <div className="space-y-4">
+                              {/* Patient Identifier */}
+                              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3">
+                                <p className="text-blue-300 text-sm">
+                                  <strong>Patient ID:</strong> {selectedPatient}
+                                </p>
+                              </div>
+
+                              {/* Patient Data Display */}
+                              {selectedPatientData && (
+                                <div className="space-y-3">
+                                  {/* Initial HPI Confirmation Summary */}
+                                  {selectedPatientData.consultation?.hpi_summary && (
+                                    <div className="bg-cyan-900/20 border border-cyan-500/30 rounded-lg p-3">
+                                      <h4 className="text-cyan-300 text-sm font-semibold mb-2">📋 Initial HPI Summary:</h4>
+                                      <p className="text-cyan-200 text-xs whitespace-pre-wrap">
+                                        {selectedPatientData.consultation.hpi_summary}
+                                      </p>
+                                    </div>
+                                  )}
+
+                                  {/* 10 Follow-Up Questions & Answers */}
+                                  {selectedPatientData.answers && Object.keys(selectedPatientData.answers).length > 0 && (
+                                    <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-3 max-h-60 overflow-y-auto">
+                                      <h4 className="text-green-300 text-sm font-semibold mb-2">❓ Follow-Up Questions & Answers:</h4>
+                                      <div className="space-y-2">
+                                        {Object.entries(selectedPatientData.answers).map(([index, answer]) => (
+                                          <div key={index} className="text-xs">
+                                            <p className="text-green-300 font-medium">Q{parseInt(index) + 1}:</p>
+                                            <p className="text-green-200 ml-3">{String(answer)}</p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {/* Enhanced HPI for Physician */}
+                                  {(selectedPatientData.doctor_hpi_summary || selectedPatientData.enhanced_soap_note) && (
+                                    <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-3">
+                                      <h4 className="text-purple-300 text-sm font-semibold mb-2">🩺 Enhanced HPI Summary:</h4>
+                                      <p className="text-purple-200 text-xs whitespace-pre-wrap">
+                                        {selectedPatientData.doctor_hpi_summary || selectedPatientData.enhanced_soap_note}
+                                      </p>
+                                    </div>
+                                  )}
+
+                                  {/* Original Form Data */}
+                                  {selectedPatientData.consultation?.form_data && (
+                                    <div className="bg-[#2a2a2a] border border-[#333] rounded-lg p-3 max-h-40 overflow-y-auto">
+                                      <h4 className="text-[#e6e6e6] text-sm font-semibold mb-2">📝 Form Data:</h4>
+                                      <div className="text-xs text-[#999] space-y-1">
+                                        {Object.entries(selectedPatientData.consultation.form_data).map(([key, value]) => (
+                                          <div key={key}>
+                                            <strong>{key}:</strong> {String(value)}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* Generate Report Button */}
+                              <Button
+                                onClick={generateMedicalReport}
+                                disabled={generating}
+                                className="w-full bg-primary hover:bg-primary/90 text-white disabled:opacity-50"
+                              >
+                                {generating ? (
+                                  <>
+                                    <Activity className="w-4 h-4 mr-2 animate-spin" />
+                                    Generating 12-Section Report...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Brain className="w-4 h-4 mr-2" />
+                                    Generate Complete Medical Report
+                                  </>
+                                )}
+                              </Button>
+
+                              {/* Template Selection Button */}
+                              {frenchDoc && frenchDoc.sap_note && (
+                                <Dialog open={showTemplateLibrary} onOpenChange={setShowTemplateLibrary}>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      onClick={() => {
+                                        const diagnoses = parseDiagnosisFromSAP(frenchDoc.sap_note || "");
+                                        setSelectedDiagnosis(diagnoses[0] || "");
+                                        setShowTemplateLibrary(true);
+                                      }}
+                                      variant="outline"
+                                      className="w-full border-[#2a2a2a] text-[#999] hover:bg-purple-50"
+                                    >
+                                      <FileText className="w-4 h-4 mr-2" />
+                                      Select Plan Template
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+                                    <DialogHeader>
+                                      <DialogTitle>Select Treatment Plan Template</DialogTitle>
+                                      <DialogDescription>
+                                        Choose a template for {selectedDiagnosis} and customize the plan items
+                                      </DialogDescription>
+                                    </DialogHeader>
+
+                                    {/* Templates List */}
+                                    <div className="space-y-4 mt-4">
+                                      {availableTemplates.length === 0 ? (
+                                        <div className="text-center py-8 text-[#666]">
+                                          <FileText className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                                          <p>No templates found for this diagnosis.</p>
+                                          <p className="text-sm mt-2">
+                                            Create one in your <a href="/doctor-profile" className="text-[#999] underline">Profile Settings</a>
+                                          </p>
+                                        </div>
+                                      ) : (
+                                        availableTemplates.map((template) => (
+                                          <Card
+                                            key={template.id}
+                                            className={`cursor-pointer transition-all ${selectedTemplate?.id === template.id
+                                              ? "ring-2 ring-purple-600 bg-purple-50"
+                                              : "hover:bg-gray-50"
+                                              }`}
+                                            onClick={() => applyTemplate(template)}
+                                          >
+                                            <CardContent className="p-4">
+                                              <div className="flex justify-between items-start mb-2">
+                                                <div>
+                                                  <h4 className="font-semibold">{template.template_name}</h4>
+                                                  <p className="text-sm text-gray-600">
+                                                    {template.diagnosis_name} • {template.plan_items?.length || 0} items
+                                                  </p>
+                                                </div>
+                                                {selectedTemplate?.id === template.id && (
+                                                  <CheckCircle className="w-5 h-5 text-[#999]" />
+                                                )}
+                                              </div>
+
+                                              {/* Plan Items with Checkboxes */}
+                                              {selectedTemplate?.id === template.id && template.plan_items && (
+                                                <div className="mt-4 space-y-2 border-t pt-4">
+                                                  <p className="text-sm font-medium mb-2">Select items to include:</p>
+                                                  {template.plan_items.map((item: any, idx: number) => {
+                                                    const category = item.category?.toLowerCase() || "other";
+                                                    const isSelected = selectedPlanItems[category as keyof typeof selectedPlanItems]?.includes(item.item) || false;
+
+                                                    return (
+                                                      <div key={idx} className="flex items-start gap-2 p-2 hover:bg-gray-50 rounded">
+                                                        <Checkbox
+                                                          checked={isSelected}
+                                                          onCheckedChange={() => togglePlanItem(category, item.item)}
+                                                          id={`item-${idx}`}
+                                                        />
+                                                        <label htmlFor={`item-${idx}`} className="flex-1 text-sm cursor-pointer">
+                                                          <span className="font-medium text-[#999]">{item.category}:</span>{" "}
+                                                          {item.item}
+                                                          {item.details && (
+                                                            <div className="text-xs text-gray-600 mt-1">{item.details}</div>
+                                                          )}
+                                                        </label>
+                                                      </div>
+                                                    );
+                                                  })}
+                                                </div>
+                                              )}
+                                            </CardContent>
+                                          </Card>
+                                        ))
+                                      )}
+                                    </div>
+
+                                    {/* Apply Button */}
+                                    {selectedTemplate && (
+                                      <div className="flex justify-end gap-2 mt-4 pt-4 border-t">
+                                        <Button
+                                          variant="outline"
+                                          onClick={() => {
+                                            setShowTemplateLibrary(false);
+                                            setSelectedTemplate(null);
+                                          }}
+                                        >
+                                          Cancel
+                                        </Button>
+                                        <Button
+                                          onClick={applyTemplateToReport}
+                                          className="bg-[#222] hover:bg-slate-750"
+                                        >
+                                          Apply Template to Report
+                                        </Button>
+                                      </div>
+                                    )}
+                                  </DialogContent>
+                                </Dialog>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-center py-8">
+                              <User className="w-12 h-12 text-[#999] mx-auto mb-4" />
+                              <p className="text-[#999]">Select a patient to view details and generate report</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      {/* Medical Report Sections */}
+                      {frenchDoc && (
+                        <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
+                          <CardHeader>
+                            <CardTitle className="text-[#e6e6e6] text-lg font-medium flex items-center gap-2">
+                              <FileText className="w-5 h-5 text-[#999]" />
+                              Medical Report
+                            </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              <MedicalSection
+                                title="HPI Summary"
+                                content={frenchDoc.hpiSummary}
+                                onCopy={() => copyToClipboard(frenchDoc.hpiSummary || "", "hpiSummary")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, hpiSummary: text })}
+                                onPdf={requestPdf}
+                                icon={<FileText className="w-4 h-4" />}
+                                color="blue"
+                                copyCount={copiedSections.has("hpiSummary") ? 1 : 0}
+                                sectionName="HPI Summary"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Super Spartan SAP"
+                                content={frenchDoc.superSpartanSAP}
+                                onCopy={() => copyToClipboard(frenchDoc.superSpartanSAP || "", "superSpartanSAP")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, superSpartanSAP: text })}
+                                onPdf={requestPdf}
+                                icon={<Stethoscope className="w-4 h-4" />}
+                                color="green"
+                                copyCount={copiedSections.has("superSpartanSAP") ? 1 : 0}
+                                sectionName="Super Spartan SAP"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Medications Ready to Use"
+                                content={frenchDoc.medicationsReadyToUse}
+                                onCopy={() => copyToClipboard(frenchDoc.medicationsReadyToUse || "", "medicationsReadyToUse")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, medicationsReadyToUse: text })}
+                                onPdf={requestPdf}
+                                icon={<Heart className="w-4 h-4" />}
+                                color="purple"
+                                copyCount={copiedSections.has("medicationsReadyToUse") ? 1 : 0}
+                                sectionName="Medications Ready to Use"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Lab Works"
+                                content={frenchDoc.labWorks}
+                                onCopy={() => copyToClipboard(frenchDoc.labWorks || "", "labWorks")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, labWorks: text })}
+                                onPdf={requestPdf}
+                                icon={<Activity className="w-4 h-4" />}
+                                color="orange"
+                                copyCount={copiedSections.has("labWorks") ? 1 : 0}
+                                sectionName="Lab Works"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Imagerie Médicale"
+                                content={frenchDoc.imagerieMedicale}
+                                onCopy={() => copyToClipboard(frenchDoc.imagerieMedicale || "", "imagerieMedicale")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, imagerieMedicale: text })}
+                                onPdf={requestPdf}
+                                icon={<AlertTriangle className="w-4 h-4" />}
+                                color="red"
+                                copyCount={copiedSections.has("imagerieMedicale") ? 1 : 0}
+                                sectionName="Imagerie Médicale"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Référence Spécialistes"
+                                content={frenchDoc.referenceSpecialistes}
+                                onCopy={() => copyToClipboard(frenchDoc.referenceSpecialistes || "", "referenceSpecialistes")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, referenceSpecialistes: text })}
+                                onPdf={requestPdf}
+                                icon={<Users className="w-4 h-4" />}
+                                color="cyan"
+                                copyCount={copiedSections.has("referenceSpecialistes") ? 1 : 0}
+                                sectionName="Référence Spécialistes"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Questions de Suivi"
+                                content={frenchDoc.followUpQuestions}
+                                onCopy={() => copyToClipboard(frenchDoc.followUpQuestions || "", "followUpQuestions")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, followUpQuestions: text })}
+                                onPdf={requestPdf}
+                                icon={<MessageSquare className="w-4 h-4" />}
+                                color="blue"
+                                copyCount={copiedSections.has("followUpQuestions") ? 1 : 0}
+                                sectionName="Questions de Suivi"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Certificat d'Arrêt de Travail"
+                                content={frenchDoc.workLeaveCertificate}
+                                onCopy={() => copyToClipboard(frenchDoc.workLeaveCertificate || "", "workLeaveCertificate")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, workLeaveCertificate: text })}
+                                onPdf={requestPdf}
+                                icon={<FileText className="w-4 h-4" />}
+                                color="orange"
+                                copyCount={copiedSections.has("workLeaveCertificate") ? 1 : 0}
+                                sectionName="Certificat d'Arrêt de Travail"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Modifications au Travail"
+                                content={frenchDoc.workplaceModifications}
+                                onCopy={() => copyToClipboard(frenchDoc.workplaceModifications || "", "workplaceModifications")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, workplaceModifications: text })}
+                                onPdf={requestPdf}
+                                icon={<Settings className="w-4 h-4" />}
+                                color="purple"
+                                copyCount={copiedSections.has("workplaceModifications") ? 1 : 0}
+                                sectionName="Modifications au Travail"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Documentation Assurance"
+                                content={frenchDoc.insuranceDocumentation}
+                                onCopy={() => copyToClipboard(frenchDoc.insuranceDocumentation || "", "insuranceDocumentation")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, insuranceDocumentation: text })}
+                                onPdf={requestPdf}
+                                icon={<FileText className="w-4 h-4" />}
+                                color="green"
+                                copyCount={copiedSections.has("insuranceDocumentation") ? 1 : 0}
+                                sectionName="Documentation Assurance"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Télémédecine vs En Personne"
+                                content={frenchDoc.telemedicineNeedsInPerson}
+                                onCopy={() => copyToClipboard(frenchDoc.telemedicineNeedsInPerson || "", "telemedicineNeedsInPerson")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, telemedicineNeedsInPerson: text })}
+                                onPdf={requestPdf}
+                                icon={<AlertTriangle className="w-4 h-4" />}
+                                color="red"
+                                copyCount={copiedSections.has("telemedicineNeedsInPerson") ? 1 : 0}
+                                sectionName="Télémédecine vs En Personne"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Message au Patient"
+                                content={frenchDoc.patientMessage}
+                                onCopy={() => copyToClipboard(frenchDoc.patientMessage || "", "patientMessage")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, patientMessage: text })}
+                                onPdf={requestPdf}
+                                icon={<MessageSquare className="w-4 h-4" />}
+                                color="cyan"
+                                copyCount={copiedSections.has("patientMessage") ? 1 : 0}
+                                sectionName="Message au Patient"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+                              <MedicalSection
+                                title="Stepwise Strategy"
+                                content={frenchDoc.stepwiseStrategy}
+                                onCopy={() => copyToClipboard(frenchDoc.stepwiseStrategy || "", "stepwiseStrategy")}
+                                onAIGenerate={(text) => setFrenchDoc({ ...frenchDoc, stepwiseStrategy: text })}
+                                onPdf={requestPdf}
+                                icon={<FileText className="w-4 h-4" />}
+                                color="blue"
+                                copyCount={copiedSections.has("stepwiseStrategy") ? 1 : 0}
+                                sectionName="Stepwise Strategy"
+                                patientData={selectedPatientData}
+                                writingStyleTemplate={{ template_name: "Default" }}
+                                doctorApiKey={doctorApiKey}
+                                doctorApiProvider={doctorApiProvider}
+                              />
+
+                              {/* Savings Summary */}
+                              {(() => {
+                                const savings = calculateSavings();
+                                return savings.totalCopies > 0 && (
+                                  <div className="mt-6 bg-green-900/20 border border-green-500/30 rounded-lg p-4">
+                                    <div className="flex items-center justify-between mb-3">
+                                      <h4 className="font-semibold text-green-300 flex items-center gap-2">
+                                        <TrendingUp className="w-4 h-4" />
+                                        Time & Money Saved
+                                      </h4>
+                                      <Badge className="bg-emerald-900/30 text-emerald-300 border border-emerald-800/50">
+                                        {savings.totalCopies} copies
+                                      </Badge>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4 text-sm">
+                                      <div>
+                                        <span className="text-[#999]">Time Saved:</span>
+                                        <span className="text-green-300 font-semibold ml-2">
+                                          {savings.totalTimeSaved} minutes
+                                        </span>
+                                      </div>
+                                      <div>
+                                        <span className="text-[#999]">Money Saved:</span>
+                                        <span className="text-green-300 font-semibold ml-2">
+                                          ${savings.moneySaved} CAD
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                );
+                              })()}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
             </div>
 
             {/* Copy Toast */}
@@ -2052,7 +2061,7 @@ export default function DoctorDashboardNew() {
                 {copyToast}
               </div>
             )}
-          </AppLayoutSpruce>
+          </ModernLayout>
         </>
       </ErrorBoundary>
     );
@@ -2129,7 +2138,7 @@ function EnhancedPatientCard({
             <Calendar className="w-4 h-4" />
             <span>Last visit: {format(new Date(patient.created_at), "MMM d")}</span>
           </div>
-          
+
           <div className="flex items-center gap-2 text-sm text-[#999]">
             <Heart className="w-4 h-4" />
             <span>Condition: {patient.chief_complaint}</span>
@@ -2248,13 +2257,12 @@ function MedicalSection({
             disabled={!content}
             size="sm"
             variant="ghost"
-            className={`text-xs ${
-              copied 
-                ? 'bg-emerald-800/20 text-green-300' 
-                : content 
-                  ? 'text-[#e6e6e6] hover:bg-[#333]' 
-                  : 'text-[#666] cursor-not-allowed'
-            }`}
+            className={`text-xs ${copied
+              ? 'bg-emerald-800/20 text-green-300'
+              : content
+                ? 'text-[#e6e6e6] hover:bg-[#333]'
+                : 'text-[#666] cursor-not-allowed'
+              }`}
           >
             {copied ? (
               <>
@@ -2279,7 +2287,7 @@ function MedicalSection({
           </Button>
         </div>
       </div>
-      
+
       <div className="min-h-[80px]">
         {content ? (
           <div className="text-sm text-[#e6e6e6] leading-relaxed whitespace-pre-wrap bg-[#222] p-3 rounded border border-[#333] font-mono text-xs">

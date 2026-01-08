@@ -53,7 +53,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 interface BillingEntry {
   id: number;
@@ -162,7 +162,7 @@ export default function AiBillingPage() {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="AI Billing" description="Automated medical billing">
       <div className="p-4">
         <div className="max-w-7xl mx-auto">
           <header className="mb-6">
@@ -185,13 +185,13 @@ export default function AiBillingPage() {
               <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardContent className="flex items-start p-4">
                   <div className="mr-3 mt-1">
-                    <div className="p-2 bg-blue-900/20 border border-blue-800/30 rounded-md">
-                      <ClipboardList className="h-5 w-5 text-blue-400" />
+                    <div className="p-2 bg-[#1a1a1a] border border-[#333] rounded-md">
+                      <ClipboardList className="h-5 w-5 text-[#999]" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-md font-semibold mb-1">Pending Entries</h3>
-                    <div className="text-2xl font-bold">
+                    <h3 className="text-md font-semibold mb-1 text-[#e6e6e6]">Pending Entries</h3>
+                    <div className="text-2xl font-bold text-[#e6e6e6]">
                       {isLoading ? (
                         <div className="h-7 w-12 bg-[#1a1a1a] rounded animate-pulse"></div>
                       ) : (
@@ -206,13 +206,13 @@ export default function AiBillingPage() {
               <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardContent className="flex items-start p-4">
                   <div className="mr-3 mt-1">
-                    <div className="p-2 bg-green-900/20 border border-green-800/30 rounded-md">
-                      <Calendar className="h-5 w-5 text-green-400" />
+                    <div className="p-2 bg-[#1a1a1a] border border-[#333] rounded-md">
+                      <Calendar className="h-5 w-5 text-[#999]" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-md font-semibold mb-1">Today's Encounters</h3>
-                    <div className="text-2xl font-bold">
+                    <h3 className="text-md font-semibold mb-1 text-[#e6e6e6]">Today's Encounters</h3>
+                    <div className="text-2xl font-bold text-[#e6e6e6]">
                       {isLoading ? (
                         <div className="h-7 w-12 bg-[#1a1a1a] rounded animate-pulse"></div>
                       ) : (
@@ -231,13 +231,13 @@ export default function AiBillingPage() {
               <Card className="bg-[#1a1a1a] border-[#2a2a2a]">
                 <CardContent className="flex items-start p-4">
                   <div className="mr-3 mt-1">
-                    <div className="p-2 bg-purple-900/20 border border-purple-800/30 rounded-md">
-                      <CheckCircle className="h-5 w-5 text-purple-400" />
+                    <div className="p-2 bg-[#1a1a1a] border border-[#333] rounded-md">
+                      <CheckCircle className="h-5 w-5 text-[#999]" />
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-md font-semibold mb-1">Processed This Month</h3>
-                    <div className="text-2xl font-bold">
+                    <h3 className="text-md font-semibold mb-1 text-[#e6e6e6]">Processed This Month</h3>
+                    <div className="text-2xl font-bold text-[#e6e6e6]">
                       {isLoading ? (
                         <div className="h-7 w-12 bg-[#1a1a1a] rounded animate-pulse"></div>
                       ) : (
@@ -297,7 +297,7 @@ export default function AiBillingPage() {
                 <Button
                   variant="default"
                   size="sm"
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
                   onClick={() => {
                     // Sample entry for testing - in real app, this would open a form
                     const newEntry = {
@@ -423,7 +423,7 @@ export default function AiBillingPage() {
                                 {(entry.suggestedCodes || []).map((code) => (
                                   <span
                                     key={code}
-                                    className="px-1.5 py-0.5 text-xs rounded bg-blue-900/30 text-blue-300"
+                                    className="px-1.5 py-0.5 text-xs rounded bg-[#1a1a1a] border border-[#333] text-[#999]"
                                   >
                                     {code}
                                   </span>
@@ -432,12 +432,12 @@ export default function AiBillingPage() {
                             </TableCell>
                             <TableCell>
                               <span
-                                className={`px-1.5 py-0.5 text-xs rounded ${
+                                className={`px-1.5 py-0.5 text-xs rounded border ${
                                   entry.status === "pending"
-                                    ? "bg-yellow-900/30 text-yellow-300"
+                                    ? "bg-[#1a1a1a] border-[#333] text-[#999]"
                                     : entry.status === "processed"
-                                      ? "bg-green-900/30 text-green-300"
-                                      : "bg-red-900/30 text-red-300"
+                                      ? "bg-[#1a1a1a] border-[#333] text-[#999]"
+                                      : "bg-[#1a1a1a] border-[#333] text-[#999]"
                                 }`}
                               >
                                 {entry.status}
@@ -460,7 +460,7 @@ export default function AiBillingPage() {
                     {!(searchTerm || filterStatus !== "all") && (
                       <Button
                         variant="default"
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                      className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
                         onClick={() => {
                           // Sample entry for testing
                           const newEntry = {
@@ -505,6 +505,6 @@ export default function AiBillingPage() {
           </main>
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

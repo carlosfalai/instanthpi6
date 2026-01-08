@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -78,14 +78,27 @@ const UrgentCarePage: React.FC = () => {
   } = useQuery<UrgentCarePatient[]>({
     queryKey: ["/api/urgent-care/patients"],
     queryFn: async () => {
-      // Use authentic data from your API - replace with actual endpoint when available
-      const response = await fetch("/api/urgent-care/patients");
-      if (!response.ok) {
-        throw new Error("Failed to fetch urgent care patients");
+      try {
+        const response = await fetch("/api/urgent-care/patients");
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Error fetching urgent care patients:", response.status, errorText);
+          // Return empty array if endpoint doesn't exist yet
+          if (response.status === 404) {
+            return [];
+          }
+          throw new Error(`Failed to fetch urgent care patients: ${response.status}`);
+        }
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      } catch (error) {
+        console.error("Error fetching urgent care patients:", error);
+        // Return empty array on error to prevent page crash
+        return [];
       }
-      return await response.json();
     },
     refetchInterval: 30000, // Refresh every 30 seconds
+    retry: 1,
   });
 
   // Update patient status mutation
@@ -245,7 +258,7 @@ const UrgentCarePage: React.FC = () => {
 
   if (error) {
     return (
-      <AppLayoutSpruce>
+      <ModernLayout title="Urgent Care" description="Manage urgent patient cases">
         <div className="flex items-center justify-center min-h-[60vh] bg-[#121212] text-white">
           <div className="text-center text-red-400">
             <AlertTriangle className="h-12 w-12 mx-auto mb-4" />
@@ -259,12 +272,12 @@ const UrgentCarePage: React.FC = () => {
             </Button>
           </div>
         </div>
-      </AppLayoutSpruce>
+      </ModernLayout>
     );
   }
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Urgent Care" description="Manage urgent patient cases">
       {/* Header */}
       <div className="mb-6 flex justify-between items-center">
         <div className="flex items-center">
@@ -624,7 +637,7 @@ const UrgentCarePage: React.FC = () => {
           )}
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 };
 

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, MessageSquare, Clock, User, Send } from "lucide-react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import { Link } from "wouter";
+import { Loader2, MessageSquare, Clock, User, Send, Settings, ExternalLink } from "lucide-react";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -188,7 +189,7 @@ export default function InboxPage() {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Inbox" description="Patient messages and notifications">
       <div className="h-screen flex bg-white dark:bg-gray-900">
         {/* Conversation List */}
         <div className="w-80 border-r border-gray-200 dark:border-gray-700 flex flex-col bg-white dark:bg-gray-800">
@@ -206,23 +207,34 @@ export default function InboxPage() {
               </div>
             ) : error ? (
               <div className="p-4 text-center">
-                <p className="text-sm text-destructive mb-2">
-                  Failed to load conversations
-                </p>
-                <p className="text-xs text-muted-foreground mb-3">
-                  {(error as Error).message || "Unknown error"}
-                </p>
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 mb-3">
+                  <Settings className="h-5 w-5 text-yellow-600 dark:text-yellow-400 mx-auto mb-2" />
+                  <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-100 mb-1">
+                    Spruce API Credentials Required
+                  </p>
+                  <p className="text-xs text-yellow-700 dark:text-yellow-300 mb-3">
+                    {(error as Error).message || "Please configure your Spruce API credentials to access conversations."}
+                  </p>
+                  <Link href="/doctor-profile">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-yellow-100 dark:bg-yellow-900/40 border-yellow-300 dark:border-yellow-700 text-yellow-900 dark:text-yellow-100 hover:bg-yellow-200 dark:hover:bg-yellow-900/60"
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Configure API Credentials
+                      <ExternalLink className="h-3 w-3 ml-2" />
+                    </Button>
+                  </Link>
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
                   className="mt-2"
-                  onClick={() => window.location.reload()}
+                  onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/spruce/conversations"] })}
                 >
                   Retry
                 </Button>
-                <p className="text-xs text-muted-foreground mt-3">
-                  Make sure Spruce API credentials are configured in Doctor Profile → API Integrations
-                </p>
               </div>
             ) : conversations?.length === 0 ? (
               <div className="p-4 text-center">
@@ -387,6 +399,6 @@ export default function InboxPage() {
           )}
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

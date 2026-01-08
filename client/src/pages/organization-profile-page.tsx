@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -144,7 +144,7 @@ export default function OrganizationProfilePage() {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Organization Profile" description="Manage organization details">
       <div className="p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -382,6 +382,6 @@ export default function OrganizationProfilePage() {
           </div>
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

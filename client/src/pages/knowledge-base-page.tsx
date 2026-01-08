@@ -20,7 +20,7 @@ import {
   RefreshCw,
   Loader2,
 } from "lucide-react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import {
   Card,
   CardContent,
@@ -1653,7 +1653,7 @@ export default function KnowledgeBasePage() {
     ) || {};
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Knowledge Base" description="Medical resources and guidelines">
       <div className="container mx-auto py-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
@@ -1920,6 +1920,6 @@ export default function KnowledgeBasePage() {
           )}
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

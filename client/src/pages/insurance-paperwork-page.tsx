@@ -39,7 +39,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Mail, AlertCircle, CheckCircle, FileText, RefreshCw } from "lucide-react";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -114,12 +114,26 @@ export default function InsurancePaperworkPage() {
   } = useQuery<InsuranceDocument[]>({
     queryKey: ["/api/insurance-documents"],
     queryFn: async () => {
-      const response = await fetch("/api/insurance-documents");
-      if (!response.ok) {
-        throw new Error("Failed to fetch insurance documents");
+      try {
+        const response = await fetch("/api/insurance-documents");
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("Error fetching insurance documents:", response.status, errorText);
+          // Return empty array if endpoint doesn't exist yet
+          if (response.status === 404) {
+            return [];
+          }
+          throw new Error(`Failed to fetch insurance documents: ${response.status}`);
+        }
+        const data = await response.json();
+        return Array.isArray(data) ? data : [];
+      } catch (error) {
+        console.error("Error fetching insurance documents:", error);
+        // Return empty array on error to prevent page crash
+        return [];
       }
-      return response.json();
     },
+    retry: 1,
   });
 
   // Process document mutation
@@ -215,7 +229,7 @@ export default function InsurancePaperworkPage() {
   const needsInfoDocuments = documents?.filter((doc) => doc.status === "needs_info") || [];
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Insurance Paperwork" description="Manage insurance forms and requests">
       <div className="container mx-auto px-6 py-8">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -659,6 +673,6 @@ export default function InsurancePaperworkPage() {
           </DialogContent>
         </Dialog>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

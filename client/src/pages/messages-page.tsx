@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -127,16 +127,16 @@ export default function MessagesPage() {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Messages" description="Secure patient communication">
       <div className="flex h-full">
         {/* Left sidebar - Patient list */}
-        <div className="w-72 border-r border-gray-800 h-full flex flex-col">
-          <div className="p-4 border-b border-gray-800">
+        <div className="w-72 border-r border-[#2a2a2a] h-full flex flex-col bg-[#0d0d0d]">
+          <div className="p-4 border-b border-[#2a2a2a]">
             <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-[#999]" />
               <Input
                 placeholder="Search patients..."
-                className="pl-8 bg-[#1a1a1a] border-[#333]"
+                className="pl-8 bg-[#1a1a1a] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -146,7 +146,7 @@ export default function MessagesPage() {
           <ScrollArea className="flex-1">
             {patientsLoading ? (
               <div className="flex justify-center items-center h-32">
-                <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                <Loader2 className="h-6 w-6 animate-spin text-[#8b5cf6]" />
               </div>
             ) : (
               <div className="space-y-1 p-2">
@@ -155,20 +155,20 @@ export default function MessagesPage() {
                     key={patient.id}
                     className={`w-full text-left p-2 rounded-md transition-colors ${
                       selectedPatientId === patient.id
-                        ? "bg-blue-900/30 text-blue-100"
-                        : "hover:bg-gray-800"
+                        ? "bg-[#222] text-[#e6e6e6] border border-[#2a2a2a]"
+                        : "hover:bg-[#1a1a1a] text-[#999]"
                     }`}
                     onClick={() => setSelectedPatientId(patient.id)}
                   >
                     <div className="flex items-center space-x-3">
                       <Avatar className="h-9 w-9 flex-shrink-0">
-                        <AvatarFallback className="bg-blue-700 text-white">
+                        <AvatarFallback className="bg-[#1a1a1a] border border-[#333] text-[#8b5cf6]">
                           {getInitials(patient.name)}
                         </AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium">{patient.name}</p>
-                        <p className="text-sm text-gray-400 truncate">
+                        <p className="text-sm text-[#666] truncate">
                           {patient.email || patient.phone}
                         </p>
                       </div>
@@ -181,20 +181,20 @@ export default function MessagesPage() {
         </div>
 
         {/* Right area - Conversation */}
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col bg-[#0d0d0d]">
           {selectedPatientId ? (
             <>
               {/* Conversation header */}
-              <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+              <div className="p-4 border-b border-[#2a2a2a] flex items-center justify-between bg-[#1a1a1a]">
                 <div className="flex items-center space-x-3">
                   <Avatar className="h-10 w-10">
-                    <AvatarFallback className="bg-blue-700 text-white">
+                    <AvatarFallback className="bg-[#1a1a1a] border border-[#333] text-[#8b5cf6]">
                       {selectedPatient ? getInitials(selectedPatient.name) : ""}
                     </AvatarFallback>
                   </Avatar>
                   <div>
-                    <h2 className="font-semibold">{selectedPatient?.name}</h2>
-                    <p className="text-sm text-gray-400">
+                    <h2 className="font-semibold text-[#e6e6e6]">{selectedPatient?.name}</h2>
+                    <p className="text-sm text-[#999]">
                       {selectedPatient?.language === "french" ? "French" : "English"} •{" "}
                       {selectedPatient?.email}
                     </p>
@@ -206,14 +206,14 @@ export default function MessagesPage() {
               <ScrollArea className="flex-1 p-4">
                 {messagesLoading ? (
                   <div className="flex justify-center items-center h-32">
-                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                    <Loader2 className="h-8 w-8 animate-spin text-[#8b5cf6]" />
                   </div>
                 ) : messages.length > 0 ? (
                   <div className="space-y-8">
                     {Object.entries(messagesByDate).map(([date, dateMessages]) => (
                       <div key={date}>
                         <div className="flex justify-center mb-4">
-                          <span className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded-full">
+                          <span className="text-xs bg-[#1a1a1a] border border-[#2a2a2a] text-[#999] px-2 py-1 rounded-full">
                             {date}
                           </span>
                         </div>
@@ -226,8 +226,8 @@ export default function MessagesPage() {
                               <div
                                 className={`max-w-[80%] rounded-lg p-3 ${
                                   message.isFromPatient
-                                    ? "bg-gray-800 text-gray-100"
-                                    : "bg-blue-600 text-white"
+                                    ? "bg-[#1a1a1a] border border-[#2a2a2a] text-[#e6e6e6]"
+                                    : "bg-[#8b5cf6] text-white"
                                 }`}
                               >
                                 <div className="mb-1">
@@ -246,7 +246,7 @@ export default function MessagesPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                  <div className="flex flex-col items-center justify-center h-full text-[#999]">
                     <p>No messages yet</p>
                     <p className="text-sm mt-1">
                       Start a conversation with {selectedPatient?.name}
@@ -256,11 +256,11 @@ export default function MessagesPage() {
               </ScrollArea>
 
               {/* Message input */}
-              <div className="p-4 border-t border-gray-800">
+              <div className="p-4 border-t border-[#2a2a2a] bg-[#1a1a1a]">
                 <div className="flex space-x-2">
                   <Input
                     placeholder="Type your message..."
-                    className="bg-[#1a1a1a] border-[#333]"
+                    className="bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                     value={messageText}
                     onChange={(e) => setMessageText(e.target.value)}
                     onKeyDown={(e) => {
@@ -270,7 +270,11 @@ export default function MessagesPage() {
                       }
                     }}
                   />
-                  <Button onClick={handleSendMessage} disabled={!messageText.trim()}>
+                  <Button 
+                    onClick={handleSendMessage} 
+                    disabled={!messageText.trim()}
+                    className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
+                  >
                     <Send className="h-4 w-4 mr-2" />
                     Send
                   </Button>
@@ -278,13 +282,13 @@ export default function MessagesPage() {
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <div className="flex flex-col items-center justify-center h-full text-[#999]">
               <p className="text-xl">Select a patient to view conversation</p>
               <p className="text-sm mt-2">Choose a patient from the list on the left</p>
             </div>
           )}
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

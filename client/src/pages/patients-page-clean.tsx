@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useDebounce } from "@/hooks/use-debounce";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 
 interface Patient {
   id: number;
@@ -138,7 +138,7 @@ export default function PatientsPage() {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Patients" description="Manage patient records">
       <div className="flex h-full bg-background overflow-hidden">
         {/* Left column - Patient List */}
         <div className="w-full md:w-1/3 border-r border-[#333] flex flex-col bg-[#1a1a1a] overflow-hidden">
@@ -248,6 +248,6 @@ export default function PatientsPage() {
           </div>
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }

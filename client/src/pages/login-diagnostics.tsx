@@ -72,7 +72,7 @@ export default function LoginDiagnostics() {
       setDiagnostics(results);
 
       // Also log to console
-      console.group("🔍 InstantHPI Login Diagnostics");
+      console.group("🔍 InstantConsult Login Diagnostics");
       console.log("Full Report:", results);
       if (results.issues.length > 0) {
         console.error("Issues Found:", results.issues);
@@ -108,7 +108,7 @@ export default function LoginDiagnostics() {
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header */}
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold">🔍 Login Diagnostics</h1>
+          <h1 className="text-3xl font-bold">🔍 Consultation Platform Diagnostics</h1>
           <p className="text-muted-foreground">
             Check your OAuth configuration status
           </p>
@@ -116,11 +116,10 @@ export default function LoginDiagnostics() {
 
         {/* Status Banner */}
         <div
-          className={`border rounded-lg p-4 flex items-start gap-3 ${
-            isBlocked
+          className={`border rounded-lg p-4 flex items-start gap-3 ${isBlocked
               ? "bg-red-900/20 border-red-700/50"
               : "bg-green-900/20 border-green-700/50"
-          }`}
+            }`}
         >
           {isBlocked ? (
             <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
@@ -268,7 +267,7 @@ export default function LoginDiagnostics() {
               </p>
             </div>
             <div>
-              <p className="text-muted-foreground mb-1">Doctor Dashboard Redirect</p>
+              <p className="text-muted-foreground mb-1">Consultant Dashboard Redirect</p>
               <p className="text-primary break-all">
                 {diagnostics.domain}/doctor-dashboard
               </p>

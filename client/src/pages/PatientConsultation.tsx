@@ -3,7 +3,7 @@ import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
+import ModernLayout from "@/components/layout/ModernLayout";
 import LeftPanel from "@/components/consultation/LeftPanel";
 import MiddlePanel from "@/components/consultation/MiddlePanel";
 import RightPanel from "@/components/consultation/RightPanel";
@@ -192,7 +192,7 @@ export default function PatientConsultation() {
   };
 
   return (
-    <AppLayoutSpruce>
+    <ModernLayout title="Patient Consultation" description="Consultation details">
       <div className="container py-6">
         <h1 className="text-2xl font-bold mb-6 bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
           Patient Consultation
@@ -226,6 +226,6 @@ export default function PatientConsultation() {
           </div>
         </div>
       </div>
-    </AppLayoutSpruce>
+    </ModernLayout>
   );
 }
