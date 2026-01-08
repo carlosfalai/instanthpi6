@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
 import { startGoogleLogin } from "@/lib/auth";
+import { Sparkles } from "lucide-react";
 
 export default function DoctorLogin() {
   const [, navigate] = useLocation();
@@ -18,7 +19,7 @@ export default function DoctorLogin() {
   useEffect(() => {
     // For local development, bypass login and go straight to dashboard
     if (isLocalDev) {
-      console.log('🔧 Local development mode detected - bypassing authentication');
+      console.log('Local development mode detected - bypassing authentication');
       // Set local auth flag for ProtectedRoute
       localStorage.setItem('doctor_authenticated', 'true');
       localStorage.setItem('doctor_info', JSON.stringify({
@@ -89,34 +90,19 @@ export default function DoctorLogin() {
     }
   };
 
-  // Light purple gradient matching the profile page
-  const backgroundImages = [
-    "bg-gradient-to-br from-purple-50 to-violet-100",
-    "bg-gradient-to-br from-purple-50 to-indigo-100",
-    "bg-gradient-to-br from-violet-50 to-purple-100",
-    "bg-gradient-to-br from-indigo-50 to-purple-100",
-    "bg-gradient-to-br from-purple-100 to-violet-200"
-  ];
-
-  const [currentBg, setCurrentBg] = React.useState(() =>
-    backgroundImages[Math.floor(Math.random() * backgroundImages.length)]
-  );
-
-  // Rotate background on each page load
-  React.useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * backgroundImages.length);
-    setCurrentBg(backgroundImages[randomIndex]);
-  }, []);
-
   // In local dev, show a loading message while redirecting
   if (isLocalDev) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${currentBg}`}>
-        <Card className="w-full max-w-md bg-white shadow-xl border-0">
-          <CardContent className="pt-6">
+      <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+        {/* Ambient Glow */}
+        <div className="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-glow-pulse pointer-events-none" />
+        <div className="fixed bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[150px] animate-glow-pulse pointer-events-none" style={{ animationDelay: '-2s' }} />
+
+        <Card className="w-full max-w-md glass-dark border-border shadow-2xl">
+          <CardContent className="pt-8 pb-8">
             <div className="text-center space-y-4">
-              <div className="w-10 h-10 rounded-full border-2 border-purple-600 border-t-transparent animate-spin mx-auto" />
-              <p className="text-gray-600">Local development mode - Redirecting to dashboard...</p>
+              <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto" />
+              <p className="text-muted-foreground font-medium">Development mode - Redirecting to dashboard...</p>
             </div>
           </CardContent>
         </Card>
@@ -125,23 +111,49 @@ export default function DoctorLogin() {
   }
 
   return (
-    <div className={`min-h-screen flex items-center justify-center ${currentBg}`}>
-      <Card className="w-full max-w-md bg-white shadow-xl border-0">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center text-gray-900">Consultant Dashboard</CardTitle>
-          <CardDescription className="text-center text-gray-600">
-            Access the InstantConsult SaaS Platform
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
+      {/* Ambient Glow Effects */}
+      <div className="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-glow-pulse pointer-events-none" />
+      <div className="fixed bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[150px] animate-glow-pulse pointer-events-none" style={{ animationDelay: '-2s' }} />
+
+      {/* Subtle Grid Pattern */}
+      <div className="fixed inset-0 opacity-[0.02]" style={{
+        backgroundImage: `linear-gradient(rgba(245, 158, 11, 0.5) 1px, transparent 1px),
+                          linear-gradient(90deg, rgba(245, 158, 11, 0.5) 1px, transparent 1px)`,
+        backgroundSize: '60px 60px'
+      }} />
+
+      <div className="relative z-10 w-full max-w-md px-4">
+        {/* Logo & Brand */}
+        <div className="text-center mb-8 animate-fade-in-up">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary amber-glow-primary mb-6">
+            <Sparkles className="w-8 h-8 text-background" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            InstantHPI
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Consultant Dashboard
+          </p>
+        </div>
+
+        <Card className="glass-dark border-border/50 shadow-2xl animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <CardHeader className="space-y-1 pb-4">
+            <CardTitle className="text-xl font-semibold text-center text-foreground" style={{ fontFamily: 'Outfit, sans-serif' }}>
+              Welcome Back
+            </CardTitle>
+            <CardDescription className="text-center text-muted-foreground">
+              Sign in to access the InstantConsult SaaS Platform
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             {message && message.toLowerCase().includes("already signed") && (
-              <div className="flex items-center justify-between rounded-md border border-amber-300 bg-amber-50 p-3 text-amber-900">
-                <span className="text-sm">You are already signed in.</span>
+              <div className="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
+                <span className="text-sm text-foreground/90">You are already signed in.</span>
                 <div className="flex gap-2">
                   <Button
                     type="button"
-                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                    className="flex-1 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-background font-semibold amber-glow-primary"
                     onClick={() => navigate("/doctor-dashboard")}
                   >
                     Continue
@@ -149,7 +161,7 @@ export default function DoctorLogin() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="border-gray-300"
+                    className="flex-1 border-border/50 bg-transparent hover:bg-card text-foreground"
                     onClick={async () => {
                       try {
                         await supabase.auth.signOut();
@@ -164,15 +176,16 @@ export default function DoctorLogin() {
                 </div>
               </div>
             )}
+
             {/* Google Sign-in Button */}
             <Button
               type="button"
               onClick={handleGoogleLogin}
               disabled={googleLoading}
-              className="w-full flex items-center justify-center gap-3 py-6 !bg-white hover:!bg-gray-50 !text-gray-900 !border !border-gray-300 rounded-md shadow-sm"
+              className="w-full flex items-center justify-center gap-3 py-6 bg-card hover:bg-card/80 text-foreground border border-border/50 rounded-xl shadow-lg transition-all duration-300 hover:border-primary/30 hover:shadow-xl"
               variant="outline"
             >
-              <svg className="w-6 h-6" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -190,31 +203,38 @@ export default function DoctorLogin() {
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                 />
               </svg>
-              {googleLoading ? "Redirecting to Google..." : "Sign in with Google"}
+              <span className="font-medium">
+                {googleLoading ? "Redirecting to Google..." : "Sign in with Google"}
+              </span>
             </Button>
 
             {message && !message.toLowerCase().includes("already signed") && (
-              <div className={`p-3 rounded-md text-sm whitespace-pre-line ${message.includes("error") || message.includes("failed") || message.includes("not configured")
-                  ? "bg-red-50 text-red-800 border border-red-200"
-                  : "bg-blue-50 text-blue-800 border border-blue-200"
+              <div className={`p-4 rounded-xl text-sm whitespace-pre-line ${message.includes("error") || message.includes("failed") || message.includes("not configured")
+                  ? "bg-destructive/10 text-destructive border border-destructive/20"
+                  : "bg-primary/10 text-primary border border-primary/20"
                 }`}>
                 {message}
                 {message.includes("not configured") && (
-                  <div className="mt-3 pt-3 border-t border-red-300">
+                  <div className="mt-3 pt-3 border-t border-destructive/30">
                     <p className="font-semibold mb-2">Quick Fix:</p>
-                    <ol className="list-decimal list-inside space-y-1 text-xs">
-                      <li>Go to <a href="https://supabase.com/dashboard/project/gbxksgxezbljwlnlpkpz/auth/providers" target="_blank" rel="noopener noreferrer" className="underline">Supabase Dashboard → Auth → Providers</a></li>
+                    <ol className="list-decimal list-inside space-y-1 text-xs opacity-90">
+                      <li>Go to <a href="https://supabase.com/dashboard/project/gbxksgxezbljwlnlpkpz/auth/providers" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">Supabase Dashboard → Auth → Providers</a></li>
                       <li>Click on "Google" provider</li>
                       <li>Enable it and add your Google OAuth credentials</li>
-                      <li>Get credentials from <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Console</a></li>
+                      <li>Get credentials from <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">Google Cloud Console</a></li>
                     </ol>
                   </div>
                 )}
               </div>
             )}
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+        {/* Footer */}
+        <p className="text-center text-muted-foreground/60 text-xs mt-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          &copy; {new Date().getFullYear()} InstantHPI. All rights reserved.
+        </p>
+      </div>
     </div>
   );
 }

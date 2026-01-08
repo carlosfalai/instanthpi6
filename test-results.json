@@ -150,7 +150,7 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "failed",
-                      "duration": 2092,
+                      "duration": 1918,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:33:39",
@@ -174,7 +174,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:14.468Z",
+                      "startTime": "2026-01-06T14:37:53.652Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -224,12 +224,12 @@
                       "workerIndex": 1,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 2325,
+                      "duration": 3446,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:14.459Z",
+                      "startTime": "2026-01-06T14:37:53.656Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -258,12 +258,12 @@
                       "workerIndex": 2,
                       "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 2405,
+                      "duration": 2038,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:14.458Z",
+                      "startTime": "2026-01-06T14:37:53.664Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -292,7 +292,7 @@
                       "workerIndex": 3,
                       "parallelIndex": 3,
                       "status": "failed",
-                      "duration": 2204,
+                      "duration": 2006,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m100\u001b[39m\nReceived:   \u001b[31m84\u001b[39m",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m100\u001b[39m\nReceived:   \u001b[31m84\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:136:34",
@@ -316,7 +316,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:14.460Z",
+                      "startTime": "2026-01-06T14:37:53.672Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -366,12 +366,12 @@
                       "workerIndex": 4,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1653,
+                      "duration": 2465,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:18.440Z",
+                      "startTime": "2026-01-06T14:37:57.476Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -400,12 +400,12 @@
                       "workerIndex": 5,
                       "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 1758,
+                      "duration": 1457,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:18.542Z",
+                      "startTime": "2026-01-06T14:37:57.522Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -431,15 +431,15 @@
                   "projectName": "chromium",
                   "results": [
                     {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 3736,
+                      "duration": 4947,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:18.239Z",
+                      "startTime": "2026-01-06T14:37:57.140Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -466,9 +466,9 @@
                   "results": [
                     {
                       "workerIndex": 6,
-                      "parallelIndex": 2,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 4411,
+                      "duration": 2576,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:33:39",
@@ -492,7 +492,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:18.773Z",
+                      "startTime": "2026-01-06T14:37:58.868Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -528,7 +528,7 @@
             },
             {
               "title": "Patient intake form is accessible and functional",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -540,26 +540,51 @@
                   "results": [
                     {
                       "workerIndex": 7,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 5749,
-                      "errors": [],
-                      "stdout": [
+                      "parallelIndex": 3,
+                      "status": "timedOut",
+                      "duration": 30178,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
                         {
-                          "text": "[Console Error] [JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit\" line: 0}]\n"
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                         },
                         {
-                          "text": "[Console Error] [JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit\" line: 0}]\n"
+                          "location": {
+                            "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts",
+                            "column": 16,
+                            "line": 37
+                          },
+                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://instanthpi.ca/patient-intake\", waiting until \"networkidle\"\u001b[22m\n\n\n  35 |\n  36 |   test('Patient intake form is accessible and functional', async ({ page }) => {\n> 37 |     await page.goto(`${BASE_URL}/patient-intake`, { waitUntil: 'networkidle' });\n     |                ^\n  38 |     \n  39 |     // Check form exists\n  40 |     const form = page.locator('form').first();\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:37:16"
                         }
                       ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:20.727Z",
+                      "startTime": "2026-01-06T14:37:59.521Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/production-smoke-Productio-1e1d0-s-accessible-and-functional-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/production-smoke-Productio-1e1d0-s-accessible-and-functional-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/production-smoke-Productio-1e1d0-s-accessible-and-functional-firefox/error-context.md"
+                        }
+                      ]
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
               "id": "55314ca2cec2170df90e-0438a6f1d3ef0a024a68",
@@ -581,14 +606,14 @@
                   "results": [
                     {
                       "workerIndex": 8,
-                      "parallelIndex": 3,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 2998,
+                      "duration": 2450,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:20.881Z",
+                      "startTime": "2026-01-06T14:38:00.498Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -615,9 +640,9 @@
                   "results": [
                     {
                       "workerIndex": 9,
-                      "parallelIndex": 1,
+                      "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 3028,
+                      "duration": 2612,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m100\u001b[39m\nReceived:   \u001b[31m84\u001b[39m",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m100\u001b[39m\nReceived:   \u001b[31m84\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:136:34",
@@ -641,7 +666,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:22.692Z",
+                      "startTime": "2026-01-06T14:38:02.968Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -689,14 +714,14 @@
                   "results": [
                     {
                       "workerIndex": 8,
-                      "parallelIndex": 3,
+                      "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 1324,
+                      "duration": 902,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:24.759Z",
+                      "startTime": "2026-01-06T14:38:04.765Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -722,15 +747,15 @@
                   "projectName": "firefox",
                   "results": [
                     {
-                      "workerIndex": 8,
-                      "parallelIndex": 3,
+                      "workerIndex": 10,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 2166,
+                      "duration": 1988,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:26.096Z",
+                      "startTime": "2026-01-06T14:38:05.260Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -745,7 +770,7 @@
             },
             {
               "title": "Form submission handles timeouts gracefully",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -756,27 +781,52 @@
                   "projectName": "firefox",
                   "results": [
                     {
-                      "workerIndex": 10,
-                      "parallelIndex": 2,
-                      "status": "passed",
-                      "duration": 6387,
-                      "errors": [],
-                      "stdout": [
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "timedOut",
+                      "duration": 30159,
+                      "error": {
+                        "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                        "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                      },
+                      "errors": [
                         {
-                          "text": "[Console Error] [JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit\" line: 0}]\n"
+                          "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
                         },
                         {
-                          "text": "[Console Error] [JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit\" line: 0}]\n"
+                          "location": {
+                            "file": "/Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts",
+                            "column": 16,
+                            "line": 215
+                          },
+                          "message": "Error: page.goto: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - navigating to \"https://instanthpi.ca/patient-intake\", waiting until \"networkidle\"\u001b[22m\n\n\n  213 |\n  214 |   test('Form submission handles timeouts gracefully', async ({ page }) => {\n> 215 |     await page.goto(`${BASE_URL}/patient-intake`, { waitUntil: 'networkidle' });\n      |                ^\n  216 |     \n  217 |     // Fill minimal form data\n  218 |     const form = page.locator('form').first();\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:215:16"
                         }
                       ],
+                      "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:26.963Z",
+                      "startTime": "2026-01-06T14:38:05.675Z",
                       "annotations": [],
-                      "attachments": []
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/production-smoke-Productio-7aa41-handles-timeouts-gracefully-firefox/test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/production-smoke-Productio-7aa41-handles-timeouts-gracefully-firefox/video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/carlosfavielfont/Downloads/Instanthpi 6/test-results/production-smoke-Productio-7aa41-handles-timeouts-gracefully-firefox/error-context.md"
+                        }
+                      ]
                     }
                   ],
-                  "status": "expected"
+                  "status": "unexpected"
                 }
               ],
               "id": "55314ca2cec2170df90e-916bc3cdbcd669100945",
@@ -797,10 +847,10 @@
                   "projectName": "webkit",
                   "results": [
                     {
-                      "workerIndex": 12,
-                      "parallelIndex": 0,
+                      "workerIndex": 11,
+                      "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 2371,
+                      "duration": 2073,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:33:39",
@@ -828,7 +878,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:29.101Z",
+                      "startTime": "2026-01-06T14:38:07.162Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -875,19 +925,28 @@
                   "projectName": "webkit",
                   "results": [
                     {
-                      "workerIndex": 13,
-                      "parallelIndex": 3,
+                      "workerIndex": 12,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 2564,
+                      "duration": 3535,
                       "errors": [],
                       "stdout": [
+                        {
+                          "text": "[Console Error] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
+                        },
+                        {
+                          "text": "[Console Error] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
+                        },
+                        {
+                          "text": "[Console Error] [Report Only] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
+                        },
                         {
                           "text": "[Console Error] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:29.205Z",
+                      "startTime": "2026-01-06T14:38:08.746Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -913,10 +972,10 @@
                   "projectName": "webkit",
                   "results": [
                     {
-                      "workerIndex": 11,
-                      "parallelIndex": 1,
+                      "workerIndex": 13,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 2416,
+                      "duration": 1569,
                       "errors": [],
                       "stdout": [
                         {
@@ -925,7 +984,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:28.782Z",
+                      "startTime": "2026-01-06T14:38:11.971Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -951,10 +1010,10 @@
                   "projectName": "webkit",
                   "results": [
                     {
-                      "workerIndex": 14,
-                      "parallelIndex": 0,
+                      "workerIndex": 12,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 2173,
+                      "duration": 1423,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m100\u001b[39m\nReceived:   \u001b[31m84\u001b[39m",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m100\u001b[39m\nReceived:   \u001b[31m84\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:136:34",
@@ -982,7 +1041,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:34.247Z",
+                      "startTime": "2026-01-06T14:38:13.049Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1029,15 +1088,15 @@
                   "projectName": "webkit",
                   "results": [
                     {
-                      "workerIndex": 11,
-                      "parallelIndex": 1,
+                      "workerIndex": 13,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 929,
+                      "duration": 948,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:33.679Z",
+                      "startTime": "2026-01-06T14:38:13.721Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1063,10 +1122,10 @@
                   "projectName": "webkit",
                   "results": [
                     {
-                      "workerIndex": 13,
-                      "parallelIndex": 3,
+                      "workerIndex": 14,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 1949,
+                      "duration": 1458,
                       "errors": [],
                       "stdout": [
                         {
@@ -1075,7 +1134,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:33.830Z",
+                      "startTime": "2026-01-06T14:38:14.837Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1101,10 +1160,10 @@
                   "projectName": "webkit",
                   "results": [
                     {
-                      "workerIndex": 15,
+                      "workerIndex": 13,
                       "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 4495,
+                      "duration": 5562,
                       "errors": [],
                       "stdout": [
                         {
@@ -1122,7 +1181,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:34.979Z",
+                      "startTime": "2026-01-06T14:38:14.675Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1148,10 +1207,10 @@
                   "projectName": "Mobile Chrome",
                   "results": [
                     {
-                      "workerIndex": 16,
+                      "workerIndex": 15,
                       "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 1859,
+                      "duration": 1899,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:33:39",
@@ -1175,7 +1234,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:35.072Z",
+                      "startTime": "2026-01-06T14:38:16.813Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1222,15 +1281,15 @@
                   "projectName": "Mobile Chrome",
                   "results": [
                     {
-                      "workerIndex": 17,
-                      "parallelIndex": 3,
+                      "workerIndex": 16,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 1884,
+                      "duration": 3053,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:36.197Z",
+                      "startTime": "2026-01-06T14:38:19.255Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1256,15 +1315,15 @@
                   "projectName": "Mobile Chrome",
                   "results": [
                     {
-                      "workerIndex": 18,
-                      "parallelIndex": 0,
+                      "workerIndex": 17,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 1937,
+                      "duration": 1653,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:37.018Z",
+                      "startTime": "2026-01-06T14:38:20.569Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1290,10 +1349,10 @@
                   "projectName": "Mobile Chrome",
                   "results": [
                     {
-                      "workerIndex": 19,
-                      "parallelIndex": 1,
+                      "workerIndex": 17,
+                      "parallelIndex": 2,
                       "status": "failed",
-                      "duration": 2071,
+                      "duration": 1455,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m100\u001b[39m\nReceived:   \u001b[31m84\u001b[39m",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m100\u001b[39m\nReceived:   \u001b[31m84\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:136:34",
@@ -1317,7 +1376,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:37.614Z",
+                      "startTime": "2026-01-06T14:38:22.316Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1364,15 +1423,15 @@
                   "projectName": "Mobile Chrome",
                   "results": [
                     {
-                      "workerIndex": 17,
-                      "parallelIndex": 3,
+                      "workerIndex": 16,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 683,
+                      "duration": 460,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:38.183Z",
+                      "startTime": "2026-01-06T14:38:22.416Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1398,15 +1457,15 @@
                   "projectName": "Mobile Chrome",
                   "results": [
                     {
-                      "workerIndex": 17,
-                      "parallelIndex": 3,
+                      "workerIndex": 16,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 1859,
+                      "duration": 1340,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:38.876Z",
+                      "startTime": "2026-01-06T14:38:22.888Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1433,14 +1492,14 @@
                   "results": [
                     {
                       "workerIndex": 18,
-                      "parallelIndex": 0,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 3819,
+                      "duration": 5041,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:39.065Z",
+                      "startTime": "2026-01-06T14:38:24.146Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1466,10 +1525,10 @@
                   "projectName": "Mobile Safari",
                   "results": [
                     {
-                      "workerIndex": 20,
-                      "parallelIndex": 2,
+                      "workerIndex": 19,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 3701,
+                      "duration": 1620,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeTruthy\u001b[2m()\u001b[22m\n\nReceived: \u001b[31mfalse\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:33:39",
@@ -1493,20 +1552,11 @@
                       "stdout": [
                         {
                           "text": "[Console Error] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
-                        },
-                        {
-                          "text": "[Console Error] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
-                        },
-                        {
-                          "text": "[Console Error] [Report Only] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
-                        },
-                        {
-                          "text": "[Console Error] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:40.125Z",
+                      "startTime": "2026-01-06T14:38:24.639Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1553,19 +1603,28 @@
                   "projectName": "Mobile Safari",
                   "results": [
                     {
-                      "workerIndex": 21,
+                      "workerIndex": 20,
                       "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 2821,
+                      "duration": 3167,
                       "errors": [],
                       "stdout": [
+                        {
+                          "text": "[Console Error] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
+                        },
+                        {
+                          "text": "[Console Error] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
+                        },
+                        {
+                          "text": "[Console Error] [Report Only] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
+                        },
                         {
                           "text": "[Console Error] Refused to apply a stylesheet because its hash, its nonce, or 'unsafe-inline' does not appear in the style-src directive of the Content Security Policy.\n"
                         }
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:40.197Z",
+                      "startTime": "2026-01-06T14:38:26.768Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1591,10 +1650,10 @@
                   "projectName": "Mobile Safari",
                   "results": [
                     {
-                      "workerIndex": 22,
-                      "parallelIndex": 3,
+                      "workerIndex": 21,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 2029,
+                      "duration": 1552,
                       "errors": [],
                       "stdout": [
                         {
@@ -1603,7 +1662,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:41.213Z",
+                      "startTime": "2026-01-06T14:38:29.678Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1629,10 +1688,10 @@
                   "projectName": "Mobile Safari",
                   "results": [
                     {
-                      "workerIndex": 23,
-                      "parallelIndex": 0,
+                      "workerIndex": 20,
+                      "parallelIndex": 1,
                       "status": "failed",
-                      "duration": 2286,
+                      "duration": 1510,
                       "error": {
                         "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m100\u001b[39m\nReceived:   \u001b[31m84\u001b[39m",
                         "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m100\u001b[39m\nReceived:   \u001b[31m84\u001b[39m\n    at /Users/carlosfavielfont/Downloads/Instanthpi 6/tests/production-smoke.spec.ts:136:34",
@@ -1660,7 +1719,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:43.375Z",
+                      "startTime": "2026-01-06T14:38:30.132Z",
                       "annotations": [],
                       "attachments": [
                         {
@@ -1708,14 +1767,14 @@
                   "results": [
                     {
                       "workerIndex": 21,
-                      "parallelIndex": 1,
+                      "parallelIndex": 2,
                       "status": "passed",
-                      "duration": 698,
+                      "duration": 650,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:43.175Z",
+                      "startTime": "2026-01-06T14:38:31.407Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1742,9 +1801,9 @@
                   "results": [
                     {
                       "workerIndex": 22,
-                      "parallelIndex": 3,
+                      "parallelIndex": 1,
                       "status": "passed",
-                      "duration": 1767,
+                      "duration": 1549,
                       "errors": [],
                       "stdout": [
                         {
@@ -1753,7 +1812,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:43.438Z",
+                      "startTime": "2026-01-06T14:38:32.025Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1779,10 +1838,10 @@
                   "projectName": "Mobile Safari",
                   "results": [
                     {
-                      "workerIndex": 21,
-                      "parallelIndex": 1,
+                      "workerIndex": 23,
+                      "parallelIndex": 3,
                       "status": "passed",
-                      "duration": 3908,
+                      "duration": 5070,
                       "errors": [],
                       "stdout": [
                         {
@@ -1800,7 +1859,7 @@
                       ],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2025-11-15T22:44:43.883Z",
+                      "startTime": "2026-01-06T14:38:32.178Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1820,11 +1879,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-11-15T22:44:14.040Z",
-    "duration": 33791.452,
-    "expected": 25,
+    "startTime": "2026-01-06T14:37:53.095Z",
+    "duration": 44387.942,
+    "expected": 23,
     "skipped": 0,
-    "unexpected": 10,
+    "unexpected": 12,
     "flaky": 0
   }
 }

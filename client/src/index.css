@@ -1,4 +1,4 @@
-/* Import Modern Design System - must be first */
+/* Import Obsidian Precision Design System - must be first */
 @import './styles/design-system.css';
 
 @tailwind base;
@@ -147,57 +147,61 @@
 }
 
 :root {
-  --color-1: 190 100% 50%;
-  /* Neon Cyan */
-  --color-2: 280 100% 50%;
-  /* Electric Purple */
-  --color-3: 210 100% 50%;
-  --color-4: 195 100% 50%;
-  --color-5: 270 100% 50%;
+  /* Obsidian Precision Color System */
+  --color-1: 38 92% 50%;
+  /* Amber Primary */
+  --color-2: 32 95% 44%;
+  /* Warm Orange */
+  --color-3: 43 96% 56%;
+  /* Golden Yellow */
+  --color-4: 28 80% 52%;
+  /* Bronze */
+  --color-5: 45 93% 47%;
+  /* Gold */
 
-  /* Cinematic Midnight Palette */
-  --background: 240 10% 2%;
-  /* #050505 - Deepest midnight */
-  --foreground: 0 0% 98%;
-  /* #fafafa */
+  /* Obsidian Precision Palette */
+  --background: 30 10% 4%;
+  /* #0a0908 - Warm obsidian */
+  --foreground: 40 20% 98%;
+  /* #faf9f7 - Warm white */
 
-  --card: 240 10% 4%;
-  /* #0a0a0c */
-  --card-foreground: 0 0% 98%;
+  --card: 30 8% 7%;
+  /* #12110f */
+  --card-foreground: 40 20% 98%;
 
-  --popover: 240 10% 4%;
-  --popover-foreground: 0 0% 98%;
+  --popover: 30 8% 7%;
+  --popover-foreground: 40 20% 98%;
 
-  --primary: 190 100% 50%;
-  /* Neon Cyan */
-  --primary-foreground: 0 0% 0%;
+  --primary: 38 92% 50%;
+  /* Amber - #f59e0b */
+  --primary-foreground: 30 10% 4%;
 
-  --secondary: 280 100% 50%;
-  /* Electric Purple */
-  --secondary-foreground: 0 0% 100%;
+  --secondary: 32 95% 44%;
+  /* Warm Orange - #d97706 */
+  --secondary-foreground: 40 20% 98%;
 
-  --muted: 240 5% 15%;
-  --muted-foreground: 240 5% 65%;
+  --muted: 30 5% 15%;
+  --muted-foreground: 30 10% 60%;
 
-  --accent: 240 10% 10%;
-  --accent-foreground: 0 0% 98%;
+  --accent: 38 92% 50%;
+  --accent-foreground: 30 10% 4%;
 
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 240 5% 12%;
-  /* Subtle borders */
-  --input: 240 5% 5%;
-  --ring: 190 100% 50%;
+  --border: 30 5% 12%;
+  /* Subtle warm borders */
+  --input: 30 8% 8%;
+  --ring: 38 92% 50%;
 
-  --sidebar-background: 240 10% 2%;
-  --sidebar-foreground: 0 0% 98%;
-  --sidebar-primary: 190 100% 50%;
-  --sidebar-primary-foreground: 0 0% 0%;
-  --sidebar-accent: 240 10% 8%;
-  --sidebar-accent-foreground: 0 0% 98%;
-  --sidebar-border: 240 10% 10%;
-  --sidebar-ring: 190 100% 50%;
+  --sidebar-background: 30 10% 4%;
+  --sidebar-foreground: 40 20% 98%;
+  --sidebar-primary: 38 92% 50%;
+  --sidebar-primary-foreground: 30 10% 4%;
+  --sidebar-accent: 30 8% 10%;
+  --sidebar-accent-foreground: 40 20% 98%;
+  --sidebar-border: 30 8% 12%;
+  --sidebar-ring: 38 92% 50%;
 
   --radius: 0.75rem;
 }
@@ -219,17 +223,13 @@
   }
 }
 
-@keyframes rainbow {
+@keyframes shimmer-gold {
   0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
+    background-position: -200% 0;
   }
 
   100% {
-    background-position: 0% 50%;
+    background-position: 200% 0;
   }
 }
 
@@ -255,12 +255,31 @@
   }
 }
 
+@keyframes glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    filter: blur(80px);
+  }
+
+  50% {
+    opacity: 0.5;
+    filter: blur(100px);
+  }
+}
+
 .animate-tilt {
   animation: tilt 3s infinite linear;
 }
 
-.animate-rainbow {
-  animation: rainbow 3s ease infinite;
+.animate-shimmer-gold {
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(245, 158, 11, 0.15) 50%,
+      transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer-gold 2.5s ease-in-out infinite;
 }
 
 .animate-grid {
@@ -272,6 +291,10 @@
   animation: gradient 3s ease infinite;
 }
 
+.animate-glow-pulse {
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -279,40 +302,81 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 }
 
 @layer utilities {
+  /* Obsidian Glass Effects */
   .glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(18, 17, 15, 0.7);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
   .glass-dark {
-    background: rgba(0, 0, 0, 0.4);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: linear-gradient(135deg,
+        rgba(18, 17, 15, 0.9) 0%,
+        rgba(10, 9, 8, 0.95) 100%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.05);
   }
 
+  /* Amber Glow Effects */
+  .amber-glow-primary {
+    box-shadow: 0 0 40px rgba(245, 158, 11, 0.15);
+  }
+
+  .amber-glow-secondary {
+    box-shadow: 0 0 40px rgba(217, 119, 6, 0.15);
+  }
+
+  .amber-glow-intense {
+    box-shadow: 0 0 60px rgba(245, 158, 11, 0.25);
+  }
+
+  /* Legacy neon classes mapped to amber for compatibility */
   .neon-glow-primary {
-    box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+    box-shadow: 0 0 30px rgba(245, 158, 11, 0.2);
   }
 
   .neon-glow-secondary {
-    box-shadow: 0 0 15px rgba(191, 0, 255, 0.3);
+    box-shadow: 0 0 30px rgba(217, 119, 6, 0.2);
   }
 
+  /* Text Effects */
+  .text-amber-glow {
+    color: #f59e0b;
+    text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+  }
+
+  .text-gradient-amber {
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Legacy neon text classes mapped to amber */
   .text-neon-cyan {
-    color: #00f2ff;
-    text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+    color: #f59e0b;
+    text-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
   }
 
   .text-neon-purple {
-    color: #bf00ff;
-    text-shadow: 0 0 10px rgba(191, 0, 255, 0.5);
+    color: #d97706;
+    text-shadow: 0 0 15px rgba(217, 119, 6, 0.4);
   }
 
   /* Hide scrollbar for Chrome, Safari and Opera */
@@ -326,5 +390,32 @@
     /* IE and Edge */
     scrollbar-width: none;
     /* Firefox */
+  }
+
+  /* Obsidian Card Styles */
+  .obsidian-card {
+    background: linear-gradient(180deg,
+        rgba(26, 24, 22, 1) 0%,
+        rgba(18, 17, 15, 1) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 1rem;
+  }
+
+  .obsidian-card:hover {
+    border-color: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 32px rgba(10, 9, 8, 0.5);
+  }
+
+  /* Ambient Glow Backgrounds */
+  .ambient-amber {
+    background: radial-gradient(circle at 30% 20%,
+        rgba(245, 158, 11, 0.08) 0%,
+        transparent 50%);
+  }
+
+  .ambient-warm {
+    background: radial-gradient(circle at 70% 80%,
+        rgba(180, 83, 9, 0.05) 0%,
+        transparent 50%);
   }
 }
