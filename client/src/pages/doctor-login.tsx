@@ -203,7 +203,7 @@ export default function DoctorLogin() {
                   <div className="mt-3 pt-3 border-t border-red-300">
                     <p className="font-semibold mb-2">Quick Fix:</p>
                     <ol className="list-decimal list-inside space-y-1 text-xs">
-                      <li>Go to <a href="https://supabase.com/dashboard/project/uoahrhroyqsqixusewwe/auth/providers" target="_blank" rel="noopener noreferrer" className="underline">Supabase Dashboard → Auth → Providers</a></li>
+                      <li>Go to <a href="https://supabase.com/dashboard/project/gbxksgxezbljwlnlpkpz/auth/providers" target="_blank" rel="noopener noreferrer" className="underline">Supabase Dashboard → Auth → Providers</a></li>
                       <li>Click on "Google" provider</li>
                       <li>Enable it and add your Google OAuth credentials</li>
                       <li>Get credentials from <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="underline">Google Cloud Console</a></li>

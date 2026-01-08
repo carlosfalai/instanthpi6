@@ -97,13 +97,14 @@ export async function startGoogleLogin(nextPath: string) {
       
       // Check for specific OAuth configuration errors
       if (error.message?.includes('client_id') || error.message?.includes('invalid_request')) {
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://gbxksgxezbljwlnlpkpz.supabase.co';
         errorMsg = 'Google OAuth is not configured in Supabase. Please configure Google OAuth in the Supabase Dashboard:\n\n' +
           '1. Go to Supabase Dashboard → Authentication → Providers → Google\n' +
           '2. Enable Google provider\n' +
           '3. Add your Google OAuth Client ID and Client Secret\n' +
           '4. Save the configuration\n\n' +
           'Also verify in Google Cloud Console that the redirect URI is set:\n' +
-          'https://uoahrhroyqsqixusewwe.supabase.co/auth/v1/callback';
+          `${supabaseUrl}/auth/v1/callback`;
       }
       
       console.error('[Auth] signInWithOAuth error:', {
