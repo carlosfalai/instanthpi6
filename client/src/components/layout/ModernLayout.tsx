@@ -29,10 +29,8 @@ interface ModernLayoutProps {
 
 const navItems = [
   { id: "home", label: "Dashboard", path: "/doctor-dashboard", icon: Home },
-  { id: "patients", label: "Clients", path: "/patients", icon: Users, badge: 12 },
-  { id: "messages", label: "Messages", path: "/messages", icon: MessageSquare, badge: 7 },
+  { id: "command", label: "Command Center", path: "/command", icon: Users },
   { id: "documents", label: "Documents", path: "/documents", icon: FileText },
-  { id: "inbox", label: "Inbox", path: "/inbox", icon: Mail, badge: 4 },
   { id: "ai", label: "AI Assistant", path: "/claude-ai", icon: Brain },
   { id: "settings", label: "Settings", path: "/doctor-profile", icon: Settings },
 ];

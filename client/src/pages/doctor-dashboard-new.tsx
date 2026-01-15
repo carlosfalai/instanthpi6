@@ -358,23 +358,8 @@ export default function ConsultantDashboardNew() {
 
         if (error) {
           console.error("Error loading patients:", error);
-          // Set sample data if no real data
-          setRecentPatients([
-            {
-              id: "1",
-              patient_id: "P001",
-              chief_complaint: "Chest pain",
-              created_at: new Date().toISOString(),
-              triage_level: "Urgent"
-            },
-            {
-              id: "2",
-              patient_id: "P002",
-              chief_complaint: "Headache",
-              created_at: new Date().toISOString(),
-              triage_level: "Moderate"
-            }
-          ]);
+          // Show empty state - no fake data
+          setRecentPatients([]);
         } else {
           setRecentPatients(data || []);
         }

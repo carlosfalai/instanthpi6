@@ -62,10 +62,22 @@ exports.handler = async (event, context) => {
 
     // Fallback to headers if provided (direct test without persistence)
     if (!spruceAccessId && (event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"])) {
-      spruceAccessId = event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"]; 
+      spruceAccessId = event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"];
     }
     if (!spruceApiKey && (event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"])) {
-      spruceApiKey = event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"]; 
+      spruceApiKey = event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"];
+    }
+
+    // Fallback to environment variables (global config)
+    if (!spruceAccessId && process.env.SPRUCE_ACCESS_ID) {
+      spruceAccessId = process.env.SPRUCE_ACCESS_ID;
+    }
+    if (!spruceApiKey && process.env.SPRUCE_API_KEY) {
+      spruceApiKey = process.env.SPRUCE_API_KEY;
+    }
+    // Also check SPRUCE_BEARER_TOKEN as alternative
+    if (!spruceApiKey && process.env.SPRUCE_BEARER_TOKEN) {
+      spruceApiKey = process.env.SPRUCE_BEARER_TOKEN;
     }
 
     if (!spruceAccessId || !spruceApiKey) {
@@ -79,20 +91,20 @@ exports.handler = async (event, context) => {
       };
     }
 
-    console.log("Fetching ALL conversations from Spruce API with pagination...");
+    console.log("Fetching conversations from Spruce API...");
 
     let allConversations = [];
     let paginationToken = null;
     let hasMore = true;
     let pageCount = 0;
-    const maxPages = 50; // Increased limit to fetch more conversations (old and new)
-    const maxConversations = 10000; // Absolute maximum to prevent excessive memory usage
+    const maxPages = 3; // Limit pages to avoid timeout (Netlify functions have 10-30s limit)
+    const maxConversations = 500; // Reasonable limit for initial load
 
-    // Keep fetching pages until we have all conversations
+    // Keep fetching pages until we have enough conversations
     while (hasMore && pageCount < maxPages && allConversations.length < maxConversations) {
       const params = {
         orderBy: "lastActivity",
-        limit: 200, // Max per page per Spruce API
+        limit: 100, // Reduced for faster response
       };
 
       // Add pagination token if we have one
@@ -139,7 +151,7 @@ exports.handler = async (event, context) => {
         }
 
         // Break if we got fewer conversations than requested (likely last page)
-        if (conversations.length < 200) {
+        if (conversations.length < 100) {
           console.log(`Reached last page (got ${conversations.length} conversations)`);
           break;
         }

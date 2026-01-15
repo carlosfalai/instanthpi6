@@ -2,16 +2,19 @@ import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { supabase } from "@/lib/supabase";
 import { startGoogleLogin } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, ArrowLeft, Stethoscope } from "lucide-react";
+import { EliteLayout } from "@/components/elite/EliteLayout";
+import { EliteCard } from "@/components/elite/EliteCard";
+import { EliteInput } from "@/components/elite/EliteInput";
+import { EliteButton } from "@/components/elite/EliteButton";
+import { User, ArrowLeft, Lock, Mail, CheckCircle2 } from "lucide-react";
 
 export default function PatientLogin() {
   const [, navigate] = useLocation();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  // Check if user is already authenticated
   useEffect(() => {
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -21,9 +24,6 @@ export default function PatientLogin() {
     };
     checkAuth();
   }, [navigate]);
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
 
   const handleEmailLogin = async () => {
     try {
@@ -36,10 +36,10 @@ export default function PatientLogin() {
       });
 
       if (error) {
-        setMessage(`Erreur de connexion: ${error.message}`);
+        setMessage(`Error: ${error.message}`);
       }
     } catch (error) {
-      setMessage("Erreur de connexion. Veuillez réessayer.");
+      setMessage("Connection error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -52,145 +52,158 @@ export default function PatientLogin() {
 
       const { error } = await startGoogleLogin("/patient-dashboard");
       if (error) {
-        setMessage(`Erreur de connexion: ${error}`);
+        setMessage(`Error: ${error}`);
         setLoading(false);
       }
     } catch (error) {
-      setMessage("Erreur de connexion. Veuillez réessayer.");
+      setMessage("Connection error. Please try again.");
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#E6E0F2' }}>
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-            <User className="w-8 h-8 text-green-600" />
+    <EliteLayout showAura={true}>
+      <div className="min-h-[80vh] flex flex-col items-center justify-center p-4">
+
+        {/* Brand Header */}
+        <div className="text-center mb-8 relative z-10">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6 neon-glow-primary border border-primary/20">
+            <User className="w-10 h-10 text-primary" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Client Portal
+          <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary tracking-tight mb-2">
+            CLIENT PORTAL
           </h1>
-          <p className="text-gray-600">
-            Connexion sécurisée pour les clients
+          <p className="text-muted-foreground font-medium tracking-wide">
+            SECURE ACCESS SYSTEM
           </p>
         </div>
 
-        {/* Login Card */}
-        <Card className="shadow-lg">
-          <CardHeader className="text-center">
-            <CardTitle className="text-xl text-gray-900">
-              Accès Client
-            </CardTitle>
-            <CardDescription>
-              Connectez-vous avec votre email ou Google pour accéder à votre session de conseil
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Email/Password Login */}
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
+        <div className="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
+
+          {/* Login Form */}
+          <EliteCard className="w-full max-w-md mx-auto relative overflow-hidden" glow>
+            {/* Card Header */}
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-foreground">Access Your Account</h2>
+              <p className="text-sm text-muted-foreground">Enter your credentials to continue</p>
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <EliteInput
+                  label="Email Address"
                   type="email"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="votre@email.com"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Mot de passe
-                </label>
-                <input
+                <EliteInput
+                  label="Password"
                   type="password"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Votre mot de passe"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
-              <Button
-                onClick={handleEmailLogin}
-                disabled={loading || !email || !password}
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-              >
-                {loading ? "Connexion..." : "Se connecter"}
-              </Button>
+
+              {message && (
+                <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium">
+                  {message}
+                </div>
+              )}
+
+              <div className="space-y-4 pt-2">
+                <EliteButton
+                  className="w-full"
+                  onClick={handleEmailLogin}
+                  disabled={loading || !email || !password}
+                >
+                  {loading ? "Authenticating..." : "Secure Login"}
+                </EliteButton>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-white/10" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-[#12110f] px-2 text-muted-foreground">Or continue with</span>
+                  </div>
+                </div>
+
+                <EliteButton
+                  variant="secondary"
+                  className="w-full"
+                  onClick={handleGoogleLogin}
+                  disabled={loading}
+                >
+                  <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z" />
+                  </svg>
+                  Google Access
+                </EliteButton>
+              </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">ou</span>
-              </div>
-            </div>
-
-            {/* Google Login Button */}
-            <Button
-              onClick={handleGoogleLogin}
-              disabled={loading}
-              className="w-full bg-white hover:bg-gray-50 text-gray-900 border border-gray-300"
-            >
-              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-              </svg>
-              {loading ? "Connexion..." : "Continuer avec Google"}
-            </Button>
-
-            {/* Message */}
-            {message && (
-              <div className="p-3 rounded-md text-sm bg-amber-50 text-amber-800">
-                {message}
-              </div>
-            )}
-
-            {/* Back to Landing */}
-            <div className="text-center">
-              <Button
-                variant="ghost"
+            <div className="mt-8 pt-6 border-t border-white/10 text-center">
+              <button
                 onClick={() => navigate("/")}
-                className="text-gray-500 hover:text-gray-700"
+                className="text-sm text-muted-foreground hover:text-white transition-colors flex items-center justify-center mx-auto group"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Retour à l'accueil
-              </Button>
+                <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+                Return to Homepage
+              </button>
             </div>
-          </CardContent>
-        </Card>
+          </EliteCard>
 
-        {/* Features */}
-        <div className="mt-8 text-center">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Ce que vous pouvez faire
-          </h3>
-          <div className="space-y-3 text-sm text-gray-600">
-            <div className="flex items-center justify-center gap-2">
-              <User className="w-4 h-4 text-green-600" />
-              <span>Compléter votre profil de consultation</span>
+          {/* Features Info (Visible on larger screens) */}
+          <div className="hidden md:block space-y-8 p-6">
+            <div className="space-y-6">
+              <div className="flex gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 neon-glow-primary">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Consultation Profile</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed mt-1">
+                    Manage your personal information and complete your intake profile securely.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-secondary/10 flex items-center justify-center border border-secondary/20 neon-glow-secondary">
+                  <CheckCircle2 className="w-6 h-6 text-secondary" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Follow-up Tracking</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed mt-1">
+                    Respond to follow-up questions and track your consultation status in real-time.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
+                  <Lock className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Secure Documents</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed mt-1">
+                    Access and generate encrypted documents shared by your consultant.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="flex items-center justify-center gap-2">
-              <User className="w-4 h-4 text-green-600" />
-              <span>Répondre aux questions de suivi</span>
-            </div>
-            <div className="flex items-center justify-center gap-2">
-              <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-              </svg>
-              <span>Générer un document pour votre consultant</span>
+
+            <div className="p-6 rounded-3xl bg-gradient-to-br from-primary/20 to-secondary/10 border border-primary/20 backdrop-blur-sm">
+              <p className="text-sm font-medium text-amber-200/90 italic">
+                "Experience the future of consultation handling with our Elite platform."
+              </p>
             </div>
           </div>
+
         </div>
       </div>
-    </div>
+    </EliteLayout>
   );
 }

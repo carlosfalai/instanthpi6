@@ -37,6 +37,11 @@ import PrioritizedTasksPage from "@/pages/prioritized-tasks-page";
 import InsurancePaperworkPage from "@/pages/insurance-paperwork-page";
 import ClaudeAIPage from "@/pages/claude-ai-page";
 import GmailInboxPage from "@/pages/gmail-inbox-page";
+import PricingPage from "@/pages/pricing";
+import SubscriptionSuccessPage from "@/pages/subscription-success";
+import CommandCenter from "@/pages/command-center";
+import EliteBuilderDemo from "@/pages/elite-builder-demo";
+import EliteDashboardDemo from "@/pages/elite-dashboard-demo";
 import { ProtectedRoute } from "@/lib/auth-guard";
 
 class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
@@ -130,6 +135,16 @@ export default function App() {
               <FormBuilder />
             </ProtectedRoute>
           </Route>
+          <Route path="/elite-builder-demo">
+            <ProtectedRoute>
+              <EliteBuilderDemo />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/elite-dashboard-demo">
+            <ProtectedRoute>
+              <EliteDashboardDemo />
+            </ProtectedRoute>
+          </Route>
           <Route path="/doctor-login" component={DoctorLogin} />
           <Route path="/doctor-dashboard">
             <ProtectedRoute>
@@ -145,6 +160,11 @@ export default function App() {
           <Route path="/patients">
             <ProtectedRoute>
               <PatientsPage />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/command">
+            <ProtectedRoute>
+              <CommandCenter />
             </ProtectedRoute>
           </Route>
           <Route path="/documents">
@@ -254,6 +274,8 @@ export default function App() {
               <GmailInboxPage />
             </ProtectedRoute>
           </Route>
+          <Route path="/pricing" component={PricingPage} />
+          <Route path="/subscription/success" component={SubscriptionSuccessPage} />
           <Route>
             <div className="min-h-screen flex items-center justify-center">
               <div className="text-center">

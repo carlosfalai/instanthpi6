@@ -1,4 +1,14 @@
+
 import type { Config } from "tailwindcss";
+import fs from 'fs';
+import path from 'path';
+
+// Read the additions generated from theme.css
+const additionsPath = path.join(__dirname, 'tailwind-config-additions.json');
+let additions = { colors: {}, boxShadow: {}, borderRadius: {}, screens: {}, fontFamily: {} };
+if (fs.existsSync(additionsPath)) {
+  additions = JSON.parse(fs.readFileSync(additionsPath, 'utf8'));
+}
 
 export default {
   darkMode: ["class"],
@@ -6,11 +16,13 @@ export default {
   theme: {
     extend: {
       borderRadius: {
+        ...additions.borderRadius,
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        ...additions.colors,
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -67,6 +79,12 @@ export default {
         "color-4": "hsl(var(--color-4))",
         "color-5": "hsl(var(--color-5))",
       },
+      boxShadow: {
+        ...additions.boxShadow,
+      },
+      fontFamily: {
+        ...additions.fontFamily,
+      },
       keyframes: {
         "accordion-down": {
           from: {
@@ -114,6 +132,7 @@ export default {
   plugins: [
     require("tailwindcss-animate"),
     require("@tailwindcss/typography"),
+    require("tailwindcss-react-aria-components"),
     function ({ addUtilities }) {
       const newUtilities = {
         ".scrollbar-thin": {

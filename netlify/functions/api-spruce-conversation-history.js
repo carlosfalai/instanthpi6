@@ -12,120 +12,6 @@ function getSupabase() {
   return createClient(url, key);
 }
 
-// Mock messages for demonstration - in production, these would come from Spruce API
-const mockMessages = {
-  t_2B0EF7IFVUG00: [
-    // Carlos Faviel Font
-    {
-      id: "msg_001",
-      content: "Bonjour Dr. Font, j'ai besoin d'un renouvellement de mon ordonnance de metformine.",
-      timestamp: "2024-12-30T04:15:00Z",
-      isFromPatient: true,
-      senderName: "Carlos Faviel Font",
-    },
-    {
-      id: "msg_002",
-      content: "Bien sûr, je vais préparer le renouvellement. Avez-vous des effets secondaires?",
-      timestamp: "2024-12-30T04:18:00Z",
-      isFromPatient: false,
-      senderName: "Dr. Font",
-    },
-    {
-      id: "msg_003",
-      content: "Non, tout va bien. Merci docteur!",
-      timestamp: "2024-12-30T04:20:00Z",
-      isFromPatient: true,
-      senderName: "Carlos Faviel Font",
-    },
-  ],
-  t_2B0E2OAUVUG00: [
-    // Team Spruce
-    {
-      id: "msg_team_001",
-      content: "Welcome to Spruce Health! Your secure messaging platform is now active.",
-      timestamp: "2024-08-12T21:35:00Z",
-      isFromPatient: false,
-      senderName: "Team Spruce",
-    },
-    {
-      id: "msg_team_002",
-      content: "You can now communicate securely with your patients through this platform.",
-      timestamp: "2024-08-12T21:36:00Z",
-      isFromPatient: false,
-      senderName: "Team Spruce",
-    },
-  ],
-  t_2B0E2OA187O00: [
-    // Centre Médical Font
-    {
-      id: "msg_004",
-      content: "Welcome to Centre Médical Font secure messaging.",
-      timestamp: "2024-08-12T21:30:00Z",
-      isFromPatient: false,
-      senderName: "System",
-    },
-  ],
-  t_2B0E2OAUVUG00: [
-    // Team Spruce
-    {
-      id: "msg_005",
-      content: "Your Spruce Health account has been set up successfully.",
-      timestamp: "2024-08-12T21:35:00Z",
-      isFromPatient: false,
-      senderName: "Spruce Team",
-    },
-  ],
-};
-
-// Generate realistic mock messages for other conversations
-function generateMockMessages(conversationId, patientName) {
-  const templates = [
-    {
-      patient: "J'ai des douleurs au dos depuis quelques jours.",
-      doctor: "Je vais vous prescrire des anti-inflammatoires. Prenez du repos.",
-    },
-    {
-      patient: "Mon fils a de la fièvre depuis hier soir.",
-      doctor: "Surveillez sa température. Si elle dépasse 39°C, allez aux urgences.",
-    },
-    {
-      patient: "J'ai besoin de renouveler mes médicaments pour la tension.",
-      doctor: "Je prépare le renouvellement. Passez le chercher à la pharmacie demain.",
-    },
-    {
-      patient: "Est-ce que je peux avoir un rendez-vous cette semaine?",
-      doctor: "J'ai une disponibilité jeudi à 14h30. Ça vous convient?",
-    },
-  ];
-
-  const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
-  const baseTime = new Date("2024-08-16T10:00:00Z");
-
-  return [
-    {
-      id: `msg_${conversationId}_1`,
-      content: randomTemplate.patient,
-      timestamp: new Date(baseTime.getTime() + 0).toISOString(),
-      isFromPatient: true,
-      senderName: patientName || "Patient",
-    },
-    {
-      id: `msg_${conversationId}_2`,
-      content: randomTemplate.doctor,
-      timestamp: new Date(baseTime.getTime() + 300000).toISOString(), // 5 minutes later
-      isFromPatient: false,
-      senderName: "Dr. Font",
-    },
-    {
-      id: `msg_${conversationId}_3`,
-      content: "Merci docteur!",
-      timestamp: new Date(baseTime.getTime() + 600000).toISOString(), // 10 minutes later
-      isFromPatient: true,
-      senderName: patientName || "Patient",
-    },
-  ];
-}
-
 exports.handler = async (event, context) => {
   // Enable CORS
   const headers = {
@@ -147,7 +33,7 @@ exports.handler = async (event, context) => {
   // Path format: /api/spruce/conversations/{id}/history
   const pathParts = event.path.split("/").filter(p => p);
   let conversationId = null;
-  
+
   // Find the conversation ID (should be before "history")
   const historyIndex = pathParts.indexOf("history");
   if (historyIndex > 0) {
@@ -162,7 +48,7 @@ exports.handler = async (event, context) => {
     return {
       statusCode: 400,
       headers,
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         error: "Conversation ID is required",
         path: event.path,
         parts: pathParts
@@ -196,10 +82,22 @@ exports.handler = async (event, context) => {
 
     // Fallback to headers if provided
     if (!spruceAccessId && (event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"])) {
-      spruceAccessId = event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"]; 
+      spruceAccessId = event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"];
     }
     if (!spruceApiKey && (event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"])) {
-      spruceApiKey = event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"]; 
+      spruceApiKey = event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"];
+    }
+
+    // Fallback to environment variables (global config)
+    if (!spruceAccessId && process.env.SPRUCE_ACCESS_ID) {
+      spruceAccessId = process.env.SPRUCE_ACCESS_ID;
+    }
+    if (!spruceApiKey && process.env.SPRUCE_API_KEY) {
+      spruceApiKey = process.env.SPRUCE_API_KEY;
+    }
+    // Also check SPRUCE_BEARER_TOKEN as alternative
+    if (!spruceApiKey && process.env.SPRUCE_BEARER_TOKEN) {
+      spruceApiKey = process.env.SPRUCE_BEARER_TOKEN;
     }
 
     if (!spruceAccessId || !spruceApiKey) {
@@ -216,76 +114,123 @@ exports.handler = async (event, context) => {
     // Use Bearer token authentication per Spruce API documentation
     const bearerToken = spruceApiKey;
 
-    // Fetch real messages from Spruce API
-    try {
-      const messagesResponse = await axios.get(
-        `${SPRUCE_API_URL}/conversations/${conversationId}/messages`,
-        {
-          headers: {
-            Authorization: `Bearer ${bearerToken}`,
-            Accept: "application/json",
-          },
-          params: {
-            limit: 100, // Fetch up to 100 messages
-          },
-        }
-      );
+    // Fetch conversation details from Spruce API
+    // Note: Spruce API doesn't have a direct endpoint to list all messages in a conversation
+    // Messages are typically received via webhooks. We fetch conversation metadata instead.
+    console.log(`Calling Spruce API: ${SPRUCE_API_URL}/conversations/${conversationId}`);
 
-      const spruceMessages = messagesResponse.data.messages || messagesResponse.data || [];
-      
-      // Transform Spruce messages to inbox format
-      const transformedMessages = spruceMessages.map((msg: any) => {
-        // Determine if message is from patient (external participant)
-        const isFromPatient = msg.sender?.type === "external" || 
-                             msg.sender?.isExternal === true ||
-                             !msg.sender?.isInternal;
+    const conversationResponse = await axios.get(
+      `${SPRUCE_API_URL}/conversations/${conversationId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+          Accept: "application/json",
+        },
+      }
+    );
 
-        return {
-          id: msg.id || msg.messageId,
-          content: msg.content || msg.text || msg.body || "",
-          timestamp: msg.timestamp || msg.createdAt || msg.sentAt || new Date().toISOString(),
-          isFromPatient: isFromPatient,
-          senderName: msg.sender?.displayName || msg.sender?.name || (isFromPatient ? "Patient" : "Dr. Font"),
-        };
-      });
+    console.log(`Spruce API response status: ${conversationResponse.status}`);
+    console.log(`Spruce API response keys: ${Object.keys(conversationResponse.data || {}).join(', ')}`);
 
-      // Sort by timestamp (oldest first)
-      transformedMessages.sort((a: any, b: any) => {
-        return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-      });
+    const conversation = conversationResponse.data;
+    console.log(`Conversation details:`, JSON.stringify(conversation).substring(0, 500));
 
-      console.log(`Fetched ${transformedMessages.length} messages for conversation ${conversationId}`);
+    // Extract any available message content from the conversation
+    let spruceMessages = [];
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify(transformedMessages),
-      };
-    } catch (spruceError: any) {
-      console.error("Error fetching messages from Spruce API:", spruceError.response?.data || spruceError.message);
-      
-      // Fallback to mock messages if Spruce API fails
-      console.log("Falling back to mock messages");
-      let messages = mockMessages[conversationId];
-      if (!messages) {
-        messages = generateMockMessages(conversationId, "Patient");
+    // Check if conversation has items/messages included
+    if (conversation.items && Array.isArray(conversation.items)) {
+      spruceMessages = conversation.items;
+    } else if (conversation.messages && Array.isArray(conversation.messages)) {
+      spruceMessages = conversation.messages;
+    } else if (conversation.conversationItems && Array.isArray(conversation.conversationItems)) {
+      spruceMessages = conversation.conversationItems;
+    }
+
+    console.log(`Found ${spruceMessages.length} items in conversation`);
+
+    // Transform Spruce messages to inbox format
+    const transformedMessages = (Array.isArray(spruceMessages) ? spruceMessages : []).map((msg) => {
+      // Determine if message is from patient (external participant)
+      const isFromPatient = msg.actor?.type === "external" ||
+                           msg.actor?.isExternal === true ||
+                           msg.sender?.type === "external" ||
+                           msg.sender?.isExternal === true ||
+                           (!msg.actor?.isInternal && !msg.sender?.isInternal);
+
+      // Get message content - can be in different fields depending on item type
+      let content = "";
+      if (msg.message) {
+        content = msg.message.text || msg.message.content || msg.message.body || "";
+      } else {
+        content = msg.content || msg.text || msg.body || msg.summary || "";
       }
 
       return {
+        id: msg.id || msg.messageId || msg.conversationItemId,
+        content: content,
+        timestamp: msg.timestamp || msg.createdAt || msg.sentAt || msg.occurredAt || new Date().toISOString(),
+        isFromPatient: isFromPatient,
+        senderName: msg.actor?.displayName || msg.actor?.name || msg.sender?.displayName || msg.sender?.name || (isFromPatient ? "Patient" : "Dr. Font"),
+        type: msg.type || "message",
+      };
+    }).filter(msg => msg.content); // Only include messages with content
+
+    // Sort by timestamp (oldest first)
+    transformedMessages.sort((a, b) => {
+      return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+    });
+
+    console.log(`Returning ${transformedMessages.length} transformed messages for conversation ${conversationId}`);
+
+    // If no messages found, return helpful info about the conversation
+    if (transformedMessages.length === 0) {
+      // Include conversation metadata so frontend can show patient info
+      const lastActivity = conversation.lastActivity || conversation.updatedAt || conversation.createdAt;
+      const subtitle = conversation.subtitle || conversation.lastMessage?.content || "";
+
+      return {
         statusCode: 200,
         headers,
-        body: JSON.stringify(messages),
+        body: JSON.stringify({
+          messages: [],
+          conversationInfo: {
+            id: conversation.id,
+            title: conversation.title,
+            lastActivity: lastActivity,
+            subtitle: subtitle,
+            note: "Message history is managed through Spruce. View the full conversation in the Spruce app."
+          }
+        }),
       };
     }
-  } catch (error: any) {
-    console.error("Error fetching message history:", error.message);
 
     return {
-      statusCode: error.response?.status || 500,
+      statusCode: 200,
+      headers,
+      body: JSON.stringify(transformedMessages),
+    };
+  } catch (error) {
+    const errorStatus = error.response?.status || 500;
+    const errorData = error.response?.data;
+
+    console.error("Error fetching message history:", {
+      status: errorStatus,
+      data: errorData,
+      message: error.message
+    });
+
+    // Return the actual error - no fake data
+    return {
+      statusCode: errorStatus,
       headers,
       body: JSON.stringify({
         error: "Failed to fetch message history",
-        message: error.message || "Unknown error",
+        message: errorStatus === 401 ? "Authentication failed. Please check your Spruce API credentials." :
+                 errorStatus === 403 ? "Access denied. Please verify your Spruce API permissions." :
+                 errorStatus === 404 ? "Conversation not found or no messages available." :
+                 error.message || "Unknown error",
+        conversationId: conversationId,
         timestamp: new Date().toISOString()
       }),
     };

@@ -17,6 +17,13 @@
 /api-doctor-credentials/* /.netlify/functions/api-doctor-credentials/:splat 200
 /api/spruce-conversations-all /.netlify/functions/api-spruce-conversations-all 200
 /api/gmail/* /.netlify/functions/api-gmail 200
+
+# Stripe API endpoints
+/api/stripe/create-checkout-session /.netlify/functions/stripe-create-checkout 200
+/api/stripe/create-portal-session /.netlify/functions/stripe-portal 200
+/api/stripe/subscription-status /.netlify/functions/stripe-subscription-status 200
+/api/stripe/webhook /.netlify/functions/stripe-webhook 200
+
 # Ollama endpoints removed - using OpenAI/Anthropic APIs only
 
 # Redirect all routes to index.html for client-side routing (must be last)
