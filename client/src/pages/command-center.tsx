@@ -485,6 +485,9 @@ export default function CommandCenter() {
     refetchInterval: 30000,
   });
 
+  // Get selected conversation - must be defined before callbacks that use it
+  const selectedConversation = conversations.find(c => c.id === selectedId);
+
   // Fetch conversation messages when selected
   const {
     data: chatMessages = [],
@@ -857,7 +860,6 @@ Extract all relevant clinical information from the conversation.`;
     setPendingApproval(null);
   }, [selectedId]);
 
-  const selectedConversation = conversations.find(c => c.id === selectedId);
   const filteredConversations = searchQuery
     ? conversations.filter(c => c.patient_name?.toLowerCase().includes(searchQuery.toLowerCase()))
     : conversations;
