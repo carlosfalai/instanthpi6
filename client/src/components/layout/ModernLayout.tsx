@@ -26,6 +26,8 @@ interface ModernLayoutProps {
   description?: string;
   showAura?: boolean;
   hideSidebar?: boolean;
+  noPadding?: boolean;
+  fullHeight?: boolean;
 }
 
 const navItems = [
@@ -36,7 +38,7 @@ const navItems = [
   { id: "settings", label: "Settings", path: "/doctor-profile", icon: Settings },
 ];
 
-export default function ModernLayout({ children, title, description, showAura = true, hideSidebar = false }: ModernLayoutProps) {
+export default function ModernLayout({ children, title, description, showAura = true, hideSidebar = false, noPadding = false, fullHeight = false }: ModernLayoutProps) {
   const [location, setLocation] = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
@@ -162,14 +164,14 @@ export default function ModernLayout({ children, title, description, showAura = 
         )}
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-0">
+        <main className={`flex-1 lg:ml-0 ${fullHeight ? "h-[calc(100vh-64px)] overflow-hidden" : ""}`}>
           {title && (
             <div className="border-b border-border glass-dark px-4 py-6 sm:px-6 lg:px-8">
               <h1 className="text-3xl font-bold tracking-tight text-foreground" style={{ fontFamily: 'Outfit, sans-serif' }}>{title}</h1>
               {description && <p className="mt-2 text-sm text-muted-foreground">{description}</p>}
             </div>
           )}
-          <div className="p-4 sm:p-6 lg:p-8">{children}</div>
+          <div className={`${noPadding ? "" : "p-4 sm:p-6 lg:p-8"} ${fullHeight ? "h-full" : ""}`}>{children}</div>
         </main>
       </div>
     </div>

@@ -1,5 +1,24 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  DndContext,
+  DragOverlay,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  horizontalListSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
 import {
   Search,
   Loader2,
@@ -28,6 +47,8 @@ import {
   Briefcase,
   FlaskConical,
   ScanLine,
+  GripVertical,
+  RotateCcw,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,6 +63,8 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useStagingQueue } from "@/hooks/useStagingQueue";
+import { usePanelLayout, type PanelId, DEFAULT_PANEL_CONFIGS } from "@/hooks/usePanelLayout";
+import { DragOverlayPanel } from "@/components/command-center/SortablePanel";
 import { DEFAULT_TIMER_CONFIG } from "@/types/staging";
 import { supabase } from "@/lib/supabase";
 import {
@@ -121,31 +144,31 @@ const TEMPLATES = [
     id: 'soap_note',
     name: 'SOAP Note',
     icon: FileText,
-    systemPrompt: `You are a medical documentation specialist for Truck Stop Santé clinic.
+    systemPrompt: `You are a medical documentation specialist for Truck Stop Sante clinic.
 Based on the patient conversation, generate a complete SOAP note in French.
 
 Format:
 **SUBJECTIF (S):**
 - Motif de consultation
 - Histoire de la maladie actuelle (HMA)
-- Symptômes rapportés par le patient
-- Antécédents pertinents mentionnés
+- Symptomes rapportes par le patient
+- Antecedents pertinents mentionnes
 
 **OBJECTIF (O):**
-- Signes vitaux (si mentionnés)
-- Examen physique pertinent (si mentionné)
-- Résultats de tests (si mentionnés)
+- Signes vitaux (si mentionnes)
+- Examen physique pertinent (si mentionne)
+- Resultats de tests (si mentionnes)
 
 **ANALYSE (A):**
 - Diagnostic principal ou impression clinique
-- Diagnostics différentiels
-- Problèmes identifiés
+- Diagnostics differentiels
+- Problemes identifies
 
 **PLAN (P):**
-- Investigations demandées
+- Investigations demandees
 - Traitement prescrit
-- Suivi recommandé
-- Éducation au patient
+- Suivi recommande
+- Education au patient
 
 Extraire toutes les informations cliniques pertinentes de la conversation.`,
     color: 'bg-slate-600',
@@ -155,18 +178,18 @@ Extraire toutes les informations cliniques pertinentes de la conversation.`,
     id: 'referral',
     name: 'Referrals',
     icon: Send,
-    systemPrompt: `You are a medical consultation request generator for Truck Stop Santé clinic.
-Based on the patient conversation, generate a REQUÊTE (consultation request) document in French.
+    systemPrompt: `You are a medical consultation request generator for Truck Stop Sante clinic.
+Based on the patient conversation, generate a REQUETE (consultation request) document in French.
 
 Format the output as a professional medical consultation request including:
-1. Brief context line (e.g., "Médecine familiale: Merci d'évaluer ce patient pour [reason]")
+1. Brief context line (e.g., "Medecine familiale: Merci d'evaluer ce patient pour [reason]")
 2. Patient presentation paragraph with age, chief complaint, onset, duration, and severity
 3. Description of symptoms with specific details (location, character, radiation, associated symptoms)
 4. Relevant negatives (what the patient denies)
 5. Medical history and allergies if mentioned
 6. Clinical impression and differential diagnosis
 7. Requested evaluation or investigations
-8. "Consultation prioritaire recommandée" if urgent
+8. "Consultation prioritaire recommandee" if urgent
 
 Write in formal medical French. Be thorough but concise. Extract all relevant clinical details from the conversation.`,
     color: 'bg-blue-600',
@@ -176,12 +199,12 @@ Write in formal medical French. Be thorough but concise. Extract all relevant cl
     id: 'imaging_requisition',
     name: 'Imaging',
     icon: Activity,
-    systemPrompt: `You are a radiology requisition specialist for Truck Stop Santé clinic.
-Based on the patient conversation, generate a REQUÊTE D'IMAGERIE (imaging requisition) in French.
+    systemPrompt: `You are a radiology requisition specialist for Truck Stop Sante clinic.
+Based on the patient conversation, generate a REQUETE D'IMAGERIE (imaging requisition) in French.
 
 Include:
-1. **TYPE D'EXAMEN DEMANDÉ:** (Radiographie, Échographie, TDM, IRM, etc.)
-2. **RÉGION ANATOMIQUE:** Specify exact body part/region
+1. **TYPE D'EXAMEN DEMANDE:** (Radiographie, Echographie, TDM, IRM, etc.)
+2. **REGION ANATOMIQUE:** Specify exact body part/region
 3. **INDICATION CLINIQUE:**
    - Symptoms and duration
    - Clinical findings
@@ -191,7 +214,7 @@ Include:
    - Previous imaging if mentioned
    - Allergies (especially contrast)
 5. **URGENCE:** Routine / Semi-urgent / Urgent
-6. **QUESTION CLINIQUE SPÉCIFIQUE:** What are we looking for?
+6. **QUESTION CLINIQUE SPECIFIQUE:** What are we looking for?
 
 Format clearly for radiology department review.`,
     color: 'bg-purple-600',
@@ -201,7 +224,7 @@ Format clearly for radiology department review.`,
     id: 'meds_prescription',
     name: 'Meds',
     icon: Pill,
-    systemPrompt: `You are a prescription generator for Truck Stop Santé clinic.
+    systemPrompt: `You are a prescription generator for Truck Stop Sante clinic.
 Based on the patient conversation, generate an ORDONNANCE (prescription) in French.
 
 Format:
@@ -212,14 +235,14 @@ Date: [Today's date]
 
 Rx:
 1. [Medication name] [Strength]
-   Posologie: [Directions - e.g., "1 comprimé PO BID x 7 jours"]
-   Quantité: [Amount to dispense]
+   Posologie: [Directions - e.g., "1 comprime PO BID x 7 jours"]
+   Quantite: [Amount to dispense]
    Renouvellements: [Number of refills]
 
 [Repeat for each medication]
 
-Instructions spéciales: [Any special instructions]
-Substitution générique: □ Permise  □ Non permise
+Instructions speciales: [Any special instructions]
+Substitution generique: Permise / Non permise
 
 Extract all medication details from the conversation including dosage, frequency, duration.`,
     color: 'bg-green-600',
@@ -229,21 +252,21 @@ Extract all medication details from the conversation including dosage, frequency
     id: 'labs_requisition',
     name: 'Labs',
     icon: Activity,
-    systemPrompt: `You are a laboratory requisition specialist for Truck Stop Santé clinic.
-Based on the patient conversation, generate a REQUÊTE DE LABORATOIRE (lab requisition) in French.
+    systemPrompt: `You are a laboratory requisition specialist for Truck Stop Sante clinic.
+Based on the patient conversation, generate a REQUETE DE LABORATOIRE (lab requisition) in French.
 
 Include:
-**ANALYSES DEMANDÉES:**
-□ FSC (Formule sanguine complète)
-□ Glycémie à jeun
-□ HbA1c
-□ Bilan lipidique
-□ Bilan hépatique (AST, ALT, GGT, Bili)
-□ Bilan rénal (Créatinine, Urée, DFGe)
-□ TSH
-□ Électrolytes (Na, K, Cl)
-□ Analyse d'urine
-□ Autres: [specify]
+**ANALYSES DEMANDEES:**
+- FSC (Formule sanguine complete)
+- Glycemie a jeun
+- HbA1c
+- Bilan lipidique
+- Bilan hepatique (AST, ALT, GGT, Bili)
+- Bilan renal (Creatinine, Uree, DFGe)
+- TSH
+- Electrolytes (Na, K, Cl)
+- Analyse d'urine
+- Autres: [specify]
 
 **INDICATION CLINIQUE:**
 [Reason for testing based on conversation]
@@ -251,10 +274,10 @@ Include:
 **RENSEIGNEMENTS CLINIQUES:**
 [Relevant clinical context]
 
-**INSTRUCTIONS SPÉCIALES:**
-□ À jeun requis
-□ Prélèvement matinal
-□ Autres: [specify]
+**INSTRUCTIONS SPECIALES:**
+- A jeun requis
+- Prelevement matinal
+- Autres: [specify]
 
 **URGENCE:** Routine / Urgent
 
@@ -266,13 +289,13 @@ Check the boxes that apply based on the clinical context from the conversation.`
     id: 'work_leave',
     name: 'Work Leave',
     icon: Calendar,
-    systemPrompt: `You are generating a medical certificate for Truck Stop Santé clinic.
-Based on the patient conversation, generate a CERTIFICAT MÉDICAL / BILLET DE TRAVAIL (work leave certificate) in French.
+    systemPrompt: `You are generating a medical certificate for Truck Stop Sante clinic.
+Based on the patient conversation, generate a CERTIFICAT MEDICAL / BILLET DE TRAVAIL (work leave certificate) in French.
 
 Format:
-**CERTIFICAT MÉDICAL**
+**CERTIFICAT MEDICAL**
 
-Je soussigné, Dr Carlos Faviel Font, médecin, certifie avoir examiné:
+Je soussigne, Dr Carlos Faviel Font, medecin, certifie avoir examine:
 
 Patient: [Name]
 Date de naissance: [If mentioned]
@@ -281,23 +304,23 @@ NAM: [If mentioned]
 Date de consultation: [Today]
 
 **ATTESTATION:**
-Ce patient est/était incapable de travailler pour raisons médicales:
+Ce patient est/etait incapable de travailler pour raisons medicales:
 
 Du: [Start date]
 Au: [End date] (inclusivement)
 
-Durée totale: [X] jours
+Duree totale: [X] jours
 
-□ Arrêt de travail complet
-□ Travail léger / Restrictions: [specify if mentioned]
+- Arret de travail complet
+- Travail leger / Restrictions: [specify if mentioned]
 
-**Restrictions spécifiques (si applicable):**
+**Restrictions specifiques (si applicable):**
 [Any work restrictions mentioned]
 
-**Suivi recommandé:**
+**Suivi recommande:**
 [Follow-up plan]
 
-Ce certificat est délivré à la demande du patient pour fins administratives.
+Ce certificat est delivre a la demande du patient pour fins administratives.
 
 Note: Keep medical details confidential - only state inability to work, not diagnosis.`,
     color: 'bg-rose-600',
@@ -308,28 +331,28 @@ Note: Keep medical details confidential - only state inability to work, not diag
     id: 'patient_edu',
     name: 'Edu/Reply',
     icon: MessageCircle,
-    systemPrompt: `You are a caring medical office assistant for Truck Stop Santé.
+    systemPrompt: `You are a caring medical office assistant for Truck Stop Sante.
 Based on the patient conversation, generate a warm, professional message to the patient explaining what you will prepare for them.
 
 Format the message like this:
 "Bonjour [Patient Name],
 
-Merci pour votre message. Suite à notre échange, je vais préparer les documents suivants pour vous:
+Merci pour votre message. Suite a notre echange, je vais preparer les documents suivants pour vous:
 
 [List what applies based on the conversation:]
-• Votre note clinique (SOAP)
-• Une demande de consultation/référence vers [specialist if mentioned]
-• Une requête d'imagerie pour [exam type if needed]
-• Votre ordonnance pour [medications if discussed]
-• Une requête de laboratoire pour [tests if needed]
-• Un certificat médical/billet de travail [if needed]
+- Votre note clinique (SOAP)
+- Une demande de consultation/reference vers [specialist if mentioned]
+- Une requete d'imagerie pour [exam type if needed]
+- Votre ordonnance pour [medications if discussed]
+- Une requete de laboratoire pour [tests if needed]
+- Un certificat medical/billet de travail [if needed]
 
 [Add any specific instructions or next steps]
 
-N'hésitez pas à nous contacter si vous avez des questions.
+N'hesitez pas a nous contacter si vous avez des questions.
 
 Cordialement,
-L'équipe Truck Stop Santé"
+L'equipe Truck Stop Sante"
 
 Adapt the list based on what was actually discussed in the conversation. Be warm and reassuring.`,
     color: 'bg-cyan-600'
@@ -345,13 +368,13 @@ Adapt the list based on what was actually discussed in the conversation. Be warm
     id: 'fax_pharmacy',
     name: 'Fax Rx',
     icon: Printer,
-    systemPrompt: `You are a pharmacy fax coordinator for Truck Stop Santé clinic.
+    systemPrompt: `You are a pharmacy fax coordinator for Truck Stop Sante clinic.
 Based on the patient conversation, prepare a prescription for faxing to pharmacy in French.
 
-**TÉLÉCOPIE - ORDONNANCE**
-À: [Pharmacy name if mentioned]
+**TELECOPIE - ORDONNANCE**
+A: [Pharmacy name if mentioned]
 Fax: [Pharmacy fax if mentioned]
-De: Truck Stop Santé - Dr Carlos Faviel Font
+De: Truck Stop Sante - Dr Carlos Faviel Font
 Fax: 833-964-4725
 
 Patient: [Name]
@@ -361,7 +384,7 @@ NAM: [If mentioned]
 Rx:
 [Medication details as extracted from conversation]
 
-Merci de confirmer réception.`,
+Merci de confirmer reception.`,
     color: 'bg-indigo-600',
     isFax: true
   },
@@ -370,7 +393,7 @@ Merci de confirmer réception.`,
     id: 'prepare_all',
     name: 'Prepare All',
     icon: CheckCircle,
-    systemPrompt: `You are a comprehensive medical documentation assistant for Truck Stop Santé clinic.
+    systemPrompt: `You are a comprehensive medical documentation assistant for Truck Stop Sante clinic.
 Based on the patient conversation, generate ALL applicable documents in one response.
 
 Generate each section that applies to this patient case:
@@ -380,7 +403,7 @@ Generate each section that applies to this patient case:
 [Generate complete SOAP note in French]
 
 ---
-## 2. REFERRAL/REQUÊTE (if specialist consultation needed)
+## 2. REFERRAL/REQUETE (if specialist consultation needed)
 [Generate consultation request]
 
 ---
@@ -411,6 +434,86 @@ Write all clinical documents in formal medical French.`,
   },
 ];
 
+// Panel icons mapping
+const PANEL_ICONS: Record<PanelId, React.ReactNode> = {
+  inbox: <MessageCircle className="h-3 w-3" />,
+  history: <FileText className="h-3 w-3" />,
+  queue: <Clock className="h-3 w-3" />,
+  ai: <Sparkles className="h-3 w-3" />,
+  templates: <Zap className="h-3 w-3" />,
+};
+
+// Sortable Panel Header Component
+interface SortablePanelHeaderProps {
+  id: PanelId;
+  name: string;
+  icon: React.ReactNode;
+  badge?: React.ReactNode;
+  subtitle?: string;
+  actions?: React.ReactNode;
+}
+
+function SortablePanelHeader({ id, name, icon, badge, subtitle, actions }: SortablePanelHeaderProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={cn(
+        "p-2 border-b border-[#1a1a1a] flex items-start gap-1",
+        isDragging && "opacity-50"
+      )}
+    >
+      {/* Drag Handle */}
+      <button
+        {...attributes}
+        {...listeners}
+        className={cn(
+          'flex-shrink-0 p-0.5 rounded cursor-grab active:cursor-grabbing',
+          'hover:bg-[#222] transition-colors',
+          'focus:outline-none focus:ring-1 focus:ring-[#d4af37]/50',
+          isDragging && 'cursor-grabbing'
+        )}
+        title="Drag to reorder panels"
+      >
+        <GripVertical className="h-3 w-3 text-[#555] hover:text-[#888]" />
+      </button>
+
+      {/* Header Content */}
+      <div className="flex-1 min-w-0">
+        <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
+          {icon}
+          <span className="truncate">{name}</span>
+          {badge}
+        </h2>
+        {subtitle && (
+          <p className="text-[8px] text-[#555] mt-0.5">{subtitle}</p>
+        )}
+      </div>
+
+      {/* Header Actions */}
+      {actions && (
+        <div className="flex-shrink-0">
+          {actions}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function CommandCenter() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -423,13 +526,27 @@ export default function CommandCenter() {
     isPDF?: boolean;
     isFax?: boolean;
   } | null>(null);
+  const [activeDragId, setActiveDragId] = useState<PanelId | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const claudeScrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const stagingQueue = useStagingQueue();
+  const panelLayout = usePanelLayout();
   const [selectedTemplateCategory, setSelectedTemplateCategory] = useState<string>("soap_note");
+
+  // DnD sensors configuration
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   // Fetch medical templates from database
   const {
@@ -649,7 +766,7 @@ Please generate appropriate content based on the template style and patient conv
 
     try {
       const categoryConfig = TEMPLATE_CATEGORIES[dbTemplate.template_category as keyof typeof TEMPLATE_CATEGORIES];
-      const systemPrompt = `You are a medical documentation assistant for Truck Stop Santé clinic (Dr Carlos Faviel Font, CMQ: 16812).
+      const systemPrompt = `You are a medical documentation assistant for Truck Stop Sante clinic (Dr Carlos Faviel Font, CMQ: 16812).
 Based on the patient conversation and reference template provided, generate appropriate ${categoryConfig?.label || 'medical'} documentation.
 Write in formal medical French. Follow the style and format of the reference template but adapt the content to this specific patient case.
 Extract all relevant clinical information from the conversation.`;
@@ -749,7 +866,7 @@ Extract all relevant clinical information from the conversation.`;
     }
   }, [claudeInput, selectedConversation, toast]);
 
-  // Approve message → move to staging queue or generate PDF
+  // Approve message -> move to staging queue or generate PDF
   const approveMessage = useCallback(async () => {
     if (!pendingApproval || !selectedId || !selectedConversation) return;
 
@@ -804,7 +921,7 @@ Extract all relevant clinical information from the conversation.`;
       }
     }
 
-    // Standard message → staging queue
+    // Standard message -> staging queue
     stagingQueue.addToQueue(
       pendingApproval.content,
       selectedId,
@@ -880,483 +997,575 @@ Extract all relevant clinical information from the conversation.`;
 
   const pendingMessages = stagingQueue.messages.filter(m => m.status === 'pending' || m.status === 'sending');
 
-  return (
-    <ModernLayout title="Command Center" description="5-Panel AI Workflow" hideSidebar>
-      <PanelGroup direction="horizontal" className="h-[calc(100vh-64px)] bg-[#080808]">
+  // Drag handlers
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragId(event.active.id as PanelId);
+  };
 
-        {/* PANEL 1: Spruce Inbox */}
-        <Panel defaultSize={15} minSize={10} maxSize={25} className="flex flex-col border-r border-[#1a1a1a]">
-          <div className="p-2 border-b border-[#1a1a1a]">
-            <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest mb-1.5 flex items-center gap-1">
-              <MessageCircle className="h-3 w-3" /> Spruce Inbox
-            </h2>
-            <div className="relative">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-[#444]" />
-              <Input
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-7 h-6 text-[10px] bg-[#111] border-[#222] text-[#fafafa]"
-              />
-            </div>
-          </div>
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveDragId(null);
 
-          <ScrollArea className="flex-1">
-            {isLoading ? (
-              <div className="p-4 text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto text-[#d4af37]" /></div>
-            ) : error ? (
-              <div className="p-4 text-center text-[10px] text-[#ef4444]">Connection error</div>
-            ) : (
-              <div className="p-1">
-                {filteredConversations.map((conv) => (
-                  <button
-                    key={conv.id}
-                    onClick={() => setSelectedId(conv.id)}
-                    className={cn(
-                      "w-full p-1.5 mb-0.5 rounded text-left transition-all",
-                      selectedId === conv.id ? "bg-[#d4af37]/10 border-l-2 border-l-[#d4af37]" : "hover:bg-[#111]"
-                    )}
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <div className={cn(
-                        "h-6 w-6 rounded flex items-center justify-center text-[9px] font-bold flex-shrink-0",
-                        conv.unread_count > 0 ? "bg-[#d4af37] text-[#0a0908]" : "bg-[#222] text-[#666]"
-                      )}>
-                        {getInitials(conv.patient_name)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-medium text-[#fafafa] truncate">{conv.patient_name}</span>
-                          <span className="text-[8px] text-[#555] ml-1">{formatTime(conv.updated_at)}</span>
-                        </div>
-                        <p className="text-[9px] text-[#555] truncate">{conv.last_message}</p>
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
+    if (over && active.id !== over.id) {
+      panelLayout.reorderPanels(active.id as PanelId, over.id as PanelId);
+      toast({
+        title: "Layout updated",
+        description: "Panel order saved",
+      });
+    }
+  };
 
-          <div className="p-1.5 border-t border-[#1a1a1a] text-[8px] text-[#444] flex justify-between items-center">
-            <span>{conversations.length} total</span>
-            <button onClick={() => refetch()} className="hover:text-[#d4af37] p-1"><RefreshCw className="h-3 w-3" /></button>
-          </div>
-        </Panel>
-
-        <PanelResizeHandle className="w-1 bg-[#1a1a1a] hover:bg-[#d4af37] transition-colors cursor-col-resize" />
-
-        {/* PANEL 2: Conversation History */}
-        <Panel defaultSize={20} minSize={15} maxSize={35} className="flex flex-col border-r border-[#1a1a1a]">
-          <div className="p-2 border-b border-[#1a1a1a]">
-            <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
-              <FileText className="h-3 w-3" /> Conversation
-            </h2>
-            {selectedConversation && (
-              <p className="text-[9px] text-[#666] mt-0.5">{selectedConversation.patient_name}</p>
-            )}
-          </div>
-
-          <ScrollArea className="flex-1 p-2">
-            {!selectedId ? (
-              <div className="h-full flex items-center justify-center">
-                <div className="text-center">
-                  <User className="h-6 w-6 mx-auto text-[#333] mb-1" />
-                  <p className="text-[9px] text-[#555]">Select a conversation</p>
-                </div>
-              </div>
-            ) : isLoadingMessages ? (
-              <div className="flex items-center justify-center h-20"><Loader2 className="h-4 w-4 animate-spin text-[#d4af37]" /></div>
-            ) : chatMessages.length === 0 ? (
-              <div className="text-center text-[#555] text-[10px] py-4">No messages</div>
-            ) : (
-              <div className="space-y-1.5">
-                {chatMessages.map((msg) => (
-                  <div key={msg.id} className={cn("flex flex-col", msg.isFromPatient ? "items-start" : "items-end")}>
-                    <div className={cn(
-                      "max-w-[90%] p-1.5 rounded text-[10px]",
-                      msg.isFromPatient ? "bg-[#1a1a1a] text-[#e6e6e6]" : "bg-[#d4af37] text-[#0a0908]"
-                    )}>
-                      {msg.content && <p className="whitespace-pre-wrap">{msg.content}</p>}
-
-                      {/* Render attachments/images */}
-                      {msg.attachments && msg.attachments.length > 0 && (
-                        <div className="mt-1.5 space-y-1">
-                          {msg.attachments.map((attachment) => (
-                            <div key={attachment.id} className="rounded overflow-hidden">
-                              {attachment.type === 'image' ? (
-                                <div className="relative group">
-                                  <img
-                                    src={attachment.url}
-                                    alt={attachment.name || 'Patient image'}
-                                    className="max-w-full max-h-[150px] rounded cursor-pointer hover:opacity-90 transition-opacity"
-                                    onClick={() => window.open(attachment.url, '_blank')}
-                                  />
-                                  <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        window.open(attachment.url, '_blank');
-                                      }}
-                                      className="p-1 bg-black/50 rounded hover:bg-black/70"
-                                      title="Open full size"
-                                    >
-                                      <ExternalLink className="h-3 w-3 text-white" />
-                                    </button>
-                                  </div>
-                                  <div className="flex items-center gap-1 mt-0.5 text-[8px] opacity-70">
-                                    <ImageIcon className="h-2.5 w-2.5" />
-                                    <span>{attachment.name || 'Image'}</span>
-                                  </div>
-                                </div>
-                              ) : (
-                                <a
-                                  href={attachment.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="flex items-center gap-1 p-1 bg-black/20 rounded hover:bg-black/30 transition-colors"
-                                >
-                                  <FileText className="h-3 w-3" />
-                                  <span className="text-[8px] truncate">{attachment.name || 'Document'}</span>
-                                  <Download className="h-2.5 w-2.5 ml-auto" />
-                                </a>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      <p className="text-[8px] opacity-60 mt-0.5">{formatTime(msg.timestamp)}</p>
-                    </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-            )}
-          </ScrollArea>
-        </Panel>
-
-        <PanelResizeHandle className="w-1 bg-[#1a1a1a] hover:bg-[#d4af37] transition-colors cursor-col-resize" />
-
-        {/* PANEL 3: Staging Queue (60s countdown) */}
-        <Panel defaultSize={15} minSize={10} maxSize={25} className="flex flex-col border-r border-[#1a1a1a]">
-          <div className="p-2 border-b border-[#1a1a1a]">
-            <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
-              <Clock className="h-3 w-3" /> Staging Queue
-              {pendingMessages.length > 0 && (
-                <Badge className="ml-auto h-4 px-1 text-[8px] bg-[#ef4444]">{pendingMessages.length}</Badge>
-              )}
-            </h2>
-            <p className="text-[8px] text-[#555] mt-0.5">60s countdown → auto-send</p>
-          </div>
-
-          <ScrollArea className="flex-1 p-1.5">
-            {pendingMessages.length === 0 ? (
-              <div className="h-full flex items-center justify-center">
-                <div className="text-center p-2">
-                  <Send className="h-5 w-5 mx-auto text-[#333] mb-1" />
-                  <p className="text-[9px] text-[#555]">Approved messages</p>
-                  <p className="text-[8px] text-[#444]">appear here</p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                {pendingMessages.map((msg) => {
-                  const progress = (msg.countdown / DEFAULT_TIMER_CONFIG.initialCountdown) * 100;
-                  const isUrgent = msg.countdown <= 10;
-                  const isSending = msg.status === 'sending';
-
-                  return (
-                    <Card key={msg.id} className={cn(
-                      "border",
-                      isUrgent && !isSending && "border-[#ef4444]/50 bg-[#ef4444]/5",
-                      isSending && "border-[#d4af37]/50 bg-[#d4af37]/5",
-                      !isUrgent && !isSending && "bg-[#111] border-[#222]"
-                    )}>
-                      <CardContent className="p-2">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[9px] text-[#888] truncate">{msg.patientName}</span>
-                          {isSending ? (
-                            <Loader2 className="h-3 w-3 animate-spin text-[#d4af37]" />
-                          ) : (
-                            <span className={cn("text-xs font-bold", isUrgent ? "text-[#ef4444]" : "text-[#fafafa]")}>
-                              {msg.countdown}s
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[9px] text-[#aaa] line-clamp-2 mb-1.5">{msg.content}</p>
-                        <Progress value={progress} className={cn("h-0.5 mb-1.5", isUrgent && "[&>div]:bg-[#ef4444]")} />
-                        <div className="flex gap-1">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => stagingQueue.cancelMessage(msg.id)}
-                            disabled={isSending}
-                            className="h-5 px-1.5 text-[8px] flex-1"
-                          >
-                            <X className="h-2.5 w-2.5" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            onClick={() => {
-                              stagingQueue.markAsSending(msg.id);
-                              sendMessageMutation.mutate(
-                                { conversationId: msg.conversationId, message: msg.content },
-                                {
-                                  onSuccess: () => stagingQueue.markAsSent(msg.id),
-                                  onError: () => stagingQueue.markAsError(msg.id, 'Failed'),
-                                }
-                              );
-                            }}
-                            disabled={isSending}
-                            className="h-5 px-1.5 text-[8px] flex-1 bg-[#d4af37] text-[#0a0908]"
-                          >
-                            <Send className="h-2.5 w-2.5" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            )}
-          </ScrollArea>
-        </Panel>
-
-        <PanelResizeHandle className="w-1 bg-[#1a1a1a] hover:bg-[#d4af37] transition-colors cursor-col-resize" />
-
-        {/* PANEL 4: Claude Haiku 4.5 Chat */}
-        <Panel defaultSize={25} minSize={15} maxSize={40} className="flex flex-col border-r border-[#1a1a1a]">
-          <div className="p-2 border-b border-[#1a1a1a]">
-            <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
-              <Sparkles className="h-3 w-3" /> Claude Chat
-              <Badge variant="secondary" className="ml-auto text-[8px] h-4">Haiku 4.5</Badge>
-            </h2>
-            <p className="text-[8px] text-[#555] mt-0.5">Review & approve AI responses</p>
-          </div>
-
-          <ScrollArea className="flex-1 p-2">
-            {claudeMessages.length === 0 ? (
-              <div className="h-full flex items-center justify-center">
-                <div className="text-center p-4">
-                  <Bot className="h-8 w-8 mx-auto text-[#333] mb-2" />
-                  <p className="text-[10px] text-[#555]">Click a template to generate</p>
-                  <p className="text-[9px] text-[#444] mt-1">or chat freely below</p>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {claudeMessages.map((msg) => (
-                  <div key={msg.id} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
-                    <div className={cn(
-                      "max-w-[90%] p-2 rounded text-[10px]",
-                      msg.role === 'user' ? "bg-[#1a1a1a] text-[#e6e6e6]" : "bg-[#0a1a0a] border border-[#22c55e]/30 text-[#e6e6e6]"
-                    )}>
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
-                    </div>
-                  </div>
-                ))}
-                {isGenerating && (
-                  <div className="flex justify-start">
-                    <div className="bg-[#111] rounded p-2">
-                      <Loader2 className="h-4 w-4 animate-spin text-[#d4af37]" />
-                    </div>
-                  </div>
-                )}
-                <div ref={claudeScrollRef} />
-              </div>
-            )}
-          </ScrollArea>
-
-          {/* Approval buttons */}
-          {pendingApproval && (
-            <div className="p-2 border-t border-[#1a1a1a] bg-[#0a1a0a]">
-              <p className="text-[9px] text-[#22c55e] mb-1.5">
-                Ready to approve: {pendingApproval.templateName}
-                {pendingApproval.isPDF && <Badge className="ml-1 h-3 text-[7px] bg-teal-600">PDF</Badge>}
-                {pendingApproval.isFax && <Badge className="ml-1 h-3 text-[7px] bg-indigo-600">FAX</Badge>}
-              </p>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={rejectMessage}
-                  className="h-7 flex-1 text-[10px]"
-                >
-                  <X className="h-3 w-3 mr-1" /> Reject
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={approveMessage}
-                  className="h-7 flex-1 text-[10px] bg-[#22c55e] hover:bg-[#16a34a]"
-                >
-                  {pendingApproval.isPDF ? (
-                    <><FileDown className="h-3 w-3 mr-1" /> Generate PDF</>
-                  ) : pendingApproval.isFax ? (
-                    <><Printer className="h-3 w-3 mr-1" /> Generate & Fax</>
-                  ) : (
-                    <><Check className="h-3 w-3 mr-1" /> Approve → Queue</>
-                  )}
-                </Button>
+  // Panel content renderers
+  const renderPanelContent = (panelId: PanelId) => {
+    switch (panelId) {
+      case 'inbox':
+        return (
+          <>
+            <SortablePanelHeader
+              id="inbox"
+              name={panelLayout.panelNames.inbox}
+              icon={PANEL_ICONS.inbox}
+            />
+            <div className="p-2 border-b border-[#1a1a1a]">
+              <div className="relative">
+                <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-[#444]" />
+                <Input
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-7 h-6 text-[10px] bg-[#111] border-[#222] text-[#fafafa]"
+                />
               </div>
             </div>
-          )}
 
-          {/* Free chat input */}
-          <div className="p-2 border-t border-[#1a1a1a]">
-            <div className="flex gap-1.5">
-              <Textarea
-                placeholder="Chat with Claude..."
-                value={claudeInput}
-                onChange={(e) => setClaudeInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendToClaudeChat();
-                  }
-                }}
-                disabled={isGenerating}
-                className="min-h-[50px] resize-none text-[10px] bg-[#111] border-[#222]"
-              />
-              <Button
-                onClick={sendToClaudeChat}
-                disabled={!claudeInput.trim() || isGenerating}
-                size="icon"
-                className="h-[50px] w-10 bg-[#d4af37] text-[#0a0908]"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </Panel>
-
-        <PanelResizeHandle className="w-1 bg-[#1a1a1a] hover:bg-[#d4af37] transition-colors cursor-col-resize" />
-
-        {/* PANEL 5: Template Buttons */}
-        <Panel defaultSize={25} minSize={15} maxSize={40} className="flex flex-col">
-          <div className="p-2 border-b border-[#1a1a1a]">
-            <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
-              <Zap className="h-3 w-3" /> Templates
-            </h2>
-            <p className="text-[8px] text-[#555] mt-0.5">Click any template to generate</p>
-          </div>
-
-          {/* Category tabs */}
-          <div className="p-1.5 border-b border-[#1a1a1a]">
-            <div className="flex flex-wrap gap-1">
-              {Object.entries(TEMPLATE_CATEGORIES).map(([key, config]) => {
-                const Icon = config.icon;
-                const hasTemplates = templatesByCategory[key]?.length > 0;
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setSelectedTemplateCategory(key)}
-                    disabled={!hasTemplates}
-                    className={cn(
-                      "flex items-center gap-1 px-2 py-1 rounded text-[9px] transition-all",
-                      selectedTemplateCategory === key
-                        ? `${config.color} text-white`
-                        : "bg-[#1a1a1a] text-[#888] hover:bg-[#222]",
-                      !hasTemplates && "opacity-30 cursor-not-allowed"
-                    )}
-                  >
-                    <Icon className="h-3 w-3" />
-                    {config.label}
-                    {hasTemplates && (
-                      <span className="ml-0.5 bg-white/20 px-1 rounded text-[8px]">
-                        {templatesByCategory[key].length}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Templates list from database */}
-          <ScrollArea className="flex-1 p-2">
-            {isLoadingTemplates ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-5 w-5 animate-spin text-[#d4af37]" />
-              </div>
-            ) : !templatesByCategory[selectedTemplateCategory]?.length ? (
-              <div className="text-center py-8 text-[#555] text-[10px]">
-                <FileText className="h-6 w-6 mx-auto mb-2 opacity-50" />
-                No templates in this category
-                <p className="text-[8px] mt-1">Add templates in Settings</p>
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                {templatesByCategory[selectedTemplateCategory].map((template) => {
-                  const categoryConfig = TEMPLATE_CATEGORIES[selectedTemplateCategory as keyof typeof TEMPLATE_CATEGORIES];
-                  return (
+            <ScrollArea className="flex-1">
+              {isLoading ? (
+                <div className="p-4 text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto text-[#d4af37]" /></div>
+              ) : error ? (
+                <div className="p-4 text-center text-[10px] text-[#ef4444]">Connection error</div>
+              ) : (
+                <div className="p-1">
+                  {filteredConversations.map((conv) => (
                     <button
-                      key={template.id}
-                      onClick={() => generateWithDbTemplate(template)}
-                      disabled={!selectedId || isGenerating}
+                      key={conv.id}
+                      onClick={() => setSelectedId(conv.id)}
                       className={cn(
-                        "w-full p-2 rounded-lg transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
-                        categoryConfig?.color || 'bg-[#333]',
-                        "hover:opacity-90 hover:scale-[1.01] active:scale-[0.99]"
+                        "w-full p-1.5 mb-0.5 rounded text-left transition-all",
+                        selectedId === conv.id ? "bg-[#d4af37]/10 border-l-2 border-l-[#d4af37]" : "hover:bg-[#111]"
                       )}
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10px] font-bold text-white truncate">
-                            {template.template_name}
-                          </p>
-                          <p className="text-[8px] text-white/70 line-clamp-2 mt-0.5">
-                            {template.template_content.substring(0, 80)}...
-                          </p>
+                      <div className="flex items-center gap-1.5">
+                        <div className={cn(
+                          "h-6 w-6 rounded flex items-center justify-center text-[9px] font-bold flex-shrink-0",
+                          conv.unread_count > 0 ? "bg-[#d4af37] text-[#0a0908]" : "bg-[#222] text-[#666]"
+                        )}>
+                          {getInitials(conv.patient_name)}
                         </div>
-                        {template.is_default && (
-                          <Badge className="h-4 text-[7px] bg-white/20 flex-shrink-0">Default</Badge>
-                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-medium text-[#fafafa] truncate">{conv.patient_name}</span>
+                            <span className="text-[8px] text-[#555] ml-1">{formatTime(conv.updated_at)}</span>
+                          </div>
+                          <p className="text-[9px] text-[#555] truncate">{conv.last_message}</p>
+                        </div>
                       </div>
-                      {template.case_type && (
-                        <Badge className="mt-1 h-4 text-[7px] bg-black/20">
-                          {template.case_type}
-                        </Badge>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+
+            <div className="p-1.5 border-t border-[#1a1a1a] text-[8px] text-[#444] flex justify-between items-center">
+              <span>{conversations.length} total</span>
+              <button onClick={() => refetch()} className="hover:text-[#d4af37] p-1"><RefreshCw className="h-3 w-3" /></button>
+            </div>
+          </>
+        );
+
+      case 'history':
+        return (
+          <>
+            <SortablePanelHeader
+              id="history"
+              name={panelLayout.panelNames.history}
+              icon={PANEL_ICONS.history}
+              subtitle={selectedConversation?.patient_name}
+            />
+
+            <ScrollArea className="flex-1 p-2">
+              {!selectedId ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center">
+                    <User className="h-6 w-6 mx-auto text-[#333] mb-1" />
+                    <p className="text-[9px] text-[#555]">Select a conversation</p>
+                  </div>
+                </div>
+              ) : isLoadingMessages ? (
+                <div className="flex items-center justify-center h-20"><Loader2 className="h-4 w-4 animate-spin text-[#d4af37]" /></div>
+              ) : chatMessages.length === 0 ? (
+                <div className="text-center text-[#555] text-[10px] py-4">No messages</div>
+              ) : (
+                <div className="space-y-1.5">
+                  {chatMessages.map((msg) => (
+                    <div key={msg.id} className={cn("flex flex-col", msg.isFromPatient ? "items-start" : "items-end")}>
+                      <div className={cn(
+                        "max-w-[90%] p-1.5 rounded text-[10px]",
+                        msg.isFromPatient ? "bg-[#1a1a1a] text-[#e6e6e6]" : "bg-[#d4af37] text-[#0a0908]"
+                      )}>
+                        {msg.content && <p className="whitespace-pre-wrap">{msg.content}</p>}
+
+                        {/* Render attachments/images */}
+                        {msg.attachments && msg.attachments.length > 0 && (
+                          <div className="mt-1.5 space-y-1">
+                            {msg.attachments.map((attachment) => (
+                              <div key={attachment.id} className="rounded overflow-hidden">
+                                {attachment.type === 'image' ? (
+                                  <div className="relative group">
+                                    <img
+                                      src={attachment.url}
+                                      alt={attachment.name || 'Patient image'}
+                                      className="max-w-full max-h-[150px] rounded cursor-pointer hover:opacity-90 transition-opacity"
+                                      onClick={() => window.open(attachment.url, '_blank')}
+                                    />
+                                    <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          window.open(attachment.url, '_blank');
+                                        }}
+                                        className="p-1 bg-black/50 rounded hover:bg-black/70"
+                                        title="Open full size"
+                                      >
+                                        <ExternalLink className="h-3 w-3 text-white" />
+                                      </button>
+                                    </div>
+                                    <div className="flex items-center gap-1 mt-0.5 text-[8px] opacity-70">
+                                      <ImageIcon className="h-2.5 w-2.5" />
+                                      <span>{attachment.name || 'Image'}</span>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <a
+                                    href={attachment.url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-1 p-1 bg-black/20 rounded hover:bg-black/30 transition-colors"
+                                  >
+                                    <FileText className="h-3 w-3" />
+                                    <span className="text-[8px] truncate">{attachment.name || 'Document'}</span>
+                                    <Download className="h-2.5 w-2.5 ml-auto" />
+                                  </a>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <p className="text-[8px] opacity-60 mt-0.5">{formatTime(msg.timestamp)}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
+            </ScrollArea>
+          </>
+        );
+
+      case 'queue':
+        return (
+          <>
+            <SortablePanelHeader
+              id="queue"
+              name={panelLayout.panelNames.queue}
+              icon={PANEL_ICONS.queue}
+              badge={pendingMessages.length > 0 ? (
+                <Badge className="ml-auto h-4 px-1 text-[8px] bg-[#ef4444]">{pendingMessages.length}</Badge>
+              ) : undefined}
+              subtitle="60s countdown -> auto-send"
+            />
+
+            <ScrollArea className="flex-1 p-1.5">
+              {pendingMessages.length === 0 ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center p-2">
+                    <Send className="h-5 w-5 mx-auto text-[#333] mb-1" />
+                    <p className="text-[9px] text-[#555]">Approved messages</p>
+                    <p className="text-[8px] text-[#444]">appear here</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {pendingMessages.map((msg) => {
+                    const progress = (msg.countdown / DEFAULT_TIMER_CONFIG.initialCountdown) * 100;
+                    const isUrgent = msg.countdown <= 10;
+                    const isSending = msg.status === 'sending';
+
+                    return (
+                      <Card key={msg.id} className={cn(
+                        "border",
+                        isUrgent && !isSending && "border-[#ef4444]/50 bg-[#ef4444]/5",
+                        isSending && "border-[#d4af37]/50 bg-[#d4af37]/5",
+                        !isUrgent && !isSending && "bg-[#111] border-[#222]"
+                      )}>
+                        <CardContent className="p-2">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[9px] text-[#888] truncate">{msg.patientName}</span>
+                            {isSending ? (
+                              <Loader2 className="h-3 w-3 animate-spin text-[#d4af37]" />
+                            ) : (
+                              <span className={cn("text-xs font-bold", isUrgent ? "text-[#ef4444]" : "text-[#fafafa]")}>
+                                {msg.countdown}s
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[9px] text-[#aaa] line-clamp-2 mb-1.5">{msg.content}</p>
+                          <Progress value={progress} className={cn("h-0.5 mb-1.5", isUrgent && "[&>div]:bg-[#ef4444]")} />
+                          <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => stagingQueue.cancelMessage(msg.id)}
+                              disabled={isSending}
+                              className="h-5 px-1.5 text-[8px] flex-1"
+                            >
+                              <X className="h-2.5 w-2.5" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                stagingQueue.markAsSending(msg.id);
+                                sendMessageMutation.mutate(
+                                  { conversationId: msg.conversationId, message: msg.content },
+                                  {
+                                    onSuccess: () => stagingQueue.markAsSent(msg.id),
+                                    onError: () => stagingQueue.markAsError(msg.id, 'Failed'),
+                                  }
+                                );
+                              }}
+                              disabled={isSending}
+                              className="h-5 px-1.5 text-[8px] flex-1 bg-[#d4af37] text-[#0a0908]"
+                            >
+                              <Send className="h-2.5 w-2.5" />
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
+            </ScrollArea>
+          </>
+        );
+
+      case 'ai':
+        return (
+          <>
+            <SortablePanelHeader
+              id="ai"
+              name={panelLayout.panelNames.ai}
+              icon={PANEL_ICONS.ai}
+              badge={<Badge variant="secondary" className="ml-auto text-[8px] h-4">Haiku 4.5</Badge>}
+              subtitle="Review & approve AI responses"
+            />
+
+            <ScrollArea className="flex-1 p-2">
+              {claudeMessages.length === 0 ? (
+                <div className="h-full flex items-center justify-center">
+                  <div className="text-center p-4">
+                    <Bot className="h-8 w-8 mx-auto text-[#333] mb-2" />
+                    <p className="text-[10px] text-[#555]">Click a template to generate</p>
+                    <p className="text-[9px] text-[#444] mt-1">or chat freely below</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {claudeMessages.map((msg) => (
+                    <div key={msg.id} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
+                      <div className={cn(
+                        "max-w-[90%] p-2 rounded text-[10px]",
+                        msg.role === 'user' ? "bg-[#1a1a1a] text-[#e6e6e6]" : "bg-[#0a1a0a] border border-[#22c55e]/30 text-[#e6e6e6]"
+                      )}>
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                      </div>
+                    </div>
+                  ))}
+                  {isGenerating && (
+                    <div className="flex justify-start">
+                      <div className="bg-[#111] rounded p-2">
+                        <Loader2 className="h-4 w-4 animate-spin text-[#d4af37]" />
+                      </div>
+                    </div>
+                  )}
+                  <div ref={claudeScrollRef} />
+                </div>
+              )}
+            </ScrollArea>
+
+            {/* Approval buttons */}
+            {pendingApproval && (
+              <div className="p-2 border-t border-[#1a1a1a] bg-[#0a1a0a]">
+                <p className="text-[9px] text-[#22c55e] mb-1.5">
+                  Ready to approve: {pendingApproval.templateName}
+                  {pendingApproval.isPDF && <Badge className="ml-1 h-3 text-[7px] bg-teal-600">PDF</Badge>}
+                  {pendingApproval.isFax && <Badge className="ml-1 h-3 text-[7px] bg-indigo-600">FAX</Badge>}
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={rejectMessage}
+                    className="h-7 flex-1 text-[10px]"
+                  >
+                    <X className="h-3 w-3 mr-1" /> Reject
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={approveMessage}
+                    className="h-7 flex-1 text-[10px] bg-[#22c55e] hover:bg-[#16a34a]"
+                  >
+                    {pendingApproval.isPDF ? (
+                      <><FileDown className="h-3 w-3 mr-1" /> Generate PDF</>
+                    ) : pendingApproval.isFax ? (
+                      <><Printer className="h-3 w-3 mr-1" /> Generate & Fax</>
+                    ) : (
+                      <><Check className="h-3 w-3 mr-1" /> Approve -> Queue</>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Free chat input */}
+            <div className="p-2 border-t border-[#1a1a1a]">
+              <div className="flex gap-1.5">
+                <Textarea
+                  placeholder="Chat with Claude..."
+                  value={claudeInput}
+                  onChange={(e) => setClaudeInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      sendToClaudeChat();
+                    }
+                  }}
+                  disabled={isGenerating}
+                  className="min-h-[50px] resize-none text-[10px] bg-[#111] border-[#222]"
+                />
+                <Button
+                  onClick={sendToClaudeChat}
+                  disabled={!claudeInput.trim() || isGenerating}
+                  size="icon"
+                  className="h-[50px] w-10 bg-[#d4af37] text-[#0a0908]"
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </>
+        );
+
+      case 'templates':
+        return (
+          <>
+            <SortablePanelHeader
+              id="templates"
+              name={panelLayout.panelNames.templates}
+              icon={PANEL_ICONS.templates}
+              subtitle="Click any template to generate"
+              actions={
+                <button
+                  onClick={panelLayout.resetLayout}
+                  className="p-1 hover:bg-[#222] rounded transition-colors"
+                  title="Reset layout"
+                >
+                  <RotateCcw className="h-3 w-3 text-[#555] hover:text-[#888]" />
+                </button>
+              }
+            />
+
+            {/* Category tabs */}
+            <div className="p-1.5 border-b border-[#1a1a1a]">
+              <div className="flex flex-wrap gap-1">
+                {Object.entries(TEMPLATE_CATEGORIES).map(([key, config]) => {
+                  const Icon = config.icon;
+                  const hasTemplates = templatesByCategory[key]?.length > 0;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => setSelectedTemplateCategory(key)}
+                      disabled={!hasTemplates}
+                      className={cn(
+                        "flex items-center gap-1 px-2 py-1 rounded text-[9px] transition-all",
+                        selectedTemplateCategory === key
+                          ? `${config.color} text-white`
+                          : "bg-[#1a1a1a] text-[#888] hover:bg-[#222]",
+                        !hasTemplates && "opacity-30 cursor-not-allowed"
+                      )}
+                    >
+                      <Icon className="h-3 w-3" />
+                      {config.label}
+                      {hasTemplates && (
+                        <span className="ml-0.5 bg-white/20 px-1 rounded text-[8px]">
+                          {templatesByCategory[key].length}
+                        </span>
                       )}
                     </button>
                   );
                 })}
               </div>
-            )}
-          </ScrollArea>
-
-          {/* Quick action buttons (hardcoded templates) */}
-          <div className="p-2 border-t border-[#1a1a1a]">
-            <p className="text-[8px] text-[#555] mb-1.5">Quick Actions</p>
-            <div className="grid grid-cols-3 gap-1">
-              {TEMPLATES.slice(0, 3).map((template) => {
-                const Icon = template.icon;
-                return (
-                  <button
-                    key={template.id}
-                    onClick={() => generateWithTemplate(template)}
-                    disabled={!selectedId || isGenerating}
-                    className={cn(
-                      "p-1.5 rounded transition-all disabled:opacity-50",
-                      template.color,
-                      "hover:opacity-90"
-                    )}
-                    title={template.name}
-                  >
-                    <Icon className="h-3 w-3 text-white mx-auto" />
-                  </button>
-                );
-              })}
             </div>
-          </div>
 
-          <div className="p-2 border-t border-[#1a1a1a] text-[8px] text-[#555] text-center">
-            {selectedConversation
-              ? `Patient: ${selectedConversation.patient_name}`
-              : "Select a patient first"}
-          </div>
-        </Panel>
-      </PanelGroup>
+            {/* Templates list from database */}
+            <ScrollArea className="flex-1 p-2">
+              {isLoadingTemplates ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 className="h-5 w-5 animate-spin text-[#d4af37]" />
+                </div>
+              ) : !templatesByCategory[selectedTemplateCategory]?.length ? (
+                <div className="text-center py-8 text-[#555] text-[10px]">
+                  <FileText className="h-6 w-6 mx-auto mb-2 opacity-50" />
+                  No templates in this category
+                  <p className="text-[8px] mt-1">Add templates in Settings</p>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  {templatesByCategory[selectedTemplateCategory].map((template) => {
+                    const categoryConfig = TEMPLATE_CATEGORIES[selectedTemplateCategory as keyof typeof TEMPLATE_CATEGORIES];
+                    return (
+                      <button
+                        key={template.id}
+                        onClick={() => generateWithDbTemplate(template)}
+                        disabled={!selectedId || isGenerating}
+                        className={cn(
+                          "w-full p-2 rounded-lg transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
+                          categoryConfig?.color || 'bg-[#333]',
+                          "hover:opacity-90 hover:scale-[1.01] active:scale-[0.99]"
+                        )}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[10px] font-bold text-white truncate">
+                              {template.template_name}
+                            </p>
+                            <p className="text-[8px] text-white/70 line-clamp-2 mt-0.5">
+                              {template.template_content.substring(0, 80)}...
+                            </p>
+                          </div>
+                          {template.is_default && (
+                            <Badge className="h-4 text-[7px] bg-white/20 flex-shrink-0">Default</Badge>
+                          )}
+                        </div>
+                        {template.case_type && (
+                          <Badge className="mt-1 h-4 text-[7px] bg-black/20">
+                            {template.case_type}
+                          </Badge>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </ScrollArea>
+
+            {/* Quick action buttons (hardcoded templates) */}
+            <div className="p-2 border-t border-[#1a1a1a]">
+              <p className="text-[8px] text-[#555] mb-1.5">Quick Actions</p>
+              <div className="grid grid-cols-3 gap-1">
+                {TEMPLATES.slice(0, 3).map((template) => {
+                  const Icon = template.icon;
+                  return (
+                    <button
+                      key={template.id}
+                      onClick={() => generateWithTemplate(template)}
+                      disabled={!selectedId || isGenerating}
+                      className={cn(
+                        "p-1.5 rounded transition-all disabled:opacity-50",
+                        template.color,
+                        "hover:opacity-90"
+                      )}
+                      title={template.name}
+                    >
+                      <Icon className="h-3 w-3 text-white mx-auto" />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="p-2 border-t border-[#1a1a1a] text-[8px] text-[#555] text-center">
+              {selectedConversation
+                ? `Patient: ${selectedConversation.patient_name}`
+                : "Select a patient first"}
+            </div>
+          </>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  // Get active panel name for drag overlay
+  const activePanelName = activeDragId ? panelLayout.panelNames[activeDragId] : '';
+
+  return (
+    <ModernLayout hideSidebar noPadding fullHeight>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToHorizontalAxis]}
+      >
+        <SortableContext
+          items={panelLayout.panelOrder}
+          strategy={horizontalListSortingStrategy}
+        >
+          <PanelGroup
+            direction="horizontal"
+            className="h-full bg-[#080808] overflow-hidden"
+            onLayout={panelLayout.updateAllSizes}
+          >
+            {panelLayout.panelOrder.map((panelId, index) => {
+              const config = DEFAULT_PANEL_CONFIGS[panelId];
+              const isLast = index === panelLayout.panelOrder.length - 1;
+
+              return (
+                <React.Fragment key={panelId}>
+                  <Panel
+                    id={panelId}
+                    defaultSize={panelLayout.panelSizes[panelId]}
+                    minSize={config.minSize}
+                    maxSize={config.maxSize}
+                    className={cn(
+                      "flex flex-col overflow-hidden",
+                      !isLast && "border-r border-[#1a1a1a]",
+                      activeDragId === panelId && "opacity-50 bg-[#d4af37]/5"
+                    )}
+                  >
+                    {renderPanelContent(panelId)}
+                  </Panel>
+                  {!isLast && (
+                    <PanelResizeHandle className="w-1 bg-[#1a1a1a] hover:bg-[#d4af37] transition-colors cursor-col-resize" />
+                  )}
+                </React.Fragment>
+              );
+            })}
+          </PanelGroup>
+        </SortableContext>
+
+        {/* Drag Overlay */}
+        <DragOverlay>
+          {activeDragId ? (
+            <DragOverlayPanel
+              name={activePanelName}
+              icon={PANEL_ICONS[activeDragId]}
+            />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
     </ModernLayout>
   );
 }

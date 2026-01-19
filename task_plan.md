@@ -92,6 +92,41 @@ Build a production-ready medical consultation SaaS platform with Stripe payments
   - Dashboard, Command Center, Documents, AI Assistant, Settings
 - Removed redundant Clients, Messages, Inbox links
 
+## Current Work: Command Center Dynamic Panels
+
+### Goal
+Transform the 5-panel Command Center into a fully dynamic, customizable workspace.
+
+### Phases
+
+#### Phase 1: Foundation (DONE)
+- [x] Install react-resizable-panels
+- [x] Convert panels to resizable
+- [x] Remove sidebar and title bar
+- [x] Fix scroll containment
+
+#### Phase 2: Drag & Drop Reordering (DONE)
+- [x] Install @dnd-kit/core, @dnd-kit/sortable
+- [x] Create usePanelLayout hook
+- [x] Wrap panels in SortableContext
+- [x] Implement handleDragEnd for reordering
+- [x] Add visual drag handles (GripVertical icon)
+
+#### Phase 3: Editable Panel Names
+- [ ] Create EditableTitle component
+- [ ] Double-click to edit panel names
+- [ ] Save on blur/enter
+
+#### Phase 4: Layout Persistence
+- [ ] Save layout to localStorage (order, sizes, names)
+- [ ] Restore layout on mount
+- [ ] Add reset button
+
+### Current Status
+Phase 2 - Implementing drag-and-drop panel reordering
+
+---
+
 ## Next Steps
 1. Core workflow: Form storage and search by alphanumeric ID
 2. Auto-generate documentation when form found using doctor's templates
