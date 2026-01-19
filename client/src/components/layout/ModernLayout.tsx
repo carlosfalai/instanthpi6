@@ -25,6 +25,7 @@ interface ModernLayoutProps {
   title?: string;
   description?: string;
   showAura?: boolean;
+  hideSidebar?: boolean;
 }
 
 const navItems = [
@@ -35,7 +36,7 @@ const navItems = [
   { id: "settings", label: "Settings", path: "/doctor-profile", icon: Settings },
 ];
 
-export default function ModernLayout({ children, title, description, showAura = true }: ModernLayoutProps) {
+export default function ModernLayout({ children, title, description, showAura = true, hideSidebar = false }: ModernLayoutProps) {
   const [location, setLocation] = useLocation();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
@@ -62,12 +63,12 @@ export default function ModernLayout({ children, title, description, showAura = 
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-3">
-              <button
+              {!hideSidebar && <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="lg:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
               >
                 {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
+              </button>}
               <Link href="/doctor-dashboard" className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-secondary amber-glow-primary">
                   <Sparkles className="h-5 w-5 text-background" />
@@ -102,7 +103,7 @@ export default function ModernLayout({ children, title, description, showAura = 
 
       <div className="flex">
         {/* Sidebar */}
-        <aside
+        {!hideSidebar && <aside
           className={`fixed inset-y-0 left-0 z-40 w-64 transform border-r border-border glass-dark transition-transform duration-300 ease-out lg:translate-x-0 lg:static lg:inset-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"
             }`}
         >
@@ -150,10 +151,10 @@ export default function ModernLayout({ children, title, description, showAura = 
               </div>
             </div>
           </div>
-        </aside>
+        </aside>}
 
         {/* Overlay for mobile */}
-        {sidebarOpen && (
+        {!hideSidebar && sidebarOpen && (
           <div
             className="fixed inset-0 z-30 bg-background/80 backdrop-blur-sm lg:hidden"
             onClick={() => setSidebarOpen(false)}

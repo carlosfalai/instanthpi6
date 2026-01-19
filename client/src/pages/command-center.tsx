@@ -38,6 +38,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ModernLayout from "@/components/layout/ModernLayout";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useStagingQueue } from "@/hooks/useStagingQueue";
@@ -880,11 +881,11 @@ Extract all relevant clinical information from the conversation.`;
   const pendingMessages = stagingQueue.messages.filter(m => m.status === 'pending' || m.status === 'sending');
 
   return (
-    <ModernLayout title="Command Center" description="5-Panel AI Workflow">
-      <div className="h-[calc(100vh-64px)] flex bg-[#080808]">
+    <ModernLayout title="Command Center" description="5-Panel AI Workflow" hideSidebar>
+      <PanelGroup direction="horizontal" className="h-[calc(100vh-64px)] bg-[#080808]">
 
         {/* PANEL 1: Spruce Inbox */}
-        <div className="w-[240px] border-r border-[#1a1a1a] flex flex-col">
+        <Panel defaultSize={15} minSize={10} maxSize={25} className="flex flex-col border-r border-[#1a1a1a]">
           <div className="p-2 border-b border-[#1a1a1a]">
             <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest mb-1.5 flex items-center gap-1">
               <MessageCircle className="h-3 w-3" /> Spruce Inbox
@@ -941,10 +942,12 @@ Extract all relevant clinical information from the conversation.`;
             <span>{conversations.length} total</span>
             <button onClick={() => refetch()} className="hover:text-[#d4af37] p-1"><RefreshCw className="h-3 w-3" /></button>
           </div>
-        </div>
+        </Panel>
+
+        <PanelResizeHandle className="w-1 bg-[#1a1a1a] hover:bg-[#d4af37] transition-colors cursor-col-resize" />
 
         {/* PANEL 2: Conversation History */}
-        <div className="w-[280px] border-r border-[#1a1a1a] flex flex-col">
+        <Panel defaultSize={20} minSize={15} maxSize={35} className="flex flex-col border-r border-[#1a1a1a]">
           <div className="p-2 border-b border-[#1a1a1a]">
             <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
               <FileText className="h-3 w-3" /> Conversation
@@ -1031,10 +1034,12 @@ Extract all relevant clinical information from the conversation.`;
               </div>
             )}
           </ScrollArea>
-        </div>
+        </Panel>
+
+        <PanelResizeHandle className="w-1 bg-[#1a1a1a] hover:bg-[#d4af37] transition-colors cursor-col-resize" />
 
         {/* PANEL 3: Staging Queue (60s countdown) */}
-        <div className="w-[220px] border-r border-[#1a1a1a] flex flex-col">
+        <Panel defaultSize={15} minSize={10} maxSize={25} className="flex flex-col border-r border-[#1a1a1a]">
           <div className="p-2 border-b border-[#1a1a1a]">
             <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
               <Clock className="h-3 w-3" /> Staging Queue
@@ -1116,10 +1121,12 @@ Extract all relevant clinical information from the conversation.`;
               </div>
             )}
           </ScrollArea>
-        </div>
+        </Panel>
+
+        <PanelResizeHandle className="w-1 bg-[#1a1a1a] hover:bg-[#d4af37] transition-colors cursor-col-resize" />
 
         {/* PANEL 4: Claude Haiku 4.5 Chat */}
-        <div className="w-[320px] border-r border-[#1a1a1a] flex flex-col">
+        <Panel defaultSize={25} minSize={15} maxSize={40} className="flex flex-col border-r border-[#1a1a1a]">
           <div className="p-2 border-b border-[#1a1a1a]">
             <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
               <Sparkles className="h-3 w-3" /> Claude Chat
@@ -1221,10 +1228,12 @@ Extract all relevant clinical information from the conversation.`;
               </Button>
             </div>
           </div>
-        </div>
+        </Panel>
+
+        <PanelResizeHandle className="w-1 bg-[#1a1a1a] hover:bg-[#d4af37] transition-colors cursor-col-resize" />
 
         {/* PANEL 5: Template Buttons */}
-        <div className="flex-1 flex flex-col min-w-[240px]">
+        <Panel defaultSize={25} minSize={15} maxSize={40} className="flex flex-col">
           <div className="p-2 border-b border-[#1a1a1a]">
             <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
               <Zap className="h-3 w-3" /> Templates
@@ -1346,8 +1355,8 @@ Extract all relevant clinical information from the conversation.`;
               ? `Patient: ${selectedConversation.patient_name}`
               : "Select a patient first"}
           </div>
-        </div>
-      </div>
+        </Panel>
+      </PanelGroup>
     </ModernLayout>
   );
 }
