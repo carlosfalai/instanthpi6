@@ -65,6 +65,7 @@ import { cn } from "@/lib/utils";
 import { useStagingQueue } from "@/hooks/useStagingQueue";
 import { usePanelLayout, type PanelId, DEFAULT_PANEL_CONFIGS } from "@/hooks/usePanelLayout";
 import { DragOverlayPanel } from "@/components/command-center/SortablePanel";
+import { EditableTitle } from "@/components/command-center/EditableTitle";
 import { DEFAULT_TIMER_CONFIG } from "@/types/staging";
 import { supabase } from "@/lib/supabase";
 import {
@@ -451,9 +452,10 @@ interface SortablePanelHeaderProps {
   badge?: React.ReactNode;
   subtitle?: string;
   actions?: React.ReactNode;
+  onNameChange?: (newName: string) => void;
 }
 
-function SortablePanelHeader({ id, name, icon, badge, subtitle, actions }: SortablePanelHeaderProps) {
+function SortablePanelHeader({ id, name, icon, badge, subtitle, actions, onNameChange }: SortablePanelHeaderProps) {
   const {
     attributes,
     listeners,
@@ -496,7 +498,14 @@ function SortablePanelHeader({ id, name, icon, badge, subtitle, actions }: Sorta
       <div className="flex-1 min-w-0">
         <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
           {icon}
-          <span className="truncate">{name}</span>
+          {onNameChange ? (
+            <EditableTitle
+              value={name}
+              onChange={onNameChange}
+            />
+          ) : (
+            <span className="truncate">{name}</span>
+          )}
           {badge}
         </h2>
         {subtitle && (
@@ -1025,6 +1034,7 @@ Extract all relevant clinical information from the conversation.`;
               id="inbox"
               name={panelLayout.panelNames.inbox}
               icon={PANEL_ICONS.inbox}
+              onNameChange={(name) => panelLayout.updatePanelName('inbox', name)}
             />
             <div className="p-2 border-b border-[#1a1a1a]">
               <div className="relative">
@@ -1090,6 +1100,7 @@ Extract all relevant clinical information from the conversation.`;
               name={panelLayout.panelNames.history}
               icon={PANEL_ICONS.history}
               subtitle={selectedConversation?.patient_name}
+              onNameChange={(name) => panelLayout.updatePanelName('history', name)}
             />
 
             <ScrollArea className="flex-1 p-2">
@@ -1182,7 +1193,8 @@ Extract all relevant clinical information from the conversation.`;
               badge={pendingMessages.length > 0 ? (
                 <Badge className="ml-auto h-4 px-1 text-[8px] bg-[#ef4444]">{pendingMessages.length}</Badge>
               ) : undefined}
-              subtitle="60s countdown -> auto-send"
+              subtitle="60s countdown → auto-send"
+              onNameChange={(name) => panelLayout.updatePanelName('queue', name)}
             />
 
             <ScrollArea className="flex-1 p-1.5">
@@ -1268,6 +1280,7 @@ Extract all relevant clinical information from the conversation.`;
               icon={PANEL_ICONS.ai}
               badge={<Badge variant="secondary" className="ml-auto text-[8px] h-4">Haiku 4.5</Badge>}
               subtitle="Review & approve AI responses"
+              onNameChange={(name) => panelLayout.updatePanelName('ai', name)}
             />
 
             <ScrollArea className="flex-1 p-2">
@@ -1330,7 +1343,7 @@ Extract all relevant clinical information from the conversation.`;
                     ) : pendingApproval.isFax ? (
                       <><Printer className="h-3 w-3 mr-1" /> Generate & Fax</>
                     ) : (
-                      <><Check className="h-3 w-3 mr-1" /> Approve -> Queue</>
+                      <><Check className="h-3 w-3 mr-1" /> Approve → Queue</>
                     )}
                   </Button>
                 </div>
@@ -1374,6 +1387,7 @@ Extract all relevant clinical information from the conversation.`;
               name={panelLayout.panelNames.templates}
               icon={PANEL_ICONS.templates}
               subtitle="Click any template to generate"
+              onNameChange={(name) => panelLayout.updatePanelName('templates', name)}
               actions={
                 <button
                   onClick={panelLayout.resetLayout}

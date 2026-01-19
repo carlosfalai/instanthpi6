@@ -71,7 +71,10 @@ Build a production-ready medical consultation SaaS platform with Stripe payments
 - [Hosting]: Netlify with serverless functions
 
 ## Errors Encountered
-- None currently
+- **API Keys Invalid** (2026-01-19): Both Anthropic and OpenAI API keys are invalid/expired
+  - ANTHROPIC_API_KEY: Placeholder value `sk-ant-placeholder-key-for-development`
+  - OPENAI_API_KEY: Key is expired/revoked
+  - **ACTION REQUIRED**: User must update .env with valid API keys for AI features to work
 
 ## Status
 **Command Center Complete** - Unified communications hub deployed with integrated chat and AI modes.
@@ -112,18 +115,18 @@ Transform the 5-panel Command Center into a fully dynamic, customizable workspac
 - [x] Implement handleDragEnd for reordering
 - [x] Add visual drag handles (GripVertical icon)
 
-#### Phase 3: Editable Panel Names
-- [ ] Create EditableTitle component
-- [ ] Double-click to edit panel names
-- [ ] Save on blur/enter
+#### Phase 3: Editable Panel Names (DONE)
+- [x] Create EditableTitle component
+- [x] Double-click to edit panel names
+- [x] Save on blur/enter (via usePanelLayout hook)
 
-#### Phase 4: Layout Persistence
-- [ ] Save layout to localStorage (order, sizes, names)
-- [ ] Restore layout on mount
-- [ ] Add reset button
+#### Phase 4: Layout Persistence (DONE)
+- [x] Save layout to localStorage (order, sizes, names)
+- [x] Restore layout on mount
+- [x] Add reset button (in Templates panel header)
 
 ### Current Status
-Phase 2 - Implementing drag-and-drop panel reordering
+All Dynamic Panel Phases Complete - Testing and deployment next
 
 ---
 
