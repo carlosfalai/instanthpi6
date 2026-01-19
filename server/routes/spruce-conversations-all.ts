@@ -1,6 +1,7 @@
 import { Router } from "express";
 import axios from "axios";
 import { createClient } from "@supabase/supabase-js";
+import { SpruceHealthClient } from "../spruce-health-client";
 
 const router = Router();
 
@@ -62,86 +63,19 @@ router.get("/", async (req, res) => {
       });
     }
 
-    console.log("Fetching ALL conversations from Spruce API with pagination...");
+    const client = new SpruceHealthClient({
+      bearerToken: spruceApiKey || spruceAccessId || ""
+    });
 
-    let allConversations: any[] = [];
-    let paginationToken: string | null = null;
-    let hasMore = true;
-    let pageCount = 0;
-    const maxPages = 50; // Increased limit to fetch more conversations
-    const maxConversations = 10000; // Absolute maximum to prevent excessive memory usage
-
-    // Keep fetching pages until we have all conversations
-    while (hasMore && pageCount < maxPages && allConversations.length < maxConversations) {
-      const params: any = {
-        orderBy: "lastActivity",
-        limit: 200, // Max per page per Spruce API
-      };
-
-      // Add pagination token if we have one
-      if (paginationToken) {
-        params.paginationToken = paginationToken;
-      }
-
-      // Build Basic auth token from aid:api_key per Spruce API
-      const basicToken = /^YWlk/.test(spruceApiKey)
-        ? spruceApiKey
-        : Buffer.from(`${spruceAccessId}:${spruceApiKey}`).toString("base64");
-      
-      try {
-        const response = await axios.get(`${SPRUCE_API_URL}/conversations`, {
-          headers: {
-            Authorization: `Basic ${basicToken}`,
-            Accept: "application/json",
-          },
-          params,
-        });
-
-        const conversations = response.data.conversations || [];
-        
-        // Avoid duplicates by checking conversation IDs
-        const existingIds = new Set(allConversations.map(c => c.id));
-        const newConversations = conversations.filter((c: any) => !existingIds.has(c.id));
-        
-        allConversations = allConversations.concat(newConversations);
-
-        // Check if there are more pages
-        hasMore = response.data.hasMore || false;
-        paginationToken = response.data.paginationToken || response.data.nextPageToken;
-        pageCount++;
-
-        console.log(
-          `Page ${pageCount}: fetched ${conversations.length} conversations (${newConversations.length} new). Total: ${allConversations.length}`
-        );
-
-        // Break if no pagination token even though hasMore is true
-        if (hasMore && !paginationToken) {
-          console.log("⚠️ Has more conversations but no pagination token provided - stopping pagination");
-          break;
-        }
-
-        // Break if we got fewer conversations than requested (likely last page)
-        if (conversations.length < 200) {
-          console.log(`Reached last page (got ${conversations.length} conversations)`);
-          break;
-        }
-      } catch (pageError: any) {
-        console.error(`Error fetching page ${pageCount + 1}:`, pageError.response?.data || pageError.message);
-        // Continue with what we have if we've already fetched some conversations
-        if (allConversations.length > 0) {
-          console.log(`Continuing with ${allConversations.length} conversations already fetched`);
-          break;
-        }
-        throw pageError;
-      }
-    }
-
-    console.log(
-      `Fetched total of ${allConversations.length} conversations across ${pageCount} pages`
-    );
+    console.log("Fetching conversations from Spruce API...");
+    // Fetch conversations - Spruce API doesn't support true pagination
+    // Just fetch max available in single request
+    const conversationsResponse = await client.getConversations({ perPage: 200 });
+    const allConversations = conversationsResponse.conversations || [];
+    console.log(`Conversations fetched: ${allConversations.length}`);
 
     // Transform conversations for the frontend
-    const transformedConversations = allConversations.map((conv) => {
+    const transformedConversations = allConversations.map((conv: any) => {
       // Extract patient name from various possible fields
       let patientName = "Unknown Patient";
 
@@ -150,33 +84,22 @@ router.get("/", async (req, res) => {
         patientName = participant.displayName || participant.name || participant.contact || "Unknown Patient";
       } else if (conv.title && conv.title !== "Centre Médical Font") {
         patientName = conv.title;
-      } else if (conv.participants && conv.participants.length > 0) {
-        patientName = conv.participants[0].displayName || conv.participants[0].name || "Unknown Patient";
       }
 
-      // Get last message info - check multiple possible fields
-      let lastMessage = "Click to view conversation";
+      // Get last message info
+      let lastMessage = conv.subtitle || "Click to view conversation";
       let lastMessageTime = conv.lastActivity || conv.lastMessageAt || conv.updatedAt || conv.createdAt || new Date().toISOString();
 
       if (conv.lastMessage) {
-        lastMessage = conv.lastMessage.content || conv.lastMessage.text || conv.lastMessage.body || lastMessage;
-        lastMessageTime = conv.lastMessage.timestamp || conv.lastMessage.createdAt || lastMessageTime;
-      } else if (conv.subtitle) {
-        lastMessage = conv.subtitle;
+        lastMessage = conv.lastMessage.content || lastMessage;
       }
 
-      // Align field names with frontend expectations (doctor-dashboard-new.tsx):
-      // patient_name, last_message, updated_at
       return {
         id: conv.id,
         patient_name: patientName,
         last_message: lastMessage,
         updated_at: lastMessageTime,
-        unread_count: conv.unreadCount || conv.unread_count || 0,
-        // Include additional fields that might be useful
-        title: conv.title,
-        createdAt: conv.createdAt,
-        lastActivity: conv.lastActivity,
+        unread_count: conv.unreadCount || 0,
       };
     });
 

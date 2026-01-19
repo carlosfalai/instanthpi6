@@ -128,3 +128,25 @@ router.post("/generate-treatment-plan", async (req, res) => {
     res.status(500).json({ error: error.message || "Unknown error" });
   }
 });
+
+/**
+ * Generate a clinical draft with Claude
+ * POST /api/anthropic/generate-clinical-draft
+ */
+router.post("/generate-clinical-draft", async (req, res) => {
+  try {
+    const { patientContext, lastMessages, model } = req.body;
+
+    if (!patientContext) {
+      return res.status(400).json({ error: "Patient context is required" });
+    }
+
+    const result = await anthropicUtils.generateClinicalDraft(patientContext, lastMessages, model);
+
+    res.json({ result });
+  } catch (error: any) {
+    console.error("Error in generate-clinical-draft endpoint:", error);
+    res.status(500).json({ error: error.message || "Unknown error" });
+  }
+});
+

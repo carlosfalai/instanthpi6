@@ -42,6 +42,7 @@ import SubscriptionSuccessPage from "@/pages/subscription-success";
 import CommandCenter from "@/pages/command-center";
 import EliteBuilderDemo from "@/pages/elite-builder-demo";
 import EliteDashboardDemo from "@/pages/elite-dashboard-demo";
+import UntitledUIDemo from "@/pages/UntitledUIDemo";
 import { ProtectedRoute } from "@/lib/auth-guard";
 
 class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
@@ -97,10 +98,20 @@ class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, {
   }
 }
 
+// Local dev detection for auto-redirect to dashboard
+const isLocalDev = typeof window !== 'undefined' &&
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
 export default function App() {
   const [location, setLocation] = useLocation();
 
   useEffect(() => {
+    // LOCAL DEV: Auto-redirect to dashboard from landing page
+    if (isLocalDev && location === "/") {
+      setLocation("/doctor-dashboard");
+      return;
+    }
+
     // Check auth state on mount
     const {
       data: { subscription },
@@ -143,6 +154,11 @@ export default function App() {
           <Route path="/elite-dashboard-demo">
             <ProtectedRoute>
               <EliteDashboardDemo />
+            </ProtectedRoute>
+          </Route>
+          <Route path="/untitled-ui-demo">
+            <ProtectedRoute>
+              <UntitledUIDemo />
             </ProtectedRoute>
           </Route>
           <Route path="/doctor-login" component={DoctorLogin} />

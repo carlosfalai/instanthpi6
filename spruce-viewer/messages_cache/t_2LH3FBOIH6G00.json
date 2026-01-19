@@ -1,0 +1,86 @@
+{
+  "lastFetched": 1768688667480,
+  "messages": [
+    {
+      "id": "ti_2LH3FBSGC1G00",
+      "content": "Carlos Faviel Font, MD sent an invitation to (438) 988-7683 and bilalumar40@gmail.com to connect through the centremdicalfont Spruce Link.",
+      "timestamp": "2026-01-17T21:30:04Z",
+      "senderName": "Carlos Faviel Font, MD",
+      "isFromPatient": false,
+      "isInternalNote": true,
+      "type": "conversationItem"
+    },
+    {
+      "id": "ti_2LH3FBV341G00",
+      "content": "'Centre Médical Font - Truckstopsante.com invited you to message with them on Spruce. Accept invitation:\nTo accept your invite, visit: https://spruce.care/086831731578\n\nYou are messaging with Centre Médical Font - Truckstopsante.com. To opt out, reply STOP.'\n\nSender identification and opt-out instructions were included automatically with your SMS-based invitation, so that your organization will remain compliant with text-messaging industry regulations. Remaining compliant helps to prevent your invitations from being blocked or treated as spam. Learn More",
+      "timestamp": "2026-01-17T21:30:04Z",
+      "senderName": "Spruce",
+      "isFromPatient": false,
+      "isInternalNote": true,
+      "type": "conversationItem"
+    },
+    {
+      "id": "ti_2LH3G94SH6G06",
+      "content": "Bilal Umar has connected. Please verify that the following information is correct:\n\nBilal Umar, DOB 6/25/2002\n(438) 988-7683, bilalumar40@gmail.com\nGender: Male",
+      "timestamp": "2026-01-17T21:32:04Z",
+      "senderName": "Centre Médical Font - Truckstopsante.com",
+      "isFromPatient": false,
+      "isInternalNote": true,
+      "type": "conversationItem"
+    },
+    {
+      "id": "ti_2LH3G979C1G00",
+      "content": "Bienvenue au Centre Médical Font : Le Truck Stop Santé 🚛💬👨‍⚕️📱 !\n\nUne clinique 100 % en ligne et accessible de partout !\n\nTruckstopsante.com à votre service :\n\nÉtape 1 (Cette étape s’applique à tous les services) :\nEnvoyez une photo de votre carte RAMQ (recto seulement, voir example).\n\nÉtape 2 (pour les évaluations de la SAAQ seulement) :\nCréez votre dossier médical et choisissez l’heure qui vous convient :\n👉 Portail patient\n\nÉtape 3 – Remplissez le formulaire approprié avant le rendez-vous :\n• SAAQ M28 – Permis 1, 2, 3, 4A, 4B, retrait W : Formulaire M28\n• ITSS – (tout en ligne) : Formulaire ITSS\n• Sans rendez-vous – Clic Santé, Bonjour Santé, autres : Formulaire sans rendez-vous\n\nÉtape 4: Envoyez-nous l'identifiant ou pseudonyme par le chat ici.\n\n🩺 Cette clinique fonctionne exclusivement en téléconsultation. Conformément aux règlements du Collège des médecins du Québec, nous ne prescrivons aucune médication contrôlée, incluant les traitements pour le TDAH (ex. méthylphénidate, Vyvanse), les narcotiques (opiacés) ou les benzodiazépines. Ces médicaments exigent une évaluation en personne avec le même médecin pour des raisons de sécurité et de suivi. Si votre rendez-vous concerne ce type de prescription, veuillez l’annuler dès maintenant afin de libérer la place pour un autre patient.\n\nMerci de faire ces étapes, il n'y a pas d'appel téléphonique avant toutes ces étapes.\n\nTout comportement irrespectueux entraînera la résiliation immédiate de votre rendez-vous actuel ainsi que l'annulation définitive de tous vos rendez-vous futurs.\n\nMerci de votre collaboration. 🫡",
+      "timestamp": "2026-01-17T21:32:04Z",
+      "senderName": "Centre Médical Font - Truckstopsante.com",
+      "isFromPatient": false,
+      "isInternalNote": false,
+      "type": "conversationItem"
+    },
+    {
+      "id": "ti_2LH3I5MBIMO00",
+      "content": "Media/Event",
+      "timestamp": "2026-01-17T21:36:12Z",
+      "senderName": "Bilal Umar",
+      "isFromPatient": true,
+      "isInternalNote": false,
+      "type": "conversationItem"
+    },
+    {
+      "id": "ti_2LH3KAVIAMO00",
+      "content": "Merci pour la vérification, j’attendrai que vous me donniez par ici l'identifiant généré par le formulaire que vous aurez rempli regardez le lien en haut, ceci me permettra de trouver votre formulaire, ce code agit comme une clé-serrure.",
+      "timestamp": "2026-01-17T21:40:56Z",
+      "senderName": "Carlos Faviel Font, MD",
+      "isFromPatient": false,
+      "isInternalNote": false,
+      "type": "conversationItem"
+    },
+    {
+      "id": "ti_2LH3L4UQP6G00",
+      "content": "F9E0X7V5N1",
+      "timestamp": "2026-01-17T21:42:42Z",
+      "senderName": "Bilal Umar",
+      "isFromPatient": true,
+      "isInternalNote": false,
+      "type": "conversationItem"
+    },
+    {
+      "id": "ti_2LH3LED241G00",
+      "content": "Merci, je revise votre dossier, un moment svp.",
+      "timestamp": "2026-01-17T21:43:21Z",
+      "senderName": "Carlos Faviel Font, MD",
+      "isFromPatient": false,
+      "isInternalNote": false,
+      "type": "conversationItem"
+    },
+    {
+      "id": "ti_2LH3LIONK1G00",
+      "content": "Juste pour confirmer avec vous, vous êtes un jeune homme de 23 ans qui a commencé à ressentir une irritation et des démangeaisons sur la paupière depuis vendredi 9 janvier 2026 en fin d'après-midi. Vous décrivez la sensation comme étant à la fois qui démange et qui brûle, avec parfois un peu de desquamation, et c'est devenu plus grave depuis le début. Vous avez remarqué que ça s'aggrave quand vous vous grattez ou quand vous touchez trop la zone, mais ça s'améliore un peu quand vous vous lavez le visage. Vous avez essayé de désinfecter la zone et de vous laver le visage souvent, mais ça n'a pas vraiment aidé. Vous avez aussi une rougeur et des démangeaisons autour de l'œil. Vous avez la maladie de Crohn, mais vous n'avez pas d'allergies connues aux médicaments. Est-ce que ça résume bien ce que vous vivez ?\n\n1. Avez-vous remarqué si c'est juste une paupière ou les deux yeux qui sont irrités ?\n2. Est-ce que vous avez utilisé un nouveau produit pour le visage, un savon différent, ou des cosmétiques avant que ça commence ?\n3. Est-ce que vous avez des croûtes jaunes ou du pus qui sort de la paupière, ou c'est juste sec et qui démange ?\n4. Est-ce que votre vision est normale, ou est-ce que vous voyez flou ou avez de la difficulté à voir ?\n5. Est-ce que vous avez de la fièvre ou vous vous sentez malade ailleurs dans votre corps ?\n6. Est-ce que vous avez eu ce genre d'irritation des paupières avant, ou c'est la première fois ?\n7. Est-ce que vous avez des démangeaisons ou des rougeurs ailleurs sur votre peau en ce moment ?\n8. Est-ce que votre maladie de Crohn est bien contrôlée en ce moment avec vos médicaments ?\n9. Est-ce que vous portez des lentilles de contact, ou vous utilisez des lunettes ?\n10. Est-ce que quelqu'un d'autre dans votre entourage a une irritation des yeux ou une infection de la peau en ce moment ?",
+      "timestamp": "2026-01-17T21:43:39Z",
+      "senderName": "Carlos Faviel Font, MD",
+      "isFromPatient": false,
+      "isInternalNote": false,
+      "type": "conversationItem"
+    }
+  ]
+}

@@ -2,11 +2,17 @@ import { Router } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { storage } from "../storage";
 import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
 // Initialize OpenAI client
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+// Initialize Anthropic client
+const anthropic = process.env.ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  : null;
 
 // Spruce API configuration (for future use)
 const SPRUCE_ACCESS_ID = process.env.SPRUCE_ACCESS_ID;
@@ -90,6 +96,52 @@ router.get("/suggestions", async (req, res) => {
   } catch (error) {
     console.error("Error fetching AI suggestions:", error);
     res.status(500).json({ message: "Failed to fetch AI suggestions" });
+  }
+});
+
+// Chat endpoint for Command Center AI
+router.post("/chat", async (req, res) => {
+  try {
+    const { prompt, model = "claude-3-5-haiku-20241022", systemPrompt } = req.body;
+
+    if (!prompt) {
+      return res.status(400).json({ message: "Missing prompt" });
+    }
+
+    // Use Anthropic Claude
+    if (anthropic) {
+      try {
+        const response = await anthropic.messages.create({
+          model: model,
+          system: systemPrompt || "You are a helpful medical assistant.",
+          max_tokens: 2048,
+          messages: [{ role: "user", content: prompt }],
+        });
+
+        return res.json({ content: response.content[0].text.trim() });
+      } catch (error) {
+        console.error("Anthropic error:", error);
+        // Fall through to OpenAI
+      }
+    }
+
+    // Fallback to OpenAI
+    if (process.env.OPENAI_API_KEY) {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemPrompt || "You are a helpful medical assistant." },
+          { role: "user", content: prompt },
+        ],
+      });
+
+      return res.json({ content: response.choices[0].message.content?.trim() || "" });
+    }
+
+    return res.status(503).json({ message: "AI services not configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY." });
+  } catch (error) {
+    console.error("Chat error:", error);
+    res.status(500).json({ message: "AI chat failed" });
   }
 });
 

@@ -136,7 +136,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Spruce conversations all API endpoint
   app.use("/api/spruce-conversations-all", spruceConversationsAllRouter);
   // Spruce conversation history API endpoint
-  app.use("/api/spruce/conversation", spruceConversationHistoryRouter);
+  // Route: /api/spruce/conversations/:conversationId/history
+  app.use("/api/spruce/conversations", spruceConversationHistoryRouter);
   // Gmail API endpoint
   app.use("/api/gmail", gmailRouter);
   // Medical templates API endpoint

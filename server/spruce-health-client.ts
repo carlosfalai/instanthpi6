@@ -75,10 +75,14 @@ class SpruceHealthClient {
       ...config,
     };
 
+    const authHeader = this.config.bearerToken.startsWith('YWlk') || this.config.bearerToken.startsWith('aid_')
+      ? `Basic ${this.config.bearerToken}`
+      : `Bearer ${this.config.bearerToken}`;
+
     this.client = axios.create({
       baseURL: this.config.baseUrl,
       headers: {
-        Authorization: `Bearer ${this.config.bearerToken}`,
+        Authorization: authHeader,
         "Content-Type": "application/json",
         "User-Agent": "SpruceHealthClient/1.0",
       },
@@ -225,37 +229,32 @@ class SpruceHealthClient {
       let finalMessages: any[] = [];
 
       try {
-        // Try the messages endpoint with proper parameters
-        response = await this.client.get(`/conversations/${conversationId}/messages`, {
+        // Try the items endpoint which seems preferred in some versions
+        response = await this.client.get(`/conversations/${conversationId}/items`, {
           params: {
-            page: params?.page || 1,
-            per_page: params?.per_page || 50,
-            include: "all",
+            limit: params?.per_page || 50,
           },
         });
-        console.log(`Messages endpoint response:`, JSON.stringify(response.data, null, 2));
-        finalMessages = response.data.messages || response.data.data || [];
-      } catch (messagesError: any) {
-        console.log(
-          `Direct messages endpoint failed (${messagesError.response?.status}): ${messagesError.message}`
-        );
+        console.log(`Items endpoint response:`, JSON.stringify(response.data, null, 2));
+        finalMessages = response.data.conversationItems || response.data.items || [];
+      } catch (itemsError: any) {
+        console.log(`Items endpoint failed: ${itemsError.message}`);
 
         try {
-          // Try alternative messages endpoint
-          response = await this.client.get(`/messages`, {
+          // Try the messages endpoint with proper parameters
+          response = await this.client.get(`/conversations/${conversationId}/messages`, {
             params: {
-              conversation_id: conversationId,
               page: params?.page || 1,
               per_page: params?.per_page || 50,
+              include: "all",
             },
           });
-          console.log(
-            `Alternative messages endpoint response:`,
-            JSON.stringify(response.data, null, 2)
-          );
+          console.log(`Messages endpoint response:`, JSON.stringify(response.data, null, 2));
           finalMessages = response.data.messages || response.data.data || [];
-        } catch (altError: any) {
-          console.log(`Alternative messages endpoint failed: ${altError.message}`);
+        } catch (messagesError: any) {
+          console.log(
+            `Direct messages endpoint failed (${messagesError.response?.status}): ${messagesError.message}`
+          );
 
           // Get conversation details for context
           const convResponse = await this.client.get(`/conversations/${conversationId}`);
@@ -263,7 +262,7 @@ class SpruceHealthClient {
 
           // Extract any embedded messages
           const conversation = convResponse.data.conversation || convResponse.data;
-          finalMessages = conversation.messages || conversation.recent_messages || [];
+          finalMessages = conversation.recentMessages || conversation.messages || conversation.recent_messages || [];
         }
       }
 
@@ -271,13 +270,13 @@ class SpruceHealthClient {
 
       return {
         messages: finalMessages.map((msg: any) => ({
-          id: msg.id || `msg_${Date.now()}`,
+          id: msg.id || msg.messageId || `msg_${Date.now()}`,
           conversation_id: conversationId,
-          content: msg.content || msg.text || msg.body || "Message content not available",
-          sent_at: msg.sent_at || msg.created_at || msg.timestamp || new Date().toISOString(),
-          sender_id: msg.sender_id || msg.from || msg.sender || "unknown",
-          sender_name: msg.sender_name || msg.from_name || msg.display_name || "Unknown",
-          message_type: msg.message_type || msg.type || "text",
+          content: msg.content || msg.text || msg.body || (msg.message?.body) || "Message content not available",
+          sent_at: msg.sentAt || msg.sent_at || msg.createdAt || msg.created_at || msg.timestamp || new Date().toISOString(),
+          sender_id: msg.authorId || msg.sender_id || msg.from || msg.sender || "unknown",
+          sender_name: msg.author?.displayName || msg.sender_name || msg.from_name || msg.display_name || (msg.isFromPatient ? "Patient" : "Doctor"),
+          message_type: msg.type || msg.message_type || "text",
           read: msg.read !== undefined ? msg.read : true,
         })),
         pagination: {

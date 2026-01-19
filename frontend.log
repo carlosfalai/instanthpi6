@@ -1,35 +1,8 @@
 
-  VITE v5.4.14  ready in 4908 ms
+  VITE v5.4.14  ready in 1260 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
 Browserslist: browsers data (caniuse-lite) is 15 months old. Please run:
   npx update-browserslist-db@latest
   Why you should do it regularly: https://github.com/browserslist/update-db#readme
-2:11:33 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
-2:17:36 AM [vite] hmr update /src/pages/landing.tsx, /src/index.css
-2:17:40 AM [vite] hmr update /src/App.tsx, /src/index.css
-2:17:50 AM [vite] hmr update /src/components/layout/ModernLayout.tsx, /src/index.css
-2:18:08 AM [vite] hmr update /src/pages/doctor-dashboard-new.tsx, /src/index.css
-2:18:19 AM [vite] page reload src/pages/patients-page.tsx
-2:18:22 AM [vite] page reload src/pages/home-page.tsx
-2:19:12 AM [vite] hmr update /src/App.tsx, /src/index.css
-2:19:25 AM [vite] hmr update /src/pages/doctor-login.tsx, /src/index.css
-2:19:27 AM [vite] hmr update /src/pages/patient-login.tsx, /src/index.css
-2:19:40 AM [vite] hmr update /src/pages/login-diagnostics.tsx, /src/index.css
-2:34:11 AM [vite] hmr update /src/pages/landing.tsx, /src/index.css
-2:34:12 AM [vite] hmr update /src/pages/landing.tsx, /src/index.css
-2:45:09 AM [vite] page reload /Users/carlosfavielfont/Downloads/Instanthpi 6/tailwind.config.ts
-2:45:21 AM [vite] hmr update /src/index.css
-2:46:01 AM [vite] page reload /Users/carlosfavielfont/Downloads/Instanthpi 6/tailwind.config.ts
-2:46:04 AM [vite] hmr update /src/index.css
-2:46:14 AM [vite] hmr update /src/pages/landing.tsx, /src/index.css
-2:46:50 AM [vite] hmr update /src/pages/landing.tsx, /src/index.css
-2:49:16 AM [vite] hmr update /src/pages/landing.tsx, /src/index.css
-2:49:23 AM [vite] hmr update /src/App.tsx, /src/index.css
-2:50:24 AM [vite] hmr update /src/App.tsx, /src/index.css
-10:06:13 AM [vite] hmr update /src/App.tsx, /src/index.css
-10:06:16 AM [vite] hmr update /src/App.tsx, /src/index.css
-10:06:38 AM [vite] hmr update /src/pages/onboarding.tsx, /src/index.css
-10:07:04 AM [vite] page reload src/pages/form-builder.tsx
-10:07:11 AM [vite] page reload src/pages/form-builder.tsx

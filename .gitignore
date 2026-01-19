@@ -1,6 +1,7 @@
 node_modules
 dist
 .DS_Store
+._*
 server/public
 vite.config.ts.*
 *.tar.gz
@@ -34,3 +35,14 @@ dev-output.log
 # Local state
 .local/
 Archive.zip
+
+# Auto Claude data directory
+.auto-claude/
+
+# Auto Claude generated files
+.auto-claude-security.json
+.auto-claude-status
+.claude_settings.json
+.worktrees/
+.security-key
+logs/security/

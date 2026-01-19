@@ -477,3 +477,48 @@ Please fill in all placeholders with information from the form data. Generate al
     throw new Error(`Failed to process FormSite submission with Claude: ${error.message}`);
   }
 }
+
+/**
+ * Generate a clinical draft for a message directed to a patient
+ * @param patientContext Context about the patient and their condition
+ * @param lastMessages Previous messages in the conversation for context
+ * @param tone The tone to use (defaults to 'spartan')
+ * @returns The generated draft
+ */
+export async function generateClinicalDraft(
+  patientContext: string,
+  lastMessages?: string,
+  model: string = DEFAULT_MODEL
+): Promise<string> {
+  try {
+    const systemPrompt = `You are a clinical AI assistant for a physician. Your goal is to draft a message to a patient.
+Your tone is Spartan: clear, direct, natural, and highly professional.
+
+STRICT FORMATTING RULES:
+- NEVER use machine-like formatting (dashes, bullet points, asterisks, numbered lists) in messages directed to patients.
+- Use natural, fluid paragraphs for explanations.
+- Keep it concise. No fluff or unnecessary pleasantries.
+- Ensure the tone remains empathetic but professional.
+- Do not state 'Clinical Summary:' or similar headers. Just write the message.`;
+
+    const userPrompt = `Context about the patient: ${patientContext}
+${lastMessages ? `\nRecent messages in the conversation for context:\n${lastMessages}` : ""}
+
+Please draft a response to this patient based on the context provided.`;
+
+    const response = await anthropic.messages.create({
+      model: model,
+      system: systemPrompt,
+      max_tokens: 1024,
+      messages: [{ role: "user", content: userPrompt }],
+    });
+
+    if (response.content.length > 0 && response.content[0].type === "text") {
+      return response.content[0].text;
+    }
+    return "No draft content returned from Claude AI.";
+  } catch (error: any) {
+    console.error("Error generating clinical draft with Claude:", error);
+    throw new Error(`Failed to generate clinical draft with Claude: ${error.message}`);
+  }
+}

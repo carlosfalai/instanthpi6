@@ -34,6 +34,7 @@ export function EliteSpruceMessenger({ isOpen, onClose, initialDraft = "", recip
     const [activeConversation, setActiveConversation] = useState<SpruceConversation | null>(null);
     const [messageDraft, setMessageDraft] = useState(initialDraft);
     const [queuedMessages, setQueuedMessages] = useState<QueuedMessage[]>([]);
+    const [activeMessages, setActiveMessages] = useState<any[]>([]);
     const [now, setNow] = useState(Date.now());
 
     useEffect(() => {
@@ -97,6 +98,29 @@ export function EliteSpruceMessenger({ isOpen, onClose, initialDraft = "", recip
             setLoading(false);
         }
     };
+
+    const fetchMessages = async (id: string) => {
+        try {
+            const response = await fetch(`/api/spruce/conversation/history/${id}`);
+            if (response.ok) {
+                const data = await response.json();
+                // If the response is an array, it's our direct messages
+                // If it's an object with messages property, handle that too
+                const msgs = Array.isArray(data) ? data : (data.messages || []);
+                setActiveMessages(msgs);
+            }
+        } catch (error) {
+            console.error("Error loading messages", error);
+        }
+    };
+
+    useEffect(() => {
+        if (activeConversation) {
+            fetchMessages(activeConversation.id);
+        } else {
+            setActiveMessages([]);
+        }
+    }, [activeConversation]);
 
     const handleQueueSend = () => {
         if (!activeConversation) return;
@@ -185,8 +209,31 @@ export function EliteSpruceMessenger({ isOpen, onClose, initialDraft = "", recip
                         </button>
                     </div>
 
-                    <div className="flex-1 p-4 overflow-y-auto bg-black/40">
-                        {/* To Send Queue (Floating at top or visible in chat flow) */}
+                    <div className="flex-1 p-4 overflow-y-auto bg-black/40 flex flex-col space-y-4">
+                        {/* Messages List */}
+                        {activeMessages.map((msg: any) => (
+                            <div
+                                key={msg.id}
+                                className={cn(
+                                    "flex flex-col max-w-[80%]",
+                                    msg.isFromPatient ? "self-start" : "self-end items-end"
+                                )}
+                            >
+                                <div className={cn(
+                                    "p-3 rounded-2xl text-sm",
+                                    msg.isFromPatient
+                                        ? "bg-white/5 border border-white/5 rounded-tl-sm"
+                                        : "bg-primary text-primary-foreground rounded-tr-sm"
+                                )}>
+                                    {msg.content}
+                                </div>
+                                <span className="text-[10px] text-muted-foreground mt-1 px-1">
+                                    {msg.sender_name || (msg.isFromPatient ? "Patient" : "Doctor")} • {new Date(msg.sent_at || msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            </div>
+                        ))}
+
+                        {/* To Send Queue */}
                         {queuedMessages.length > 0 && (
                             <div className="mb-6 space-y-2">
                                 <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest pl-1">

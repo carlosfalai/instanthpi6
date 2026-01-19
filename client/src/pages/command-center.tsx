@@ -1,34 +1,76 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Link } from "wouter";
 import {
   Search,
   Loader2,
   User,
   MessageCircle,
   Clock,
-  ChevronRight,
-  SortDesc,
-  Phone,
-  Mail,
   FileText,
   Activity,
   Zap,
-  ExternalLink,
   Send,
-  Bot,
-  PanelRightClose,
-  PanelRight,
   Sparkles,
-  AlertCircle,
+  Check,
+  X,
+  Calendar,
+  Pill,
+  AlertTriangle,
+  CheckCircle,
+  FileDown,
+  Printer,
+  Bot,
+  RefreshCw,
+  Image as ImageIcon,
+  Download,
+  ExternalLink,
+  Stethoscope,
+  Briefcase,
+  FlaskConical,
+  ScanLine,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import ModernLayout from "@/components/layout/ModernLayout";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
+import { useStagingQueue } from "@/hooks/useStagingQueue";
+import { DEFAULT_TIMER_CONFIG } from "@/types/staging";
+import { supabase } from "@/lib/supabase";
+import {
+  generateAndDownloadRequete,
+  extractPatientInfoFromConversation,
+  type PatientData,
+} from "@/utils/pdfGenerator";
+
+// Database template interface
+interface MedicalTemplate {
+  id: string;
+  template_name: string;
+  template_category: string;
+  template_type: string;
+  case_type: string | null;
+  template_content: string;
+  is_enabled: boolean;
+  is_default: boolean;
+  usage_count: number;
+}
+
+// Template category config - all same color for consistency
+const TEMPLATE_CATEGORIES = {
+  soap_note: { label: 'SOAP', icon: Stethoscope, color: 'bg-[#333]' },
+  specialist_referral: { label: 'Referrals', icon: Send, color: 'bg-[#333]' },
+  imaging_requisition: { label: 'Imaging', icon: ScanLine, color: 'bg-[#333]' },
+  patient_message: { label: 'Meds', icon: Pill, color: 'bg-[#333]' },
+  case_discussion: { label: 'Labs', icon: FlaskConical, color: 'bg-[#333]' },
+  work_leave: { label: 'Work Leave', icon: Briefcase, color: 'bg-[#333]' },
+};
 
 interface Conversation {
   id: string;
@@ -39,31 +81,392 @@ interface Conversation {
   title?: string;
 }
 
-type ViewMode = "all" | "unread" | "recent";
-type SortMode = "recent" | "name" | "unread";
-type RightPanelMode = "details" | "chat" | "ai";
-
 interface ChatMessage {
   id: string;
   content: string;
   isFromPatient: boolean;
   timestamp: string;
+  attachments?: Array<{
+    id: string;
+    type: 'image' | 'document' | 'other';
+    url: string;
+    name?: string;
+    mimeType?: string;
+  }>;
 }
+
+interface PatientInfo {
+  name: string;
+  nam?: string; // Health insurance number
+  dob?: string; // Date of birth
+  sex?: string;
+  phone?: string;
+  address?: string;
+  email?: string;
+  dossier?: string; // File number
+}
+
+interface ClaudeMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+// Medical document templates - clicking sends conversation as user prompt + template as system prompt
+const TEMPLATES = [
+  // === CLINICAL DOCUMENTS ===
+  {
+    id: 'soap_note',
+    name: 'SOAP Note',
+    icon: FileText,
+    systemPrompt: `You are a medical documentation specialist for Truck Stop Santé clinic.
+Based on the patient conversation, generate a complete SOAP note in French.
+
+Format:
+**SUBJECTIF (S):**
+- Motif de consultation
+- Histoire de la maladie actuelle (HMA)
+- Symptômes rapportés par le patient
+- Antécédents pertinents mentionnés
+
+**OBJECTIF (O):**
+- Signes vitaux (si mentionnés)
+- Examen physique pertinent (si mentionné)
+- Résultats de tests (si mentionnés)
+
+**ANALYSE (A):**
+- Diagnostic principal ou impression clinique
+- Diagnostics différentiels
+- Problèmes identifiés
+
+**PLAN (P):**
+- Investigations demandées
+- Traitement prescrit
+- Suivi recommandé
+- Éducation au patient
+
+Extraire toutes les informations cliniques pertinentes de la conversation.`,
+    color: 'bg-slate-600',
+    isPDF: true
+  },
+  {
+    id: 'referral',
+    name: 'Referrals',
+    icon: Send,
+    systemPrompt: `You are a medical consultation request generator for Truck Stop Santé clinic.
+Based on the patient conversation, generate a REQUÊTE (consultation request) document in French.
+
+Format the output as a professional medical consultation request including:
+1. Brief context line (e.g., "Médecine familiale: Merci d'évaluer ce patient pour [reason]")
+2. Patient presentation paragraph with age, chief complaint, onset, duration, and severity
+3. Description of symptoms with specific details (location, character, radiation, associated symptoms)
+4. Relevant negatives (what the patient denies)
+5. Medical history and allergies if mentioned
+6. Clinical impression and differential diagnosis
+7. Requested evaluation or investigations
+8. "Consultation prioritaire recommandée" if urgent
+
+Write in formal medical French. Be thorough but concise. Extract all relevant clinical details from the conversation.`,
+    color: 'bg-blue-600',
+    isPDF: true
+  },
+  {
+    id: 'imaging_requisition',
+    name: 'Imaging',
+    icon: Activity,
+    systemPrompt: `You are a radiology requisition specialist for Truck Stop Santé clinic.
+Based on the patient conversation, generate a REQUÊTE D'IMAGERIE (imaging requisition) in French.
+
+Include:
+1. **TYPE D'EXAMEN DEMANDÉ:** (Radiographie, Échographie, TDM, IRM, etc.)
+2. **RÉGION ANATOMIQUE:** Specify exact body part/region
+3. **INDICATION CLINIQUE:**
+   - Symptoms and duration
+   - Clinical findings
+   - Suspected diagnosis
+4. **RENSEIGNEMENTS CLINIQUES PERTINENTS:**
+   - Relevant history
+   - Previous imaging if mentioned
+   - Allergies (especially contrast)
+5. **URGENCE:** Routine / Semi-urgent / Urgent
+6. **QUESTION CLINIQUE SPÉCIFIQUE:** What are we looking for?
+
+Format clearly for radiology department review.`,
+    color: 'bg-purple-600',
+    isPDF: true
+  },
+  {
+    id: 'meds_prescription',
+    name: 'Meds',
+    icon: Pill,
+    systemPrompt: `You are a prescription generator for Truck Stop Santé clinic.
+Based on the patient conversation, generate an ORDONNANCE (prescription) in French.
+
+Format:
+**ORDONNANCE**
+
+Patient: [Name]
+Date: [Today's date]
+
+Rx:
+1. [Medication name] [Strength]
+   Posologie: [Directions - e.g., "1 comprimé PO BID x 7 jours"]
+   Quantité: [Amount to dispense]
+   Renouvellements: [Number of refills]
+
+[Repeat for each medication]
+
+Instructions spéciales: [Any special instructions]
+Substitution générique: □ Permise  □ Non permise
+
+Extract all medication details from the conversation including dosage, frequency, duration.`,
+    color: 'bg-green-600',
+    isPDF: true
+  },
+  {
+    id: 'labs_requisition',
+    name: 'Labs',
+    icon: Activity,
+    systemPrompt: `You are a laboratory requisition specialist for Truck Stop Santé clinic.
+Based on the patient conversation, generate a REQUÊTE DE LABORATOIRE (lab requisition) in French.
+
+Include:
+**ANALYSES DEMANDÉES:**
+□ FSC (Formule sanguine complète)
+□ Glycémie à jeun
+□ HbA1c
+□ Bilan lipidique
+□ Bilan hépatique (AST, ALT, GGT, Bili)
+□ Bilan rénal (Créatinine, Urée, DFGe)
+□ TSH
+□ Électrolytes (Na, K, Cl)
+□ Analyse d'urine
+□ Autres: [specify]
+
+**INDICATION CLINIQUE:**
+[Reason for testing based on conversation]
+
+**RENSEIGNEMENTS CLINIQUES:**
+[Relevant clinical context]
+
+**INSTRUCTIONS SPÉCIALES:**
+□ À jeun requis
+□ Prélèvement matinal
+□ Autres: [specify]
+
+**URGENCE:** Routine / Urgent
+
+Check the boxes that apply based on the clinical context from the conversation.`,
+    color: 'bg-amber-600',
+    isPDF: true
+  },
+  {
+    id: 'work_leave',
+    name: 'Work Leave',
+    icon: Calendar,
+    systemPrompt: `You are generating a medical certificate for Truck Stop Santé clinic.
+Based on the patient conversation, generate a CERTIFICAT MÉDICAL / BILLET DE TRAVAIL (work leave certificate) in French.
+
+Format:
+**CERTIFICAT MÉDICAL**
+
+Je soussigné, Dr Carlos Faviel Font, médecin, certifie avoir examiné:
+
+Patient: [Name]
+Date de naissance: [If mentioned]
+NAM: [If mentioned]
+
+Date de consultation: [Today]
+
+**ATTESTATION:**
+Ce patient est/était incapable de travailler pour raisons médicales:
+
+Du: [Start date]
+Au: [End date] (inclusivement)
+
+Durée totale: [X] jours
+
+□ Arrêt de travail complet
+□ Travail léger / Restrictions: [specify if mentioned]
+
+**Restrictions spécifiques (si applicable):**
+[Any work restrictions mentioned]
+
+**Suivi recommandé:**
+[Follow-up plan]
+
+Ce certificat est délivré à la demande du patient pour fins administratives.
+
+Note: Keep medical details confidential - only state inability to work, not diagnosis.`,
+    color: 'bg-rose-600',
+    isPDF: true
+  },
+  // === COMMUNICATION TEMPLATES ===
+  {
+    id: 'patient_edu',
+    name: 'Edu/Reply',
+    icon: MessageCircle,
+    systemPrompt: `You are a caring medical office assistant for Truck Stop Santé.
+Based on the patient conversation, generate a warm, professional message to the patient explaining what you will prepare for them.
+
+Format the message like this:
+"Bonjour [Patient Name],
+
+Merci pour votre message. Suite à notre échange, je vais préparer les documents suivants pour vous:
+
+[List what applies based on the conversation:]
+• Votre note clinique (SOAP)
+• Une demande de consultation/référence vers [specialist if mentioned]
+• Une requête d'imagerie pour [exam type if needed]
+• Votre ordonnance pour [medications if discussed]
+• Une requête de laboratoire pour [tests if needed]
+• Un certificat médical/billet de travail [if needed]
+
+[Add any specific instructions or next steps]
+
+N'hésitez pas à nous contacter si vous avez des questions.
+
+Cordialement,
+L'équipe Truck Stop Santé"
+
+Adapt the list based on what was actually discussed in the conversation. Be warm and reassuring.`,
+    color: 'bg-cyan-600'
+  },
+  {
+    id: 'general_response',
+    name: 'Reply',
+    icon: Zap,
+    systemPrompt: 'You are a helpful medical office assistant. Based on the patient conversation, generate an appropriate professional response addressing their inquiry or concern. Be empathetic and clear.',
+    color: 'bg-gray-600'
+  },
+  {
+    id: 'fax_pharmacy',
+    name: 'Fax Rx',
+    icon: Printer,
+    systemPrompt: `You are a pharmacy fax coordinator for Truck Stop Santé clinic.
+Based on the patient conversation, prepare a prescription for faxing to pharmacy in French.
+
+**TÉLÉCOPIE - ORDONNANCE**
+À: [Pharmacy name if mentioned]
+Fax: [Pharmacy fax if mentioned]
+De: Truck Stop Santé - Dr Carlos Faviel Font
+Fax: 833-964-4725
+
+Patient: [Name]
+DDN: [DOB if mentioned]
+NAM: [If mentioned]
+
+Rx:
+[Medication details as extracted from conversation]
+
+Merci de confirmer réception.`,
+    color: 'bg-indigo-600',
+    isFax: true
+  },
+  // === BATCH GENERATION ===
+  {
+    id: 'prepare_all',
+    name: 'Prepare All',
+    icon: CheckCircle,
+    systemPrompt: `You are a comprehensive medical documentation assistant for Truck Stop Santé clinic.
+Based on the patient conversation, generate ALL applicable documents in one response.
+
+Generate each section that applies to this patient case:
+
+---
+## 1. SOAP NOTE
+[Generate complete SOAP note in French]
+
+---
+## 2. REFERRAL/REQUÊTE (if specialist consultation needed)
+[Generate consultation request]
+
+---
+## 3. IMAGING REQUISITION (if imaging needed)
+[Generate imaging request]
+
+---
+## 4. PRESCRIPTION/ORDONNANCE (if medications discussed)
+[Generate prescription]
+
+---
+## 5. LAB REQUISITION (if lab tests needed)
+[Generate lab requisition]
+
+---
+## 6. WORK LEAVE CERTIFICATE (if work absence needed)
+[Generate medical certificate]
+
+---
+## 7. PATIENT MESSAGE
+[Generate message to patient explaining what was prepared]
+
+Only include sections that are relevant based on the conversation. Skip sections that don't apply.
+Write all clinical documents in formal medical French.`,
+    color: 'bg-gradient-to-r from-teal-600 to-blue-600',
+    isPDF: true,
+    isBatch: true
+  },
+];
 
 export default function CommandCenter() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState<ViewMode>("all");
-  const [sortMode, setSortMode] = useState<SortMode>("recent");
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [rightPanelMode, setRightPanelMode] = useState<RightPanelMode>("details");
-  const [messageText, setMessageText] = useState("");
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [showRightPanel, setShowRightPanel] = useState(true);
+  const [claudeMessages, setClaudeMessages] = useState<ClaudeMessage[]>([]);
+  const [claudeInput, setClaudeInput] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [pendingApproval, setPendingApproval] = useState<{
+    content: string;
+    templateName: string;
+    isPDF?: boolean;
+    isFax?: boolean;
+  } | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const claudeScrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Fetch all Spruce conversations
+  const stagingQueue = useStagingQueue();
+  const [selectedTemplateCategory, setSelectedTemplateCategory] = useState<string>("soap_note");
+
+  // Fetch medical templates from database
+  const {
+    data: dbTemplates = [],
+    isLoading: isLoadingTemplates,
+  } = useQuery<MedicalTemplate[]>({
+    queryKey: ["medical-templates"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      const { data, error } = await supabase
+        .from("medical_templates")
+        .select("*")
+        .eq("physician_id", user.id)
+        .eq("is_enabled", true)
+        .order("template_category", { ascending: true })
+        .order("template_name", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching templates:", error);
+        return [];
+      }
+      return data || [];
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Group templates by category
+  const templatesByCategory = dbTemplates.reduce((acc, template) => {
+    if (!acc[template.template_category]) {
+      acc[template.template_category] = [];
+    }
+    acc[template.template_category].push(template);
+    return acc;
+  }, {} as Record<string, MedicalTemplate[]>);
+
+  // Fetch all Spruce conversations (sorted by latest first)
   const {
     data: conversations = [],
     isLoading,
@@ -73,18 +476,16 @@ export default function CommandCenter() {
     queryKey: ["/api/spruce-conversations-all"],
     queryFn: async () => {
       const response = await fetch("/api/spruce-conversations-all");
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to fetch conversations");
-      }
+      if (!response.ok) throw new Error("Failed to fetch conversations");
       const data = await response.json();
       if (data.error) throw new Error(data.message || data.error);
-      return Array.isArray(data) ? data : [];
+      const convs = Array.isArray(data) ? data : [];
+      return convs.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
     },
-    refetchInterval: 60000, // Refresh every minute
+    refetchInterval: 30000,
   });
 
-  // Fetch conversation messages when selected and in chat mode
+  // Fetch conversation messages when selected
   const {
     data: chatMessages = [],
     isLoading: isLoadingMessages,
@@ -96,10 +497,10 @@ export default function CommandCenter() {
       if (!response.ok) throw new Error("Failed to fetch messages");
       const data = await response.json();
       if (Array.isArray(data)) return data;
-      if (data.messages && Array.isArray(data.messages)) return data.messages;
+      if (data.messages) return data.messages;
       return [];
     },
-    enabled: !!selectedId && rightPanelMode === "chat",
+    enabled: !!selectedId,
   });
 
   // Send message mutation
@@ -114,295 +515,419 @@ export default function CommandCenter() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/spruce/conversation", selectedId, "messages"] });
-      setMessageText("");
-      toast({ title: "Message sent", description: "Your message has been delivered." });
+      queryClient.invalidateQueries({ queryKey: ["/api/spruce/conversation"] });
+      toast({ title: "Message sent" });
     },
     onError: (error: Error) => {
-      toast({ title: "Failed to send", description: error.message, variant: "destructive" });
+      toast({ title: "Send failed", description: error.message, variant: "destructive" });
     },
   });
 
-  // AI generation mutation
-  const aiMutation = useMutation({
-    mutationFn: async (prompt: string) => {
-      const response = await fetch("/api/ai-generate-section", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+  // Generate AI response using template
+  const generateWithTemplate = useCallback(async (template: typeof TEMPLATES[0]) => {
+    if (!selectedId || !selectedConversation) {
+      toast({ title: "Select a patient first", variant: "destructive" });
+      return;
+    }
+
+    setIsGenerating(true);
+
+    // Build conversation context as user prompt
+    const conversationContext = chatMessages.map(m =>
+      `${m.isFromPatient ? 'Patient' : 'Provider'}: ${m.content}`
+    ).join('\n');
+
+    const userPrompt = `Patient: ${selectedConversation.patient_name}
+
+Recent conversation:
+${conversationContext || selectedConversation.last_message || 'No conversation history'}
+
+Please generate an appropriate response.`;
+
+    // Add user message to Claude chat
+    const userMsg: ClaudeMessage = {
+      id: `user_${Date.now()}`,
+      role: 'user',
+      content: `[Using template: ${template.name}]\n\nPatient conversation loaded for ${selectedConversation.patient_name}`,
+      timestamp: new Date(),
+    };
+    setClaudeMessages(prev => [...prev, userMsg]);
+
+    try {
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          section_name: "Medical Documentation",
-          custom_request: prompt,
-          patient_data: selectedConversation ? { name: selectedConversation.patient_name, id: selectedConversation.id } : null,
+          prompt: userPrompt,
+          model: 'claude-3-5-haiku-20241022',
+          systemPrompt: template.systemPrompt + `\n\nPatient name: ${selectedConversation.patient_name}. Generate a professional, empathetic message ready to send.`,
         }),
       });
-      if (!response.ok) throw new Error("Failed to generate");
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({ title: "Generated", description: "AI response ready" });
-      setAiPrompt("");
-    },
-    onError: (error: Error) => {
-      toast({ title: "AI Error", description: error.message, variant: "destructive" });
-    },
-  });
 
-  // Scroll to bottom when messages change
+      if (!response.ok) throw new Error('AI request failed');
+
+      const data = await response.json();
+      const aiContent = data.content || data.message || data.response || 'Unable to generate response';
+
+      // Format the response
+      const formattedResponse = `Dear ${selectedConversation.patient_name},\n\n${aiContent}\n\nBest regards,\nInstantHPI Team`;
+
+      // Add AI response to Claude chat
+      const aiMsg: ClaudeMessage = {
+        id: `ai_${Date.now()}`,
+        role: 'assistant',
+        content: formattedResponse,
+        timestamp: new Date(),
+      };
+      setClaudeMessages(prev => [...prev, aiMsg]);
+
+      // Set pending approval with template type flags
+      setPendingApproval({
+        content: formattedResponse,
+        templateName: template.name,
+        isPDF: template.isPDF,
+        isFax: template.isFax,
+      });
+
+      // Handle PDF generation
+      if (template.isPDF) {
+        toast({ title: "PDF Ready", description: "Review the prescription and click approve to generate PDF" });
+      }
+
+      // Handle Fax
+      if (template.isFax) {
+        toast({ title: "Fax Prepared", description: "Review and approve to send fax to pharmacy" });
+      }
+
+    } catch (error) {
+      console.error('AI generation error:', error);
+      toast({ title: "Generation failed", variant: "destructive" });
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [selectedId, chatMessages, toast]);
+
+  // Generate with database template
+  const generateWithDbTemplate = useCallback(async (dbTemplate: MedicalTemplate) => {
+    if (!selectedId || !selectedConversation) {
+      toast({ title: "Select a patient first", variant: "destructive" });
+      return;
+    }
+
+    setIsGenerating(true);
+
+    // Build conversation context as user prompt
+    const conversationContext = chatMessages.map(m =>
+      `${m.isFromPatient ? 'Patient' : 'Provider'}: ${m.content}`
+    ).join('\n');
+
+    // Determine if this is a PDF-generating template
+    const isPdfCategory = ['soap_note', 'specialist_referral', 'imaging_requisition', 'work_leave'].includes(dbTemplate.template_category);
+
+    const userPrompt = `Patient: ${selectedConversation.patient_name}
+
+Recent conversation:
+${conversationContext || selectedConversation.last_message || 'No conversation history'}
+
+Reference template to follow (adapt to this patient's case):
+${dbTemplate.template_content}
+
+Please generate appropriate content based on the template style and patient conversation.`;
+
+    // Add user message to Claude chat
+    const userMsg: ClaudeMessage = {
+      id: `user_${Date.now()}`,
+      role: 'user',
+      content: `[Using template: ${dbTemplate.template_name}]\n\nGenerating for ${selectedConversation.patient_name}`,
+      timestamp: new Date(),
+    };
+    setClaudeMessages(prev => [...prev, userMsg]);
+
+    try {
+      const categoryConfig = TEMPLATE_CATEGORIES[dbTemplate.template_category as keyof typeof TEMPLATE_CATEGORIES];
+      const systemPrompt = `You are a medical documentation assistant for Truck Stop Santé clinic (Dr Carlos Faviel Font, CMQ: 16812).
+Based on the patient conversation and reference template provided, generate appropriate ${categoryConfig?.label || 'medical'} documentation.
+Write in formal medical French. Follow the style and format of the reference template but adapt the content to this specific patient case.
+Extract all relevant clinical information from the conversation.`;
+
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: userPrompt,
+          model: 'claude-3-5-haiku-20241022',
+          systemPrompt,
+        }),
+      });
+
+      if (!response.ok) throw new Error('AI request failed');
+
+      const data = await response.json();
+      const aiContent = data.content || data.message || data.response || 'Unable to generate response';
+
+      // Add AI response to Claude chat
+      const aiMsg: ClaudeMessage = {
+        id: `ai_${Date.now()}`,
+        role: 'assistant',
+        content: aiContent,
+        timestamp: new Date(),
+      };
+      setClaudeMessages(prev => [...prev, aiMsg]);
+
+      // Set pending approval with PDF flag for clinical documents
+      setPendingApproval({
+        content: aiContent,
+        templateName: dbTemplate.template_name,
+        isPDF: isPdfCategory,
+      });
+
+      // Update usage count in database
+      supabase
+        .from("medical_templates")
+        .update({ usage_count: (dbTemplate.usage_count || 0) + 1 })
+        .eq("id", dbTemplate.id)
+        .then(() => {});
+
+    } catch (error) {
+      console.error('AI generation error:', error);
+      toast({ title: "Generation failed", variant: "destructive" });
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [selectedId, chatMessages, selectedConversation, toast]);
+
+  // Free chat with Claude
+  const sendToClaudeChat = useCallback(async () => {
+    if (!claudeInput.trim()) return;
+
+    const userMsg: ClaudeMessage = {
+      id: `user_${Date.now()}`,
+      role: 'user',
+      content: claudeInput,
+      timestamp: new Date(),
+    };
+    setClaudeMessages(prev => [...prev, userMsg]);
+    setClaudeInput("");
+    setIsGenerating(true);
+
+    try {
+      const conversationContext = selectedConversation
+        ? `Current patient: ${selectedConversation.patient_name}\nRecent message: ${selectedConversation.last_message}`
+        : 'No patient selected';
+
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: `Context: ${conversationContext}\n\nUser request: ${claudeInput}`,
+          model: 'claude-3-5-haiku-20241022',
+          systemPrompt: 'You are a helpful medical office AI assistant. Help with patient communications, scheduling, and administrative tasks. Be concise and professional.',
+        }),
+      });
+
+      if (!response.ok) throw new Error('AI request failed');
+
+      const data = await response.json();
+      const aiContent = data.content || data.message || 'No response';
+
+      const aiMsg: ClaudeMessage = {
+        id: `ai_${Date.now()}`,
+        role: 'assistant',
+        content: aiContent,
+        timestamp: new Date(),
+      };
+      setClaudeMessages(prev => [...prev, aiMsg]);
+
+    } catch (error) {
+      toast({ title: "Chat error", variant: "destructive" });
+    } finally {
+      setIsGenerating(false);
+    }
+  }, [claudeInput, selectedConversation, toast]);
+
+  // Approve message → move to staging queue or generate PDF
+  const approveMessage = useCallback(async () => {
+    if (!pendingApproval || !selectedId || !selectedConversation) return;
+
+    // Handle PDF generation
+    if (pendingApproval.isPDF) {
+      try {
+        // Extract patient info from conversation
+        const patientData = extractPatientInfoFromConversation(
+          chatMessages,
+          selectedConversation.patient_name
+        );
+
+        // Generate and download PDF
+        await generateAndDownloadRequete(
+          patientData,
+          pendingApproval.content // The AI-generated description/prescription
+        );
+
+        toast({ title: "PDF Generated", description: "Download started" });
+        setPendingApproval(null);
+        return;
+      } catch (error) {
+        console.error('PDF generation error:', error);
+        toast({ title: "PDF Error", description: "Failed to generate PDF", variant: "destructive" });
+        return;
+      }
+    }
+
+    // Handle Fax (for now, just download PDF + show fax info)
+    if (pendingApproval.isFax) {
+      try {
+        const patientData = extractPatientInfoFromConversation(
+          chatMessages,
+          selectedConversation.patient_name
+        );
+
+        await generateAndDownloadRequete(
+          patientData,
+          pendingApproval.content
+        );
+
+        toast({
+          title: "Fax Document Ready",
+          description: "PDF downloaded. Fax to pharmacy: 833-964-4725",
+        });
+        setPendingApproval(null);
+        return;
+      } catch (error) {
+        console.error('Fax document error:', error);
+        toast({ title: "Error", description: "Failed to generate fax document", variant: "destructive" });
+        return;
+      }
+    }
+
+    // Standard message → staging queue
+    stagingQueue.addToQueue(
+      pendingApproval.content,
+      selectedId,
+      selectedConversation.patient_name,
+      selectedId,
+      true
+    );
+    setPendingApproval(null);
+    toast({ title: "Message approved", description: "60 second countdown started" });
+  }, [pendingApproval, selectedId, selectedConversation, chatMessages, stagingQueue, toast]);
+
+  // Reject pending message
+  const rejectMessage = useCallback(() => {
+    setPendingApproval(null);
+    toast({ title: "Message rejected" });
+  }, [toast]);
+
+  // Handle staged message countdown and auto-send
+  useEffect(() => {
+    const interval = setInterval(() => {
+      stagingQueue.messages.forEach(msg => {
+        if (msg.status === 'pending' && msg.countdown > 0) {
+          stagingQueue.updateCountdown(msg.id, msg.countdown - 1);
+
+          if (msg.countdown <= 1) {
+            stagingQueue.markAsSending(msg.id);
+            sendMessageMutation.mutate(
+              { conversationId: msg.conversationId, message: msg.content },
+              {
+                onSuccess: () => stagingQueue.markAsSent(msg.id),
+                onError: () => stagingQueue.markAsError(msg.id, 'Failed to send'),
+              }
+            );
+          }
+        }
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [stagingQueue, sendMessageMutation]);
+
+  // Scroll effects
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatMessages]);
 
-  // Filter and sort conversations
-  const filteredConversations = React.useMemo(() => {
-    let filtered = [...conversations];
+  useEffect(() => {
+    claudeScrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [claudeMessages]);
 
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (c) =>
-          c.patient_name?.toLowerCase().includes(query) ||
-          c.last_message?.toLowerCase().includes(query)
-      );
-    }
+  // Clear Claude chat when patient changes
+  useEffect(() => {
+    setClaudeMessages([]);
+    setPendingApproval(null);
+  }, [selectedId]);
 
-    // View mode filter
-    if (viewMode === "unread") {
-      filtered = filtered.filter((c) => c.unread_count > 0);
-    } else if (viewMode === "recent") {
-      const dayAgo = new Date();
-      dayAgo.setDate(dayAgo.getDate() - 1);
-      filtered = filtered.filter((c) => new Date(c.updated_at) > dayAgo);
-    }
+  const selectedConversation = conversations.find(c => c.id === selectedId);
+  const filteredConversations = searchQuery
+    ? conversations.filter(c => c.patient_name?.toLowerCase().includes(searchQuery.toLowerCase()))
+    : conversations;
 
-    // Sort
-    filtered.sort((a, b) => {
-      if (sortMode === "name") {
-        return (a.patient_name || "").localeCompare(b.patient_name || "");
-      } else if (sortMode === "unread") {
-        return (b.unread_count || 0) - (a.unread_count || 0);
-      }
-      return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-    });
-
-    return filtered;
-  }, [conversations, searchQuery, viewMode, sortMode]);
-
-  const formatTimestamp = (timestamp: string) => {
-    const date = new Date(timestamp);
+  const formatTime = (dateStr: string) => {
+    const date = new Date(dateStr);
     const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 60) return `${diffMins}m`;
-    if (diffHours < 24) return `${diffHours}h`;
-    if (diffDays < 7) return `${diffDays}d`;
-    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    const diff = now.getTime() - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}m`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h`;
+    return date.toLocaleDateString();
   };
 
-  const getInitials = (name: string) => {
-    if (!name) return "?";
-    return name
-      .split(" ")
-      .map((part) => part[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
-  };
+  const getInitials = (name: string) => name?.split(" ").map(p => p[0]).join("").toUpperCase().slice(0, 2) || "?";
 
-  const selectedConversation = conversations.find((c) => c.id === selectedId);
-
-  const totalUnread = conversations.reduce((sum, c) => sum + (c.unread_count || 0), 0);
+  const pendingMessages = stagingQueue.messages.filter(m => m.status === 'pending' || m.status === 'sending');
 
   return (
-    <ModernLayout title="Command Center" description="Unified patient communications">
-      <div className="h-[calc(100vh-64px)] flex">
-        {/* Left Panel - Conversation List */}
-        <div className="w-[420px] border-r border-[#1a1a1a] flex flex-col bg-[#080808]">
-          {/* Header Stats */}
-          <div className="p-4 border-b border-[#1a1a1a]">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h1 className="text-2xl font-bold text-[#fafafa] tracking-tight" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                  COMMAND
-                </h1>
-                <p className="text-xs text-[#666] uppercase tracking-widest">Patient Communications Hub</p>
-              </div>
-              <div className="text-right">
-                <div className="text-3xl font-bold text-[#d4af37]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                  {conversations.length}
-                </div>
-                <p className="text-xs text-[#666] uppercase">Total</p>
-              </div>
-            </div>
+    <ModernLayout title="Command Center" description="5-Panel AI Workflow">
+      <div className="h-[calc(100vh-64px)] flex bg-[#080808]">
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                onClick={() => setViewMode("all")}
-                className={`p-3 rounded-lg border transition-all ${
-                  viewMode === "all"
-                    ? "border-[#d4af37] bg-[#d4af37]/10"
-                    : "border-[#222] bg-[#111] hover:border-[#333]"
-                }`}
-              >
-                <div className="text-xl font-bold text-[#fafafa]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                  {conversations.length}
-                </div>
-                <div className="text-[10px] text-[#666] uppercase tracking-wider">All</div>
-              </button>
-              <button
-                onClick={() => setViewMode("unread")}
-                className={`p-3 rounded-lg border transition-all ${
-                  viewMode === "unread"
-                    ? "border-[#ef4444] bg-[#ef4444]/10"
-                    : "border-[#222] bg-[#111] hover:border-[#333]"
-                }`}
-              >
-                <div className="text-xl font-bold text-[#ef4444]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                  {totalUnread}
-                </div>
-                <div className="text-[10px] text-[#666] uppercase tracking-wider">Unread</div>
-              </button>
-              <button
-                onClick={() => setViewMode("recent")}
-                className={`p-3 rounded-lg border transition-all ${
-                  viewMode === "recent"
-                    ? "border-[#22c55e] bg-[#22c55e]/10"
-                    : "border-[#222] bg-[#111] hover:border-[#333]"
-                }`}
-              >
-                <div className="text-xl font-bold text-[#22c55e]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                  {conversations.filter((c) => {
-                    const dayAgo = new Date();
-                    dayAgo.setDate(dayAgo.getDate() - 1);
-                    return new Date(c.updated_at) > dayAgo;
-                  }).length}
-                </div>
-                <div className="text-[10px] text-[#666] uppercase tracking-wider">24h</div>
-              </button>
-            </div>
-          </div>
-
-          {/* Search & Filters */}
-          <div className="p-3 border-b border-[#1a1a1a]">
+        {/* PANEL 1: Spruce Inbox */}
+        <div className="w-[240px] border-r border-[#1a1a1a] flex flex-col">
+          <div className="p-2 border-b border-[#1a1a1a]">
+            <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest mb-1.5 flex items-center gap-1">
+              <MessageCircle className="h-3 w-3" /> Spruce Inbox
+            </h2>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#444]" />
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-[#444]" />
               <Input
-                placeholder="Search patients..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-[#111] border-[#222] text-[#fafafa] placeholder:text-[#444] focus:border-[#d4af37] focus:ring-[#d4af37]/20"
-                style={{ fontFamily: "'JetBrains Mono', monospace" }}
+                className="pl-7 h-6 text-[10px] bg-[#111] border-[#222] text-[#fafafa]"
               />
-            </div>
-            <div className="flex gap-2 mt-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSortMode(sortMode === "recent" ? "name" : sortMode === "name" ? "unread" : "recent")}
-                className="flex-1 bg-[#111] border-[#222] text-[#888] hover:bg-[#1a1a1a] hover:text-[#fafafa]"
-              >
-                <SortDesc className="h-3.5 w-3.5 mr-1.5" />
-                {sortMode === "recent" ? "Recent" : sortMode === "name" ? "Name" : "Unread"}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetch()}
-                className="bg-[#111] border-[#222] text-[#888] hover:bg-[#1a1a1a] hover:text-[#fafafa]"
-              >
-                <Activity className="h-3.5 w-3.5" />
-              </Button>
             </div>
           </div>
 
-          {/* Conversation List */}
           <ScrollArea className="flex-1">
             {isLoading ? (
-              <div className="flex items-center justify-center h-48">
-                <Loader2 className="h-6 w-6 animate-spin text-[#d4af37]" />
-              </div>
+              <div className="p-4 text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto text-[#d4af37]" /></div>
             ) : error ? (
-              <div className="p-4 text-center">
-                <div className="text-[#ef4444] text-sm mb-2">Connection Error</div>
-                <p className="text-[#666] text-xs">Configure Spruce API in Settings</p>
-                <Link href="/doctor-profile">
-                  <Button variant="outline" size="sm" className="mt-3 border-[#333] text-[#888]">
-                    <ExternalLink className="h-3.5 w-3.5 mr-1.5" />
-                    Settings
-                  </Button>
-                </Link>
-              </div>
-            ) : filteredConversations.length === 0 ? (
-              <div className="p-8 text-center">
-                <User className="h-8 w-8 mx-auto text-[#333] mb-3" />
-                <p className="text-[#666] text-sm">No conversations found</p>
-              </div>
+              <div className="p-4 text-center text-[10px] text-[#ef4444]">Connection error</div>
             ) : (
-              <div className="p-2">
-                {filteredConversations.map((conversation, index) => (
+              <div className="p-1">
+                {filteredConversations.map((conv) => (
                   <button
-                    key={conversation.id}
-                    onClick={() => setSelectedId(conversation.id)}
-                    className={`w-full p-3 mb-1 rounded-lg text-left transition-all group ${
-                      selectedId === conversation.id
-                        ? "bg-[#d4af37]/10 border border-[#d4af37]/30"
-                        : "bg-[#0c0c0c] border border-transparent hover:bg-[#111] hover:border-[#222]"
-                    }`}
-                    style={{ animationDelay: `${index * 20}ms` }}
+                    key={conv.id}
+                    onClick={() => setSelectedId(conv.id)}
+                    className={cn(
+                      "w-full p-1.5 mb-0.5 rounded text-left transition-all",
+                      selectedId === conv.id ? "bg-[#d4af37]/10 border-l-2 border-l-[#d4af37]" : "hover:bg-[#111]"
+                    )}
                   >
-                    <div className="flex items-start gap-3">
-                      {/* Avatar */}
-                      <div
-                        className={`h-10 w-10 rounded-lg flex items-center justify-center text-sm font-bold shrink-0 ${
-                          conversation.unread_count > 0
-                            ? "bg-[#d4af37] text-[#0a0908]"
-                            : "bg-[#1a1a1a] text-[#666]"
-                        }`}
-                        style={{ fontFamily: "'JetBrains Mono', monospace" }}
-                      >
-                        {getInitials(conversation.patient_name)}
+                    <div className="flex items-center gap-1.5">
+                      <div className={cn(
+                        "h-6 w-6 rounded flex items-center justify-center text-[9px] font-bold flex-shrink-0",
+                        conv.unread_count > 0 ? "bg-[#d4af37] text-[#0a0908]" : "bg-[#222] text-[#666]"
+                      )}>
+                        {getInitials(conv.patient_name)}
                       </div>
-
-                      {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <span
-                            className={`font-medium truncate ${
-                              conversation.unread_count > 0 ? "text-[#fafafa]" : "text-[#aaa]"
-                            }`}
-                            style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: "13px" }}
-                          >
-                            {conversation.patient_name}
-                          </span>
-                          <span className="text-[10px] text-[#555] uppercase tracking-wider ml-2 shrink-0">
-                            {formatTimestamp(conversation.updated_at)}
-                          </span>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-medium text-[#fafafa] truncate">{conv.patient_name}</span>
+                          <span className="text-[8px] text-[#555] ml-1">{formatTime(conv.updated_at)}</span>
                         </div>
-                        <p className="text-xs text-[#555] truncate leading-relaxed">
-                          {conversation.last_message}
-                        </p>
-                        {conversation.unread_count > 0 && (
-                          <div className="mt-1.5 flex items-center gap-1.5">
-                            <span className="h-1.5 w-1.5 rounded-full bg-[#d4af37] animate-pulse" />
-                            <span className="text-[10px] text-[#d4af37] uppercase tracking-wider">
-                              {conversation.unread_count} new
-                            </span>
-                          </div>
-                        )}
+                        <p className="text-[9px] text-[#555] truncate">{conv.last_message}</p>
                       </div>
-
-                      {/* Arrow */}
-                      <ChevronRight
-                        className={`h-4 w-4 shrink-0 transition-transform ${
-                          selectedId === conversation.id
-                            ? "text-[#d4af37] translate-x-0"
-                            : "text-[#333] -translate-x-1 group-hover:translate-x-0 group-hover:text-[#555]"
-                        }`}
-                      />
                     </div>
                   </button>
                 ))}
@@ -410,334 +935,416 @@ export default function CommandCenter() {
             )}
           </ScrollArea>
 
-          {/* Footer */}
-          <div className="p-3 border-t border-[#1a1a1a] bg-[#080808]">
-            <div className="flex items-center justify-between text-[10px] text-[#444] uppercase tracking-wider">
-              <span>Showing {filteredConversations.length} of {conversations.length}</span>
-              <span className="flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e]" />
-                Live
-              </span>
-            </div>
+          <div className="p-1.5 border-t border-[#1a1a1a] text-[8px] text-[#444] flex justify-between items-center">
+            <span>{conversations.length} total</span>
+            <button onClick={() => refetch()} className="hover:text-[#d4af37] p-1"><RefreshCw className="h-3 w-3" /></button>
           </div>
         </div>
 
-        {/* Right Panel - Detail/Chat/AI View */}
-        <div className={`flex flex-col bg-[#0a0908] transition-all duration-300 ${showRightPanel ? "flex-1" : "w-0 overflow-hidden"}`}>
-          {selectedConversation ? (
-            <>
-              {/* Selected Patient Header */}
-              <div className="p-4 border-b border-[#1a1a1a]">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-[#d4af37] flex items-center justify-center text-lg font-bold text-[#0a0908]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                    {getInitials(selectedConversation.patient_name)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-lg font-bold text-[#fafafa] truncate" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                      {selectedConversation.patient_name}
-                    </h2>
-                    <p className="text-[10px] text-[#666] uppercase tracking-widest">
-                      ID: {selectedConversation.id.slice(-8)} • {formatTimestamp(selectedConversation.updated_at)}
-                    </p>
-                  </div>
-                  {/* Mode Toggle Buttons */}
-                  <div className="flex gap-1 bg-[#111] rounded-lg p-1 border border-[#222]">
-                    <button
-                      onClick={() => setRightPanelMode("details")}
-                      className={`p-2 rounded-md transition-all ${rightPanelMode === "details" ? "bg-[#d4af37] text-[#0a0908]" : "text-[#666] hover:text-[#fafafa]"}`}
-                      title="Patient Details"
-                    >
-                      <User className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setRightPanelMode("chat")}
-                      className={`p-2 rounded-md transition-all ${rightPanelMode === "chat" ? "bg-[#d4af37] text-[#0a0908]" : "text-[#666] hover:text-[#fafafa]"}`}
-                      title="Chat"
-                    >
-                      <MessageCircle className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => setRightPanelMode("ai")}
-                      className={`p-2 rounded-md transition-all ${rightPanelMode === "ai" ? "bg-[#d4af37] text-[#0a0908]" : "text-[#666] hover:text-[#fafafa]"}`}
-                      title="AI Assistant"
-                    >
-                      <Bot className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowRightPanel(false)}
-                    className="text-[#666] hover:text-[#fafafa]"
-                  >
-                    <PanelRightClose className="h-4 w-4" />
-                  </Button>
+        {/* PANEL 2: Conversation History */}
+        <div className="w-[280px] border-r border-[#1a1a1a] flex flex-col">
+          <div className="p-2 border-b border-[#1a1a1a]">
+            <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
+              <FileText className="h-3 w-3" /> Conversation
+            </h2>
+            {selectedConversation && (
+              <p className="text-[9px] text-[#666] mt-0.5">{selectedConversation.patient_name}</p>
+            )}
+          </div>
+
+          <ScrollArea className="flex-1 p-2">
+            {!selectedId ? (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center">
+                  <User className="h-6 w-6 mx-auto text-[#333] mb-1" />
+                  <p className="text-[9px] text-[#555]">Select a conversation</p>
                 </div>
               </div>
+            ) : isLoadingMessages ? (
+              <div className="flex items-center justify-center h-20"><Loader2 className="h-4 w-4 animate-spin text-[#d4af37]" /></div>
+            ) : chatMessages.length === 0 ? (
+              <div className="text-center text-[#555] text-[10px] py-4">No messages</div>
+            ) : (
+              <div className="space-y-1.5">
+                {chatMessages.map((msg) => (
+                  <div key={msg.id} className={cn("flex flex-col", msg.isFromPatient ? "items-start" : "items-end")}>
+                    <div className={cn(
+                      "max-w-[90%] p-1.5 rounded text-[10px]",
+                      msg.isFromPatient ? "bg-[#1a1a1a] text-[#e6e6e6]" : "bg-[#d4af37] text-[#0a0908]"
+                    )}>
+                      {msg.content && <p className="whitespace-pre-wrap">{msg.content}</p>}
 
-              {/* DETAILS MODE */}
-              {rightPanelMode === "details" && (
-                <>
-                  {/* Quick Actions */}
-                  <div className="p-4 border-b border-[#1a1a1a]">
-                    <div className="grid grid-cols-4 gap-2">
-                      <button
-                        onClick={() => setRightPanelMode("chat")}
-                        className="p-3 rounded-lg bg-[#111] border border-[#222] hover:border-[#d4af37] transition-all group"
-                      >
-                        <MessageCircle className="h-5 w-5 mx-auto mb-1.5 text-[#666] group-hover:text-[#d4af37]" />
-                        <span className="text-[10px] text-[#888] group-hover:text-[#fafafa] uppercase tracking-wider">Chat</span>
-                      </button>
-                      <button
-                        onClick={() => setRightPanelMode("ai")}
-                        className="p-3 rounded-lg bg-[#111] border border-[#222] hover:border-[#d4af37] transition-all group"
-                      >
-                        <Zap className="h-5 w-5 mx-auto mb-1.5 text-[#666] group-hover:text-[#d4af37]" />
-                        <span className="text-[10px] text-[#888] group-hover:text-[#fafafa] uppercase tracking-wider">AI</span>
-                      </button>
-                      <button className="p-3 rounded-lg bg-[#111] border border-[#222] hover:border-[#333] transition-all group">
-                        <FileText className="h-5 w-5 mx-auto mb-1.5 text-[#666] group-hover:text-[#d4af37]" />
-                        <span className="text-[10px] text-[#888] group-hover:text-[#fafafa] uppercase tracking-wider">Notes</span>
-                      </button>
-                      <a
-                        href="https://web.sprucehealth.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-3 rounded-lg bg-[#111] border border-[#222] hover:border-[#333] transition-all group text-center"
-                      >
-                        <ExternalLink className="h-5 w-5 mx-auto mb-1.5 text-[#666] group-hover:text-[#d4af37]" />
-                        <span className="text-[10px] text-[#888] group-hover:text-[#fafafa] uppercase tracking-wider">Spruce</span>
-                      </a>
-                    </div>
-                  </div>
-
-                  {/* Conversation Info */}
-                  <ScrollArea className="flex-1 p-4">
-                    <div className="space-y-4">
-                      <div className="p-4 rounded-lg bg-[#111] border border-[#222]">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Clock className="h-4 w-4 text-[#666]" />
-                          <span className="text-xs text-[#666] uppercase tracking-wider">Last Activity</span>
-                        </div>
-                        <p className="text-[#fafafa] text-sm" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                          {new Date(selectedConversation.updated_at).toLocaleString()}
-                        </p>
-                      </div>
-                      <div className="p-4 rounded-lg bg-[#111] border border-[#222]">
-                        <div className="flex items-center gap-2 mb-2">
-                          <MessageCircle className="h-4 w-4 text-[#666]" />
-                          <span className="text-xs text-[#666] uppercase tracking-wider">Last Message</span>
-                        </div>
-                        <p className="text-[#aaa] text-sm leading-relaxed">
-                          {selectedConversation.last_message || "No message preview available"}
-                        </p>
-                      </div>
-                      {selectedConversation.unread_count > 0 && (
-                        <div className="p-4 rounded-lg bg-[#d4af37]/10 border border-[#d4af37]/30">
-                          <div className="flex items-center gap-2">
-                            <AlertCircle className="h-4 w-4 text-[#d4af37]" />
-                            <span className="text-sm text-[#d4af37] font-medium">
-                              {selectedConversation.unread_count} unread message{selectedConversation.unread_count > 1 ? "s" : ""}
-                            </span>
-                          </div>
+                      {/* Render attachments/images */}
+                      {msg.attachments && msg.attachments.length > 0 && (
+                        <div className="mt-1.5 space-y-1">
+                          {msg.attachments.map((attachment) => (
+                            <div key={attachment.id} className="rounded overflow-hidden">
+                              {attachment.type === 'image' ? (
+                                <div className="relative group">
+                                  <img
+                                    src={attachment.url}
+                                    alt={attachment.name || 'Patient image'}
+                                    className="max-w-full max-h-[150px] rounded cursor-pointer hover:opacity-90 transition-opacity"
+                                    onClick={() => window.open(attachment.url, '_blank')}
+                                  />
+                                  <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        window.open(attachment.url, '_blank');
+                                      }}
+                                      className="p-1 bg-black/50 rounded hover:bg-black/70"
+                                      title="Open full size"
+                                    >
+                                      <ExternalLink className="h-3 w-3 text-white" />
+                                    </button>
+                                  </div>
+                                  <div className="flex items-center gap-1 mt-0.5 text-[8px] opacity-70">
+                                    <ImageIcon className="h-2.5 w-2.5" />
+                                    <span>{attachment.name || 'Image'}</span>
+                                  </div>
+                                </div>
+                              ) : (
+                                <a
+                                  href={attachment.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-1 p-1 bg-black/20 rounded hover:bg-black/30 transition-colors"
+                                >
+                                  <FileText className="h-3 w-3" />
+                                  <span className="text-[8px] truncate">{attachment.name || 'Document'}</span>
+                                  <Download className="h-2.5 w-2.5 ml-auto" />
+                                </a>
+                              )}
+                            </div>
+                          ))}
                         </div>
                       )}
-                    </div>
-                  </ScrollArea>
-                </>
-              )}
 
-              {/* CHAT MODE */}
-              {rightPanelMode === "chat" && (
-                <>
-                  <ScrollArea className="flex-1 p-4">
-                    {isLoadingMessages ? (
-                      <div className="flex items-center justify-center h-32">
-                        <Loader2 className="h-6 w-6 animate-spin text-[#d4af37]" />
-                      </div>
-                    ) : chatMessages.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center h-full text-center">
-                        <MessageCircle className="h-10 w-10 text-[#333] mb-3" />
-                        <p className="text-[#666] text-sm">No messages in this conversation</p>
-                        <p className="text-[#444] text-xs mt-1">Start typing below to send a message</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        {chatMessages.map((message) => (
-                          <div
-                            key={message.id}
-                            className={`flex ${message.isFromPatient ? "justify-start" : "justify-end"}`}
-                          >
-                            <div
-                              className={`max-w-[80%] p-3 rounded-lg ${
-                                message.isFromPatient
-                                  ? "bg-[#1a1a1a] border border-[#222] text-[#e6e6e6]"
-                                  : "bg-[#d4af37] text-[#0a0908]"
-                              }`}
-                            >
-                              <p className="text-sm">{message.content}</p>
-                              <p className="text-[10px] mt-1.5 opacity-60">
-                                {formatTimestamp(message.timestamp)}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                        <div ref={messagesEndRef} />
-                      </div>
-                    )}
-                  </ScrollArea>
-                  <div className="p-3 border-t border-[#1a1a1a]">
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        if (messageText.trim() && selectedId) {
-                          sendMessageMutation.mutate({ conversationId: selectedId, message: messageText.trim() });
-                        }
-                      }}
-                      className="flex gap-2"
-                    >
-                      <Input
-                        value={messageText}
-                        onChange={(e) => setMessageText(e.target.value)}
-                        placeholder="Type a message..."
-                        className="flex-1 bg-[#111] border-[#222] text-[#fafafa] placeholder:text-[#444]"
-                        disabled={sendMessageMutation.isPending}
-                      />
-                      <Button
-                        type="submit"
-                        disabled={!messageText.trim() || sendMessageMutation.isPending}
-                        className="bg-[#d4af37] text-[#0a0908] hover:bg-[#c9a432]"
-                      >
-                        {sendMessageMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Send className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </form>
-                  </div>
-                </>
-              )}
-
-              {/* AI MODE */}
-              {rightPanelMode === "ai" && (
-                <>
-                  {/* AI Quick Actions - Stream Deck Style */}
-                  <div className="p-3 border-b border-[#1a1a1a]">
-                    <div className="grid grid-cols-3 gap-2">
-                      {[
-                        { label: "SOAP Note", cmd: "Generate a complete SOAP note", color: "bg-blue-600" },
-                        { label: "Assessment", cmd: "Generate clinical assessment", color: "bg-green-600" },
-                        { label: "Medications", cmd: "List recommended medications", color: "bg-orange-600" },
-                        { label: "Diff Dx", cmd: "Generate differential diagnosis", color: "bg-pink-600" },
-                        { label: "Plan", cmd: "Generate treatment plan", color: "bg-purple-600" },
-                        { label: "Summarize", cmd: "Summarize key points", color: "bg-amber-600" },
-                      ].map((action) => (
-                        <button
-                          key={action.label}
-                          onClick={() => aiMutation.mutate(action.cmd + " for patient " + selectedConversation.patient_name)}
-                          disabled={aiMutation.isPending}
-                          className={`p-2.5 rounded-lg ${action.color} hover:opacity-90 transition-all disabled:opacity-50 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg hover:shadow-xl transform hover:scale-105`}
-                        >
-                          {action.label}
-                        </button>
-                      ))}
+                      <p className="text-[8px] opacity-60 mt-0.5">{formatTime(msg.timestamp)}</p>
                     </div>
                   </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
+          </ScrollArea>
+        </div>
 
-                  {/* AI Response Area */}
-                  <ScrollArea className="flex-1 p-4">
-                    {aiMutation.isPending ? (
-                      <div className="flex flex-col items-center justify-center h-32">
-                        <Loader2 className="h-6 w-6 animate-spin text-[#d4af37] mb-2" />
-                        <p className="text-[#666] text-sm">Generating...</p>
-                      </div>
-                    ) : aiMutation.data ? (
-                      <div className="p-4 rounded-lg bg-[#111] border border-[#222]">
-                        <div className="flex items-center gap-2 mb-3">
-                          <Sparkles className="h-4 w-4 text-[#d4af37]" />
-                          <span className="text-xs text-[#d4af37] uppercase tracking-wider font-bold">AI Generated</span>
-                        </div>
-                        <p className="text-[#e6e6e6] text-sm whitespace-pre-wrap leading-relaxed">
-                          {aiMutation.data.generated_text}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full text-center">
-                        <Bot className="h-10 w-10 text-[#333] mb-3" />
-                        <p className="text-[#666] text-sm">AI Assistant Ready</p>
-                        <p className="text-[#444] text-xs mt-1 max-w-[200px]">
-                          Click a quick action above or type a custom prompt below
-                        </p>
-                      </div>
-                    )}
-                  </ScrollArea>
-
-                  {/* AI Input */}
-                  <div className="p-3 border-t border-[#1a1a1a]">
-                    <form
-                      onSubmit={(e) => {
-                        e.preventDefault();
-                        if (aiPrompt.trim()) {
-                          aiMutation.mutate(aiPrompt + " for patient " + selectedConversation.patient_name);
-                        }
-                      }}
-                      className="flex gap-2"
-                    >
-                      <Textarea
-                        value={aiPrompt}
-                        onChange={(e) => setAiPrompt(e.target.value)}
-                        placeholder="Ask AI anything about this patient..."
-                        className="flex-1 bg-[#111] border-[#222] text-[#fafafa] placeholder:text-[#444] resize-none text-sm"
-                        rows={2}
-                        disabled={aiMutation.isPending}
-                      />
-                      <Button
-                        type="submit"
-                        disabled={!aiPrompt.trim() || aiMutation.isPending}
-                        className="bg-[#d4af37] text-[#0a0908] hover:bg-[#c9a432] self-end"
-                      >
-                        {aiMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Sparkles className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </form>
-                  </div>
-                </>
+        {/* PANEL 3: Staging Queue (60s countdown) */}
+        <div className="w-[220px] border-r border-[#1a1a1a] flex flex-col">
+          <div className="p-2 border-b border-[#1a1a1a]">
+            <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
+              <Clock className="h-3 w-3" /> Staging Queue
+              {pendingMessages.length > 0 && (
+                <Badge className="ml-auto h-4 px-1 text-[8px] bg-[#ef4444]">{pendingMessages.length}</Badge>
               )}
-            </>
-          ) : (
-            <div className="flex-1 flex items-center justify-center">
-              <div className="text-center">
-                <div className="h-20 w-20 mx-auto rounded-2xl bg-[#111] border border-[#222] flex items-center justify-center mb-6">
-                  <User className="h-10 w-10 text-[#333]" />
+            </h2>
+            <p className="text-[8px] text-[#555] mt-0.5">60s countdown → auto-send</p>
+          </div>
+
+          <ScrollArea className="flex-1 p-1.5">
+            {pendingMessages.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center p-2">
+                  <Send className="h-5 w-5 mx-auto text-[#333] mb-1" />
+                  <p className="text-[9px] text-[#555]">Approved messages</p>
+                  <p className="text-[8px] text-[#444]">appear here</p>
                 </div>
-                <h3 className="text-lg font-bold text-[#fafafa] mb-2" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                  SELECT A PATIENT
-                </h3>
-                <p className="text-[#666] text-sm max-w-xs mx-auto">
-                  Choose a conversation from the list to view details, chat, or use AI
-                </p>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                {pendingMessages.map((msg) => {
+                  const progress = (msg.countdown / DEFAULT_TIMER_CONFIG.initialCountdown) * 100;
+                  const isUrgent = msg.countdown <= 10;
+                  const isSending = msg.status === 'sending';
+
+                  return (
+                    <Card key={msg.id} className={cn(
+                      "border",
+                      isUrgent && !isSending && "border-[#ef4444]/50 bg-[#ef4444]/5",
+                      isSending && "border-[#d4af37]/50 bg-[#d4af37]/5",
+                      !isUrgent && !isSending && "bg-[#111] border-[#222]"
+                    )}>
+                      <CardContent className="p-2">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[9px] text-[#888] truncate">{msg.patientName}</span>
+                          {isSending ? (
+                            <Loader2 className="h-3 w-3 animate-spin text-[#d4af37]" />
+                          ) : (
+                            <span className={cn("text-xs font-bold", isUrgent ? "text-[#ef4444]" : "text-[#fafafa]")}>
+                              {msg.countdown}s
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[9px] text-[#aaa] line-clamp-2 mb-1.5">{msg.content}</p>
+                        <Progress value={progress} className={cn("h-0.5 mb-1.5", isUrgent && "[&>div]:bg-[#ef4444]")} />
+                        <div className="flex gap-1">
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => stagingQueue.cancelMessage(msg.id)}
+                            disabled={isSending}
+                            className="h-5 px-1.5 text-[8px] flex-1"
+                          >
+                            <X className="h-2.5 w-2.5" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              stagingQueue.markAsSending(msg.id);
+                              sendMessageMutation.mutate(
+                                { conversationId: msg.conversationId, message: msg.content },
+                                {
+                                  onSuccess: () => stagingQueue.markAsSent(msg.id),
+                                  onError: () => stagingQueue.markAsError(msg.id, 'Failed'),
+                                }
+                              );
+                            }}
+                            disabled={isSending}
+                            className="h-5 px-1.5 text-[8px] flex-1 bg-[#d4af37] text-[#0a0908]"
+                          >
+                            <Send className="h-2.5 w-2.5" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </ScrollArea>
+        </div>
+
+        {/* PANEL 4: Claude Haiku 4.5 Chat */}
+        <div className="w-[320px] border-r border-[#1a1a1a] flex flex-col">
+          <div className="p-2 border-b border-[#1a1a1a]">
+            <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
+              <Sparkles className="h-3 w-3" /> Claude Chat
+              <Badge variant="secondary" className="ml-auto text-[8px] h-4">Haiku 4.5</Badge>
+            </h2>
+            <p className="text-[8px] text-[#555] mt-0.5">Review & approve AI responses</p>
+          </div>
+
+          <ScrollArea className="flex-1 p-2">
+            {claudeMessages.length === 0 ? (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center p-4">
+                  <Bot className="h-8 w-8 mx-auto text-[#333] mb-2" />
+                  <p className="text-[10px] text-[#555]">Click a template to generate</p>
+                  <p className="text-[9px] text-[#444] mt-1">or chat freely below</p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {claudeMessages.map((msg) => (
+                  <div key={msg.id} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
+                    <div className={cn(
+                      "max-w-[90%] p-2 rounded text-[10px]",
+                      msg.role === 'user' ? "bg-[#1a1a1a] text-[#e6e6e6]" : "bg-[#0a1a0a] border border-[#22c55e]/30 text-[#e6e6e6]"
+                    )}>
+                      <p className="whitespace-pre-wrap">{msg.content}</p>
+                    </div>
+                  </div>
+                ))}
+                {isGenerating && (
+                  <div className="flex justify-start">
+                    <div className="bg-[#111] rounded p-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-[#d4af37]" />
+                    </div>
+                  </div>
+                )}
+                <div ref={claudeScrollRef} />
+              </div>
+            )}
+          </ScrollArea>
+
+          {/* Approval buttons */}
+          {pendingApproval && (
+            <div className="p-2 border-t border-[#1a1a1a] bg-[#0a1a0a]">
+              <p className="text-[9px] text-[#22c55e] mb-1.5">
+                Ready to approve: {pendingApproval.templateName}
+                {pendingApproval.isPDF && <Badge className="ml-1 h-3 text-[7px] bg-teal-600">PDF</Badge>}
+                {pendingApproval.isFax && <Badge className="ml-1 h-3 text-[7px] bg-indigo-600">FAX</Badge>}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={rejectMessage}
+                  className="h-7 flex-1 text-[10px]"
+                >
+                  <X className="h-3 w-3 mr-1" /> Reject
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={approveMessage}
+                  className="h-7 flex-1 text-[10px] bg-[#22c55e] hover:bg-[#16a34a]"
+                >
+                  {pendingApproval.isPDF ? (
+                    <><FileDown className="h-3 w-3 mr-1" /> Generate PDF</>
+                  ) : pendingApproval.isFax ? (
+                    <><Printer className="h-3 w-3 mr-1" /> Generate & Fax</>
+                  ) : (
+                    <><Check className="h-3 w-3 mr-1" /> Approve → Queue</>
+                  )}
+                </Button>
               </div>
             </div>
           )}
+
+          {/* Free chat input */}
+          <div className="p-2 border-t border-[#1a1a1a]">
+            <div className="flex gap-1.5">
+              <Textarea
+                placeholder="Chat with Claude..."
+                value={claudeInput}
+                onChange={(e) => setClaudeInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendToClaudeChat();
+                  }
+                }}
+                disabled={isGenerating}
+                className="min-h-[50px] resize-none text-[10px] bg-[#111] border-[#222]"
+              />
+              <Button
+                onClick={sendToClaudeChat}
+                disabled={!claudeInput.trim() || isGenerating}
+                size="icon"
+                className="h-[50px] w-10 bg-[#d4af37] text-[#0a0908]"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
         </div>
 
-        {/* Panel Toggle (when hidden) */}
-        {!showRightPanel && selectedConversation && (
-          <div className="w-12 border-l border-[#1a1a1a] bg-[#0a0908] flex flex-col items-center py-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowRightPanel(true)}
-              className="text-[#666] hover:text-[#fafafa]"
-            >
-              <PanelRight className="h-4 w-4" />
-            </Button>
+        {/* PANEL 5: Template Buttons */}
+        <div className="flex-1 flex flex-col min-w-[240px]">
+          <div className="p-2 border-b border-[#1a1a1a]">
+            <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
+              <Zap className="h-3 w-3" /> Templates
+            </h2>
+            <p className="text-[8px] text-[#555] mt-0.5">Click any template to generate</p>
           </div>
-        )}
+
+          {/* Category tabs */}
+          <div className="p-1.5 border-b border-[#1a1a1a]">
+            <div className="flex flex-wrap gap-1">
+              {Object.entries(TEMPLATE_CATEGORIES).map(([key, config]) => {
+                const Icon = config.icon;
+                const hasTemplates = templatesByCategory[key]?.length > 0;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => setSelectedTemplateCategory(key)}
+                    disabled={!hasTemplates}
+                    className={cn(
+                      "flex items-center gap-1 px-2 py-1 rounded text-[9px] transition-all",
+                      selectedTemplateCategory === key
+                        ? `${config.color} text-white`
+                        : "bg-[#1a1a1a] text-[#888] hover:bg-[#222]",
+                      !hasTemplates && "opacity-30 cursor-not-allowed"
+                    )}
+                  >
+                    <Icon className="h-3 w-3" />
+                    {config.label}
+                    {hasTemplates && (
+                      <span className="ml-0.5 bg-white/20 px-1 rounded text-[8px]">
+                        {templatesByCategory[key].length}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Templates list from database */}
+          <ScrollArea className="flex-1 p-2">
+            {isLoadingTemplates ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-5 w-5 animate-spin text-[#d4af37]" />
+              </div>
+            ) : !templatesByCategory[selectedTemplateCategory]?.length ? (
+              <div className="text-center py-8 text-[#555] text-[10px]">
+                <FileText className="h-6 w-6 mx-auto mb-2 opacity-50" />
+                No templates in this category
+                <p className="text-[8px] mt-1">Add templates in Settings</p>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                {templatesByCategory[selectedTemplateCategory].map((template) => {
+                  const categoryConfig = TEMPLATE_CATEGORIES[selectedTemplateCategory as keyof typeof TEMPLATE_CATEGORIES];
+                  return (
+                    <button
+                      key={template.id}
+                      onClick={() => generateWithDbTemplate(template)}
+                      disabled={!selectedId || isGenerating}
+                      className={cn(
+                        "w-full p-2 rounded-lg transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
+                        categoryConfig?.color || 'bg-[#333]',
+                        "hover:opacity-90 hover:scale-[1.01] active:scale-[0.99]"
+                      )}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-bold text-white truncate">
+                            {template.template_name}
+                          </p>
+                          <p className="text-[8px] text-white/70 line-clamp-2 mt-0.5">
+                            {template.template_content.substring(0, 80)}...
+                          </p>
+                        </div>
+                        {template.is_default && (
+                          <Badge className="h-4 text-[7px] bg-white/20 flex-shrink-0">Default</Badge>
+                        )}
+                      </div>
+                      {template.case_type && (
+                        <Badge className="mt-1 h-4 text-[7px] bg-black/20">
+                          {template.case_type}
+                        </Badge>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </ScrollArea>
+
+          {/* Quick action buttons (hardcoded templates) */}
+          <div className="p-2 border-t border-[#1a1a1a]">
+            <p className="text-[8px] text-[#555] mb-1.5">Quick Actions</p>
+            <div className="grid grid-cols-3 gap-1">
+              {TEMPLATES.slice(0, 3).map((template) => {
+                const Icon = template.icon;
+                return (
+                  <button
+                    key={template.id}
+                    onClick={() => generateWithTemplate(template)}
+                    disabled={!selectedId || isGenerating}
+                    className={cn(
+                      "p-1.5 rounded transition-all disabled:opacity-50",
+                      template.color,
+                      "hover:opacity-90"
+                    )}
+                    title={template.name}
+                  >
+                    <Icon className="h-3 w-3 text-white mx-auto" />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="p-2 border-t border-[#1a1a1a] text-[8px] text-[#555] text-center">
+            {selectedConversation
+              ? `Patient: ${selectedConversation.patient_name}`
+              : "Select a patient first"}
+          </div>
+        </div>
       </div>
     </ModernLayout>
   );

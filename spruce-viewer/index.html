@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spruce Conversations | InstantHPI Elite</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="background-glow"></div>
+
+    <div class="app-dashboard">
+        <!-- Column 1: Conversations (Sidebar) -->
+        <div class="column sidebar-col">
+            <header class="sidebar-header">
+                <div class="logo-container">
+                    <span class="logo-text">InstantHPI <span class="accent">Elite</span></span>
+                </div>
+                <div class="header-top">
+                    <h1>Spruce</h1>
+                    <button id="sync-button" class="icon-button" title="Sync with Spruce">🔄</button>
+                </div>
+                <div class="status-badge" id="sync-status">Refreshing...</div>
+            </header>
+
+            <div class="search-container">
+                <input type="text" id="conversation-search" placeholder="Search patients...">
+            </div>
+
+            <div class="sidebar-controls">
+                <select id="filter-select">
+                    <option value="all">All Active</option>
+                    <option value="unread">Unread Only</option>
+                    <option value="archived">Archived</option>
+                </select>
+                <select id="sort-select">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="archive">Archive Time</option>
+                </select>
+            </div>
+
+            <div class="conversation-list" id="conversations-container">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+        </div>
+
+        <!-- Column 2: Active Chat (History) -->
+        <div class="column chat-col">
+            <div id="welcome-view" class="main-content-centered">
+                <div class="welcome-box">
+                    <div class="welcome-icon">💬</div>
+                    <h2>Clinical Feed</h2>
+                    <p>Select a thread to view history.</p>
+                </div>
+            </div>
+
+            <div id="chat-view" class="chat-container" style="display: none;">
+                <header class="chat-header">
+                    <div class="patient-info">
+                        <h2 id="active-patient-name">Patient Name</h2>
+                        <span id="active-conversation-id" class="id-tag">ID: ...</span>
+                    </div>
+                </header>
+
+                <div id="messages-container" class="messages-container">
+                    <!-- Messages will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Column 3: AI Interface (Claude) -->
+        <div class="column ai-col">
+            <header class="column-header">
+                <h2>Claude AI</h2>
+                <div class="ai-status">Opus 4.5 • Clinical Intelligence</div>
+            </header>
+            <div id="ai-chat-container" class="ai-messages">
+                <div class="ai-welcome">
+                    <div class="ai-avatar">🤖</div>
+                    <p>I'm your AI assistant. Select a conversation to start analyzing clinical history.</p>
+                </div>
+            </div>
+            <div class="ai-input-area">
+                <textarea id="ai-input" placeholder="Ask Claude to analyze history or draft a response..."></textarea>
+                <button id="send-ai-btn" class="ai-send-btn">Ask AI</button>
+            </div>
+        </div>
+
+        <!-- Column 4: Prompts & Saved Messages -->
+        <div class="column prompt-col">
+            <header class="column-header">
+                <h2>Prompt Panel</h2>
+            </header>
+            <div class="prompt-grid">
+                <div class="prompt-section">
+                    <h3>Core Actions</h3>
+                    <button class="prompt-btn"
+                        onclick="applyAIDirect('Generate a clinical SOAP note based on the recent conversation.')">SOAP
+                        Note</button>
+                    <button class="prompt-btn"
+                        onclick="applyAIDirect('Draft a professional natural message to the patient explaining the diagnosis and medications.')">Patient
+                        Message</button>
+                    <button class="prompt-btn"
+                        onclick="applyAIDirect('Provide a Clinical Discussion and Next Steps Strategy for this case.')">Case
+                        Discussion</button>
+                    <button class="prompt-btn"
+                        onclick="applyAIDirect('Draft a medical leave note or work release for this patient.')">Medical
+                        Leave</button>
+                    <button class="prompt-btn"
+                        onclick="applyAIDirect('Create a lab, imaging, or specialist requisition form.')">Requisition /
+                        Ref</button>
+                    <button class="prompt-btn"
+                        onclick="applyAIDirect('Draft a Medication Prescription (Ordonnance).')">Prescription
+                        (Rx)</button>
+                    <button class="prompt-btn"
+                        onclick="applyAIDirect('Provide clinical evidence or risk education (e.g. FLQ Risks, Safe Pyelo).')">Clinical
+                        Evidence</button>
+                    <button class="prompt-btn"
+                        onclick="applyAIDirect('Create a horizontal ASCII timeline of the patient symptoms.')">Symptom
+                        Timeline</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allConversations = [];
+        let activeConversation = null;
+
+        let currentFilter = 'all';
+        let currentSort = 'newest';
+
+        async function fetchConversations() {
+            const container = document.getElementById('conversations-container');
+            const syncStatus = document.getElementById('sync-status');
+
+            try {
+                const response = await fetch('/api/conversations');
+                const data = await response.json();
+
+                if (data.error) {
+                    container.innerHTML = `<div class="error-state">Error: ${data.error}</div>`;
+                    syncStatus.textContent = 'Connection Error';
+                    syncStatus.className = 'status-badge error';
+                    return;
+                }
+
+                allConversations = data;
+                applyFiltersAndRender();
+
+                const activeCount = allConversations.filter(c => !c.archived).length;
+                syncStatus.textContent = `${activeCount} Active`;
+                syncStatus.className = 'status-badge active';
+            } catch (error) {
+                container.innerHTML = `<div class="error-state">Offline</div>`;
+                syncStatus.textContent = 'Offline';
+            }
+        }
+
+        function applyFiltersAndRender() {
+            const searchTerm = document.getElementById('conversation-search').value.toLowerCase();
+            let filtered = [...allConversations];
+
+            // 1. Filter
+            if (currentFilter === 'unread') {
+                filtered = filtered.filter(c => c.unread_count > 0 && !c.archived);
+            } else if (currentFilter === 'archived') {
+                filtered = filtered.filter(c => c.archived);
+            } else {
+                filtered = filtered.filter(c => !c.archived);
+            }
+
+            // 2. Search
+            if (searchTerm) {
+                filtered = filtered.filter(c =>
+                    c.patient_name.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // 3. Sort
+            filtered.sort((a, b) => {
+                const dateA = new Date(a.updated_at);
+                const dateB = new Date(b.updated_at);
+
+                if (currentSort === 'newest') return dateB - dateA;
+                if (currentSort === 'oldest') return dateA - dateB;
+                if (currentSort === 'archive') return dateB - dateA; // Defaulting to newest for now
+                return 0;
+            });
+
+            renderConversations(filtered);
+        }
+
+        function renderConversations(conversations) {
+            const container = document.getElementById('conversations-container');
+            container.innerHTML = '';
+
+            if (conversations.length === 0) {
+                container.innerHTML = '<div class="empty-state">No conversations found.</div>';
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            conversations.forEach(conv => {
+                const date = new Date(conv.updated_at);
+                const formattedDate = date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+
+                const card = document.createElement('div');
+                card.className = `conversation-card ${activeConversation && activeConversation.id === conv.id ? 'active' : ''}`;
+                card.onclick = () => openConversation(conv);
+                card.innerHTML = `
+                    <div class="card-left">
+                        <div class="avatar">${conv.patient_name.charAt(0)}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-header">
+                            <span class="patient-name">${conv.patient_name}</span>
+                            <span class="timestamp">${formattedDate}</span>
+                        </div>
+                        <p class="last-message">${conv.last_message}</p>
+                    </div>
+                    ${conv.unread_count > 0 ? `<div class="unread-dot"></div>` : ''}
+                `;
+                fragment.appendChild(card);
+            });
+            container.appendChild(fragment);
+        }
+
+        async function openConversation(conv) {
+            activeConversation = conv;
+            const welcomeView = document.getElementById('welcome-view');
+            const chatView = document.getElementById('chat-view');
+            const patientHeader = document.getElementById('active-patient-name');
+            const idHeader = document.getElementById('active-conversation-id');
+            const messagesContainer = document.getElementById('messages-container');
+
+            // Update UI state
+            renderConversations(allConversations); // Refresh active state in sidebar
+
+            patientHeader.textContent = conv.patient_name;
+            idHeader.textContent = `ID: ${conv.id}`;
+            messagesContainer.innerHTML = '<div class="loading-messages">Fetching authentic clinical history...</div>';
+
+            welcomeView.style.display = 'none';
+            chatView.style.display = 'flex';
+
+            try {
+                const response = await fetch(`/api/history/${conv.id}`);
+                const messages = await response.json();
+
+                if (messages.error) {
+                    messagesContainer.innerHTML = `<div class="error-state">
+                        <p>Unable to retrieve history.</p>
+                        <small>${messages.details || messages.error}</small>
+                    </div>`;
+                    return;
+                }
+
+                renderMessages(messages);
+            } catch (error) {
+                messagesContainer.innerHTML = `<div class="error-state">Connection timeout or server failure.</div>`;
+            }
+        }
+
+        function renderMessages(messages) {
+            const container = document.getElementById('messages-container');
+            container.innerHTML = '';
+
+            if (!Array.isArray(messages) || messages.length === 0) {
+                container.innerHTML = `<div class="empty-state">
+                    <p>No clinical history found for this secure conversation.</p>
+                    <small>This may be an empty contact or a newly created conversation.</small>
+                </div>`;
+                return;
+            }
+
+            messages.forEach(msg => {
+                const date = new Date(msg.timestamp);
+                const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const bubble = document.createElement('div');
+                bubble.className = `message-bubble ${msg.isFromPatient ? 'patient' : 'doctor'} ${msg.isInternalNote ? 'internal' : ''}`;
+
+                let mediaHtml = '';
+                if (msg.media && msg.media.length > 0) {
+                    mediaHtml = msg.media.map(url => `
+                        <div class="message-media">
+                            <img src="${url}" alt="Patient Photo" onclick="window.open('${url}', '_blank')">
+                        </div>
+                    `).join('');
+                }
+
+                if (msg.isInternalNote) {
+                    bubble.innerHTML = `
+                        <div class="internal-header">INTERNAL NOTE • ${time}</div>
+                        <div class="bubble-content">${msg.content.replace(/\n/g, '<br>')}</div>
+                        ${mediaHtml}
+                    `;
+                } else {
+                    const sender = msg.isFromPatient ? msg.senderName : 'You';
+                    bubble.innerHTML = `
+                        <div class="bubble-header">${sender} • ${time}</div>
+                        <div class="bubble-content">${msg.content.replace(/\n/g, '<br>')}</div>
+                        ${mediaHtml}
+                    `;
+                }
+                container.appendChild(bubble);
+            });
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function archiveActiveConversation() {
+            if (!activeConversation) return;
+
+            const btn = document.getElementById('archive-button');
+            const originalText = btn.textContent;
+            btn.textContent = 'Archiving...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(`/api/archive/${activeConversation.id}`, { method: 'POST' });
+                const result = await response.json();
+
+                if (result.success) {
+                    // Remove from local list
+                    allConversations = allConversations.filter(c => c.id !== activeConversation.id);
+                    renderConversations(allConversations);
+
+                    // Reset view
+                    document.getElementById('chat-view').style.display = 'none';
+                    document.getElementById('welcome-view').style.display = 'flex';
+                    activeConversation = null;
+                } else {
+                    alert('Archive failed: ' + result.error);
+                }
+            } catch (error) {
+                alert('Connection error during archive.');
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        async function syncWithSpruce() {
+            const btn = document.getElementById('sync-button');
+            const syncStatus = document.getElementById('sync-status');
+
+            btn.classList.add('rotating');
+            syncStatus.textContent = 'Syncing...';
+            syncStatus.className = 'status-badge syncing';
+
+            try {
+                const response = await fetch('/api/sync', { method: 'POST' });
+                const result = await response.json();
+
+                if (result.success) {
+                    await fetchConversations(); // Reload list from new cache
+                    alert(`Sync complete! ${result.count} conversations updated.`);
+                } else {
+                    alert('Sync failed: ' + result.error);
+                }
+            } catch (error) {
+                alert('Sync error: Connection lost.');
+            } finally {
+                btn.classList.remove('rotating');
+            }
+        }
+
+        // document.getElementById('archive-button').onclick = archiveActiveConversation; // This button was removed from the HTML
+        document.getElementById('sync-button').onclick = syncWithSpruce;
+
+        // Event Listeners
+        document.getElementById('filter-select').addEventListener('change', (e) => {
+            currentFilter = e.target.value;
+            applyFiltersAndRender();
+        });
+
+        document.getElementById('sort-select').addEventListener('change', (e) => {
+            currentSort = e.target.value;
+            applyFiltersAndRender();
+        });
+
+        async function askAI(message) {
+            const aiContainer = document.getElementById('ai-chat-container');
+            const btn = document.getElementById('send-ai-btn');
+
+            if (!message) return;
+
+            // Add user message
+            const userDiv = document.createElement('div');
+            userDiv.className = 'ai-chat-bubble user';
+            userDiv.textContent = message;
+            aiContainer.appendChild(userDiv);
+            aiContainer.scrollTop = aiContainer.scrollHeight;
+
+            btn.disabled = true;
+            btn.textContent = 'Analyzing...';
+
+            try {
+                const response = await fetch('/api/ai', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, conversationId: activeConversation?.id })
+                });
+                const data = await response.json();
+
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'ai-chat-bubble bot';
+                aiDiv.innerHTML = data.response.replace(/\n/g, '<br>');
+
+                // Add PDF Download Button
+                const pdfBtn = document.createElement('button');
+                pdfBtn.className = 'pdf-download-btn';
+                pdfBtn.innerHTML = '📄 Download PDF';
+                pdfBtn.onclick = () => downloadPDF(data.response, `clinical_note_${activeConversation?.patient_name || 'export'}.pdf`);
+                aiDiv.appendChild(pdfBtn);
+
+                aiContainer.appendChild(aiDiv);
+            } catch (error) {
+                const errDiv = document.createElement('div');
+                errDiv.className = 'ai-chat-bubble error';
+                errDiv.textContent = 'AI failed to respond. Check API configuration.';
+                aiContainer.appendChild(errDiv);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Ask AI';
+                aiContainer.scrollTop = aiContainer.scrollHeight;
+            }
+        }
+
+        function applyAIDirect(prompt) {
+            document.getElementById('ai-input').value = prompt;
+            askAI(prompt);
+        }
+
+        document.getElementById('send-ai-btn').onclick = () => {
+            const input = document.getElementById('ai-input');
+            askAI(input.value);
+            input.value = '';
+        };
+
+        function downloadPDF(text, filename) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Format text (strip HTML tags if any, handle newlines)
+            const cleanText = text.replace(/<br>/g, '\n').replace(/&nbsp;/g, ' ');
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+
+            const splitText = doc.splitTextToSize(cleanText, 180);
+            doc.text(splitText, 10, 20);
+            doc.save(filename);
+        }
+
+        function downloadPDF(text, filename) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Format text (strip HTML tags if any, handle newlines)
+            const cleanText = text.replace(/<br>/g, '\n').replace(/&nbsp;/g, ' ');
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+
+            const splitText = doc.splitTextToSize(cleanText, 180);
+            doc.text(splitText, 10, 20);
+            doc.save(filename);
+        }
+
+        function downloadPDF(text, filename) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Clean text (replace <br> with newlines)
+            const cleanText = text.replace(/<br>/g, '\n');
+
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+
+            const splitText = doc.splitTextToSize(cleanText, 180);
+            doc.text(splitText, 10, 20);
+            doc.save(filename);
+        }
+
+        // Live Chronology Polling (every 15 seconds) - Only fetches delta
+        setInterval(async () => {
+            if (allConversations.length === 0) return;
+            const latest = allConversations.reduce((max, c) => {
+                const d = new Date(c.updated_at);
+                return d > max ? d : max;
+            }, new Date(0));
+
+            try {
+                const response = await fetch(`/api/updates?since=${latest.toISOString()}`);
+                const data = await response.json();
+                if (data.count > 0) {
+                    // Update local array
+                    data.conversations.forEach(newC => {
+                        const idx = allConversations.findIndex(c => c.id === newC.id);
+                        if (idx !== -1) {
+                            allConversations[idx] = { ...allConversations[idx], ...newC };
+                        } else {
+                            allConversations.unshift(newC);
+                        }
+                    });
+                    applyFiltersAndRender();
+                }
+            } catch (e) { /* silent fail for polling */ }
+        }, 15000);
+
+        fetchConversations();
+    </script>
+</body>
+
+</html>
