@@ -1819,14 +1819,9 @@ Extract all relevant clinical information from the conversation.`;
                             >
                               <X className="h-2 w-2 text-white" />
                             </span>
-                            <p className="text-[7px] font-medium text-purple-300 truncate text-center">
+                            <p className="text-[9px] font-medium text-purple-300 truncate text-center leading-tight">
                               {msg.title}
                             </p>
-                            {msg.shortcut && (
-                              <p className="text-[5px] text-purple-500/60 font-mono text-center">
-                                {msg.shortcut}
-                              </p>
-                            )}
                           </button>
                         ))}
                       </div>
@@ -1907,14 +1902,9 @@ Extract all relevant clinical information from the conversation.`;
                             >
                               <X className="h-2 w-2 text-white" />
                             </span>
-                            <p className="text-[7px] font-medium text-[#d4af37] truncate text-center">
+                            <p className="text-[9px] font-medium text-[#d4af37] truncate text-center leading-tight">
                               {msg.title}
                             </p>
-                            {msg.shortcut && (
-                              <p className="text-[5px] text-[#d4af37]/60 font-mono text-center">
-                                {msg.shortcut}
-                              </p>
-                            )}
                           </button>
                         ))}
                       </div>
