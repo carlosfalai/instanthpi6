@@ -78,11 +78,21 @@ function extractAttachments(msg: any): Array<{
   name?: string;
   mimeType?: string;
   size?: number;
+  thumbnailUrl?: string;
 }> {
   const attachments: any[] = [];
 
-  // Check various attachment fields
-  const rawAttachments = msg.attachments || msg.media || msg.files || msg.images || [];
+  // Check various attachment fields - Spruce uses multiple formats
+  const rawAttachments = [
+    ...(msg.attachments || []),
+    ...(msg.media || []),
+    ...(msg.files || []),
+    ...(msg.images || []),
+    ...(msg.photos || []),
+    ...(msg.documents || []),
+    ...(msg.conversationItem?.attachments || []),
+    ...(msg.message?.attachments || []),
+  ];
 
   for (const att of rawAttachments) {
     const mimeType = att.mimeType || att.mime_type || att.contentType || att.type || "";
@@ -108,12 +118,13 @@ function extractAttachments(msg: any): Array<{
     }
 
     attachments.push({
-      id: att.id || att.attachmentId || `att_${Date.now()}_${attachments.length}`,
+      id: att.id || att.attachmentId || att.fileId || `att_${Date.now()}_${attachments.length}`,
       type,
       url,
-      name: att.name || att.filename || att.fileName || att.title || undefined,
+      name: att.name || att.filename || att.fileName || att.title || att.originalFilename || undefined,
       mimeType: mimeType || undefined,
-      size: att.size || att.fileSize || undefined,
+      size: att.size || att.fileSize || att.contentLength || undefined,
+      thumbnailUrl: att.thumbnailUrl || att.thumbnail_url || att.previewUrl || att.preview_url || undefined,
     });
   }
 
@@ -292,8 +303,35 @@ router.get("/:conversationId/history", async (req, res) => {
       console.log(`Could not fetch conversation metadata: ${convErr}`);
     }
 
-    const messagesResponse = await client.getMessages(conversationId, { per_page: 100 });
-    const rawMessages = messagesResponse.messages || [];
+    // Fetch ALL messages using pagination
+    const allMessages: any[] = [];
+    let page = 1;
+    const perPage = 100;
+    let hasMore = true;
+
+    while (hasMore) {
+      console.log(`Fetching messages page ${page} for conversation ${conversationId}...`);
+      const messagesResponse = await client.getMessages(conversationId, { page, per_page: perPage });
+      const messages = messagesResponse.messages || [];
+
+      allMessages.push(...messages);
+      console.log(`Page ${page}: ${messages.length} messages (total: ${allMessages.length})`);
+
+      // Check if we got a full page - if less, we're done
+      if (messages.length < perPage) {
+        hasMore = false;
+      } else {
+        page++;
+        // Safety limit
+        if (page > 20) {
+          console.log("Reached message page limit (20), stopping pagination");
+          hasMore = false;
+        }
+      }
+    }
+
+    console.log(`Total messages fetched: ${allMessages.length}`);
+    const rawMessages = allMessages;
 
     // Transform messages with enhanced data and sort chronologically (earliest first)
     const transformedMessages = rawMessages.map((msg: any) => ({

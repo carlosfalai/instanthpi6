@@ -81,12 +81,36 @@ router.get("/", async (req, res) => {
       bearerToken: spruceApiKey || spruceAccessId || "",
     });
 
-    console.log("Fetching conversations from Spruce API...");
-    // Fetch conversations - Spruce API doesn't support true pagination
-    // Just fetch max available in single request
-    const conversationsResponse = await client.getConversations({ per_page: 200 });
-    const allConversations = conversationsResponse.conversations || [];
-    console.log(`Conversations fetched: ${allConversations.length}`);
+    console.log("Fetching all conversations from Spruce API with pagination...");
+
+    // Fetch ALL conversations using pagination
+    const allConversations: any[] = [];
+    let page = 1;
+    const perPage = 100;
+    let hasMore = true;
+
+    while (hasMore) {
+      console.log(`Fetching page ${page}...`);
+      const conversationsResponse = await client.getConversations({ page, per_page: perPage });
+      const conversations = conversationsResponse.conversations || [];
+
+      allConversations.push(...conversations);
+      console.log(`Page ${page}: ${conversations.length} conversations (total: ${allConversations.length})`);
+
+      // Check if we got a full page - if less, we're done
+      if (conversations.length < perPage) {
+        hasMore = false;
+      } else {
+        page++;
+        // Safety limit to prevent infinite loops
+        if (page > 50) {
+          console.log("Reached page limit (50), stopping pagination");
+          hasMore = false;
+        }
+      }
+    }
+
+    console.log(`Total conversations fetched: ${allConversations.length}`);
 
     // Transform conversations for the frontend
     const transformedConversations = allConversations.map((conv: any) => {
