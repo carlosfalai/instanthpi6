@@ -577,6 +577,8 @@ export default function CommandCenter() {
   const [showSavedMessageEditor, setShowSavedMessageEditor] = useState(false);
   const [editingSavedMessage, setEditingSavedMessage] = useState<SavedMessage | null>(null);
   const [draggedMessageId, setDraggedMessageId] = useState<string | null>(null);
+  const [templateSplitPercent, setTemplateSplitPercent] = useState(50);
+  const [isDraggingSplit, setIsDraggingSplit] = useState(false);
 
   // DnD sensors configuration
   const sensors = useSensors(
@@ -1757,10 +1759,23 @@ Extract all relevant clinical information from the conversation.`;
                     <p className="text-[8px] mt-1">Click + to add quick replies</p>
                   </div>
                 ) : (
-                  <div className="flex flex-col h-full gap-2">
+                  <div
+                    className="flex flex-col h-full"
+                    onMouseMove={(e) => {
+                      if (isDraggingSplit) {
+                        const container = e.currentTarget;
+                        const rect = container.getBoundingClientRect();
+                        const percent = ((e.clientY - rect.top) / rect.height) * 100;
+                        setTemplateSplitPercent(Math.min(85, Math.max(15, percent)));
+                      }
+                    }}
+                    onMouseUp={() => setIsDraggingSplit(false)}
+                    onMouseLeave={() => setIsDraggingSplit(false)}
+                  >
                     {/* TOP HALF: AI Prompts (messages NOT starting with ".") */}
                     <div
-                      className="flex-1 min-h-0"
+                      className="min-h-0 overflow-hidden"
+                      style={{ height: `${templateSplitPercent}%` }}
                       onDragOver={(e) => {
                         e.preventDefault();
                         e.currentTarget.classList.add("bg-purple-500/10");
@@ -1787,7 +1802,7 @@ Extract all relevant clinical information from the conversation.`;
                         <Bot className="h-3 w-3 text-purple-400" />
                         <span className="text-[8px] text-purple-400 font-medium">AI Prompts</span>
                       </div>
-                      <div className="grid grid-cols-3 gap-1 overflow-y-auto max-h-[calc(50%-20px)]">
+                      <div className="grid grid-cols-3 gap-1 overflow-y-auto h-[calc(100%-20px)]">
                         {savedMessages.sortedByUsage
                           .filter((msg) => !msg.shortcut?.startsWith("."))
                           .map((msg) => (
@@ -1827,12 +1842,18 @@ Extract all relevant clinical information from the conversation.`;
                       </div>
                     </div>
 
-                    {/* Divider */}
-                    <div className="border-t border-[#333] my-1" />
+                    {/* Draggable Divider */}
+                    <div
+                      className="h-2 flex items-center justify-center cursor-row-resize hover:bg-[#333] transition-colors group shrink-0"
+                      onMouseDown={() => setIsDraggingSplit(true)}
+                    >
+                      <div className="w-8 h-0.5 bg-[#444] group-hover:bg-[#666] rounded-full" />
+                    </div>
 
                     {/* BOTTOM HALF: Patient Messages (messages starting with ".") */}
                     <div
-                      className="flex-1 min-h-0"
+                      className="min-h-0 overflow-hidden"
+                      style={{ height: `${100 - templateSplitPercent}%` }}
                       onDragOver={(e) => {
                         e.preventDefault();
                         e.currentTarget.classList.add("bg-[#d4af37]/10");
@@ -1859,7 +1880,7 @@ Extract all relevant clinical information from the conversation.`;
                         <User className="h-3 w-3 text-[#d4af37]" />
                         <span className="text-[8px] text-[#d4af37] font-medium">Patient Messages</span>
                       </div>
-                      <div className="grid grid-cols-3 gap-1 overflow-y-auto max-h-[calc(50%-20px)]">
+                      <div className="grid grid-cols-3 gap-1 overflow-y-auto h-[calc(100%-20px)]">
                         {savedMessages.sortedByUsage
                           .filter((msg) => msg.shortcut?.startsWith("."))
                           .map((msg) => (
