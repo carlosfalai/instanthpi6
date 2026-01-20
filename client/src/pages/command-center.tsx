@@ -579,6 +579,31 @@ export default function CommandCenter() {
   const [draggedMessageId, setDraggedMessageId] = useState<string | null>(null);
   const [templateSplitPercent, setTemplateSplitPercent] = useState(50);
   const [isDraggingSplit, setIsDraggingSplit] = useState(false);
+  const templateContainerRef = useRef<HTMLDivElement>(null);
+
+  // Handle template split dragging with document-level events
+  useEffect(() => {
+    if (!isDraggingSplit) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!templateContainerRef.current) return;
+      const rect = templateContainerRef.current.getBoundingClientRect();
+      const percent = ((e.clientY - rect.top) / rect.height) * 100;
+      setTemplateSplitPercent(Math.min(85, Math.max(15, percent)));
+    };
+
+    const handleMouseUp = () => {
+      setIsDraggingSplit(false);
+    };
+
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDraggingSplit]);
 
   // DnD sensors configuration
   const sensors = useSensors(
@@ -1760,17 +1785,8 @@ Extract all relevant clinical information from the conversation.`;
                   </div>
                 ) : (
                   <div
-                    className="flex flex-col h-full"
-                    onMouseMove={(e) => {
-                      if (isDraggingSplit) {
-                        const container = e.currentTarget;
-                        const rect = container.getBoundingClientRect();
-                        const percent = ((e.clientY - rect.top) / rect.height) * 100;
-                        setTemplateSplitPercent(Math.min(85, Math.max(15, percent)));
-                      }
-                    }}
-                    onMouseUp={() => setIsDraggingSplit(false)}
-                    onMouseLeave={() => setIsDraggingSplit(false)}
+                    ref={templateContainerRef}
+                    className="flex flex-col h-full select-none"
                   >
                     {/* TOP HALF: AI Prompts (messages NOT starting with ".") */}
                     <div
@@ -1844,10 +1860,19 @@ Extract all relevant clinical information from the conversation.`;
 
                     {/* Draggable Divider */}
                     <div
-                      className="h-2 flex items-center justify-center cursor-row-resize hover:bg-[#333] transition-colors group shrink-0"
-                      onMouseDown={() => setIsDraggingSplit(true)}
+                      className={cn(
+                        "h-3 flex items-center justify-center cursor-row-resize hover:bg-[#333] transition-colors group shrink-0",
+                        isDraggingSplit && "bg-[#444]"
+                      )}
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        setIsDraggingSplit(true);
+                      }}
                     >
-                      <div className="w-8 h-0.5 bg-[#444] group-hover:bg-[#666] rounded-full" />
+                      <div className={cn(
+                        "w-10 h-1 bg-[#444] group-hover:bg-[#666] rounded-full transition-colors",
+                        isDraggingSplit && "bg-[#888]"
+                      )} />
                     </div>
 
                     {/* BOTTOM HALF: Patient Messages (messages starting with ".") */}
