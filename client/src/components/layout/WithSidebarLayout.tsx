@@ -7,4 +7,3 @@ import AppLayoutSpruce from "@/components/layout/AppLayoutSpruce";
 export function WithSidebarLayout({ children }: { children: ReactNode }) {
   return <AppLayoutSpruce>{children}</AppLayoutSpruce>;
 }
-

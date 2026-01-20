@@ -30,7 +30,12 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ icon: Icon, title, descriptio
       <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary/20 group-hover:border-primary/40 transition-all duration-500">
         <Icon className="h-7 w-7 text-primary" aria-hidden />
       </div>
-      <h3 className="text-xl font-bold text-foreground tracking-tight" style={{ fontFamily: 'Outfit, sans-serif' }}>{title}</h3>
+      <h3
+        className="text-xl font-bold text-foreground tracking-tight"
+        style={{ fontFamily: "Outfit, sans-serif" }}
+      >
+        {title}
+      </h3>
       <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
     </CardContent>
   </Card>
@@ -45,12 +50,14 @@ const features: FeatureCardProps[] = [
   {
     icon: Timer,
     title: "Gain de Temps Précieux",
-    description: "Automatisez la collecte d'informations pour vous concentrer sur le diagnostic et les soins.",
+    description:
+      "Automatisez la collecte d'informations pour vous concentrer sur le diagnostic et les soins.",
   },
   {
     icon: ShieldCheck,
     title: "Sécurité et Conformité",
-    description: "Cryptage de bout en bout conforme aux réglementations de santé les plus exigeantes.",
+    description:
+      "Cryptage de bout en bout conforme aux réglementations de santé les plus exigeantes.",
   },
   {
     icon: TrendingUp,
@@ -93,7 +100,9 @@ const Landing: React.FC = () => {
 
       // Check Supabase session
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (session?.user) {
           navigate("/doctor-dashboard");
           return;
@@ -113,35 +122,54 @@ const Landing: React.FC = () => {
       <section className="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center gap-12 px-4 py-20 text-center lg:py-32 overflow-hidden">
         {/* Ambient Glow Effects */}
         <div className="fixed top-[-20%] left-[-10%] w-[600px] h-[600px] bg-primary/8 rounded-full blur-[150px] animate-glow-pulse pointer-events-none" />
-        <div className="fixed bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-secondary/5 rounded-full blur-[180px] animate-glow-pulse pointer-events-none" style={{ animationDelay: '-2s' }} />
+        <div
+          className="fixed bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-secondary/5 rounded-full blur-[180px] animate-glow-pulse pointer-events-none"
+          style={{ animationDelay: "-2s" }}
+        />
 
         {/* Subtle Grid Pattern */}
-        <div className="absolute inset-0 opacity-[0.015]" style={{
-          backgroundImage: `linear-gradient(rgba(245, 158, 11, 0.5) 1px, transparent 1px),
+        <div
+          className="absolute inset-0 opacity-[0.015]"
+          style={{
+            backgroundImage: `linear-gradient(rgba(245, 158, 11, 0.5) 1px, transparent 1px),
                             linear-gradient(90deg, rgba(245, 158, 11, 0.5) 1px, transparent 1px)`,
-          backgroundSize: '60px 60px'
-        }} />
+            backgroundSize: "60px 60px",
+          }}
+        />
 
         <div className="relative z-10 max-w-5xl">
           <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-card border border-border rounded-full animate-fade-in-up">
             <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium text-muted-foreground">Omnichannel CRM & Consultation Platform</span>
+            <span className="text-sm font-medium text-muted-foreground">
+              Omnichannel CRM & Consultation Platform
+            </span>
           </div>
 
-          <h1 className="max-w-5xl text-5xl font-bold text-foreground sm:text-6xl md:text-7xl lg:text-8xl mb-8 leading-tight animate-fade-in-up" style={{ fontFamily: 'Outfit, sans-serif', animationDelay: '0.1s' }}>
-            <span className="text-gradient-amber">
-              InstantConsult SaaS
-            </span>
+          <h1
+            className="max-w-5xl text-5xl font-bold text-foreground sm:text-6xl md:text-7xl lg:text-8xl mb-8 leading-tight animate-fade-in-up"
+            style={{ fontFamily: "Outfit, sans-serif", animationDelay: "0.1s" }}
+          >
+            <span className="text-gradient-amber">InstantConsult SaaS</span>
             <br />
             <span className="text-foreground">L&apos;avenir de la consultation automatisée</span>
           </h1>
 
-          <p className="max-w-3xl mx-auto text-xl leading-relaxed text-muted-foreground sm:text-2xl mb-12 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
+          <p
+            className="max-w-3xl mx-auto text-xl leading-relaxed text-muted-foreground sm:text-2xl mb-12 animate-fade-in-up"
+            style={{ animationDelay: "0.2s" }}
+          >
             Optimisez vos interactions et renforcez la relation client.
-            <span className="text-foreground font-medium"> InstantConsult simplifie la collecte d&apos;informations et accélère chaque session professionnelle.</span>
+            <span className="text-foreground font-medium">
+              {" "}
+              InstantConsult simplifie la collecte d&apos;informations et accélère chaque session
+              professionnelle.
+            </span>
           </p>
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:justify-center items-center animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+          <div
+            className="flex flex-col gap-4 sm:flex-row sm:justify-center items-center animate-fade-in-up"
+            style={{ animationDelay: "0.3s" }}
+          >
             <Button
               size="lg"
               className="group flex items-center gap-3 bg-gradient-to-r from-primary to-secondary hover:opacity-90 px-8 py-6 text-lg font-semibold text-background shadow-lg amber-glow-primary hover:amber-glow-intense transition-all duration-300 hover:scale-105 rounded-xl"
@@ -167,7 +195,10 @@ const Landing: React.FC = () => {
       <section className="relative bg-card border-t border-border px-4 py-20 lg:py-32">
         <div className="mx-auto max-w-7xl">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl mb-4" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            <h2
+              className="text-4xl font-bold text-foreground sm:text-5xl lg:text-6xl mb-4"
+              style={{ fontFamily: "Outfit, sans-serif" }}
+            >
               Pourquoi choisir <span className="text-gradient-amber">InstantConsult</span> ?
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -176,7 +207,11 @@ const Landing: React.FC = () => {
           </div>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             {features.map((feature, index) => (
-              <div key={feature.title} className="animate-fade-in-up" style={{ animationDelay: `${index * 0.1}s` }}>
+              <div
+                key={feature.title}
+                className="animate-fade-in-up"
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
                 <FeatureCard {...feature} />
               </div>
             ))}
@@ -190,10 +225,16 @@ const Landing: React.FC = () => {
         <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-secondary/3 rounded-full blur-[180px] pointer-events-none" />
 
         <div className="relative mx-auto max-w-7xl text-center">
-          <h2 className="text-5xl font-bold text-foreground sm:text-6xl lg:text-7xl mb-6 tracking-tight animate-fade-in-up" style={{ fontFamily: 'Outfit, sans-serif' }}>
+          <h2
+            className="text-5xl font-bold text-foreground sm:text-6xl lg:text-7xl mb-6 tracking-tight animate-fade-in-up"
+            style={{ fontFamily: "Outfit, sans-serif" }}
+          >
             Impact <span className="text-amber-glow">Immédiat</span>.
           </h2>
-          <p className="text-xl text-muted-foreground mb-20 max-w-2xl mx-auto font-light animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <p
+            className="text-xl text-muted-foreground mb-20 max-w-2xl mx-auto font-light animate-fade-in-up"
+            style={{ animationDelay: "0.1s" }}
+          >
             Des performances supérieures pour des professionnels exigeants.
           </p>
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
@@ -206,8 +247,15 @@ const Landing: React.FC = () => {
                 <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-secondary/10 border border-secondary/20 mb-8 group-hover:scale-125 group-hover:bg-secondary/20 group-hover:border-secondary/40 transition-all duration-500 shadow-xl">
                   <Icon className="h-10 w-10 text-secondary" aria-hidden />
                 </div>
-                <p className="text-6xl font-bold text-foreground mb-4 tracking-tighter" style={{ fontFamily: 'Outfit, sans-serif' }}>{highlight}</p>
-                <p className="text-lg text-muted-foreground leading-relaxed uppercase tracking-widest font-semibold">{label}</p>
+                <p
+                  className="text-6xl font-bold text-foreground mb-4 tracking-tighter"
+                  style={{ fontFamily: "Outfit, sans-serif" }}
+                >
+                  {highlight}
+                </p>
+                <p className="text-lg text-muted-foreground leading-relaxed uppercase tracking-widest font-semibold">
+                  {label}
+                </p>
               </div>
             ))}
           </div>

@@ -4,10 +4,15 @@ import crypto from "crypto";
 
 const router = Router();
 
-// Twilio credentials - Live credentials from your account
-const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID || "ACb754b33473428f51d994ef7eaec4142d";
-const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN || "bad8612f52beafad40484799a906cfca";
-const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER || "+14388061955"; // Replace with your Twilio phone
+// Twilio credentials from environment variables (REQUIRED)
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID;
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN;
+const TWILIO_PHONE_NUMBER = process.env.TWILIO_PHONE_NUMBER;
+
+// Validate required credentials at startup
+if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN || !TWILIO_PHONE_NUMBER) {
+  console.error("[Twilio] Missing required environment variables: TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, or TWILIO_PHONE_NUMBER");
+}
 
 // Initialize Twilio client
 const twilioClient = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);

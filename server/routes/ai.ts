@@ -118,7 +118,9 @@ router.post("/chat", async (req, res) => {
           messages: [{ role: "user", content: prompt }],
         });
 
-        return res.json({ content: response.content[0].text.trim() });
+        const firstBlock = response.content[0];
+        const text = firstBlock.type === 'text' ? firstBlock.text : '';
+        return res.json({ content: text.trim() });
       } catch (error) {
         console.error("Anthropic error:", error);
         // Fall through to OpenAI
@@ -138,7 +140,9 @@ router.post("/chat", async (req, res) => {
       return res.json({ content: response.choices[0].message.content?.trim() || "" });
     }
 
-    return res.status(503).json({ message: "AI services not configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY." });
+    return res
+      .status(503)
+      .json({ message: "AI services not configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY." });
   } catch (error) {
     console.error("Chat error:", error);
     res.status(500).json({ message: "AI chat failed" });

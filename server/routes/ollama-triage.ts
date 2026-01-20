@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { createUserAIClient } from "../utils/aiClient";
+import { requireAuth, requireAuthenticatedUserId } from "../middleware/auth";
 
 const router = Router();
+
+// All triage routes require authentication
+router.use(requireAuth);
 
 // AI client will be created per user based on their configuration
 
@@ -259,10 +263,9 @@ function ruleBasedTriage(data: TriageRequest) {
 router.post("/triage", async (req, res) => {
   try {
     const patientData: TriageRequest = req.body;
-    
-    // Get user ID from request (you may need to implement authentication middleware)
-    // For now, we'll use a default user ID or get it from the request
-    const userId = req.body.userId || 1; // Default to user 1, should be replaced with actual auth
+
+    // Get user ID from authenticated session
+    const userId = requireAuthenticatedUserId(req);
 
     // Validate required fields
     if (!patientData.patient_id || !patientData.chief_complaint) {
@@ -283,22 +286,29 @@ router.post("/triage", async (req, res) => {
     try {
       console.log("🤖 Using user-specific AI client for triage analysis");
       const aiClient = await createUserAIClient(userId);
-      
+
       if (!aiClient) {
         throw new Error("No AI client available for user");
       }
 
-      const systemPrompt = "You are an expert emergency medicine physician performing medical triage using the Canadian Triage and Acuity Scale (CTAS). Provide structured responses for triage level, urgency score, reasoning, recommended action, full analysis, HPI summary, and follow-up questions.";
-      
-      const aiResponse = await aiClient.generateCompletion([
-        {
-          role: "user",
-          content: fullPrompt
-        }
-      ], systemPrompt);
+      const systemPrompt =
+        "You are an expert emergency medicine physician performing medical triage using the Canadian Triage and Acuity Scale (CTAS). Provide structured responses for triage level, urgency score, reasoning, recommended action, full analysis, HPI summary, and follow-up questions.";
+
+      const aiResponse = await aiClient.generateCompletion(
+        [
+          {
+            role: "user",
+            content: fullPrompt,
+          },
+        ],
+        systemPrompt
+      );
 
       if (aiResponse.trim().length > 0) {
-        console.log(`🤖 ${aiClient.provider} response received:`, aiResponse.substring(0, 160) + "…");
+        console.log(
+          `🤖 ${aiClient.provider} response received:`,
+          aiResponse.substring(0, 160) + "…"
+        );
         triageResult = parseTriageResponse(aiResponse);
       } else {
         throw new Error("Empty response from AI");
@@ -330,31 +340,32 @@ router.post("/triage", async (req, res) => {
 // GET /api/ollama/status - Check AI API status for user
 router.get("/status", async (req, res) => {
   try {
-    const userId = parseInt(req.query.userId as string) || 1; // Default to user 1
-    
+    const userId = requireAuthenticatedUserId(req);
+
     const aiClient = await createUserAIClient(userId);
-    
+
     if (!aiClient) {
-      return res.status(200).json({ 
-        status: "offline", 
-        error: "No AI configuration found for user"
+      return res.status(200).json({
+        status: "offline",
+        error: "No AI configuration found for user",
       });
     }
 
     // Test the AI client with a simple request
-    await aiClient.generateCompletion([
-      { role: "user", content: "test" }
-    ], "You are a helpful assistant. Respond with 'OK' to confirm the connection.");
-    
+    await aiClient.generateCompletion(
+      [{ role: "user", content: "test" }],
+      "You are a helpful assistant. Respond with 'OK' to confirm the connection."
+    );
+
     return res.json({
       status: "online",
       provider: aiClient.provider,
       model: aiClient.model,
     });
   } catch (error: any) {
-    return res.status(200).json({ 
-      status: "offline", 
-      error: error?.message || "API unavailable"
+    return res.status(200).json({
+      status: "offline",
+      error: error?.message || "API unavailable",
     });
   }
 });

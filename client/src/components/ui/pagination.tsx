@@ -105,10 +105,7 @@ export default function Pagination({
           {getPageNumbers().map((page, index) => {
             if (page === "ellipsis") {
               return (
-                <div
-                  key={`ellipsis-${index}`}
-                  className="px-2 py-1 text-[#666]"
-                >
+                <div key={`ellipsis-${index}`} className="px-2 py-1 text-[#666]">
                   <MoreHorizontal className="h-4 w-4" />
                 </div>
               );

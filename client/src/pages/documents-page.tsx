@@ -67,7 +67,9 @@ export default function DocumentsPage() {
         <div className="mb-6 flex flex-col md:flex-row md:justify-between md:items-center">
           <div className="mb-4 md:mb-0">
             <h2 className="text-2xl font-medium text-foreground">Documents</h2>
-            <p className="text-muted-foreground text-sm">Access patient documents and medical records</p>
+            <p className="text-muted-foreground text-sm">
+              Access patient documents and medical records
+            </p>
           </div>
           <div className="relative w-full md:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -90,7 +92,9 @@ export default function DocumentsPage() {
               <div className="flex items-center justify-center flex-col">
                 <AlertCircle className="h-12 w-12 text-red-500 mb-2" />
                 <h3 className="text-xl font-medium">Error loading documents</h3>
-                <p className="text-gray-400 mt-2">Unable to fetch documents. Please try again later.</p>
+                <p className="text-gray-400 mt-2">
+                  Unable to fetch documents. Please try again later.
+                </p>
               </div>
             </CardContent>
           </Card>

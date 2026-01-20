@@ -100,10 +100,7 @@ export default function UnifiedLayout({
                 <div className="flex items-center gap-4">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="h-9 w-9 rounded-full p-0 hover:bg-accent"
-                      >
+                      <Button variant="ghost" className="h-9 w-9 rounded-full p-0 hover:bg-accent">
                         <Avatar className="h-9 w-9 border-2 border-border">
                           <AvatarFallback className="bg-primary text-primary-foreground">
                             {getInitials(user.email)}
@@ -146,7 +143,9 @@ export default function UnifiedLayout({
           )}
 
           {/* Main Content */}
-          <main className={`flex-1 overflow-auto ${maxWidthClasses[maxWidth]} w-full mx-auto px-4 sm:px-6 lg:px-8 py-6`}>
+          <main
+            className={`flex-1 overflow-auto ${maxWidthClasses[maxWidth]} w-full mx-auto px-4 sm:px-6 lg:px-8 py-6`}
+          >
             {children}
           </main>
 
@@ -199,10 +198,7 @@ export default function UnifiedLayout({
             <div className="flex items-center gap-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="h-9 w-9 rounded-full p-0 hover:bg-accent"
-                  >
+                  <Button variant="ghost" className="h-9 w-9 rounded-full p-0 hover:bg-accent">
                     <Avatar className="h-9 w-9 border-2 border-border">
                       <AvatarFallback className="bg-primary text-primary-foreground">
                         {getInitials(user.email)}
@@ -252,7 +248,9 @@ export default function UnifiedLayout({
       )}
 
       {/* Main Content */}
-      <main className={`flex-1 ${maxWidthClasses[maxWidth]} w-full mx-auto px-4 sm:px-6 lg:px-8 py-6`}>
+      <main
+        className={`flex-1 ${maxWidthClasses[maxWidth]} w-full mx-auto px-4 sm:px-6 lg:px-8 py-6`}
+      >
         {children}
       </main>
 

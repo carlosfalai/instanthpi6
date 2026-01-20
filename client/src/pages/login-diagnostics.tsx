@@ -42,14 +42,10 @@ export default function LoginDiagnostics() {
 
       // Check for issues
       if (!supabaseUrl) {
-        results.issues.push(
-          "❌ VITE_SUPABASE_URL not set - add to Netlify environment variables"
-        );
+        results.issues.push("❌ VITE_SUPABASE_URL not set - add to Netlify environment variables");
         results.status = "❌ BLOCKED";
       } else if (!supabaseUrl.startsWith("https://")) {
-        results.issues.push(
-          "❌ VITE_SUPABASE_URL must be HTTPS - current value is invalid"
-        );
+        results.issues.push("❌ VITE_SUPABASE_URL must be HTTPS - current value is invalid");
         results.status = "❌ BLOCKED";
       }
 
@@ -109,17 +105,14 @@ export default function LoginDiagnostics() {
         {/* Header */}
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">🔍 Consultation Platform Diagnostics</h1>
-          <p className="text-muted-foreground">
-            Check your OAuth configuration status
-          </p>
+          <p className="text-muted-foreground">Check your OAuth configuration status</p>
         </div>
 
         {/* Status Banner */}
         <div
-          className={`border rounded-lg p-4 flex items-start gap-3 ${isBlocked
-              ? "bg-red-900/20 border-red-700/50"
-              : "bg-green-900/20 border-green-700/50"
-            }`}
+          className={`border rounded-lg p-4 flex items-start gap-3 ${
+            isBlocked ? "bg-red-900/20 border-red-700/50" : "bg-green-900/20 border-green-700/50"
+          }`}
         >
           {isBlocked ? (
             <AlertTriangle className="w-6 h-6 text-red-400 flex-shrink-0 mt-1" />
@@ -160,9 +153,7 @@ export default function LoginDiagnostics() {
             {/* Supabase URL */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="font-mono text-sm text-primary">
-                  VITE_SUPABASE_URL
-                </label>
+                <label className="font-mono text-sm text-primary">VITE_SUPABASE_URL</label>
                 {diagnostics.environment.supabaseUrl.present ? (
                   <CheckCircle className="w-4 h-4 text-green-400" />
                 ) : (
@@ -171,8 +162,7 @@ export default function LoginDiagnostics() {
               </div>
               <div className="bg-background p-2 rounded border border-border font-mono text-xs text-muted-foreground break-all">
                 {diagnostics.environment.supabaseUrl.firstChars}
-                {diagnostics.environment.supabaseUrl.value.length > 40 &&
-                  "..."}
+                {diagnostics.environment.supabaseUrl.value.length > 40 && "..."}
               </div>
               <p className="text-xs text-muted-foreground">
                 {diagnostics.environment.supabaseUrl.valid
@@ -184,9 +174,7 @@ export default function LoginDiagnostics() {
             {/* Anon Key */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <label className="font-mono text-sm text-primary">
-                  VITE_SUPABASE_ANON_KEY
-                </label>
+                <label className="font-mono text-sm text-primary">VITE_SUPABASE_ANON_KEY</label>
                 {diagnostics.environment.supabaseAnonKey.present ? (
                   <CheckCircle className="w-4 h-4 text-green-400" />
                 ) : (
@@ -198,9 +186,7 @@ export default function LoginDiagnostics() {
               </div>
               <p className="text-xs text-muted-foreground">
                 Length: {diagnostics.environment.supabaseAnonKey.length} chars
-                {diagnostics.environment.supabaseAnonKey.valid
-                  ? " ✓"
-                  : " ✗ (should be 100+)"}
+                {diagnostics.environment.supabaseAnonKey.valid ? " ✓" : " ✗ (should be 100+)"}
               </p>
             </div>
           </div>
@@ -212,9 +198,7 @@ export default function LoginDiagnostics() {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-card border border-border rounded-lg p-4">
-              <h4 className="font-mono text-sm text-primary mb-2">
-                localStorage
-              </h4>
+              <h4 className="font-mono text-sm text-primary mb-2">localStorage</h4>
               <div className="space-y-1 text-xs">
                 <p>
                   doctor_authenticated:{" "}
@@ -223,17 +207,13 @@ export default function LoginDiagnostics() {
                   </code>
                 </p>
                 <p className="text-muted-foreground">
-                  {diagnostics.localStorage.doctor_info
-                    ? "Has doctor_info"
-                    : "No doctor_info"}
+                  {diagnostics.localStorage.doctor_info ? "Has doctor_info" : "No doctor_info"}
                 </p>
               </div>
             </div>
 
             <div className="bg-card border border-border rounded-lg p-4">
-              <h4 className="font-mono text-sm text-primary mb-2">
-                sessionStorage
-              </h4>
+              <h4 className="font-mono text-sm text-primary mb-2">sessionStorage</h4>
               <div className="space-y-1 text-xs">
                 <p>
                   doctor_authenticated:{" "}
@@ -242,9 +222,7 @@ export default function LoginDiagnostics() {
                   </code>
                 </p>
                 <p className="text-muted-foreground">
-                  {diagnostics.sessionStorage.doctor_info
-                    ? "Has doctor_info"
-                    : "No doctor_info"}
+                  {diagnostics.sessionStorage.doctor_info ? "Has doctor_info" : "No doctor_info"}
                 </p>
               </div>
             </div>
@@ -262,15 +240,11 @@ export default function LoginDiagnostics() {
             </div>
             <div>
               <p className="text-muted-foreground mb-1">Auth Callback URL</p>
-              <p className="text-primary break-all">
-                {diagnostics.domain}/auth/callback
-              </p>
+              <p className="text-primary break-all">{diagnostics.domain}/auth/callback</p>
             </div>
             <div>
               <p className="text-muted-foreground mb-1">Consultant Dashboard Redirect</p>
-              <p className="text-primary break-all">
-                {diagnostics.domain}/doctor-dashboard
-              </p>
+              <p className="text-primary break-all">{diagnostics.domain}/doctor-dashboard</p>
             </div>
           </div>
         </div>
@@ -301,7 +275,7 @@ export default function LoginDiagnostics() {
         {/* Action Buttons */}
         <div className="flex gap-3">
           <Button
-            onClick={() => window.location.href = "/doctor-login"}
+            onClick={() => (window.location.href = "/doctor-login")}
             className="flex-1 bg-primary hover:bg-primary/90 text-white"
           >
             Back to Login
@@ -312,9 +286,7 @@ export default function LoginDiagnostics() {
               onClick={() => {
                 const report = JSON.stringify(diagnostics, null, 2);
                 console.error("Diagnostics Report:", report);
-                alert(
-                  "Check browser console (F12) for full diagnostics report"
-                );
+                alert("Check browser console (F12) for full diagnostics report");
               }}
               variant="outline"
               className="flex-1 border-border text-foreground hover:bg-secondary"
@@ -341,22 +313,3 @@ export default function LoginDiagnostics() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

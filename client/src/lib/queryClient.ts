@@ -1,4 +1,5 @@
 import { QueryClient } from "@tanstack/react-query";
+import { supabase } from "./supabase";
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -11,12 +12,33 @@ export const queryClient = new QueryClient({
 });
 
 /**
+ * Get the current Supabase access token for API authentication
+ */
+export async function getAuthHeaders(): Promise<HeadersInit> {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.access_token) {
+      headers["Authorization"] = `Bearer ${session.access_token}`;
+    }
+  } catch (error) {
+    console.warn("[API] Failed to get auth session:", error);
+  }
+
+  return headers;
+}
+
+/**
  * Default fetcher for react-query
  */
 export function getQueryFn(options?: { on401?: "returnNull" | "throw" }) {
   return async ({ queryKey }: { queryKey: string[] }) => {
     const [url] = queryKey;
-    const res = await fetch(url);
+    const headers = await getAuthHeaders();
+    const res = await fetch(url, { headers });
 
     if (res.status === 401) {
       if (options?.on401 === "returnNull") {
@@ -41,9 +63,7 @@ export async function apiRequest(
   url: string,
   body?: any
 ) {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-  };
+  const headers = await getAuthHeaders();
 
   const options: RequestInit = {
     method,

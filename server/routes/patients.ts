@@ -3,8 +3,12 @@ import { storage } from "../storage";
 import { ZodError } from "zod";
 import { insertPatientSchema, insertMessageSchema } from "@shared/schema";
 import axios from "axios";
+import { requireAuth } from "../middleware/auth";
 
 export const router = Router();
+
+// All patient routes require authentication - PHI protection
+router.use(requireAuth);
 
 // Setup Spruce Health API
 const spruceApi = axios.create({

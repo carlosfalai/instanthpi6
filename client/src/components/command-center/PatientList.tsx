@@ -1,9 +1,9 @@
-import React from 'react';
-import { Search, User, Clock, MessageCircle } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { Search, User, Clock, MessageCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface Conversation {
   id: string;
@@ -31,9 +31,10 @@ export function PatientList({
   onSearchChange,
   isLoading,
 }: PatientListProps) {
-  const filteredConversations = conversations.filter(c =>
-    c.patient_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.last_message?.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredConversations = conversations.filter(
+    (c) =>
+      c.patient_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      c.last_message?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const formatTime = (dateStr: string) => {
@@ -71,9 +72,7 @@ export function PatientList({
             Loading conversations...
           </div>
         ) : filteredConversations.length === 0 ? (
-          <div className="p-4 text-center text-muted-foreground text-sm">
-            No patients found
-          </div>
+          <div className="p-4 text-center text-muted-foreground text-sm">No patients found</div>
         ) : (
           <div className="divide-y divide-border">
             {filteredConversations.map((conv) => (
@@ -98,7 +97,7 @@ export function PatientList({
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground truncate mt-0.5">
-                      {conv.last_message || 'No messages'}
+                      {conv.last_message || "No messages"}
                     </p>
                   </div>
                   <span className="text-xs text-muted-foreground flex items-center gap-1">

@@ -1,7 +1,11 @@
 import { Router, Request, Response } from "express";
 import { createClient } from "@supabase/supabase-js";
+import { requireAuth } from "../middleware/auth";
 
 const router = Router();
+
+// All medical template routes require authentication - physician-specific templates
+router.use(requireAuth);
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL || "";
@@ -78,59 +82,92 @@ export function detectCaseType(variables: any): string | null {
   const allText = `${chiefComplaint} ${description} ${associatedSymptoms}`.toLowerCase();
 
   // Gastroenteritis
-  if (allText.includes("vomissement") || allText.includes("diarrhée") || 
-      allText.includes("gastro") || allText.includes("nausée")) {
+  if (
+    allText.includes("vomissement") ||
+    allText.includes("diarrhée") ||
+    allText.includes("gastro") ||
+    allText.includes("nausée")
+  ) {
     return "gastroenteritis";
   }
 
   // Cough
-  if (allText.includes("toux") || allText.includes("cough") || 
-      allText.includes("expectoration")) {
+  if (allText.includes("toux") || allText.includes("cough") || allText.includes("expectoration")) {
     return "cough";
   }
 
   // Cystitis
-  if (allText.includes("cystite") || allText.includes("dysurie") || 
-      allText.includes("brûlure urinaire") || allText.includes("pollakiurie")) {
+  if (
+    allText.includes("cystite") ||
+    allText.includes("dysurie") ||
+    allText.includes("brûlure urinaire") ||
+    allText.includes("pollakiurie")
+  ) {
     return "cystitis";
   }
 
   // STI Screening
-  if (allText.includes("itss") || allText.includes("dépistage") || 
-      allText.includes("sti") || allText.includes("chlamydia") || 
-      allText.includes("gonorrhée")) {
+  if (
+    allText.includes("itss") ||
+    allText.includes("dépistage") ||
+    allText.includes("sti") ||
+    allText.includes("chlamydia") ||
+    allText.includes("gonorrhée")
+  ) {
     return "sti_screening";
   }
 
   // Mental Health
-  if (allText.includes("anxiété") || allText.includes("dépression") || 
-      allText.includes("insomnie") || allText.includes("stress") || 
-      allText.includes("trouble") || allText.includes("psych")) {
+  if (
+    allText.includes("anxiété") ||
+    allText.includes("dépression") ||
+    allText.includes("insomnie") ||
+    allText.includes("stress") ||
+    allText.includes("trouble") ||
+    allText.includes("psych")
+  ) {
     return "mental_health";
   }
 
   // Emergency
-  if (allText.includes("urgence") || allText.includes("douleur thoracique") || 
-      allText.includes("essoufflement") || allText.includes("vision floue") ||
-      allText.includes("torsion") || allText.includes("testiculaire")) {
+  if (
+    allText.includes("urgence") ||
+    allText.includes("douleur thoracique") ||
+    allText.includes("essoufflement") ||
+    allText.includes("vision floue") ||
+    allText.includes("torsion") ||
+    allText.includes("testiculaire")
+  ) {
     return "emergency";
   }
 
   // Abdominal Pain
-  if (allText.includes("douleur abdominale") || allText.includes("colique") ||
-      allText.includes("biliaire") || allText.includes("cholécystite")) {
+  if (
+    allText.includes("douleur abdominale") ||
+    allText.includes("colique") ||
+    allText.includes("biliaire") ||
+    allText.includes("cholécystite")
+  ) {
     return "abdominal_pain";
   }
 
   // Orthopedic
-  if (allText.includes("tendon") || allText.includes("achille") || 
-      allText.includes("articulaire") || allText.includes("arthropathie")) {
+  if (
+    allText.includes("tendon") ||
+    allText.includes("achille") ||
+    allText.includes("articulaire") ||
+    allText.includes("arthropathie")
+  ) {
     return "orthopedic";
   }
 
   // License Assessment
-  if (allText.includes("classe") || allText.includes("license") || 
-      allText.includes("conduite") || allText.includes("professionnelle")) {
+  if (
+    allText.includes("classe") ||
+    allText.includes("license") ||
+    allText.includes("conduite") ||
+    allText.includes("professionnelle")
+  ) {
     return "license_assessment";
   }
 
@@ -138,4 +175,3 @@ export function detectCaseType(variables: any): string | null {
 }
 
 export default router;
-

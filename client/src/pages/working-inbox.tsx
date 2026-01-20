@@ -14,8 +14,8 @@ export default function WorkingInbox() {
 
   const fetchConversations = async () => {
     try {
-      // Use the local development server
-      const response = await fetch("http://localhost:3002/api/spruce/conversations/all");
+      // Use relative path - works in both dev and production
+      const response = await fetch("/api/spruce/conversations/all");
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       console.log(`Loaded ${data.length} total conversations`);
@@ -34,9 +34,9 @@ export default function WorkingInbox() {
     try {
       console.log("Fetching messages for conversation:", conv.id);
 
-      // Use the local development server history endpoint
+      // Use relative path - works in both dev and production
       const response = await fetch(
-        `http://localhost:3002/api/spruce/conversation/history/${conv.id}`
+        `/api/spruce/conversation/history/${conv.id}`
       );
 
       if (response.ok) {

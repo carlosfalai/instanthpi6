@@ -1,7 +1,11 @@
 import { Router, Request, Response } from "express";
 import { createUserAIClient } from "../utils/aiClient";
+import { requireAuth, requireAuthenticatedUserId } from "../middleware/auth";
 
 const router = Router();
+
+// All medical transcription routes require authentication - generates PHI
+router.use(requireAuth);
 
 // Medical transcription AI endpoint - generates comprehensive French medical blocks
 router.post("/medical-transcription", async (req: Request, res: Response) => {
@@ -34,10 +38,10 @@ router.post("/medical-transcription", async (req: Request, res: Response) => {
       OtherNotes,
     } = variables;
 
-    // Get user-specific AI client (default to user 1 for now)
-    const userId = 1; // TODO: Get from authentication
+    // Get user-specific AI client from authenticated session
+    const userId = requireAuthenticatedUserId(req);
     const aiClient = await createUserAIClient(userId);
-    
+
     if (!aiClient) {
       return res.status(500).json({ error: "No AI client available" });
     }
@@ -170,19 +174,21 @@ Autres notes: ${OtherNotes}
 
 Réponds à la demande du médecin de manière professionnelle et complète.`;
 
-      const customResponse = await aiClient.generateCompletion([
-        { role: "user", content: customUserPrompt }
-      ], customSystemPrompt);
+      const customResponse = await aiClient.generateCompletion(
+        [{ role: "user", content: customUserPrompt }],
+        customSystemPrompt
+      );
 
       return res.json({
-        customResponse: customResponse
+        customResponse: customResponse,
       });
     }
 
     // Generate the comprehensive medical transcription
-    const aiResponse = await aiClient.generateCompletion([
-      { role: "user", content: userPrompt }
-    ], systemPrompt);
+    const aiResponse = await aiClient.generateCompletion(
+      [{ role: "user", content: userPrompt }],
+      systemPrompt
+    );
 
     // Parse the AI response to extract each medical block
     const blocks = parseMedicalBlocks(aiResponse);
@@ -201,7 +207,6 @@ Réponds à la demande du médecin de manière professionnelle et complète.`;
       telemedicineNeedsInPerson: blocks.telemedicineNeedsInPerson,
       patientMessage: blocks.patientMessage,
     });
-
   } catch (error: any) {
     console.error("Error generating medical transcription:", error);
     res.status(500).json({ error: "Failed to generate medical transcription" });
@@ -219,7 +224,9 @@ function parseMedicalBlocks(response: string) {
   }
 
   // Extract Follow-up Questions
-  const followUpMatch = response.match(/```10_FollowUpQuestions_BasedOn_3Differentials```\s*([\s\S]*?)(?=```|$)/);
+  const followUpMatch = response.match(
+    /```10_FollowUpQuestions_BasedOn_3Differentials```\s*([\s\S]*?)(?=```|$)/
+  );
   if (followUpMatch) {
     blocks.followUpQuestions = followUpMatch[1].trim();
   }
@@ -231,7 +238,9 @@ function parseMedicalBlocks(response: string) {
   }
 
   // Extract Medications Ready to Use
-  const medMatch = response.match(/```Medications_ReadyToUse_Prescriptions```\s*([\s\S]*?)(?=```|$)/);
+  const medMatch = response.match(
+    /```Medications_ReadyToUse_Prescriptions```\s*([\s\S]*?)(?=```|$)/
+  );
   if (medMatch) {
     blocks.medicationsReadyToUse = medMatch[1].trim();
   }
@@ -273,7 +282,9 @@ function parseMedicalBlocks(response: string) {
   }
 
   // Extract Telemedicine Needs In Person Evaluation
-  const teleMatch = response.match(/```Telemedicine_NeedsInPersonEvaluation```\s*([\s\S]*?)(?=```|$)/);
+  const teleMatch = response.match(
+    /```Telemedicine_NeedsInPersonEvaluation```\s*([\s\S]*?)(?=```|$)/
+  );
   if (teleMatch) {
     blocks.telemedicineNeedsInPerson = teleMatch[1].trim();
   }
@@ -318,10 +329,10 @@ router.post("/medical-transcription/html-report", async (req: Request, res: Resp
       OtherNotes,
     } = variables;
 
-    // Get user-specific AI client
-    const userId = 1; // TODO: Get from authentication
+    // Get user-specific AI client from authenticated session
+    const userId = requireAuthenticatedUserId(req);
     const aiClient = await createUserAIClient(userId);
-    
+
     if (!aiClient) {
       return res.status(500).json({ error: "No AI client available" });
     }
@@ -421,15 +432,16 @@ Autres notes: ${OtherNotes}
 Génère tous les blocs médicaux en français selon les spécifications exactes.`;
 
     // Generate the comprehensive medical transcription
-    const aiResponse = await aiClient.generateCompletion([
-      { role: "user", content: userPrompt }
-    ], systemPrompt);
+    const aiResponse = await aiClient.generateCompletion(
+      [{ role: "user", content: userPrompt }],
+      systemPrompt
+    );
 
     // Parse the AI response to extract each medical block
     const blocks = parseMedicalBlocks(aiResponse);
 
     // Generate HTML report similar to instanthpi-medical
-    const currentDate = new Date().toLocaleDateString('fr-CA');
+    const currentDate = new Date().toLocaleDateString("fr-CA");
     const htmlReport = generateHTMLReport(patientId, variables, blocks, currentDate);
 
     res.json({
@@ -447,9 +459,8 @@ Génère tous les blocs médicaux en français selon les spécifications exactes
         insuranceDocumentation: blocks.insuranceDocumentation,
         telemedicineNeedsInPerson: blocks.telemedicineNeedsInPerson,
         patientMessage: blocks.patientMessage,
-      }
+      },
     });
-
   } catch (error: any) {
     console.error("Error generating HTML report:", error);
     res.status(500).json({ error: "Failed to generate HTML report" });
@@ -533,7 +544,9 @@ function generateHTMLReport(patientId: string, variables: any, blocks: any, curr
 
 <hr style="border: 2px solid #3498db; margin: 20px 0;">
 
-${blocks.hpiConfirmationSummary ? `
+${
+  blocks.hpiConfirmationSummary
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">1. HPI Confirmation Summary</h3>
     <button class="copy-btn" onclick="copySection('hpi')">📋 Copier</button>
@@ -542,9 +555,13 @@ ${blocks.hpiConfirmationSummary ? `
 <p>${blocks.hpiConfirmationSummary}</p>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.followUpQuestions ? `
+${
+  blocks.followUpQuestions
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">2. Questions de Suivi</h3>
     <button class="copy-btn" onclick="copySection('questions')">📋 Copier</button>
@@ -553,9 +570,13 @@ ${blocks.followUpQuestions ? `
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.followUpQuestions}</pre>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.superSpartanSAP ? `
+${
+  blocks.superSpartanSAP
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">3. Super Spartan SAP</h3>
     <button class="copy-btn" onclick="copySection('sap')">📋 Copier</button>
@@ -564,9 +585,13 @@ ${blocks.superSpartanSAP ? `
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.superSpartanSAP}</pre>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.medicationsReadyToUse ? `
+${
+  blocks.medicationsReadyToUse
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">4. Médicaments Prêts à l'Emploi</h3>
     <button class="copy-btn" onclick="copySection('medications')">📋 Copier</button>
@@ -575,9 +600,13 @@ ${blocks.medicationsReadyToUse ? `
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.medicationsReadyToUse}</pre>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.labWorks ? `
+${
+  blocks.labWorks
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">5. Analyses de Laboratoire</h3>
     <button class="copy-btn" onclick="copySection('lab')">📋 Copier</button>
@@ -586,9 +615,13 @@ ${blocks.labWorks ? `
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.labWorks}</pre>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.imagerieMedicale ? `
+${
+  blocks.imagerieMedicale
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">6. Imagerie Médicale</h3>
     <button class="copy-btn" onclick="copySection('imagerie')">📋 Copier</button>
@@ -597,9 +630,13 @@ ${blocks.imagerieMedicale ? `
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.imagerieMedicale}</pre>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.referenceSpecialistes ? `
+${
+  blocks.referenceSpecialistes
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">7. Références aux Spécialistes</h3>
     <button class="copy-btn" onclick="copySection('references')">📋 Copier</button>
@@ -608,9 +645,13 @@ ${blocks.referenceSpecialistes ? `
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.referenceSpecialistes}</pre>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.workLeaveCertificate ? `
+${
+  blocks.workLeaveCertificate
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">8. Certificat d'Arrêt de Travail</h3>
     <button class="copy-btn" onclick="copySection('workleave')">📋 Copier</button>
@@ -619,9 +660,13 @@ ${blocks.workLeaveCertificate ? `
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.workLeaveCertificate}</pre>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.workplaceModifications ? `
+${
+  blocks.workplaceModifications
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">9. Modifications du Lieu de Travail</h3>
     <button class="copy-btn" onclick="copySection('workplace')">📋 Copier</button>
@@ -630,9 +675,13 @@ ${blocks.workplaceModifications ? `
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.workplaceModifications}</pre>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.insuranceDocumentation ? `
+${
+  blocks.insuranceDocumentation
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">10. Documentation d'Assurance</h3>
     <button class="copy-btn" onclick="copySection('insurance')">📋 Copier</button>
@@ -641,9 +690,13 @@ ${blocks.insuranceDocumentation ? `
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.insuranceDocumentation}</pre>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.telemedicineNeedsInPerson ? `
+${
+  blocks.telemedicineNeedsInPerson
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">11. Télémédecine - Besoin d'Évaluation en Personne</h3>
     <button class="copy-btn" onclick="copySection('telemedicine')">📋 Copier</button>
@@ -652,9 +705,13 @@ ${blocks.telemedicineNeedsInPerson ? `
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.telemedicineNeedsInPerson}</pre>
 </div>
 <hr style="border: 1px solid #ddd; margin: 20px 0;">
-` : ''}
+`
+    : ""
+}
 
-${blocks.patientMessage ? `
+${
+  blocks.patientMessage
+    ? `
 <div class="section-header">
     <h3 class="section-title" style="color: #34495e;">12. Message au Patient</h3>
     <button class="copy-btn" onclick="copySection('patient')">📋 Copier</button>
@@ -662,7 +719,9 @@ ${blocks.patientMessage ? `
 <div id="patient">
 <pre style="white-space: pre-line; font-family: inherit;">${blocks.patientMessage}</pre>
 </div>
-` : ''}
+`
+    : ""
+}
 
 </body>
 </html>`;

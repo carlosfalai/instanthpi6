@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import DOMPurify from "dompurify";
 import { Loader2, Mail, MailOpen, Calendar, User, RefreshCw, AlertCircle } from "lucide-react";
 import ModernLayout from "@/components/layout/ModernLayout";
 import { Button } from "@/components/ui/button";
@@ -98,19 +99,21 @@ export default function GmailInboxPage() {
                 onClick={async () => {
                   try {
                     const res = await apiRequest("GET", "/api/gmail/auth/url");
-                    
+
                     if (!res.ok) {
                       const errorData = await res.json();
                       toast({
                         title: "Gmail OAuth Not Configured",
-                        description: errorData.message || "Gmail OAuth credentials are not set up. Please configure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Netlify environment variables.",
+                        description:
+                          errorData.message ||
+                          "Gmail OAuth credentials are not set up. Please configure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in Netlify environment variables.",
                         variant: "destructive",
                       });
                       return;
                     }
-                    
+
                     const data = await res.json();
-                    
+
                     if (data.error) {
                       toast({
                         title: "Error",
@@ -119,9 +122,9 @@ export default function GmailInboxPage() {
                       });
                       return;
                     }
-                    
+
                     if (data.authUrl) {
-                    window.location.href = data.authUrl;
+                      window.location.href = data.authUrl;
                     } else {
                       toast({
                         title: "Error",
@@ -132,7 +135,9 @@ export default function GmailInboxPage() {
                   } catch (error: any) {
                     toast({
                       title: "Error",
-                      description: error.message || "Failed to get Gmail auth URL. Please check that Gmail OAuth is configured.",
+                      description:
+                        error.message ||
+                        "Failed to get Gmail auth URL. Please check that Gmail OAuth is configured.",
                       variant: "destructive",
                     });
                   }
@@ -317,7 +322,7 @@ export default function GmailInboxPage() {
                     <div
                       className="text-gray-900 dark:text-white whitespace-pre-wrap"
                       dangerouslySetInnerHTML={{
-                        __html: selectedEmail.body || selectedEmail.snippet || "No content",
+                        __html: DOMPurify.sanitize(selectedEmail.body || selectedEmail.snippet || "No content"),
                       }}
                     />
                   </div>
@@ -330,4 +335,3 @@ export default function GmailInboxPage() {
     </ModernLayout>
   );
 }
-

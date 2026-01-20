@@ -84,22 +84,31 @@ export default function PublicPatientIntake() {
             <p className="mt-3 text-slate-700 text-lg">
               Secure patient onboarding with AI assistance. Available in English and French.
             </p>
-            
+
             {/* Patient Entry Modes */}
             <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-white border-2 border-blue-200 rounded-xl p-6 hover:border-blue-400 transition-all hover:shadow-lg">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    <svg
+                      className="w-6 h-6 text-blue-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 10V3L4 14h7v7l9-11h-7z"
+                      />
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">
-                      Just use InstantHPI
-                    </h3>
+                    <h3 className="text-lg font-bold text-slate-900 mb-2">Just use InstantHPI</h3>
                     <p className="text-sm text-slate-600 mb-4">
-                      Quick, anonymous intake. No account needed. Fill the form and print your medical summary.
+                      Quick, anonymous intake. No account needed. Fill the form and print your
+                      medical summary.
                     </p>
                     <a
                       href="#patient-form"
@@ -114,8 +123,18 @@ export default function PublicPatientIntake() {
               <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-slate-400 transition-all hover:shadow-lg">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <svg
+                      className="w-6 h-6 text-slate-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
                     </svg>
                   </div>
                   <div className="flex-1">
@@ -123,10 +142,15 @@ export default function PublicPatientIntake() {
                       Sign in to save & access later
                     </h3>
                     <p className="text-sm text-slate-600 mb-4">
-                      Create an account to save your intake, track history, and access your documents anytime.
+                      Create an account to save your intake, track history, and access your
+                      documents anytime.
                     </p>
                     <button
-                      onClick={() => alert('Patient account feature coming soon! For now, use "Just use InstantHPI" mode.')}
+                      onClick={() =>
+                        alert(
+                          'Patient account feature coming soon! For now, use "Just use InstantHPI" mode.'
+                        )
+                      }
                       className="inline-flex items-center justify-center px-4 py-2 bg-slate-100 text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-200 transition-colors w-full text-center font-medium"
                     >
                       Coming Soon

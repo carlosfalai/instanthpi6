@@ -58,7 +58,7 @@ const SpruceTopNavbar: React.FC = () => {
     { href: "/scheduler", icon: <Calendar className="h-5 w-5" />, label: "Scheduler" },
     { href: "/formsite", icon: <FileCode className="h-5 w-5" />, label: "Formsite" },
     { href: "/knowledge-base", icon: <Brain className="h-5 w-5" />, label: "Knowledge Base" },
-    { href: "/ai-billing", icon: <DollarSign className="h-5 w-5" />, label: "AI Billing" },
+    { href: "/command", icon: <LayoutList className="h-5 w-5" />, label: "Command Center" },
   ];
 
   // Second row navigation items

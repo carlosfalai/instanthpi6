@@ -1,16 +1,13 @@
-const { createClient } = require('@supabase/supabase-js');
+const { createClient } = require("@supabase/supabase-js");
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY);
 
 exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
+  if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: 'Method not allowed' })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ error: "Method not allowed" }),
     };
   }
 
@@ -20,8 +17,8 @@ exports.handler = async (event, context) => {
     if (!patientId) {
       return {
         statusCode: 400,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ error: 'Patient ID is required' })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ error: "Patient ID is required" }),
       };
     }
 
@@ -59,7 +56,7 @@ Return ONLY the enhanced HPI confirmation summary text, no formatting or code.`;
     // Try OpenAI first
     if (process.env.OPENAI_API_KEY) {
       try {
-        const openai = require('openai');
+        const openai = require("openai");
         const client = new openai.OpenAI({
           apiKey: process.env.OPENAI_API_KEY,
         });
@@ -69,46 +66,45 @@ Return ONLY the enhanced HPI confirmation summary text, no formatting or code.`;
           messages: [
             {
               role: "system",
-              content: "You are a medical AI assistant specializing in French medical documentation. Generate comprehensive, accurate medical summaries."
+              content:
+                "You are a medical AI assistant specializing in French medical documentation. Generate comprehensive, accurate medical summaries.",
             },
             {
               role: "user",
-              content: prompt
-            }
+              content: prompt,
+            },
           ],
           max_tokens: 2000,
-          temperature: 0.3
+          temperature: 0.3,
         });
 
         aiResponse = completion.choices[0].message.content;
       } catch (error) {
-        console.error('OpenAI error:', error);
-        throw new Error('AI service unavailable');
+        console.error("OpenAI error:", error);
+        throw new Error("AI service unavailable");
       }
     } else {
-      throw new Error('AI service not configured');
+      throw new Error("AI service not configured");
     }
 
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         success: true,
         enhancedHpiSummary: aiResponse,
-        patientId: patientId
-      })
+        patientId: patientId,
+      }),
     };
-
   } catch (error) {
-    console.error('Error generating enhanced HPI summary:', error);
+    console.error("Error generating enhanced HPI summary:", error);
     return {
       statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        error: 'Failed to generate enhanced HPI summary',
-        details: error.message
-      })
+        error: "Failed to generate enhanced HPI summary",
+        details: error.message,
+      }),
     };
   }
 };
-

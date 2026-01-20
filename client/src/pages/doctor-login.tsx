@@ -12,24 +12,28 @@ export default function DoctorLogin() {
   const [message, setMessage] = useState("");
 
   // Check if running locally (development mode)
-  const isLocalDev = window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1' ||
+  const isLocalDev =
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1" ||
     import.meta.env.DEV;
 
   useEffect(() => {
     // For local development, bypass login and go straight to dashboard
     if (isLocalDev) {
-      console.log('Local development mode detected - bypassing authentication');
+      console.log("Local development mode detected - bypassing authentication");
       // Set local auth flag for ProtectedRoute
-      localStorage.setItem('doctor_authenticated', 'true');
-      localStorage.setItem('doctor_info', JSON.stringify({
-        name: 'Carlos Faviel Font',
-        email: 'cff@centremedicalfont.ca',
-        specialty: 'Médecine Générale'
-      }));
+      localStorage.setItem("doctor_authenticated", "true");
+      localStorage.setItem(
+        "doctor_info",
+        JSON.stringify({
+          name: "Carlos Faviel Font",
+          email: "cff@centremedicalfont.ca",
+          specialty: "Médecine Générale",
+        })
+      );
       // Redirect to dashboard
       setTimeout(() => {
-        navigate('/doctor-dashboard');
+        navigate("/doctor-dashboard");
       }, 100);
       return;
     }
@@ -55,13 +59,19 @@ export default function DoctorLogin() {
 
           // Only show message if session is valid - but don't auto-redirect
           if (session.expires_at && session.expires_at > now) {
-            setMessage("You are already signed in. Click 'Continue' to go to dashboard or sign out to use a different account.");
+            setMessage(
+              "You are already signed in. Click 'Continue' to go to dashboard or sign out to use a different account."
+            );
           } else if (session.expires_at) {
             // Session expired - try refresh silently, but don't auto-redirect
             const expiredBy = now - session.expires_at;
-            if (expiredBy < 300) { // Within 5 minutes
-              console.log('[DoctorLogin] Session expired, attempting refresh...');
-              const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+            if (expiredBy < 300) {
+              // Within 5 minutes
+              console.log("[DoctorLogin] Session expired, attempting refresh...");
+              const {
+                data: { session: refreshedSession },
+                error: refreshError,
+              } = await supabase.auth.refreshSession();
 
               if (!refreshError && refreshedSession?.user && refreshedSession.expires_at) {
                 const newExpiresAt = refreshedSession.expires_at;
@@ -96,13 +106,18 @@ export default function DoctorLogin() {
       <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
         {/* Ambient Glow */}
         <div className="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-glow-pulse pointer-events-none" />
-        <div className="fixed bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[150px] animate-glow-pulse pointer-events-none" style={{ animationDelay: '-2s' }} />
+        <div
+          className="fixed bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[150px] animate-glow-pulse pointer-events-none"
+          style={{ animationDelay: "-2s" }}
+        />
 
         <Card className="w-full max-w-md glass-dark border-border shadow-2xl">
           <CardContent className="pt-8 pb-8">
             <div className="text-center space-y-4">
               <div className="w-12 h-12 rounded-full border-2 border-primary border-t-transparent animate-spin mx-auto" />
-              <p className="text-muted-foreground font-medium">Development mode - Redirecting to dashboard...</p>
+              <p className="text-muted-foreground font-medium">
+                Development mode - Redirecting to dashboard...
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -114,14 +129,20 @@ export default function DoctorLogin() {
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
       {/* Ambient Glow Effects */}
       <div className="fixed top-[-20%] left-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] animate-glow-pulse pointer-events-none" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[150px] animate-glow-pulse pointer-events-none" style={{ animationDelay: '-2s' }} />
+      <div
+        className="fixed bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-secondary/5 rounded-full blur-[150px] animate-glow-pulse pointer-events-none"
+        style={{ animationDelay: "-2s" }}
+      />
 
       {/* Subtle Grid Pattern */}
-      <div className="fixed inset-0 opacity-[0.02]" style={{
-        backgroundImage: `linear-gradient(rgba(245, 158, 11, 0.5) 1px, transparent 1px),
+      <div
+        className="fixed inset-0 opacity-[0.02]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(245, 158, 11, 0.5) 1px, transparent 1px),
                           linear-gradient(90deg, rgba(245, 158, 11, 0.5) 1px, transparent 1px)`,
-        backgroundSize: '60px 60px'
-      }} />
+          backgroundSize: "60px 60px",
+        }}
+      />
 
       <div className="relative z-10 w-full max-w-md px-4">
         {/* Logo & Brand */}
@@ -129,17 +150,24 @@ export default function DoctorLogin() {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-secondary amber-glow-primary mb-6">
             <Sparkles className="w-8 h-8 text-background" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground" style={{ fontFamily: 'Outfit, sans-serif' }}>
+          <h1
+            className="text-3xl font-bold tracking-tight text-foreground"
+            style={{ fontFamily: "Outfit, sans-serif" }}
+          >
             InstantHPI
           </h1>
-          <p className="text-muted-foreground mt-2">
-            Consultant Dashboard
-          </p>
+          <p className="text-muted-foreground mt-2">Consultant Dashboard</p>
         </div>
 
-        <Card className="glass-dark border-border/50 shadow-2xl animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+        <Card
+          className="glass-dark border-border/50 shadow-2xl animate-fade-in-up"
+          style={{ animationDelay: "0.1s" }}
+        >
           <CardHeader className="space-y-1 pb-4">
-            <CardTitle className="text-xl font-semibold text-center text-foreground" style={{ fontFamily: 'Outfit, sans-serif' }}>
+            <CardTitle
+              className="text-xl font-semibold text-center text-foreground"
+              style={{ fontFamily: "Outfit, sans-serif" }}
+            >
               Welcome Back
             </CardTitle>
             <CardDescription className="text-center text-muted-foreground">
@@ -209,19 +237,44 @@ export default function DoctorLogin() {
             </Button>
 
             {message && !message.toLowerCase().includes("already signed") && (
-              <div className={`p-4 rounded-xl text-sm whitespace-pre-line ${message.includes("error") || message.includes("failed") || message.includes("not configured")
-                  ? "bg-destructive/10 text-destructive border border-destructive/20"
-                  : "bg-primary/10 text-primary border border-primary/20"
-                }`}>
+              <div
+                className={`p-4 rounded-xl text-sm whitespace-pre-line ${
+                  message.includes("error") ||
+                  message.includes("failed") ||
+                  message.includes("not configured")
+                    ? "bg-destructive/10 text-destructive border border-destructive/20"
+                    : "bg-primary/10 text-primary border border-primary/20"
+                }`}
+              >
                 {message}
                 {message.includes("not configured") && (
                   <div className="mt-3 pt-3 border-t border-destructive/30">
                     <p className="font-semibold mb-2">Quick Fix:</p>
                     <ol className="list-decimal list-inside space-y-1 text-xs opacity-90">
-                      <li>Go to <a href="https://supabase.com/dashboard/project/gbxksgxezbljwlnlpkpz/auth/providers" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">Supabase Dashboard → Auth → Providers</a></li>
+                      <li>
+                        Go to{" "}
+                        <a
+                          href="https://supabase.com/dashboard/project/gbxksgxezbljwlnlpkpz/auth/providers"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline hover:opacity-80"
+                        >
+                          Supabase Dashboard → Auth → Providers
+                        </a>
+                      </li>
                       <li>Click on "Google" provider</li>
                       <li>Enable it and add your Google OAuth credentials</li>
-                      <li>Get credentials from <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer" className="underline hover:opacity-80">Google Cloud Console</a></li>
+                      <li>
+                        Get credentials from{" "}
+                        <a
+                          href="https://console.cloud.google.com/apis/credentials"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline hover:opacity-80"
+                        >
+                          Google Cloud Console
+                        </a>
+                      </li>
                     </ol>
                   </div>
                 )}
@@ -231,7 +284,10 @@ export default function DoctorLogin() {
         </Card>
 
         {/* Footer */}
-        <p className="text-center text-muted-foreground/60 text-xs mt-8 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+        <p
+          className="text-center text-muted-foreground/60 text-xs mt-8 animate-fade-in"
+          style={{ animationDelay: "0.3s" }}
+        >
           &copy; {new Date().getFullYear()} InstantHPI. All rights reserved.
         </p>
       </div>

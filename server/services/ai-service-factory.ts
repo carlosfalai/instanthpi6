@@ -1,15 +1,18 @@
-import OpenAI from 'openai';
-import Anthropic from '@anthropic-ai/sdk';
-import { supabase } from '../supabase-server';
-import { decryptCredential } from '../utils/encryption';
+import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
+import { supabase } from "../supabase-server";
+import { decryptCredential } from "../utils/encryption";
 
 // Cache for AI clients to avoid repeated decryption and instantiation
-const clientCache = new Map<string, { client: OpenAI | Anthropic; provider: 'openai' | 'claude' }>();
+const clientCache = new Map<
+  string,
+  { client: OpenAI | Anthropic; provider: "openai" | "claude" }
+>();
 
 interface DoctorAICredentials {
   openai_api_key?: string;
   claude_api_key?: string;
-  preferred_ai_provider?: 'openai' | 'claude' | 'none';
+  preferred_ai_provider?: "openai" | "claude" | "none";
 }
 
 /**
@@ -18,13 +21,13 @@ interface DoctorAICredentials {
 async function getDoctorCredentials(userId: string): Promise<DoctorAICredentials | null> {
   try {
     const { data, error } = await supabase
-      .from('doctor_credentials')
-      .select('openai_api_key, claude_api_key, preferred_ai_provider')
-      .eq('user_id', userId)
+      .from("doctor_credentials")
+      .select("openai_api_key, claude_api_key, preferred_ai_provider")
+      .eq("user_id", userId)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         // No credentials found
         return null;
       }
@@ -33,7 +36,7 @@ async function getDoctorCredentials(userId: string): Promise<DoctorAICredentials
 
     return data;
   } catch (error) {
-    console.error('Error fetching doctor credentials:', error);
+    console.error("Error fetching doctor credentials:", error);
     return null;
   }
 }
@@ -41,7 +44,7 @@ async function getDoctorCredentials(userId: string): Promise<DoctorAICredentials
 /**
  * Gets configured AI client (OpenAI or Claude) for a doctor
  * Returns the client and provider type
- * 
+ *
  * @param userId - The doctor's user ID
  * @param forceRefresh - Skip cache and get fresh credentials
  * @returns Object with client and provider, or throws if not configured
@@ -49,7 +52,7 @@ async function getDoctorCredentials(userId: string): Promise<DoctorAICredentials
 export async function getAIClient(
   userId: string,
   forceRefresh: boolean = false
-): Promise<{ client: OpenAI | Anthropic; provider: 'openai' | 'claude' }> {
+): Promise<{ client: OpenAI | Anthropic; provider: "openai" | "claude" }> {
   // Check cache first unless force refresh
   if (!forceRefresh && clientCache.has(userId)) {
     return clientCache.get(userId)!;
@@ -59,31 +62,31 @@ export async function getAIClient(
   const credentials = await getDoctorCredentials(userId);
 
   if (!credentials) {
-    throw new Error('CREDENTIALS_NOT_CONFIGURED');
+    throw new Error("CREDENTIALS_NOT_CONFIGURED");
   }
 
   const { openai_api_key, claude_api_key, preferred_ai_provider } = credentials;
 
   // Determine which provider to use
-  let provider: 'openai' | 'claude';
+  let provider: "openai" | "claude";
   let apiKey: string | undefined;
 
-  if (preferred_ai_provider === 'openai' && openai_api_key) {
-    provider = 'openai';
+  if (preferred_ai_provider === "openai" && openai_api_key) {
+    provider = "openai";
     apiKey = decryptCredential(openai_api_key);
-  } else if (preferred_ai_provider === 'claude' && claude_api_key) {
-    provider = 'claude';
+  } else if (preferred_ai_provider === "claude" && claude_api_key) {
+    provider = "claude";
     apiKey = decryptCredential(claude_api_key);
   } else if (openai_api_key) {
     // Fallback to OpenAI if available
-    provider = 'openai';
+    provider = "openai";
     apiKey = decryptCredential(openai_api_key);
   } else if (claude_api_key) {
     // Fallback to Claude if available
-    provider = 'claude';
+    provider = "claude";
     apiKey = decryptCredential(claude_api_key);
   } else {
-    throw new Error('NO_AI_CREDENTIALS');
+    throw new Error("NO_AI_CREDENTIALS");
   }
 
   if (!apiKey) {
@@ -93,7 +96,7 @@ export async function getAIClient(
   // Create the appropriate client
   let client: OpenAI | Anthropic;
 
-  if (provider === 'openai') {
+  if (provider === "openai") {
     client = new OpenAI({ apiKey });
   } else {
     client = new Anthropic({ apiKey });
@@ -112,11 +115,11 @@ export async function getAIClient(
  */
 export async function getOpenAIClient(userId: string): Promise<OpenAI> {
   const { client, provider } = await getAIClient(userId);
-  
-  if (provider !== 'openai') {
-    throw new Error('OPENAI_NOT_CONFIGURED');
+
+  if (provider !== "openai") {
+    throw new Error("OPENAI_NOT_CONFIGURED");
   }
-  
+
   return client as OpenAI;
 }
 
@@ -126,11 +129,11 @@ export async function getOpenAIClient(userId: string): Promise<OpenAI> {
  */
 export async function getClaudeClient(userId: string): Promise<Anthropic> {
   const { client, provider } = await getAIClient(userId);
-  
-  if (provider !== 'claude') {
-    throw new Error('CLAUDE_NOT_CONFIGURED');
+
+  if (provider !== "claude") {
+    throw new Error("CLAUDE_NOT_CONFIGURED");
   }
-  
+
   return client as Anthropic;
 }
 
@@ -158,21 +161,21 @@ export async function hasAICredentials(userId: string): Promise<boolean> {
  * Gets system-wide AI client as fallback (uses env variables)
  * This should only be used for non-doctor-specific operations
  */
-export function getSystemAIClient(): { client: OpenAI | Anthropic; provider: 'openai' | 'claude' } {
+export function getSystemAIClient(): { client: OpenAI | Anthropic; provider: "openai" | "claude" } {
   const openaiKey = process.env.OPENAI_API_KEY;
   const claudeKey = process.env.ANTHROPIC_API_KEY;
 
   if (openaiKey) {
     return {
       client: new OpenAI({ apiKey: openaiKey }),
-      provider: 'openai',
+      provider: "openai",
     };
   } else if (claudeKey) {
     return {
       client: new Anthropic({ apiKey: claudeKey }),
-      provider: 'claude',
+      provider: "claude",
     };
   }
 
-  throw new Error('NO_SYSTEM_AI_CREDENTIALS');
+  throw new Error("NO_SYSTEM_AI_CREDENTIALS");
 }

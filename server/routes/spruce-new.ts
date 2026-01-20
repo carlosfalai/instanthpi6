@@ -7,7 +7,7 @@ const createUserSpruceClient = (bearerToken: string) => {
   if (!bearerToken) {
     throw new Error("Spruce bearer token not provided for this user");
   }
-  
+
   return new SpruceHealthClient({
     bearerToken: bearerToken,
     maxRetries: 3,
@@ -20,12 +20,12 @@ const getUserSpruceClient = () => {
   // TODO: Get from authenticated user's profile instead of environment
   // For now, using environment variables as fallback
   const bearerToken = process.env.SPRUCE_BEARER_TOKEN || "";
-  
+
   if (!bearerToken) {
     console.warn("⚠️ WARNING: No Spruce bearer token found for this user.");
     throw new Error("Spruce API credentials not configured for this user");
   }
-  
+
   return createUserSpruceClient(bearerToken);
 };
 

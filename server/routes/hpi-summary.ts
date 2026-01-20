@@ -47,25 +47,29 @@ Format requirements:
 Example format:
 "Juste pour confirmer avec vous avant de continuer; vous êtes un homme de 45 ans présentant depuis ce matin une douleur thoracique aiguë, localisée côté gauche, aggravée par la respiration profonde, soulagée par le repos, accompagnée de douleur thoracique et essoufflement; vos antécédents incluent hypertension; allergique à aucune; Est-ce que ce résumé est exact ?"
 
-Patient data: ${JSON.stringify({
-      gender,
-      age,
-      reasonForVisit,
-      problemStartDate,
-      specificTrigger,
-      symptomLocation,
-      symptomDescription,
-      symptomAggravators,
-      symptomRelievers,
-      severity,
-      selectedSymptoms,
-      treatmentsAttempted,
-      treatmentEffectiveness,
-      chronicConditions,
-      medicationAllergies,
-      pregnancyStatus,
-      additionalNotes,
-    }, null, 2)}`;
+Patient data: ${JSON.stringify(
+      {
+        gender,
+        age,
+        reasonForVisit,
+        problemStartDate,
+        specificTrigger,
+        symptomLocation,
+        symptomDescription,
+        symptomAggravators,
+        symptomRelievers,
+        severity,
+        selectedSymptoms,
+        treatmentsAttempted,
+        treatmentEffectiveness,
+        chronicConditions,
+        medicationAllergies,
+        pregnancyStatus,
+        additionalNotes,
+      },
+      null,
+      2
+    )}`;
 
     const userMessage = `Generate the HPI confirmation summary using the exact format specified in the system prompt. Translate all English medical terms to proper French medical terminology.`;
 

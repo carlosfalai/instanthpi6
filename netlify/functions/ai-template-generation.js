@@ -35,12 +35,14 @@ exports.handler = async (event) => {
       apiKey: api_key,
     });
 
-    const exampleSection = example_template ? `\n\nHere's an example template format to follow:\n${JSON.stringify(example_template, null, 2)}` : '';
+    const exampleSection = example_template
+      ? `\n\nHere's an example template format to follow:\n${JSON.stringify(example_template, null, 2)}`
+      : "";
 
     const prompt = `You are a medical AI assistant helping physicians create treatment plan templates.
 
 Create a comprehensive treatment plan template for: ${diagnosis_name}
-${specialty ? `Specialty: ${specialty}` : ''}
+${specialty ? `Specialty: ${specialty}` : ""}
 ${exampleSection}
 
 The template should include plan items organized by categories:
@@ -57,7 +59,7 @@ Return ONLY a JSON object with this exact format:
 {
   "template_name": "Treatment Plan for ${diagnosis_name}",
   "diagnosis_name": "${diagnosis_name}",
-  "specialty": "${specialty || 'General Medicine'}",
+  "specialty": "${specialty || "General Medicine"}",
   "plan_items": [
     {
       "category": "Medications",
@@ -90,7 +92,7 @@ Be specific, evidence-based, and clinically appropriate. Include 8-15 relevant p
     });
 
     const responseText = message.content[0].text;
-    
+
     // Parse the JSON response
     let template;
     try {
@@ -126,4 +128,3 @@ Be specific, evidence-based, and clinically appropriate. Include 8-15 relevant p
     };
   }
 };
-

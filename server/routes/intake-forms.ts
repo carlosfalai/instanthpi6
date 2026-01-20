@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import { z } from "zod";
 import {
   createForm,
@@ -12,9 +12,12 @@ import {
   recordSubmissionOutput,
 } from "../services/intakeFormsService";
 import { runHaikuWorkflow } from "../services/ai/haikuWorkflow";
+import {
+  requireAuth,
+  requireAuthenticatedUserId,
+} from "../middleware/auth";
 
 const router = Router();
-const DEFAULT_USER_ID = 1;
 
 const questionSchema = z.object({
   id: z.string(),
@@ -43,39 +46,11 @@ const submissionPayloadSchema = z.object({
   meta: z.record(z.any()).optional(),
 });
 
-router.get("/", async (_req, res) => {
-  try {
-    const forms = await listForms(DEFAULT_USER_ID);
-    res.json(forms);
-  } catch (error) {
-    console.error("Error listing forms:", error);
-    res.status(500).json({ message: "Failed to load forms" });
-  }
-});
+// ============================================================================
+// PUBLIC ROUTES - No authentication required (patient-facing)
+// ============================================================================
 
-router.post("/", async (req, res) => {
-  try {
-    const payload = formPayloadSchema.parse(req.body);
-    const form = await createForm(DEFAULT_USER_ID, {
-      title: payload.title,
-      description: payload.description,
-      questions: payload.questions,
-      settings: payload.settings,
-      status: payload.status,
-      slug: payload.slug,
-      profileId: payload.profileId ?? null,
-    });
-    res.status(201).json(form);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({ message: "Invalid payload", errors: error.errors });
-    }
-    console.error("Error creating form:", error);
-    res.status(500).json({ message: "Failed to create form" });
-  }
-});
-
-router.get("/public/:slug", async (req, res) => {
+router.get("/public/:slug", async (req: Request, res: Response) => {
   try {
     const form = await getFormBySlug(req.params.slug);
     if (!form || form.status !== "published") {
@@ -94,7 +69,7 @@ router.get("/public/:slug", async (req, res) => {
   }
 });
 
-router.post("/public/:slug/submissions", async (req, res) => {
+router.post("/public/:slug/submissions", async (req: Request, res: Response) => {
   try {
     const payload = submissionPayloadSchema.parse(req.body);
     const form = await getFormBySlug(req.params.slug);
@@ -152,9 +127,48 @@ router.post("/public/:slug/submissions", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+// ============================================================================
+// AUTHENTICATED ROUTES - Require authentication (clinician-facing)
+// ============================================================================
+
+router.get("/", requireAuth, async (req: Request, res: Response) => {
   try {
-    const form = await getFormById(req.params.id, DEFAULT_USER_ID);
+    const userId = requireAuthenticatedUserId(req);
+    const forms = await listForms(userId);
+    res.json(forms);
+  } catch (error) {
+    console.error("Error listing forms:", error);
+    res.status(500).json({ message: "Failed to load forms" });
+  }
+});
+
+router.post("/", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = requireAuthenticatedUserId(req);
+    const payload = formPayloadSchema.parse(req.body);
+    const form = await createForm(userId, {
+      title: payload.title,
+      description: payload.description,
+      questions: payload.questions,
+      settings: payload.settings,
+      status: payload.status,
+      slug: payload.slug,
+      profileId: payload.profileId ?? null,
+    });
+    res.status(201).json(form);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ message: "Invalid payload", errors: error.errors });
+    }
+    console.error("Error creating form:", error);
+    res.status(500).json({ message: "Failed to create form" });
+  }
+});
+
+router.get("/:id", requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = requireAuthenticatedUserId(req);
+    const form = await getFormById(req.params.id, userId);
     if (!form) {
       return res.status(404).json({ message: "Form not found" });
     }
@@ -165,10 +179,11 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", requireAuth, async (req: Request, res: Response) => {
   try {
+    const userId = requireAuthenticatedUserId(req);
     const payload = formPayloadSchema.parse(req.body);
-    const form = await updateForm(req.params.id, DEFAULT_USER_ID, {
+    const form = await updateForm(req.params.id, userId, {
       title: payload.title,
       description: payload.description,
       questions: payload.questions,
@@ -192,9 +207,10 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.get("/:id/submissions", async (req, res) => {
+router.get("/:id/submissions", requireAuth, async (req: Request, res: Response) => {
   try {
-    const submissions = await listSubmissions(req.params.id, DEFAULT_USER_ID);
+    const userId = requireAuthenticatedUserId(req);
+    const submissions = await listSubmissions(req.params.id, userId);
     res.json(submissions);
   } catch (error) {
     console.error("Error listing submissions:", error);
@@ -202,9 +218,10 @@ router.get("/:id/submissions", async (req, res) => {
   }
 });
 
-router.get("/submissions/:submissionId", async (req, res) => {
+router.get("/submissions/:submissionId", requireAuth, async (req: Request, res: Response) => {
   try {
-    const submission = await getSubmission(req.params.submissionId, DEFAULT_USER_ID);
+    const userId = requireAuthenticatedUserId(req);
+    const submission = await getSubmission(req.params.submissionId, userId);
     if (!submission) {
       return res.status(404).json({ message: "Submission not found" });
     }

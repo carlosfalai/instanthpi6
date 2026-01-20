@@ -5,13 +5,18 @@ import { db } from "../db";
 const router = Router();
 
 // Care locations mapping - EXACTLY as specified
-const careLocations = {
+type PriorityLevel = "P1" | "P2" | "P3" | "P4" | "P5";
+const careLocations: Record<PriorityLevel, string> = {
   P1: "911 (Transport en ambulance requis)",
   P2: "Urgence hospitalière (Transport personnel ou ambulance)",
   P3: "Urgence hospitalière ou urgence mineure",
   P4: "Clinique sans rendez-vous",
   P5: "Clinique avec rendez-vous ou télémédecine",
 };
+
+function getCareLocation(priority: string): string {
+  return careLocations[priority as PriorityLevel] || careLocations.P5;
+}
 
 // Generate full triage assessment with P1-P5 priority
 router.post("/generate-triage", async (req: Request, res: Response) => {
@@ -368,7 +373,7 @@ function formatTriageResult(triageData: any, patientData: any): any {
     <div class="info-box">
         <h2>Niveau de Priorité: ${priorityLevel}</h2>
         <div class="priority-badge ${priorityClass}">${priorityLevel}</div>
-        <p><strong>Où consulter:</strong> ${triageData.whereToConsult || careLocations[priorityLevel]}</p>
+        <p><strong>Où consulter:</strong> ${triageData.whereToConsult || getCareLocation(priorityLevel)}</p>
     </div>
     
     <div class="care-explanation">
@@ -408,7 +413,7 @@ function formatTriageResult(triageData: any, patientData: any): any {
 
   return {
     priorityLevel,
-    whereToConsult: triageData.whereToConsult || careLocations[priorityLevel],
+    whereToConsult: triageData.whereToConsult || getCareLocation(priorityLevel),
     soapNote: triageData.soapNote,
     followupQuestions: triageData.followupQuestions || [],
     warningSignals: triageData.warningSignals || [],
@@ -459,7 +464,7 @@ function generateFallbackTriage(patientData: any): any {
   return formatTriageResult(
     {
       priorityLevel,
-      whereToConsult: careLocations[priorityLevel],
+      whereToConsult: getCareLocation(priorityLevel),
       soapNote,
       followupQuestions,
       warningSignals: [
@@ -483,43 +488,16 @@ function generateFallbackTriage(patientData: any): any {
 }
 
 // Check for cached triage result
-async function checkCachedTriage(patientId: string): Promise<any> {
-  try {
-    // Check database for existing triage within last 24 hours
-    const result = await db
-      .selectFrom("triage_cache")
-      .selectAll()
-      .where("patient_id", "=", patientId)
-      .where("created_at", ">", new Date(Date.now() - 24 * 60 * 60 * 1000))
-      .orderBy("created_at", "desc")
-      .limit(1)
-      .executeTakeFirst();
-
-    if (result) {
-      return JSON.parse(result.triage_data as string);
-    }
-    return null;
-  } catch (error) {
-    console.error("Error checking cached triage:", error);
-    return null;
-  }
+// Note: triage_cache table not implemented in schema - returns null for now
+async function checkCachedTriage(_patientId: string): Promise<unknown> {
+  // TODO: Implement with Drizzle ORM once triage_cache table is added to schema
+  return null;
 }
 
 // Cache triage result
-async function cacheTriageResult(patientId: string, triageData: any): Promise<void> {
-  try {
-    await db
-      .insertInto("triage_cache")
-      .values({
-        patient_id: patientId,
-        triage_data: JSON.stringify(triageData),
-        priority_level: triageData.priorityLevel,
-        created_at: new Date(),
-      })
-      .execute();
-  } catch (error) {
-    console.error("Error caching triage result:", error);
-  }
+// Note: triage_cache table not implemented in schema - no-op for now
+async function cacheTriageResult(_patientId: string, _triageData: unknown): Promise<void> {
+  // TODO: Implement with Drizzle ORM once triage_cache table is added to schema
 }
 
 export { router };

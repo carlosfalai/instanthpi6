@@ -1,5 +1,5 @@
-const { OpenAI } = require('openai');
-const Anthropic = require('@anthropic-ai/sdk');
+const { OpenAI } = require("openai");
+const Anthropic = require("@anthropic-ai/sdk");
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -70,33 +70,33 @@ Patient Information:`;
 exports.handler = async (event) => {
   // Set CORS headers
   const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Content-Type': 'application/json'
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+    "Content-Type": "application/json",
   };
 
   // Handle preflight requests
-  if (event.httpMethod === 'OPTIONS') {
+  if (event.httpMethod === "OPTIONS") {
     return {
       statusCode: 200,
       headers,
-      body: JSON.stringify({ message: 'CORS preflight' })
+      body: JSON.stringify({ message: "CORS preflight" }),
     };
   }
 
-  if (event.httpMethod !== 'POST') {
+  if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
       headers,
-      body: JSON.stringify({ error: 'Method not allowed' })
+      body: JSON.stringify({ error: "Method not allowed" }),
     };
   }
 
   try {
     const patientData = JSON.parse(event.body);
-    const patientId = patientData.patient_id || 'unknown';
-    console.log('Processing comprehensive triage for patient:', patientId);
+    const patientId = patientData.patient_id || "unknown";
+    console.log("Processing comprehensive triage for patient:", patientId);
 
     let aiResponse = null;
     let aiError = null;
@@ -108,20 +108,20 @@ exports.handler = async (event) => {
         messages: [
           {
             role: "system",
-            content: COMPREHENSIVE_TRIAGE_PROMPT
+            content: COMPREHENSIVE_TRIAGE_PROMPT,
           },
           {
             role: "user",
-            content: `Patient Information: ${JSON.stringify(patientData)}`
-          }
+            content: `Patient Information: ${JSON.stringify(patientData)}`,
+          },
         ],
         temperature: 0.3,
-        max_tokens: 4000
+        max_tokens: 4000,
       });
 
       // Add timeout wrapper (Netlify functions have 10s default, 26s max for free tier)
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('OpenAI request timeout')), 25000)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("OpenAI request timeout")), 25000)
       );
 
       const openaiResponse = await Promise.race([openaiPromise, timeoutPromise]);
@@ -130,7 +130,7 @@ exports.handler = async (event) => {
     } catch (openaiError) {
       console.error("OpenAI failed for patient:", patientId, openaiError.message);
       aiError = openaiError;
-      
+
       // Try Anthropic as fallback
       try {
         const anthropicPromise = anthropic.messages.create({
@@ -140,14 +140,14 @@ exports.handler = async (event) => {
           messages: [
             {
               role: "user",
-              content: `${COMPREHENSIVE_TRIAGE_PROMPT}\n\nPatient Information: ${JSON.stringify(patientData)}`
-            }
-          ]
+              content: `${COMPREHENSIVE_TRIAGE_PROMPT}\n\nPatient Information: ${JSON.stringify(patientData)}`,
+            },
+          ],
         });
 
         // Add timeout wrapper
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Anthropic request timeout')), 25000)
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Anthropic request timeout")), 25000)
         );
 
         const anthropicResponse = await Promise.race([anthropicPromise, timeoutPromise]);
@@ -172,7 +172,8 @@ exports.handler = async (event) => {
       } catch (parseError) {
         console.log("AI response not JSON, trying to extract content:", aiResponse);
         // Try to extract JSON from the response if it's wrapped in markdown
-        const jsonMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/) || aiResponse.match(/\{[\s\S]*\}/);
+        const jsonMatch =
+          aiResponse.match(/```json\s*([\s\S]*?)\s*```/) || aiResponse.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           try {
             const extracted = JSON.parse(jsonMatch[1] || jsonMatch[0]);
@@ -190,29 +191,32 @@ exports.handler = async (event) => {
     }
 
     // AI service unavailable - return error with details
-    console.error("AI failed for patient:", patientId, "Error:", aiError?.message || 'Unknown error');
+    console.error(
+      "AI failed for patient:",
+      patientId,
+      "Error:",
+      aiError?.message || "Unknown error"
+    );
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
         error: "AI service unavailable",
         message: aiError?.message || "Please try again later or contact support",
-        patient_id: patientId
-      })
+        patient_id: patientId,
+      }),
     };
-
-
   } catch (error) {
-    console.error('Error in comprehensive triage:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    console.error("Error in comprehensive triage:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ 
-        error: 'Internal server error',
+      body: JSON.stringify({
+        error: "Internal server error",
         message: errorMessage,
-        timestamp: new Date().toISOString()
-      })
+        timestamp: new Date().toISOString(),
+      }),
     };
   }
 };

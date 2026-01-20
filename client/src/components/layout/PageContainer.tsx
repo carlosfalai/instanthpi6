@@ -22,16 +22,10 @@ export default function PageContainer({
       {(title || headerActions) && (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            {title && (
-              <h1 className="text-3xl font-bold text-foreground mb-2">{title}</h1>
-            )}
-            {description && (
-              <p className="text-sm text-muted-foreground">{description}</p>
-            )}
+            {title && <h1 className="text-3xl font-bold text-foreground mb-2">{title}</h1>}
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
           </div>
-          {headerActions && (
-            <div className="flex items-center gap-2">{headerActions}</div>
-          )}
+          {headerActions && <div className="flex items-center gap-2">{headerActions}</div>}
         </div>
       )}
 
@@ -63,4 +57,3 @@ export function PageCard({ children, title, description, className = "" }: PageC
     </Card>
   );
 }
-

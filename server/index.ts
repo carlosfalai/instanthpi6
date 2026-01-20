@@ -2,13 +2,47 @@ import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import path from "path";
 import { createServer } from "http";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 // import { seedDatabase } from "./seed"; // DISABLED - Using real Supabase data instead of fake seed data
 
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
+// Security headers (relaxed for local development)
+app.use(helmet({
+  contentSecurityPolicy: false, // Disabled for development with Vite
+  crossOriginEmbedderPolicy: false,
+}));
+
+// Global rate limiting: 100 requests per minute per IP
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 100,
+  message: { error: "Too many requests, please try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Stricter rate limiting for auth endpoints: 10 requests per minute
+const authLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: { error: "Too many authentication attempts, please try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply global rate limiting to API routes
+app.use("/api", globalLimiter);
+
+// Apply stricter rate limiting to auth routes
+app.use("/api/auth", authLimiter);
+app.use("/api/login", authLimiter);
+
+app.use(express.json({ limit: "10mb" })); // Limit request body size
+app.use(express.urlencoded({ extended: false, limit: "10mb" }));
 
 app.use((req, res, next) => {
   const start = Date.now();

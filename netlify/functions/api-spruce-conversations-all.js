@@ -61,7 +61,10 @@ exports.handler = async (event, context) => {
     }
 
     // Fallback to headers if provided (direct test without persistence)
-    if (!spruceAccessId && (event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"])) {
+    if (
+      !spruceAccessId &&
+      (event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"])
+    ) {
       spruceAccessId = event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"];
     }
     if (!spruceApiKey && (event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"])) {
@@ -86,7 +89,8 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           error: "Spruce credentials not configured",
-          message: "Please add Spruce Access ID and API Key in Doctor Profile → API Integrations, then try again.",
+          message:
+            "Please add Spruce Access ID and API Key in Doctor Profile → API Integrations, then try again.",
         }),
       };
     }
@@ -117,7 +121,7 @@ exports.handler = async (event, context) => {
       // If the token is already base64 encoded (starts with YWlk), use it directly
       // Otherwise, it should be the token provided by Spruce
       const bearerToken = spruceApiKey;
-      
+
       try {
         const response = await axios.get(`${SPRUCE_API_URL}/conversations`, {
           headers: {
@@ -128,11 +132,11 @@ exports.handler = async (event, context) => {
         });
 
         const conversations = response.data.conversations || [];
-        
+
         // Avoid duplicates by checking conversation IDs
-        const existingIds = new Set(allConversations.map(c => c.id));
-        const newConversations = conversations.filter(c => !existingIds.has(c.id));
-        
+        const existingIds = new Set(allConversations.map((c) => c.id));
+        const newConversations = conversations.filter((c) => !existingIds.has(c.id));
+
         allConversations = allConversations.concat(newConversations);
 
         // Check if there are more pages
@@ -146,7 +150,9 @@ exports.handler = async (event, context) => {
 
         // Break if no pagination token even though hasMore is true
         if (hasMore && !paginationToken) {
-          console.log("⚠️ Has more conversations but no pagination token provided - stopping pagination");
+          console.log(
+            "⚠️ Has more conversations but no pagination token provided - stopping pagination"
+          );
           break;
         }
 
@@ -156,7 +162,10 @@ exports.handler = async (event, context) => {
           break;
         }
       } catch (pageError) {
-        console.error(`Error fetching page ${pageCount + 1}:`, pageError.response?.data || pageError.message);
+        console.error(
+          `Error fetching page ${pageCount + 1}:`,
+          pageError.response?.data || pageError.message
+        );
         // Continue with what we have if we've already fetched some conversations
         if (allConversations.length > 0) {
           console.log(`Continuing with ${allConversations.length} conversations already fetched`);
@@ -177,20 +186,29 @@ exports.handler = async (event, context) => {
 
       if (conv.externalParticipants && conv.externalParticipants.length > 0) {
         const participant = conv.externalParticipants[0];
-        patientName = participant.displayName || participant.name || participant.contact || "Unknown Patient";
+        patientName =
+          participant.displayName || participant.name || participant.contact || "Unknown Patient";
       } else if (conv.title && conv.title !== "Centre Médical Font") {
         patientName = conv.title;
       } else if (conv.participants && conv.participants.length > 0) {
-        patientName = conv.participants[0].displayName || conv.participants[0].name || "Unknown Patient";
+        patientName =
+          conv.participants[0].displayName || conv.participants[0].name || "Unknown Patient";
       }
 
       // Get last message info - check multiple possible fields
       let lastMessage = "Click to view conversation";
-      let lastMessageTime = conv.lastActivity || conv.lastMessageAt || conv.updatedAt || conv.createdAt || new Date().toISOString();
+      let lastMessageTime =
+        conv.lastActivity ||
+        conv.lastMessageAt ||
+        conv.updatedAt ||
+        conv.createdAt ||
+        new Date().toISOString();
 
       if (conv.lastMessage) {
-        lastMessage = conv.lastMessage.content || conv.lastMessage.text || conv.lastMessage.body || lastMessage;
-        lastMessageTime = conv.lastMessage.timestamp || conv.lastMessage.createdAt || lastMessageTime;
+        lastMessage =
+          conv.lastMessage.content || conv.lastMessage.text || conv.lastMessage.body || lastMessage;
+        lastMessageTime =
+          conv.lastMessage.timestamp || conv.lastMessage.createdAt || lastMessageTime;
       } else if (conv.subtitle) {
         lastMessage = conv.subtitle;
       }
@@ -223,15 +241,15 @@ exports.handler = async (event, context) => {
       body: JSON.stringify(transformedConversations),
     };
   } catch (error) {
-    const errorMessage = error.message || 'Unknown error';
+    const errorMessage = error.message || "Unknown error";
     const errorStatus = error.response?.status || 500;
     const errorDetails = error.response?.data;
-    
+
     console.error("Error fetching conversations:", {
       message: errorMessage,
       status: errorStatus,
       details: errorDetails,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     // Return user-safe error message (don't expose internal details)
@@ -240,11 +258,15 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         error: "Failed to fetch conversations",
-        message: errorStatus === 401 ? "Authentication failed. Please check your Spruce API credentials." :
-                 errorStatus === 403 ? "Access denied. Please verify your Spruce API permissions." :
-                 errorStatus === 429 ? "Rate limit exceeded. Please try again later." :
-                 "Please try again later or contact support if the problem persists.",
-        timestamp: new Date().toISOString()
+        message:
+          errorStatus === 401
+            ? "Authentication failed. Please check your Spruce API credentials."
+            : errorStatus === 403
+              ? "Access denied. Please verify your Spruce API permissions."
+              : errorStatus === 429
+                ? "Rate limit exceeded. Please try again later."
+                : "Please try again later or contact support if the problem persists.",
+        timestamp: new Date().toISOString(),
       }),
     };
   }

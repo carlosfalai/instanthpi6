@@ -50,7 +50,7 @@ export default function ThreePanelLayout() {
     if (!selectedPatientId) return;
 
     try {
-      await fetch("/api/spruce/messages", {
+      const response = await fetch("/api/spruce/messages", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,10 +61,17 @@ export default function ThreePanelLayout() {
         }),
       });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Failed to send message: ${response.status}`);
+      }
+
       // Invalidate messages cache to refresh the conversation
       // This will be handled by react-query
     } catch (error) {
       console.error("Error sending message:", error);
+      // Re-throw to let the parent component handle the error UI
+      throw error;
     }
   };
 

@@ -1,18 +1,25 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import { storage } from "../storage";
 import { DbEducationStorage } from "../db";
 import { z } from "zod";
 import { insertEducationModuleSchema, insertUserEducationProgressSchema } from "@shared/schema";
+import {
+  requireAuth,
+  requireAuthenticatedUserId,
+} from "../middleware/auth";
 
 // Initialize database storage for education modules
 const dbEducationStorage = new DbEducationStorage();
 
 export const router = Router();
 
+// ============================================================================
+// PUBLIC ROUTES - Module listing (educational content is publicly accessible)
+// ============================================================================
+
 // Get all education modules
-router.get("/modules", async (req, res) => {
+router.get("/modules", async (req: Request, res: Response) => {
   try {
-    // Use the database adapter instead of memory storage
     const modules = await dbEducationStorage.getAllEducationModules();
     res.json(modules);
   } catch (error) {
@@ -22,7 +29,7 @@ router.get("/modules", async (req, res) => {
 });
 
 // Get a specific education module
-router.get("/modules/:id", async (req, res) => {
+router.get("/modules/:id", async (req: Request, res: Response) => {
   try {
     const moduleId = parseInt(req.params.id);
     if (isNaN(moduleId)) {
@@ -41,8 +48,12 @@ router.get("/modules/:id", async (req, res) => {
   }
 });
 
+// ============================================================================
+// ADMIN ROUTES - Module management (requires authentication)
+// ============================================================================
+
 // Create a new education module
-router.post("/modules", async (req, res) => {
+router.post("/modules", requireAuth, async (req: Request, res: Response) => {
   try {
     // Validate request body
     const validatedData = insertEducationModuleSchema.parse(req.body);
@@ -58,7 +69,7 @@ router.post("/modules", async (req, res) => {
 });
 
 // Update an education module
-router.patch("/modules/:id", async (req, res) => {
+router.patch("/modules/:id", requireAuth, async (req: Request, res: Response) => {
   try {
     const moduleId = parseInt(req.params.id);
     if (isNaN(moduleId)) {
@@ -84,7 +95,7 @@ router.patch("/modules/:id", async (req, res) => {
 });
 
 // Delete an education module
-router.delete("/modules/:id", async (req, res) => {
+router.delete("/modules/:id", requireAuth, async (req: Request, res: Response) => {
   try {
     const moduleId = parseInt(req.params.id);
     if (isNaN(moduleId)) {
@@ -103,12 +114,14 @@ router.delete("/modules/:id", async (req, res) => {
   }
 });
 
+// ============================================================================
+// USER PROGRESS ROUTES - Requires authentication
+// ============================================================================
+
 // Get progress for current user
-router.get("/progress", async (req, res) => {
+router.get("/progress", requireAuth, async (req: Request, res: Response) => {
   try {
-    // For now we'll use the first user (doctor) as our default user
-    // In a real app, this would come from authentication
-    const userId = 1; // Doctor user ID
+    const userId = requireAuthenticatedUserId(req);
     const progress = await dbEducationStorage.getUserEducationProgress(userId);
     res.json(progress);
   } catch (error) {
@@ -118,11 +131,9 @@ router.get("/progress", async (req, res) => {
 });
 
 // Update or create progress for a module
-router.post("/progress", async (req, res) => {
+router.post("/progress", requireAuth, async (req: Request, res: Response) => {
   try {
-    // For now we'll use the first user (doctor) as our default user
-    // In a real app, this would come from authentication
-    const userId = 1; // Doctor user ID
+    const userId = requireAuthenticatedUserId(req);
 
     const schema = z.object({
       moduleId: z.number(),
@@ -178,11 +189,9 @@ router.post("/progress", async (req, res) => {
 });
 
 // Get unlocked features for current user
-router.get("/unlocked-features", async (req, res) => {
+router.get("/unlocked-features", requireAuth, async (req: Request, res: Response) => {
   try {
-    // For now we'll use the first user (doctor) as our default user
-    // In a real app, this would come from authentication
-    const userId = 1; // Doctor user ID
+    const userId = requireAuthenticatedUserId(req);
     const unlockedFeatures = await dbEducationStorage.getUserUnlockedFeatures(userId);
     res.json(unlockedFeatures);
   } catch (error) {

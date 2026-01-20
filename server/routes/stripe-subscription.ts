@@ -5,12 +5,9 @@ import { createClient } from "@supabase/supabase-js";
 const router = express.Router();
 
 // Initialize Stripe with environment variable
-const stripe = new Stripe(
-  process.env.STRIPE_SECRET_KEY || "",
-  {
-    apiVersion: "2025-03-31.basil" as any,
-  }
-);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+  apiVersion: "2025-03-31.basil" as any,
+});
 
 // Supabase client
 const supabase = createClient(
@@ -202,23 +199,25 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
 // Handle subscription created
 async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
+  const sub = subscription as Stripe.Subscription & { current_period_start: number; current_period_end: number };
   await supabase
     .from("physician_subscriptions")
     .update({
       status: "active",
-      current_period_start: new Date(subscription.current_period_start * 1000),
-      current_period_end: new Date(subscription.current_period_end * 1000),
+      current_period_start: new Date(sub.current_period_start * 1000),
+      current_period_end: new Date(sub.current_period_end * 1000),
     })
     .eq("stripe_subscription_id", subscription.id);
 }
 
 // Handle subscription updated
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
+  const sub = subscription as Stripe.Subscription & { current_period_start: number; current_period_end: number };
   await supabase
     .from("physician_subscriptions")
     .update({
       status: subscription.status,
-      current_period_end: new Date(subscription.current_period_end * 1000),
+      current_period_end: new Date(sub.current_period_end * 1000),
     })
     .eq("stripe_subscription_id", subscription.id);
 }

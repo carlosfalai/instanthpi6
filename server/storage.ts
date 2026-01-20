@@ -21,7 +21,42 @@ import {
   type InsertFormSubmission,
   type InsertPendingItem,
   type InsertPreventativeCare,
+  type FormTemplate as SchemaFormTemplate,
+  type FormResponse as SchemaFormResponse,
+  type InsertFormTemplate,
+  type InsertFormResponse,
 } from "@shared/schema";
+
+// Types for in-memory storage entities not in schema
+interface StorageDocument {
+  id: number;
+  patientId: number;
+  title?: string;
+  content?: string;
+  type?: string;
+  [key: string]: unknown;
+}
+
+interface EducationModule {
+  id: number;
+  title: string;
+  content: string;
+  category?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  [key: string]: unknown;
+}
+
+interface PatientActivity {
+  id: number;
+  patientId: number;
+  activityType?: string;
+  type?: string;
+  description: string;
+  metadata?: Record<string, unknown>;
+  createdAt: Date;
+  [key: string]: unknown;
+}
 
 export interface IStorage {
   // User methods
@@ -78,11 +113,11 @@ export class MemStorage implements IStorage {
   private pendingItems: PendingItem[] = [];
   private preventativeCare: PreventativeCare[] = [];
   // Optional in-memory docs/forms to satisfy routes typing
-  private documents: any[] = [];
-  private educationModules: any[] = [];
-  private formTemplates: any[] = [];
-  private formResponses: any[] = [];
-  private patientActivities: any[] = [];
+  private documents: StorageDocument[] = [];
+  private educationModules: EducationModule[] = [];
+  private formTemplates: SchemaFormTemplate[] = [];
+  private formResponses: SchemaFormResponse[] = [];
+  private patientActivities: PatientActivity[] = [];
   private nextId = 1;
 
   // User methods
@@ -336,45 +371,46 @@ export class MemStorage implements IStorage {
   }
 
   // Document methods
-  async getDocument(documentId: string): Promise<any | undefined> {
-    return this.documents.find((d) => d.id === documentId);
+  async getDocument(documentId: string): Promise<unknown | undefined> {
+    return this.documents.find((d) => String(d.id) === documentId);
   }
 
-  async createPatientActivity(activity: any): Promise<any> {
+  async createPatientActivity(activity: Omit<PatientActivity, "id" | "createdAt">): Promise<PatientActivity> {
     const newActivity = {
       id: this.nextId++,
       createdAt: new Date(),
       ...activity,
-    };
+    } as PatientActivity;
     this.patientActivities.push(newActivity);
     return newActivity;
   }
 
   // Form Template methods
-  async getAllFormTemplates(): Promise<any[]> {
+  async getAllFormTemplates(): Promise<SchemaFormTemplate[]> {
     return this.formTemplates;
   }
 
-  async getFormTemplatesByCategory(category: string): Promise<any[]> {
+  async getFormTemplatesByCategory(category: string): Promise<SchemaFormTemplate[]> {
     return this.formTemplates.filter((t) => t.category === category);
   }
 
-  async getFormTemplate(id: number): Promise<any | undefined> {
+  async getFormTemplate(id: number): Promise<SchemaFormTemplate | undefined> {
     return this.formTemplates.find((t) => t.id === id);
   }
 
-  async createFormTemplate(template: any): Promise<any> {
+  async createFormTemplate(template: InsertFormTemplate): Promise<SchemaFormTemplate> {
     const newTemplate = {
       id: this.nextId++,
       createdAt: new Date(),
       updatedAt: new Date(),
+      isPublic: template.isPublic ?? false,
       ...template,
-    };
+    } as SchemaFormTemplate;
     this.formTemplates.push(newTemplate);
     return newTemplate;
   }
 
-  async updateFormTemplate(id: number, data: any): Promise<any | undefined> {
+  async updateFormTemplate(id: number, data: Partial<InsertFormTemplate>): Promise<SchemaFormTemplate | undefined> {
     const index = this.formTemplates.findIndex((t) => t.id === id);
     if (index === -1) return undefined;
 
@@ -395,30 +431,31 @@ export class MemStorage implements IStorage {
   }
 
   // Form Response methods
-  async getFormResponsesByPatientId(patientId: number): Promise<any[]> {
+  async getFormResponsesByPatientId(patientId: number): Promise<SchemaFormResponse[]> {
     return this.formResponses.filter((r) => r.patientId === patientId);
   }
 
-  async getFormResponsesByTemplateId(templateId: number): Promise<any[]> {
+  async getFormResponsesByTemplateId(templateId: number): Promise<SchemaFormResponse[]> {
     return this.formResponses.filter((r) => r.formTemplateId === templateId);
   }
 
-  async getFormResponse(id: number): Promise<any | undefined> {
+  async getFormResponse(id: number): Promise<SchemaFormResponse | undefined> {
     return this.formResponses.find((r) => r.id === id);
   }
 
-  async createFormResponse(response: any): Promise<any> {
+  async createFormResponse(response: InsertFormResponse): Promise<SchemaFormResponse> {
     const newResponse = {
       id: this.nextId++,
       createdAt: new Date(),
       updatedAt: new Date(),
+      status: response.status ?? "in_progress",
       ...response,
-    };
+    } as SchemaFormResponse;
     this.formResponses.push(newResponse);
     return newResponse;
   }
 
-  async updateFormResponse(id: number, data: any): Promise<any | undefined> {
+  async updateFormResponse(id: number, data: Partial<InsertFormResponse>): Promise<SchemaFormResponse | undefined> {
     const index = this.formResponses.findIndex((r) => r.id === id);
     if (index === -1) return undefined;
 
@@ -439,18 +476,18 @@ export class MemStorage implements IStorage {
   }
 
   // Education Module methods
-  async createEducationModule(module: any): Promise<any> {
+  async createEducationModule(module: Omit<EducationModule, "id" | "createdAt" | "updatedAt">): Promise<EducationModule> {
     const newModule = {
       id: this.nextId++,
       createdAt: new Date(),
       updatedAt: new Date(),
       ...module,
-    };
+    } as EducationModule;
     this.educationModules.push(newModule);
     return newModule;
   }
 
-  async updateEducationModule(id: number, data: any): Promise<any | undefined> {
+  async updateEducationModule(id: number, data: Partial<Omit<EducationModule, "id" | "createdAt">>): Promise<EducationModule | undefined> {
     const index = this.educationModules.findIndex((m) => m.id === id);
     if (index === -1) return undefined;
 

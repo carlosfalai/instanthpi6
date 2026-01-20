@@ -17,46 +17,44 @@ export default function AuthCallback() {
 
       const callbackStartTime = new Date().toISOString();
       console.log(`[AuthCallback] Starting at ${callbackStartTime}`);
-      
+
       const currentUrl = new URL(window.location.href);
-      
+
       // === DIAGNOSTICS: Log all URL parameters ===
-      console.log('[AuthCallback] URL Parameters:', {
+      console.log("[AuthCallback] URL Parameters:", {
         fullUrl: window.location.href,
         hash: window.location.hash,
         search: window.location.search,
       });
-      
+
       const params = Object.fromEntries(currentUrl.searchParams);
-      console.log('[AuthCallback] All search params:', params);
-      
+      console.log("[AuthCallback] All search params:", params);
+
       // === DIAGNOSTICS: Log Supabase client state ===
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-      console.log('[AuthCallback] Supabase config loaded:', {
+      console.log("[AuthCallback] Supabase config loaded:", {
         urlSet: !!supabaseUrl,
         keySet: !!supabaseAnonKey,
-        urlPrefix: supabaseUrl?.substring(0, 30) || 'MISSING',
-        keyPrefix: supabaseAnonKey?.substring(0, 20) || 'MISSING',
+        urlPrefix: supabaseUrl?.substring(0, 30) || "MISSING",
+        keyPrefix: supabaseAnonKey?.substring(0, 20) || "MISSING",
       });
 
       const requestedNext =
-        currentUrl.searchParams.get("next") ||
-        consumePostAuthRedirect() ||
-        "/doctor-dashboard";
+        currentUrl.searchParams.get("next") || consumePostAuthRedirect() || "/doctor-dashboard";
 
       const next = requestedNext.startsWith("/") ? requestedNext : "/doctor-dashboard";
-      console.log('[AuthCallback] Redirect destination:', { requestedNext, next });
+      console.log("[AuthCallback] Redirect destination:", { requestedNext, next });
 
       // === CHECK FOR ERROR FIRST ===
       const errorDescription = currentUrl.searchParams.get("error_description");
       if (errorDescription) {
         const errorMsg = decodeURIComponent(errorDescription);
-        console.error('[AuthCallback] OAuth error detected:', errorMsg);
+        console.error("[AuthCallback] OAuth error detected:", errorMsg);
         setError(errorMsg);
         setDebugInfo({
           timestamp: callbackStartTime,
-          step: 'error_detected',
+          step: "error_detected",
           errorDescription: errorMsg,
           allParams: params,
         });
@@ -67,48 +65,57 @@ export default function AuthCallback() {
       // === CHECK FOR TOKENS IN HASH FRAGMENT (PKCE/implicit flow) ===
       const hash = window.location.hash.substring(1); // Remove leading #
       const hashParams = new URLSearchParams(hash);
-      const accessToken = hashParams.get('access_token');
-      const refreshToken = hashParams.get('refresh_token');
-      const expiresAt = hashParams.get('expires_at');
-      
-      console.log('[AuthCallback] Hash fragment check:', {
+      const accessToken = hashParams.get("access_token");
+      const refreshToken = hashParams.get("refresh_token");
+      const expiresAt = hashParams.get("expires_at");
+
+      console.log("[AuthCallback] Hash fragment check:", {
         hashPresent: !!hash,
         accessTokenPresent: !!accessToken,
         refreshTokenPresent: !!refreshToken,
       });
-      
+
       // If we have tokens in the hash, handle them directly
       if (accessToken) {
-        console.log('[AuthCallback] Tokens found in hash fragment, processing...');
+        console.log("[AuthCallback] Tokens found in hash fragment, processing...");
         try {
           // Supabase client with detectSessionInUrl: true should automatically process hash fragments
           // Wait a bit for Supabase to process the hash, then check for session
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
+          await new Promise((resolve) => setTimeout(resolve, 500));
+
           // Check for session - Supabase should have processed the hash by now
-          let { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          
+          let {
+            data: { session },
+            error: sessionError,
+          } = await supabase.auth.getSession();
+
           // If still no session, try refreshing to trigger hash processing
           if (!session && !sessionError) {
-            console.log('[AuthCallback] No session yet, triggering auth state change...');
+            console.log("[AuthCallback] No session yet, triggering auth state change...");
             // Trigger a refresh by calling getSession again after a short delay
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise((resolve) => setTimeout(resolve, 500));
             const sessionResult = await supabase.auth.getSession();
             session = sessionResult.data?.session || null;
             sessionError = sessionResult.error || null;
           }
-          
+
           if (sessionError) {
-            console.error('[AuthCallback] Failed to get session from hash tokens:', sessionError);
+            console.error("[AuthCallback] Failed to get session from hash tokens:", sessionError);
             // If it's a JWT error, the token might be invalid - try manual setSession as fallback
-            if (sessionError.message?.includes('JWT') || sessionError.message?.includes('Invalid')) {
-              console.log('[AuthCallback] JWT error detected, attempting manual setSession...');
+            if (
+              sessionError.message?.includes("JWT") ||
+              sessionError.message?.includes("Invalid")
+            ) {
+              console.log("[AuthCallback] JWT error detected, attempting manual setSession...");
               try {
-                const { data: { session: manualSession }, error: manualError } = await supabase.auth.setSession({
+                const {
+                  data: { session: manualSession },
+                  error: manualError,
+                } = await supabase.auth.setSession({
                   access_token: accessToken,
-                  refresh_token: refreshToken || '',
+                  refresh_token: refreshToken || "",
                 });
-                
+
                 if (!manualError && manualSession) {
                   session = manualSession;
                   sessionError = null;
@@ -117,59 +124,70 @@ export default function AuthCallback() {
                 // Fall through to error handling
               }
             }
-            
+
             if (sessionError) {
               setError(`Failed to process authentication: ${sessionError.message}`);
               setDebugInfo({
                 timestamp: callbackStartTime,
-                step: 'hash_token_error',
+                step: "hash_token_error",
                 errorMessage: sessionError.message,
               });
               setProcessing(false);
               return;
             }
           }
-          
+
           if (session && session.user) {
-            console.log('[AuthCallback] ✓ Session created from hash tokens', {
+            console.log("[AuthCallback] ✓ Session created from hash tokens", {
               userEmail: session.user?.email,
             });
             // Clear the hash from URL for security
-            window.history.replaceState(null, '', window.location.pathname + window.location.search);
+            window.history.replaceState(
+              null,
+              "",
+              window.location.pathname + window.location.search
+            );
             // Success - redirect
-            console.log('[AuthCallback] Redirecting to:', next);
+            console.log("[AuthCallback] Redirecting to:", next);
             navigate(next);
             return;
           } else {
             // Last resort: try to set session manually
-            console.log('[AuthCallback] No session found, attempting manual setSession...');
+            console.log("[AuthCallback] No session found, attempting manual setSession...");
             try {
-              const { data: { session: newSession }, error: setError } = await supabase.auth.setSession({
+              const {
+                data: { session: newSession },
+                error: setSessionError,
+              } = await supabase.auth.setSession({
                 access_token: accessToken,
-                refresh_token: refreshToken || '',
+                refresh_token: refreshToken || "",
               });
-              
-              if (setError) {
-                throw setError;
+
+              if (setSessionError) {
+                throw setSessionError;
               }
-              
+
               if (newSession && newSession.user) {
-                console.log('[AuthCallback] ✓ Session set from hash tokens', {
+                console.log("[AuthCallback] ✓ Session set from hash tokens", {
                   userEmail: newSession.user?.email,
                 });
                 // Clear the hash from URL
-                window.history.replaceState(null, '', window.location.pathname + window.location.search);
+                window.history.replaceState(
+                  null,
+                  "",
+                  window.location.pathname + window.location.search
+                );
                 navigate(next);
                 return;
               } else {
-                throw new Error('Session created but no user found');
+                throw new Error("Session created but no user found");
               }
             } catch (setErr: any) {
-              console.error('[AuthCallback] Failed to set session from hash tokens:', setErr);
-              setError(`Failed to create session: ${setErr?.message || 'Unknown error'}`);
+              console.error("[AuthCallback] Failed to set session from hash tokens:", setErr);
+              setError(`Failed to create session: ${setErr?.message || "Unknown error"}`);
               setDebugInfo({
                 timestamp: callbackStartTime,
-                step: 'hash_set_session_error',
+                step: "hash_set_session_error",
                 errorMessage: setErr?.message,
                 accessTokenPresent: !!accessToken,
                 refreshTokenPresent: !!refreshToken,
@@ -179,32 +197,32 @@ export default function AuthCallback() {
             }
           }
         } catch (err: any) {
-          console.error('[AuthCallback] Error processing hash tokens:', err);
-          setError(`Error processing authentication: ${err?.message || 'Unknown error'}`);
+          console.error("[AuthCallback] Error processing hash tokens:", err);
+          setError(`Error processing authentication: ${err?.message || "Unknown error"}`);
           setDebugInfo({
             timestamp: callbackStartTime,
-            step: 'hash_processing_error',
+            step: "hash_processing_error",
             errorMessage: err?.message,
           });
           setProcessing(false);
           return;
         }
       }
-      
+
       // === CHECK FOR AUTHORIZATION CODE (PKCE code exchange flow) ===
       const code = currentUrl.searchParams.get("code");
-      console.log('[AuthCallback] Authorization code check:', {
+      console.log("[AuthCallback] Authorization code check:", {
         codePresent: !!code,
         codeLength: code?.length,
       });
-      
+
       if (!code) {
         // Check if Supabase config is missing (most common issue)
         const isConfigMissing = !supabaseUrl || !supabaseAnonKey;
-        
+
         let errorMessage = "Missing authorization code. ";
         let helpMessage = "";
-        
+
         if (isConfigMissing) {
           errorMessage += "Supabase environment variables are not configured.";
           helpMessage = `This usually means VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY are missing in Netlify.
@@ -225,18 +243,18 @@ Get your keys from: https://supabase.com/dashboard/project/uoahrhroyqsqixusewwe/
 
 Check Supabase Dashboard → Authentication → URL Configuration`;
         }
-        
+
         const debugMsg = `Missing authorization code.
         URL: ${window.location.href}
         Params: ${JSON.stringify(params)}
-        Supabase Config: ${isConfigMissing ? 'MISSING' : 'PRESENT'}
+        Supabase Config: ${isConfigMissing ? "MISSING" : "PRESENT"}
         ${helpMessage}`;
-        
-        console.error('[AuthCallback] ' + debugMsg);
+
+        console.error("[AuthCallback] " + debugMsg);
         setError(errorMessage);
         setDebugInfo({
           timestamp: callbackStartTime,
-          step: 'no_code',
+          step: "no_code",
           allParams: params,
           origin: window.location.origin,
           redirectUri: `${window.location.origin}/auth/callback`,
@@ -251,54 +269,54 @@ Check Supabase Dashboard → Authentication → URL Configuration`;
       }
 
       // === ATTEMPT SESSION EXCHANGE ===
-      console.log('[AuthCallback] Attempting code exchange...');
+      console.log("[AuthCallback] Attempting code exchange...");
       const exchangeStartTime = Date.now();
-      
+
       try {
         const { data, error } = await supabase.auth.exchangeCodeForSession(code);
         const exchangeTime = Date.now() - exchangeStartTime;
-        
+
         if (error) {
-          console.error('[AuthCallback] Code exchange failed:', {
+          console.error("[AuthCallback] Code exchange failed:", {
             error: error.message,
             status: (error as any).status,
             cause: (error as any).cause,
             exchangeTimeMs: exchangeTime,
           });
-          
-          const errorMsg = error.message || 'Failed to exchange authorization code';
+
+          const errorMsg = error.message || "Failed to exchange authorization code";
           setError(errorMsg);
           setDebugInfo({
             timestamp: callbackStartTime,
-            step: 'exchange_failed',
+            step: "exchange_failed",
             errorMessage: errorMsg,
-            code: code.substring(0, 10) + '...',
+            code: code.substring(0, 10) + "...",
             exchangeTimeMs: exchangeTime,
           });
           setProcessing(false);
           return;
         }
-        
-        console.log('[AuthCallback] ✓ Code exchange successful', {
+
+        console.log("[AuthCallback] ✓ Code exchange successful", {
           exchangeTimeMs: exchangeTime,
           sessionUser: data.session?.user?.email,
         });
-        
+
         // === SUCCESS - REDIRECT ===
-        console.log('[AuthCallback] Redirecting to:', next);
+        console.log("[AuthCallback] Redirecting to:", next);
         navigate(next);
       } catch (err: any) {
-        console.error('[AuthCallback] Unexpected error during exchange:', {
+        console.error("[AuthCallback] Unexpected error during exchange:", {
           error: err?.message,
           stack: err?.stack,
         });
-        
-        setError(`Unexpected error: ${err?.message || 'Unknown error'}`);
+
+        setError(`Unexpected error: ${err?.message || "Unknown error"}`);
         setDebugInfo({
           timestamp: callbackStartTime,
-          step: 'unexpected_error',
+          step: "unexpected_error",
           errorMessage: err?.message,
-          errorStack: err?.stack?.split('\n').slice(0, 3),
+          errorStack: err?.stack?.split("\n").slice(0, 3),
         });
         setProcessing(false);
       }
@@ -312,9 +330,7 @@ Check Supabase Dashboard → Authentication → URL Configuration`;
       <div className="min-h-screen flex items-center justify-center bg-[#0d0d0d] text-[#e6e6e6]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 animate-spin text-[#8b5cf6]" />
-          <p className="text-sm text-[#999]">
-            Finalizing secure sign-in with Google&hellip;
-          </p>
+          <p className="text-sm text-[#999]">Finalizing secure sign-in with Google&hellip;</p>
         </div>
       </div>
     );
@@ -357,7 +373,7 @@ Check Supabase Dashboard → Authentication → URL Configuration`;
             Patient Sign-in
           </Button>
         </div>
-        
+
         <p className="text-xs text-[#666] text-center pt-2">
           Open browser console (F12) for detailed diagnostics
         </p>

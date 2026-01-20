@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Award, Shield } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
+import { ArrowLeft, User, Mail, Phone, MapPin, Calendar, Award, Shield } from "lucide-react";
 
 interface DoctorProfile {
   name: string;
@@ -19,25 +19,25 @@ interface DoctorProfile {
   avatarUrl?: string;
   signature?: string;
   ai_api_key?: string;
-  ai_provider?: 'claude' | 'openai';
+  ai_provider?: "claude" | "openai";
 }
 
 export default function DoctorProfile() {
   const [, navigate] = useLocation();
   const [location] = useLocation();
   const [profile, setProfile] = useState<DoctorProfile>({
-    name: '',
-    email: '',
-    specialty: '',
-    license: '',
-    phone: '',
-    address: '',
-    clinicName: '',
-    experience: '',
-    education: '',
+    name: "",
+    email: "",
+    specialty: "",
+    license: "",
+    phone: "",
+    address: "",
+    clinicName: "",
+    experience: "",
+    education: "",
     certifications: [],
-    avatarUrl: '',
-    signature: ''
+    avatarUrl: "",
+    signature: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -49,35 +49,35 @@ export default function DoctorProfile() {
   const loadProfile = async () => {
     try {
       // Try to get from localStorage first
-      const savedProfile = localStorage.getItem('doctor_profile');
+      const savedProfile = localStorage.getItem("doctor_profile");
       if (savedProfile) {
         setProfile(JSON.parse(savedProfile));
       } else {
         // Load default profile
         setProfile({
-          name: 'Dr. Carlos Faviel Font',
-          email: 'cff@centremedicalfont.ca',
-          specialty: 'Médecine Générale',
-          license: 'CMQ-12345',
-          phone: '+1 (514) 555-0123',
-          address: '123 Rue Medical, Montréal, QC H1A 1A1',
-          clinicName: 'Centre Médical Font',
-          experience: '15 ans d\'expérience en médecine générale',
-          education: 'MD - Université de Montréal (2008)',
-          certifications: ['Collège des Médecins du Québec', 'Médecine d\'Urgence'],
-          avatarUrl: '',
-          signature: 'Dr. Carlos Faviel Font'
+          name: "Dr. Carlos Faviel Font",
+          email: "cff@centremedicalfont.ca",
+          specialty: "Médecine Générale",
+          license: "CMQ-12345",
+          phone: "+1 (514) 555-0123",
+          address: "123 Rue Medical, Montréal, QC H1A 1A1",
+          clinicName: "Centre Médical Font",
+          experience: "15 ans d'expérience en médecine générale",
+          education: "MD - Université de Montréal (2008)",
+          certifications: ["Collège des Médecins du Québec", "Médecine d'Urgence"],
+          avatarUrl: "",
+          signature: "Dr. Carlos Faviel Font",
         });
       }
     } catch (error) {
-      console.error('Error loading profile:', error);
+      console.error("Error loading profile:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleSave = () => {
-    localStorage.setItem('doctor_profile', JSON.stringify(profile));
+    localStorage.setItem("doctor_profile", JSON.stringify(profile));
     setIsEditing(false);
   };
 
@@ -87,23 +87,23 @@ export default function DoctorProfile() {
   };
 
   const handleInputChange = (field: keyof DoctorProfile, value: string) => {
-    setProfile(prev => ({ ...prev, [field]: value }));
+    setProfile((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleCertificationChange = (index: number, value: string) => {
     const newCerts = [...profile.certifications];
     newCerts[index] = value;
-    setProfile(prev => ({ ...prev, certifications: newCerts }));
+    setProfile((prev) => ({ ...prev, certifications: newCerts }));
   };
 
   const addCertification = () => {
-    setProfile(prev => ({ ...prev, certifications: [...prev.certifications, ''] }));
+    setProfile((prev) => ({ ...prev, certifications: [...prev.certifications, ""] }));
   };
 
   const removeCertification = (index: number) => {
-    setProfile(prev => ({ 
-      ...prev, 
-      certifications: prev.certifications.filter((_, i) => i !== index) 
+    setProfile((prev) => ({
+      ...prev,
+      certifications: prev.certifications.filter((_, i) => i !== index),
     }));
   };
 
@@ -126,7 +126,7 @@ export default function DoctorProfile() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
               <Button
-                onClick={() => navigate('/doctor-dashboard')}
+                onClick={() => navigate("/doctor-dashboard")}
                 variant="ghost"
                 className="text-white hover:bg-white/20"
               >
@@ -174,9 +174,9 @@ export default function DoctorProfile() {
               <CardContent className="p-8 text-center">
                 <div className="w-32 h-32 mx-auto mb-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                   {profile.avatarUrl ? (
-                    <img 
-                      src={profile.avatarUrl} 
-                      alt="Avatar" 
+                    <img
+                      src={profile.avatarUrl}
+                      alt="Avatar"
                       className="w-full h-full rounded-full object-cover"
                     />
                   ) : (
@@ -219,7 +219,7 @@ export default function DoctorProfile() {
                       {isEditing ? (
                         <Input
                           value={profile.name}
-                          onChange={(e) => handleInputChange('name', e.target.value)}
+                          onChange={(e) => handleInputChange("name", e.target.value)}
                           className="bg-white/20 border-white/30 text-white placeholder-gray-400"
                         />
                       ) : (
@@ -231,9 +231,9 @@ export default function DoctorProfile() {
                         Spécialité
                       </label>
                       {isEditing ? (
-                          <Input
-                            value={profile.specialty}
-                          onChange={(e) => handleInputChange('specialty', e.target.value)}
+                        <Input
+                          value={profile.specialty}
+                          onChange={(e) => handleInputChange("specialty", e.target.value)}
                           className="bg-white/20 border-white/30 text-white placeholder-gray-400"
                         />
                       ) : (
@@ -241,14 +241,12 @@ export default function DoctorProfile() {
                       )}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Email
-                      </label>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
                       {isEditing ? (
                         <Input
                           type="email"
                           value={profile.email}
-                          onChange={(e) => handleInputChange('email', e.target.value)}
+                          onChange={(e) => handleInputChange("email", e.target.value)}
                           className="bg-white/20 border-white/30 text-white placeholder-gray-400"
                         />
                       ) : (
@@ -265,7 +263,7 @@ export default function DoctorProfile() {
                       {isEditing ? (
                         <Input
                           value={profile.phone}
-                          onChange={(e) => handleInputChange('phone', e.target.value)}
+                          onChange={(e) => handleInputChange("phone", e.target.value)}
                           className="bg-white/20 border-white/30 text-white placeholder-gray-400"
                         />
                       ) : (
@@ -275,23 +273,21 @@ export default function DoctorProfile() {
                         </p>
                       )}
                     </div>
-                        </div>
+                  </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Adresse
-                    </label>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Adresse</label>
                     {isEditing ? (
-                        <Input
+                      <Input
                         value={profile.address}
-                        onChange={(e) => handleInputChange('address', e.target.value)}
+                        onChange={(e) => handleInputChange("address", e.target.value)}
                         className="bg-white/20 border-white/30 text-white placeholder-gray-400"
-                        />
-                      ) : (
+                      />
+                    ) : (
                       <p className="text-white flex items-center gap-2">
                         <MapPin className="w-4 h-4" />
                         {profile.address}
                       </p>
-                      )}
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -305,49 +301,49 @@ export default function DoctorProfile() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                      <div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Numéro de licence
                     </label>
                     {isEditing ? (
-                        <Input
+                      <Input
                         value={profile.license}
-                        onChange={(e) => handleInputChange('license', e.target.value)}
+                        onChange={(e) => handleInputChange("license", e.target.value)}
                         className="bg-white/20 border-white/30 text-white placeholder-gray-400"
                       />
                     ) : (
                       <p className="text-white">{profile.license}</p>
                     )}
-                      </div>
-                      <div>
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Expérience
                     </label>
                     {isEditing ? (
-                        <Input
+                      <Input
                         value={profile.experience}
-                        onChange={(e) => handleInputChange('experience', e.target.value)}
+                        onChange={(e) => handleInputChange("experience", e.target.value)}
                         className="bg-white/20 border-white/30 text-white placeholder-gray-400"
-                  />
-                ) : (
+                      />
+                    ) : (
                       <p className="text-white">{profile.experience}</p>
                     )}
-                      </div>
-                      <div>
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Formation
                     </label>
                     {isEditing ? (
-                        <Input
+                      <Input
                         value={profile.education}
-                        onChange={(e) => handleInputChange('education', e.target.value)}
+                        onChange={(e) => handleInputChange("education", e.target.value)}
                         className="bg-white/20 border-white/30 text-white placeholder-gray-400"
                       />
                     ) : (
                       <p className="text-white">{profile.education}</p>
                     )}
-                      </div>
-                      <div>
+                  </div>
+                  <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">
                       Certifications
                     </label>
@@ -355,7 +351,7 @@ export default function DoctorProfile() {
                       <div className="space-y-2">
                         {profile.certifications.map((cert, index) => (
                           <div key={index} className="flex gap-2">
-                        <Input
+                            <Input
                               value={cert}
                               onChange={(e) => handleCertificationChange(index, e.target.value)}
                               className="bg-white/20 border-white/30 text-white placeholder-gray-400"
@@ -368,7 +364,7 @@ export default function DoctorProfile() {
                             >
                               Supprimer
                             </Button>
-                      </div>
+                          </div>
                         ))}
                         <Button
                           onClick={addCertification}
@@ -381,7 +377,9 @@ export default function DoctorProfile() {
                     ) : (
                       <div className="space-y-1">
                         {profile.certifications.map((cert, index) => (
-                          <p key={index} className="text-white">• {cert}</p>
+                          <p key={index} className="text-white">
+                            • {cert}
+                          </p>
                         ))}
                       </div>
                     )}
@@ -393,12 +391,12 @@ export default function DoctorProfile() {
                     {isEditing ? (
                       <Input
                         value={profile.signature}
-                        onChange={(e) => handleInputChange('signature', e.target.value)}
+                        onChange={(e) => handleInputChange("signature", e.target.value)}
                         placeholder="Ex: Dr. Carlos Faviel Font"
                         className="bg-white/20 border-white/30 text-white placeholder-gray-400"
                       />
                     ) : (
-                      <p className="text-white">{profile.signature || 'Non définie'}</p>
+                      <p className="text-white">{profile.signature || "Non définie"}</p>
                     )}
                     <p className="text-xs text-gray-400 mt-1">
                       Cette signature apparaîtra sur vos documents PDF
@@ -415,41 +413,53 @@ export default function DoctorProfile() {
                         </label>
                         {isEditing ? (
                           <select
-                            value={profile.ai_provider || 'claude'}
-                            onChange={(e) => setProfile({...profile, ai_provider: e.target.value as 'claude' | 'openai'})}
+                            value={profile.ai_provider || "claude"}
+                            onChange={(e) =>
+                              setProfile({
+                                ...profile,
+                                ai_provider: e.target.value as "claude" | "openai",
+                              })
+                            }
                             className="w-full px-3 py-2 bg-white/20 border border-white/30 text-white rounded-md"
                           >
-                            <option value="claude" className="bg-slate-900">Claude (Anthropic)</option>
-                            <option value="openai" className="bg-slate-900">OpenAI (GPT-4)</option>
+                            <option value="claude" className="bg-slate-900">
+                              Claude (Anthropic)
+                            </option>
+                            <option value="openai" className="bg-slate-900">
+                              OpenAI (GPT-4)
+                            </option>
                           </select>
                         ) : (
                           <p className="text-white">
-                            {profile.ai_provider === 'openai' ? 'OpenAI (GPT-4)' : 'Claude (Anthropic)'}
+                            {profile.ai_provider === "openai"
+                              ? "OpenAI (GPT-4)"
+                              : "Claude (Anthropic)"}
                           </p>
                         )}
                       </div>
 
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
-                          Clé API {profile.ai_provider === 'openai' ? 'OpenAI' : 'Claude'}
+                          Clé API {profile.ai_provider === "openai" ? "OpenAI" : "Claude"}
                         </label>
                         {isEditing ? (
                           <Input
                             type="password"
-                            value={profile.ai_api_key || ''}
-                            onChange={(e) => setProfile({...profile, ai_api_key: e.target.value})}
-                            placeholder={profile.ai_provider === 'openai' ? 'sk-...' : 'sk-ant-...'}
+                            value={profile.ai_api_key || ""}
+                            onChange={(e) => setProfile({ ...profile, ai_api_key: e.target.value })}
+                            placeholder={profile.ai_provider === "openai" ? "sk-..." : "sk-ant-..."}
                             className="bg-white/20 border-white/30 text-white placeholder-gray-400"
                           />
                         ) : (
                           <p className="text-white">
-                            {profile.ai_api_key 
-                              ? '●●●●●●●●●●' + profile.ai_api_key.slice(-4)
-                              : 'Non configurée'}
+                            {profile.ai_api_key
+                              ? "●●●●●●●●●●" + profile.ai_api_key.slice(-4)
+                              : "Non configurée"}
                           </p>
                         )}
                         <p className="text-xs text-gray-400 mt-1">
-                          Votre clé API sera utilisée uniquement pour générer du contenu IA dans vos documents
+                          Votre clé API sera utilisée uniquement pour générer du contenu IA dans vos
+                          documents
                         </p>
                       </div>
                     </div>

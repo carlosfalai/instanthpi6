@@ -39,7 +39,6 @@ const slugify = (value: string) =>
 async function ensureUniqueSlug(base: string, formId?: string): Promise<string> {
   let slug = base;
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     const [existing] = await db
       .select({ id: intakeForms.id })
@@ -165,10 +164,7 @@ export async function listSubmissions(formId: string, ownerId: number) {
       output: submissionOutputs,
     })
     .from(intakeFormSubmissions)
-    .leftJoin(
-      submissionOutputs,
-      eq(submissionOutputs.submissionId, intakeFormSubmissions.id)
-    )
+    .leftJoin(submissionOutputs, eq(submissionOutputs.submissionId, intakeFormSubmissions.id))
     .where(eq(intakeFormSubmissions.formId, formId))
     .orderBy(desc(intakeFormSubmissions.submittedAt));
 }
@@ -185,10 +181,7 @@ export async function getSubmission(
     })
     .from(intakeFormSubmissions)
     .innerJoin(intakeForms, eq(intakeForms.id, intakeFormSubmissions.formId))
-    .leftJoin(
-      submissionOutputs,
-      eq(submissionOutputs.submissionId, intakeFormSubmissions.id)
-    )
+    .leftJoin(submissionOutputs, eq(submissionOutputs.submissionId, intakeFormSubmissions.id))
     .where(eq(intakeFormSubmissions.id, submissionId));
 
   if (!result || result.form.ownerId !== ownerId) return undefined;

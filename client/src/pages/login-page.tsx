@@ -20,8 +20,14 @@ export default function LoginPage() {
     setError("");
 
     try {
-      // Check password (you can change this password)
-      const SITE_PASSWORD = "doctor123"; // Change this to your desired password
+      // Password from environment variable (REQUIRED for security)
+      const SITE_PASSWORD = import.meta.env.VITE_SITE_PASSWORD;
+
+      if (!SITE_PASSWORD) {
+        console.error("[Login] VITE_SITE_PASSWORD environment variable not set");
+        setError("Site authentication not configured. Contact administrator.");
+        return;
+      }
 
       if (password === SITE_PASSWORD) {
         // Store authentication in session storage

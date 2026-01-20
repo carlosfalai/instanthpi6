@@ -180,7 +180,7 @@ ${documentText}`,
     response_format: { type: "json_object" },
   });
 
-  const result = JSON.parse(response.choices[0].message.content);
+  const result = JSON.parse(response.choices[0].message.content || '{}');
   return {
     summary: result.summary || "",
     keyFindings: result.key_findings || "",
@@ -220,9 +220,12 @@ ${documentText}`,
   });
 
   // Parse the JSON from Claude's response
+  const firstBlock = response.content[0];
+  const responseText = firstBlock.type === 'text' ? firstBlock.text : '';
+
   try {
-    const jsonMatch = response.content[0].text.match(/\{[\s\S]*\}/);
-    const jsonText = jsonMatch ? jsonMatch[0] : response.content[0].text;
+    const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+    const jsonText = jsonMatch ? jsonMatch[0] : responseText;
     const result = JSON.parse(jsonText);
 
     return {
@@ -235,12 +238,11 @@ ${documentText}`,
     console.error("Error parsing Anthropic response:", error);
 
     // Fallback parsing if JSON extraction fails
-    const text = response.content[0].text;
     return {
-      summary: extractSection(text, "Summary:"),
-      keyFindings: extractSection(text, "Key Findings:"),
-      confidence: extractConfidence(text),
-      actionRecommended: text.toLowerCase().includes("action needed: true"),
+      summary: extractSection(responseText, "Summary:"),
+      keyFindings: extractSection(responseText, "Key Findings:"),
+      confidence: extractConfidence(responseText),
+      actionRecommended: responseText.toLowerCase().includes("action needed: true"),
     };
   }
 }
@@ -267,7 +269,7 @@ ${documentText}`,
   );
 
   try {
-    const result = JSON.parse(response.choices[0].message.content);
+    const result = JSON.parse(response.choices[0].message.content || '{}');
     return {
       summary: result.summary || "",
       keyFindings: result.key_findings || "",

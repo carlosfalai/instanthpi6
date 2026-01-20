@@ -4,7 +4,36 @@ import crypto from "crypto";
 import { storage } from "../storage";
 import { SpruceHealthClient } from "../spruce-health-client";
 
-// Define interface for Spruce patient data
+// Define interface for Spruce patient data from API
+interface SpruceApiPatient {
+  id: string;
+  // Name fields - Spruce API uses multiple formats
+  givenName?: string;
+  given_name?: string;
+  familyName?: string;
+  family_name?: string;
+  displayName?: string;
+  display_name?: string;
+  name?: string;
+  // Contact info - can be nested or flat
+  email?: string;
+  email_address?: string;
+  emailAddresses?: Array<{ value?: string; address?: string }>;
+  phone?: string;
+  phone_number?: string;
+  phoneNumbers?: Array<{ value?: string; displayValue?: string }>;
+  // Other fields
+  date_of_birth?: string;
+  dateOfBirth?: string;
+  birth_date?: string;
+  gender?: string;
+  language?: string;
+  preferred_language?: string;
+  last_visit?: string;
+  status?: string;
+}
+
+// Simplified patient interface for internal use
 interface SprucePatient {
   id: string;
   name: string;
@@ -15,6 +44,43 @@ interface SprucePatient {
   language?: string;
   last_visit?: string;
   status?: string;
+}
+
+// Interface for Spruce API message response
+interface SpruceApiMessage {
+  id?: string;
+  content?: string;
+  text?: string;
+  created_at?: string;
+  createdAt?: string;
+  sender?: {
+    type?: string;
+    id?: string;
+  };
+  media?: {
+    url?: string;
+  };
+}
+
+// Interface for formatted message
+interface FormattedMessage {
+  id: string;
+  patientId: string;
+  conversationId: string;
+  content: string;
+  timestamp: string;
+  isFromPatient: boolean;
+  sender: string;
+  attachmentUrl: string | null;
+}
+
+// Helper to get error message from unknown error
+function getSpruceErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'object' && error !== null && 'message' in error) {
+    return String((error as { message: unknown }).message);
+  }
+  return 'Unknown error occurred';
 }
 
 // Initialize Spruce Health client
@@ -165,12 +231,11 @@ router.get("/conversations", async (req, res) => {
     // Transform conversations for spruce-messages-page format
     const transformedConversations = conversations.conversations.map((conv) => ({
       id: conv.id,
-      patientName: conv.displayName || conv.participants?.[0]?.name || "Unknown Patient",
-      lastMessage: conv.lastMessage?.content || "Click to view conversation",
+      patientName: conv.externalParticipants?.[0]?.displayName || conv.title || "Unknown Patient",
+      lastMessage: "Click to view conversation",
       lastMessageTime:
-        conv.lastMessage?.timestamp ||
-        conv.updated_at ||
-        conv.created_at ||
+        conv.lastMessageAt ||
+        conv.createdAt ||
         new Date().toISOString(),
       unreadCount: conv.unread_count || 0,
     }));
@@ -286,7 +351,7 @@ router.get("/search-patients", async (req, res) => {
       // Only filter if a search term was provided
       if (query && typeof query === "string") {
         const searchTerm = query.toLowerCase();
-        filteredPatients = allPatients.filter((patient: any) => {
+        filteredPatients = allPatients.filter((patient: SpruceApiPatient) => {
           // Search across all possible name/contact fields
           const givenName = (patient.givenName || patient.given_name || "").toLowerCase();
           const familyName = (patient.familyName || patient.family_name || "").toLowerCase();
@@ -337,7 +402,7 @@ router.get("/search-patients", async (req, res) => {
       console.log(`Found ${filteredPatients.length} matching patients in Spruce API`);
 
       // Convert Spruce patients to our format with better field mapping
-      const mappedPatients = filteredPatients.map((patient: any) => {
+      const mappedPatients = filteredPatients.map((patient: SpruceApiPatient) => {
         // Extract name components based on the Spruce API response structure
         const givenName = patient.givenName || patient.given_name || "";
         const familyName = patient.familyName || patient.family_name || "";
@@ -393,29 +458,30 @@ router.get("/search-patients", async (req, res) => {
         patients: mappedPatients,
         source: "spruce",
       });
-    } catch (spruceError: any) {
+    } catch (spruceError: unknown) {
+      const axiosErr = spruceError as { message?: string; response?: { data?: { message?: string }; status?: number; headers?: unknown } };
       // Enhanced error logging with detailed information
       console.error("Error searching patients in Spruce API:", {
-        message: spruceError.message,
-        response: spruceError.response?.data,
-        status: spruceError.response?.status,
-        headers: spruceError.response?.headers,
+        message: getSpruceErrorMessage(spruceError),
+        response: axiosErr.response?.data,
+        status: axiosErr.response?.status,
+        headers: axiosErr.response?.headers,
       });
 
       // Return more specific error information
-      return res.status(spruceError.response?.status || 500).json({
+      return res.status(axiosErr.response?.status || 500).json({
         patients: [],
         source: "spruce",
         error: "Failed to search patients in Spruce API",
-        message: spruceError.response?.data?.message || spruceError.message,
-        details: spruceError.response?.data,
+        message: axiosErr.response?.data?.message || getSpruceErrorMessage(spruceError),
+        details: axiosErr.response?.data,
       });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in patient search:", error);
     res.status(500).json({
       message: "Failed to search patients",
-      error: error.message,
+      error: getSpruceErrorMessage(error),
     });
   }
 });
@@ -444,7 +510,7 @@ router.post("/sync-patients", async (req, res) => {
         response.data.contacts || response.data.patients || response.data.data || [];
 
       // Convert Spruce patients to our format with better field mapping
-      const mappedPatients = sprucePatients.map((patient: any) => {
+      const mappedPatients = sprucePatients.map((patient: SpruceApiPatient) => {
         // Extract name components based on the Spruce API response structure
         const givenName = patient.givenName || patient.given_name || "";
         const familyName = patient.familyName || patient.family_name || "";
@@ -502,29 +568,30 @@ router.post("/sync-patients", async (req, res) => {
         source: "spruce",
         patients: mappedPatients,
       });
-    } catch (spruceError: any) {
+    } catch (spruceError: unknown) {
+      const axiosErr = spruceError as { message?: string; response?: { data?: { message?: string }; status?: number; headers?: unknown } };
       // Enhanced error logging with detailed information
       console.error("Error connecting to Spruce API:", {
-        message: spruceError.message,
-        response: spruceError.response?.data,
-        status: spruceError.response?.status,
-        headers: spruceError.response?.headers,
+        message: getSpruceErrorMessage(spruceError),
+        response: axiosErr.response?.data,
+        status: axiosErr.response?.status,
+        headers: axiosErr.response?.headers,
       });
 
       // Return more useful error information
-      return res.status(spruceError.response?.status || 500).json({
+      return res.status(axiosErr.response?.status || 500).json({
         message: "Failed to connect to Spruce API",
-        error: spruceError.response?.data?.message || spruceError.message,
+        error: axiosErr.response?.data?.message || getSpruceErrorMessage(spruceError),
         count: 0,
         source: "spruce",
         patients: [],
       });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in sync-patients endpoint:", error);
     res.status(500).json({
       message: "Failed to sync patients",
-      error: error.message,
+      error: getSpruceErrorMessage(error),
     });
   }
 });
@@ -568,7 +635,7 @@ router.post("/refresh-patients", async (req, res) => {
       console.log(`Successfully refreshed ${sprucePatients.length} patients from Spruce API`);
 
       // Format and return the patient data with better field mapping, checking for nested fields
-      const formattedPatients = sprucePatients.map((patient: any) => {
+      const formattedPatients = sprucePatients.map((patient: SpruceApiPatient) => {
         // Extract name components based on the Spruce API response structure
         const givenName = patient.givenName || patient.given_name || "";
         const familyName = patient.familyName || patient.family_name || "";
@@ -625,28 +692,29 @@ router.post("/refresh-patients", async (req, res) => {
         count: formattedPatients.length,
         patients: formattedPatients,
       });
-    } catch (spruceError: any) {
+    } catch (spruceError: unknown) {
       // Enhanced error logging with detailed information
+      const axiosErr = spruceError as { message?: string; response?: { data?: { message?: string }; status?: number; headers?: unknown } };
       console.error("Error refreshing data from Spruce API:", {
-        message: spruceError.message,
-        response: spruceError.response?.data,
-        status: spruceError.response?.status,
-        headers: spruceError.response?.headers,
+        message: getSpruceErrorMessage(spruceError),
+        response: axiosErr.response?.data,
+        status: axiosErr.response?.status,
+        headers: axiosErr.response?.headers,
       });
 
-      res.status(spruceError.response?.status || 500).json({
+      res.status(axiosErr.response?.status || 500).json({
         success: false,
         message: "Failed to refresh patient data from Spruce API",
-        error: spruceError.response?.data?.message || spruceError.message,
-        details: spruceError.response?.data,
+        error: axiosErr.response?.data?.message || getSpruceErrorMessage(spruceError),
+        details: axiosErr.response?.data,
       });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in refresh-patients endpoint:", error);
     res.status(500).json({
       success: false,
       message: "Error processing refresh request",
-      error: error.message || "Unknown error",
+      error: getSpruceErrorMessage(error) || "Unknown error",
     });
   }
 });
@@ -677,12 +745,12 @@ router.post("/setup-webhook", async (req, res) => {
       message: "Webhook setup successful",
       webhook,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error setting up webhook:", error);
     res.status(500).json({
       success: false,
       message: "Failed to setup webhook",
-      error: error.message,
+      error: getSpruceErrorMessage(error),
     });
   }
 });
@@ -695,12 +763,12 @@ router.get("/webhooks", async (req, res) => {
       success: true,
       webhooks,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error listing webhooks:", error);
     res.status(500).json({
       success: false,
       message: "Failed to list webhooks",
-      error: error.message,
+      error: getSpruceErrorMessage(error),
     });
   }
 });
@@ -719,7 +787,7 @@ router.get("/test-connection", async (req, res) => {
       message: "Successfully connected to Spruce API",
       data: response.data,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Try webhooks endpoint as a fallback
     try {
       const fallbackResponse = await spruceApi.get("/v1/webhooks/endpoints");
@@ -728,33 +796,37 @@ router.get("/test-connection", async (req, res) => {
         message: "Successfully connected to Spruce API (fallback endpoint)",
         data: fallbackResponse.data,
       });
-    } catch (fallbackError: any) {
+    } catch (fallbackError: unknown) {
+      // Extract axios error details if available
+      const axiosError = error as { response?: { data?: unknown; status?: number; headers?: unknown } };
+      const fallbackAxiosError = fallbackError as { response?: { data?: unknown; status?: number; headers?: unknown } };
+
       console.error("Spruce API connection test failed:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        headers: error.response?.headers,
+        message: getSpruceErrorMessage(error),
+        response: axiosError.response?.data,
+        status: axiosError.response?.status,
+        headers: axiosError.response?.headers,
       });
 
       // Check for unauthorized access
-      if (error.response?.status === 403) {
+      if (axiosError.response?.status === 403) {
         return res.status(403).json({
           success: false,
           message:
             "API key authentication failed. Please check your SPRUCE_API_KEY environment variable.",
           error: "Authorization failed",
-          details: error.response?.data,
+          details: axiosError.response?.data,
         });
       }
 
       // If we received headers from the API, show them for debugging
-      const receivedHeaders = error.response?.headers || fallbackError.response?.headers;
+      const receivedHeaders = axiosError.response?.headers || fallbackAxiosError.response?.headers;
 
-      res.status(error.response?.status || 500).json({
+      res.status(axiosError.response?.status || 500).json({
         success: false,
         message: "Failed to connect to Spruce API",
-        error: error.message,
-        details: error.response?.data,
+        error: getSpruceErrorMessage(error),
+        details: axiosError.response?.data,
         apiHeaders: receivedHeaders,
       });
     }
@@ -805,12 +877,12 @@ router.post("/messages", async (req, res) => {
           timestamp: new Date(),
         });
       }
-    } catch (spruceError) {
-      console.error("Error sending message to Spruce API:", spruceError);
+    } catch (spruceError: unknown) {
+      console.error("Error sending message to Spruce API:", getSpruceErrorMessage(spruceError));
       res.status(500).json({ message: "Failed to send message to Spruce API" });
     }
-  } catch (error) {
-    console.error("Error sending message:", error);
+  } catch (error: unknown) {
+    console.error("Error sending message:", getSpruceErrorMessage(error));
     res.status(500).json({ message: "Failed to send message" });
   }
 });
@@ -838,7 +910,7 @@ router.get("/patients/:patientId/messages", async (req, res) => {
 
     // Extract conversations from response
     const conversations = conversationsResponse.data.conversations || [];
-    let allMessages: any[] = [];
+    let allMessages: FormattedMessage[] = [];
 
     // For each conversation, fetch messages
     for (const conversation of conversations) {
@@ -871,7 +943,7 @@ router.get("/patients/:patientId/messages", async (req, res) => {
         if (conversationMessages.length > 0) {
           allMessages = [
             ...allMessages,
-            ...conversationMessages.map((msg: any) => ({
+            ...conversationMessages.map((msg: SpruceApiMessage) => ({
               id: msg.id || `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
               patientId: patientId,
               conversationId: conversationId,
@@ -911,9 +983,9 @@ router.get("/patients/:patientId/messages", async (req, res) => {
         ramqVerified: ramqVerification || false,
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching messages from Spruce API:", {
-      message: error.message,
+      message: getSpruceErrorMessage(error),
       status: error.response?.status,
       statusText: error.response?.statusText,
       data: error.response?.data,
@@ -922,7 +994,7 @@ router.get("/patients/:patientId/messages", async (req, res) => {
     // Return empty array with error details
     res.status(500).json({
       success: false,
-      error: error.message,
+      error: getSpruceErrorMessage(error),
       messages: [],
       metadata: {
         ramqVerified: false,
@@ -992,18 +1064,19 @@ router.post("/patients/:patientId/messages", async (req, res) => {
         sender: "Doctor",
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const axiosError = error as { response?: { status?: number; statusText?: string; data?: unknown } };
     console.error("Error sending message via Spruce API:", {
-      message: error.message,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
+      message: getSpruceErrorMessage(error),
+      status: axiosError.response?.status,
+      statusText: axiosError.response?.statusText,
+      data: axiosError.response?.data,
     });
 
     res.status(500).json({
       success: false,
       message: "Failed to send message",
-      error: error.message,
+      error: getSpruceErrorMessage(error),
     });
   }
 });

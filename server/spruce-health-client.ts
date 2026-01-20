@@ -75,9 +75,10 @@ class SpruceHealthClient {
       ...config,
     };
 
-    const authHeader = this.config.bearerToken.startsWith('YWlk') || this.config.bearerToken.startsWith('aid_')
-      ? `Basic ${this.config.bearerToken}`
-      : `Bearer ${this.config.bearerToken}`;
+    const authHeader =
+      this.config.bearerToken.startsWith("YWlk") || this.config.bearerToken.startsWith("aid_")
+        ? `Basic ${this.config.bearerToken}`
+        : `Bearer ${this.config.bearerToken}`;
 
     this.client = axios.create({
       baseURL: this.config.baseUrl,
@@ -262,23 +263,62 @@ class SpruceHealthClient {
 
           // Extract any embedded messages
           const conversation = convResponse.data.conversation || convResponse.data;
-          finalMessages = conversation.recentMessages || conversation.messages || conversation.recent_messages || [];
+          finalMessages =
+            conversation.recentMessages ||
+            conversation.messages ||
+            conversation.recent_messages ||
+            [];
         }
       }
 
       console.log(`Found ${finalMessages.length} messages for conversation ${conversationId}`);
 
       return {
-        messages: finalMessages.map((msg: any) => ({
-          id: msg.id || msg.messageId || `msg_${Date.now()}`,
-          conversation_id: conversationId,
-          content: msg.content || msg.text || msg.body || (msg.message?.body) || "Message content not available",
-          sent_at: msg.sentAt || msg.sent_at || msg.createdAt || msg.created_at || msg.timestamp || new Date().toISOString(),
-          sender_id: msg.authorId || msg.sender_id || msg.from || msg.sender || "unknown",
-          sender_name: msg.author?.displayName || msg.sender_name || msg.from_name || msg.display_name || (msg.isFromPatient ? "Patient" : "Doctor"),
-          message_type: msg.type || msg.message_type || "text",
-          read: msg.read !== undefined ? msg.read : true,
-        })),
+        messages: finalMessages.map((msg: any) => {
+          // Extract text content or generate from attachments
+          let content = msg.content || msg.text || msg.body || msg.message?.body;
+
+          // If no text content, check for attachments
+          if (!content && msg.attachments && msg.attachments.length > 0) {
+            const attachmentDescriptions = msg.attachments
+              .map((att: any) => {
+                if (att.type === "visit" && att.title) {
+                  return `[Visit: ${att.title}]`;
+                }
+                if (att.type === "image" || att.type === "photo") {
+                  return "[Image attachment]";
+                }
+                if (att.type === "file" || att.type === "document") {
+                  return `[File: ${att.title || att.filename || "attachment"}]`;
+                }
+                return `[${att.type || "Attachment"}: ${att.title || ""}]`;
+              })
+              .join(" ");
+            content = attachmentDescriptions || "Message content not available";
+          }
+
+          return {
+            id: msg.id || msg.messageId || `msg_${Date.now()}`,
+            conversation_id: conversationId,
+            content: content || "Message content not available",
+            sent_at:
+              msg.sentAt ||
+              msg.sent_at ||
+              msg.createdAt ||
+              msg.created_at ||
+              msg.timestamp ||
+              new Date().toISOString(),
+            sender_id: msg.authorId || msg.sender_id || msg.from || msg.sender || "unknown",
+            sender_name:
+              msg.author?.displayName ||
+              msg.sender_name ||
+              msg.from_name ||
+              msg.display_name ||
+              (msg.isFromPatient ? "Patient" : "Doctor"),
+            message_type: msg.type || msg.message_type || "text",
+            read: msg.read !== undefined ? msg.read : true,
+          };
+        }),
         pagination: {
           page: params?.page || 1,
           per_page: params?.per_page || 50,
@@ -288,7 +328,10 @@ class SpruceHealthClient {
       };
     } catch (error) {
       console.error(`Error fetching messages for conversation ${conversationId}:`, error);
-      console.error("Error response:", error.response?.data);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: unknown } };
+        console.error("Error response:", axiosError.response?.data);
+      }
 
       return {
         messages: [],
@@ -450,18 +493,22 @@ class SpruceHealthClient {
   }
 
   /**
-   * Search conversations by participant name or email
+   * Search conversations by participant name or title
    */
   async searchConversations(query: string): Promise<Conversation[]> {
     try {
       const allConversations = await this.getConversations();
-      return allConversations.conversations.filter((conversation) =>
-        conversation.participants.some(
+      const lowerQuery = query.toLowerCase();
+      return allConversations.conversations.filter((conversation) => {
+        // Search in title
+        if (conversation.title.toLowerCase().includes(lowerQuery)) return true;
+        // Search in external participants
+        return conversation.externalParticipants?.some(
           (participant) =>
-            participant.name.toLowerCase().includes(query.toLowerCase()) ||
-            participant.email?.toLowerCase().includes(query.toLowerCase())
-        )
-      );
+            participant.displayName.toLowerCase().includes(lowerQuery) ||
+            participant.contact?.toLowerCase().includes(lowerQuery)
+        ) ?? false;
+      });
     } catch (error) {
       console.error("Error searching conversations:", error);
       throw error;

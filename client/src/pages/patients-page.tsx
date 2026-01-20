@@ -187,9 +187,9 @@ export default function ClientsPage() {
             setSelectedPatient((prev) =>
               prev
                 ? {
-                  ...prev,
-                  ramqVerified: data.metadata.ramqVerified,
-                }
+                    ...prev,
+                    ramqVerified: data.metadata.ramqVerified,
+                  }
                 : null
             );
           }
@@ -550,7 +550,9 @@ export default function ClientsPage() {
                   <div className="flex items-center justify-center h-24">
                     <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
                   </div>
-                ) : (patientMessages && Array.isArray(patientMessages) && patientMessages.length > 0) ? (
+                ) : patientMessages &&
+                  Array.isArray(patientMessages) &&
+                  patientMessages.length > 0 ? (
                   <div className="space-y-3 max-h-48 overflow-y-auto border border-[#333] rounded-md p-3 bg-[#1e1e1e]">
                     {(patientMessages || []).slice(-5).map((message) => (
                       <div key={message.id} className="flex items-start">
@@ -774,7 +776,9 @@ export default function ClientsPage() {
                   <div className="flex items-center justify-center h-full">
                     <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
                   </div>
-                ) : (patientMessages && Array.isArray(patientMessages) && patientMessages.length > 0) ? (
+                ) : patientMessages &&
+                  Array.isArray(patientMessages) &&
+                  patientMessages.length > 0 ? (
                   <div className="space-y-3">
                     {(patientMessages || []).map((message) => (
                       <div

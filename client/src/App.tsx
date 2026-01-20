@@ -1,51 +1,30 @@
-import React, { useEffect } from "react";
-import { Router, Route, Switch, useLocation } from "wouter";
+import React, { useEffect, Suspense, lazy } from "react";
+import { Router, Route, Switch, useLocation, Redirect } from "wouter";
 import { supabase } from "@/lib/supabase";
-import { LoginPage } from "@/components/auth/LoginPage";
-import Landing from "@/pages/landing";
-import DoctorDashboard from "@/pages/doctor-dashboard-new";
-import DoctorDashboardSimple from "@/pages/doctor-dashboard-simple";
-import DoctorLogin from "@/pages/doctor-login";
-import DoctorProfileNew from "@/pages/doctor-profile-new";
-import PatientLogin from "@/pages/patient-login";
-import PatientDashboard from "@/pages/patient-dashboard";
-import PublicPatientIntake from "@/pages/public-patient-intake";
-import WebhookSetupPage from "@/pages/webhook-setup-page";
-import PatientsPage from "@/pages/patients-page-new";
-import DocumentsPage from "@/pages/documents-page";
-import MessagesPage from "@/pages/messages-page";
-import AIBillingPage from "@/pages/ai-billing-page";
-import KnowledgeBasePage from "@/pages/knowledge-base-page";
-import TierAssociationPage from "@/pages/tier-association-page";
-import InboxPage from "@/pages/inbox-page";
-import AuthCallback from "@/pages/auth-callback";
-import LoginDiagnostics from "@/pages/login-diagnostics";
-import Onboarding from "@/pages/onboarding";
-import FormBuilder from "@/pages/form-builder";
-import PublicFormPage from "@/pages/public-form";
-import SchedulerPage from "@/pages/scheduler-page";
-import FormsitePage from "@/pages/formsite-page";
-import FormsPage from "@/pages/forms-page";
-import ChronicConditionsPage from "@/pages/chronic-conditions-page";
-import MedicationRefillsPage from "@/pages/medication-refills-page";
-import UrgentCarePage from "@/pages/urgent-care-page";
-import EducationPage from "@/pages/education-page";
-import SubscriptionPage from "@/pages/subscription-page";
-import SettingsPage from "@/pages/settings-page";
-import LeadershipAssociationPage from "@/pages/leadership-association-page";
-import PrioritizedTasksPage from "@/pages/prioritized-tasks-page";
-import InsurancePaperworkPage from "@/pages/insurance-paperwork-page";
-import ClaudeAIPage from "@/pages/claude-ai-page";
-import GmailInboxPage from "@/pages/gmail-inbox-page";
-import PricingPage from "@/pages/pricing";
-import SubscriptionSuccessPage from "@/pages/subscription-success";
-import CommandCenter from "@/pages/command-center";
-import EliteBuilderDemo from "@/pages/elite-builder-demo";
-import EliteDashboardDemo from "@/pages/elite-dashboard-demo";
-import UntitledUIDemo from "@/pages/UntitledUIDemo";
 import { ProtectedRoute } from "@/lib/auth-guard";
 
-class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
+// Lazy load pages for code splitting
+const DoctorLogin = lazy(() => import("@/pages/doctor-login"));
+const AuthCallback = lazy(() => import("@/pages/auth-callback"));
+const CommandCenter = lazy(() => import("@/pages/command-center"));
+const SettingsPage = lazy(() => import("@/pages/settings-page"));
+
+// Loading fallback component
+function PageLoader() {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0908]">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+        <span className="text-amber-500/70 text-sm">Loading...</span>
+      </div>
+    </div>
+  );
+}
+
+class RootErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
   constructor(props: { children: React.ReactNode }) {
     super(props);
     this.state = { hasError: false, error: null };
@@ -55,29 +34,6 @@ class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, {
   }
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error("Root Error Boundary caught:", error, info);
-
-    // Log to production monitoring (without sensitive data)
-    if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
-      try {
-        // Send error to monitoring endpoint (if available)
-        fetch('/api/error-log', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            error: error.message,
-            stack: error.stack?.substring(0, 500), // Limit stack trace
-            componentStack: info.componentStack?.substring(0, 500),
-            timestamp: new Date().toISOString(),
-            url: window.location.href,
-            userAgent: navigator.userAgent.substring(0, 200)
-          })
-        }).catch(() => {
-          // Silently fail if error logging endpoint is unavailable
-        });
-      } catch (e) {
-        // Silently fail if error logging fails
-      }
-    }
   }
   render() {
     if (this.state.hasError) {
@@ -88,8 +44,15 @@ class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, {
               <span className="text-3xl">⚠️</span>
             </div>
             <h2 className="text-xl font-bold text-foreground mb-3">Application Error</h2>
-            <p className="text-muted-foreground mb-6 text-sm break-words">{this.state.error?.message || 'An unknown error occurred'}</p>
-            <a href="/doctor-login" className="inline-block bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-4 rounded-md">Back to Login</a>
+            <p className="text-muted-foreground mb-6 text-sm break-words">
+              {this.state.error?.message || "An unknown error occurred"}
+            </p>
+            <a
+              href="/login"
+              className="inline-block bg-primary hover:bg-primary/90 text-primary-foreground py-2 px-4 rounded-md"
+            >
+              Back to Login
+            </a>
           </div>
         </div>
       );
@@ -98,28 +61,18 @@ class RootErrorBoundary extends React.Component<{ children: React.ReactNode }, {
   }
 }
 
-// Local dev detection for auto-redirect to dashboard
-const isLocalDev = typeof window !== 'undefined' &&
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-
 export default function App() {
   const [location, setLocation] = useLocation();
 
   useEffect(() => {
-    // LOCAL DEV: Auto-redirect to dashboard from landing page
-    if (isLocalDev && location === "/") {
-      setLocation("/doctor-dashboard");
-      return;
-    }
-
     // Check auth state on mount
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
-        // Redirect based on the login page
-        if (location === "/patient-login") {
-          setLocation("/patient-dashboard");
+        // Redirect to Command Center after login
+        if (location === "/login" || location === "/doctor-login") {
+          setLocation("/");
         }
       }
     });
@@ -131,179 +84,62 @@ export default function App() {
 
   return (
     <RootErrorBoundary>
-      <Router>
-        <Switch>
-          <Route path="/" component={Landing} />
-          <Route path="/patient-intake" component={PublicPatientIntake} />
-          <Route path="/f/:slug" component={PublicFormPage} />
-          <Route path="/patient-login" component={PatientLogin} />
-          <Route path="/patient-dashboard" component={PatientDashboard} />
-          <Route path="/login" component={LoginPage} />
-          <Route path="/login-diagnostics" component={LoginDiagnostics} />
-          <Route path="/onboarding" component={Onboarding} />
-          <Route path="/form-builder">
-            <ProtectedRoute>
-              <FormBuilder />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/elite-builder-demo">
-            <ProtectedRoute>
-              <EliteBuilderDemo />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/elite-dashboard-demo">
-            <ProtectedRoute>
-              <EliteDashboardDemo />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/untitled-ui-demo">
-            <ProtectedRoute>
-              <UntitledUIDemo />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/doctor-login" component={DoctorLogin} />
-          <Route path="/doctor-dashboard">
-            <ProtectedRoute>
-              <DoctorDashboard />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/doctor-dashboard-simple" component={DoctorDashboardSimple} />
-          <Route path="/doctor-profile">
-            <ProtectedRoute>
-              <DoctorProfileNew />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/patients">
-            <ProtectedRoute>
-              <PatientsPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/command">
+      <Suspense fallback={<PageLoader />}>
+        <Router>
+          <Switch>
+          {/* Main interface - Command Center */}
+          <Route path="/">
             <ProtectedRoute>
               <CommandCenter />
             </ProtectedRoute>
           </Route>
-          <Route path="/documents">
-            <ProtectedRoute>
-              <DocumentsPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/messages">
-            <ProtectedRoute>
-              <MessagesPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/ai-billing">
-            <ProtectedRoute>
-              <AIBillingPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/knowledge-base">
-            <ProtectedRoute>
-              <KnowledgeBasePage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/inbox">
-            <ProtectedRoute>
-              <InboxPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/association">
-            <ProtectedRoute>
-              <TierAssociationPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/tier-35">
-            <ProtectedRoute>
-              <TierAssociationPage />
-            </ProtectedRoute>
-          </Route>
+
+          {/* Auth routes */}
+          <Route path="/login" component={DoctorLogin} />
+          <Route path="/doctor-login" component={DoctorLogin} />
           <Route path="/auth/callback" component={AuthCallback} />
-          <Route path="/webhook-setup" component={WebhookSetupPage} />
-          <Route path="/scheduler">
-            <ProtectedRoute>
-              <SchedulerPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/formsite">
-            <ProtectedRoute>
-              <FormsitePage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/forms">
-            <ProtectedRoute>
-              <FormsPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/chronic-conditions">
-            <ProtectedRoute>
-              <ChronicConditionsPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/medication-refills">
-            <ProtectedRoute>
-              <MedicationRefillsPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/urgent-care">
-            <ProtectedRoute>
-              <UrgentCarePage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/education">
-            <ProtectedRoute>
-              <EducationPage />
-            </ProtectedRoute>
-          </Route>
-          <Route path="/subscription">
-            <ProtectedRoute>
-              <SubscriptionPage />
-            </ProtectedRoute>
-          </Route>
+
+          {/* Settings */}
           <Route path="/settings">
             <ProtectedRoute>
               <SettingsPage />
             </ProtectedRoute>
           </Route>
-          <Route path="/leadership-association">
-            <ProtectedRoute>
-              <LeadershipAssociationPage />
-            </ProtectedRoute>
+
+          {/* Legacy redirects - all go to Command Center */}
+          <Route path="/command">
+            <Redirect to="/" />
           </Route>
-          <Route path="/priority-tasks">
-            <ProtectedRoute>
-              <PrioritizedTasksPage />
-            </ProtectedRoute>
+          <Route path="/doctor-dashboard">
+            <Redirect to="/" />
           </Route>
-          <Route path="/insurance-paperwork">
-            <ProtectedRoute>
-              <InsurancePaperworkPage />
-            </ProtectedRoute>
+          <Route path="/inbox">
+            <Redirect to="/" />
           </Route>
-          <Route path="/claude-ai">
-            <ProtectedRoute>
-              <ClaudeAIPage />
-            </ProtectedRoute>
+          <Route path="/messages">
+            <Redirect to="/" />
           </Route>
-          <Route path="/gmail-inbox">
-            <ProtectedRoute>
-              <GmailInboxPage />
-            </ProtectedRoute>
+          <Route path="/patients">
+            <Redirect to="/" />
           </Route>
-          <Route path="/pricing" component={PricingPage} />
-          <Route path="/subscription/success" component={SubscriptionSuccessPage} />
+          <Route path="/documents">
+            <Redirect to="/" />
+          </Route>
+
+          {/* 404 */}
           <Route>
-            <div className="min-h-screen flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center bg-[#0a0908]">
               <div className="text-center">
-                <h1 className="text-2xl font-bold mb-2">404 - Page Not Found</h1>
-                <a href="/" className="text-blue-500 hover:underline">
-                  Go back home
+                <h1 className="text-2xl font-bold mb-2 text-white">404 - Page Not Found</h1>
+                <a href="/" className="text-amber-500 hover:underline">
+                  Go to Command Center
                 </a>
               </div>
             </div>
           </Route>
-        </Switch>
-      </Router>
+          </Switch>
+        </Router>
+      </Suspense>
     </RootErrorBoundary>
   );
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, getQueryFn } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -35,6 +35,7 @@ export default function AiControlPanel() {
   // Fetch the current user's AI settings
   const { data: settings, isLoading } = useQuery({
     queryKey: ["/api/ai/settings"],
+    queryFn: getQueryFn({ on401: "returnNull" }),
   });
 
   // Create a state object to track local changes to settings

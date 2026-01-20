@@ -1,11 +1,11 @@
-import React from 'react';
-import { Clock, X, Send, Edit2, AlertCircle, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { StagedMessage, DEFAULT_TIMER_CONFIG } from '@/types/staging';
-import { cn } from '@/lib/utils';
+import React from "react";
+import { Clock, X, Send, Edit2, AlertCircle, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { StagedMessage, DEFAULT_TIMER_CONFIG } from "@/types/staging";
+import { cn } from "@/lib/utils";
 
 interface StagingQueueProps {
   messages: StagedMessage[];
@@ -28,14 +28,14 @@ function StagedMessageCard({
 }) {
   const progress = (message.countdown / DEFAULT_TIMER_CONFIG.initialCountdown) * 100;
   const isUrgent = message.countdown <= 10;
-  const isSending = message.status === 'sending';
-  const isPaused = message.status === 'paused';
+  const isSending = message.status === "sending";
+  const isPaused = message.status === "paused";
 
   return (
     <div
       className={cn(
         "p-3 rounded-lg border transition-all",
-        isUrgent && message.status === 'pending' && "border-destructive/50 bg-destructive/5",
+        isUrgent && message.status === "pending" && "border-destructive/50 bg-destructive/5",
         isPaused && "border-amber-500/50 bg-amber-500/5",
         isSending && "border-primary/50 bg-primary/5",
         !isUrgent && !isPaused && !isSending && "border-border bg-card"
@@ -44,11 +44,11 @@ function StagedMessageCard({
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-sm text-foreground">
-              To: {message.patientName}
-            </span>
+            <span className="font-medium text-sm text-foreground">To: {message.patientName}</span>
             {message.aiGenerated && (
-              <Badge variant="secondary" className="text-xs">AI</Badge>
+              <Badge variant="secondary" className="text-xs">
+                AI
+              </Badge>
             )}
           </div>
         </div>
@@ -57,26 +57,25 @@ function StagedMessageCard({
             <Loader2 className="h-4 w-4 animate-spin text-primary" />
           ) : (
             <>
-              <span className={cn(
-                "text-lg font-bold tabular-nums",
-                isUrgent ? "text-destructive" : "text-foreground"
-              )}>
+              <span
+                className={cn(
+                  "text-lg font-bold tabular-nums",
+                  isUrgent ? "text-destructive" : "text-foreground"
+                )}
+              >
                 {message.countdown}s
               </span>
-              <Clock className={cn("h-4 w-4", isUrgent ? "text-destructive" : "text-muted-foreground")} />
+              <Clock
+                className={cn("h-4 w-4", isUrgent ? "text-destructive" : "text-muted-foreground")}
+              />
             </>
           )}
         </div>
       </div>
 
-      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-        {message.content}
-      </p>
+      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{message.content}</p>
 
-      <Progress
-        value={progress}
-        className={cn("h-1 mb-3", isUrgent && "[&>div]:bg-destructive")}
-      />
+      <Progress value={progress} className={cn("h-1 mb-3", isUrgent && "[&>div]:bg-destructive")} />
 
       <div className="flex items-center gap-2">
         <Button
@@ -114,14 +113,9 @@ function StagedMessageCard({
   );
 }
 
-export function StagingQueue({
-  messages,
-  onCancel,
-  onSendNow,
-  onEdit,
-}: StagingQueueProps) {
-  const pendingMessages = messages.filter(m =>
-    m.status === 'pending' || m.status === 'paused' || m.status === 'sending'
+export function StagingQueue({ messages, onCancel, onSendNow, onEdit }: StagingQueueProps) {
+  const pendingMessages = messages.filter(
+    (m) => m.status === "pending" || m.status === "paused" || m.status === "sending"
   );
 
   return (
@@ -136,9 +130,7 @@ export function StagingQueue({
             </Badge>
           )}
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">
-          60-second countdown before auto-send
-        </p>
+        <p className="text-xs text-muted-foreground mt-1">60-second countdown before auto-send</p>
       </div>
 
       <ScrollArea className="flex-1 p-3">
@@ -146,9 +138,7 @@ export function StagingQueue({
           <div className="text-center text-muted-foreground text-sm py-8">
             <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
             No messages in queue
-            <p className="text-xs mt-1">
-              AI responses will appear here before sending
-            </p>
+            <p className="text-xs mt-1">AI responses will appear here before sending</p>
           </div>
         ) : (
           <div className="space-y-3">

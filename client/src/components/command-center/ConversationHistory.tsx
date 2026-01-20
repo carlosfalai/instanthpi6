@@ -1,7 +1,7 @@
-import React, { useEffect, useRef } from 'react';
-import { MessageCircle, User, Bot } from 'lucide-react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
+import React, { useEffect, useRef } from "react";
+import { MessageCircle, User, Bot } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 interface ChatMessage {
   id: string;
@@ -31,8 +31,8 @@ export function ConversationHistory({
 
   const formatTime = (dateStr: string) => {
     return new Date(dateStr).toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -43,31 +43,20 @@ export function ConversationHistory({
           <MessageCircle className="h-4 w-4" />
           Conversation
         </h2>
-        {patientName && (
-          <p className="text-xs text-muted-foreground mt-1">
-            with {patientName}
-          </p>
-        )}
+        {patientName && <p className="text-xs text-muted-foreground mt-1">with {patientName}</p>}
       </div>
 
       <ScrollArea className="flex-1 p-3" ref={scrollRef}>
         {isLoading ? (
-          <div className="text-center text-muted-foreground text-sm py-8">
-            Loading messages...
-          </div>
+          <div className="text-center text-muted-foreground text-sm py-8">Loading messages...</div>
         ) : messages.length === 0 ? (
-          <div className="text-center text-muted-foreground text-sm py-8">
-            No messages yet
-          </div>
+          <div className="text-center text-muted-foreground text-sm py-8">No messages yet</div>
         ) : (
           <div className="space-y-3">
             {messages.map((msg) => (
               <div
                 key={msg.id}
-                className={cn(
-                  "flex gap-2",
-                  msg.isFromPatient ? "justify-start" : "justify-end"
-                )}
+                className={cn("flex gap-2", msg.isFromPatient ? "justify-start" : "justify-end")}
               >
                 {msg.isFromPatient && (
                   <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
@@ -83,9 +72,7 @@ export function ConversationHistory({
                   )}
                 >
                   <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                  <p className="text-xs opacity-70 mt-1">
-                    {formatTime(msg.timestamp)}
-                  </p>
+                  <p className="text-xs opacity-70 mt-1">{formatTime(msg.timestamp)}</p>
                 </div>
                 {!msg.isFromPatient && (
                   <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">

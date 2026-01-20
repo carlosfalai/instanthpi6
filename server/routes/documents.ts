@@ -5,8 +5,12 @@ import axios from "axios";
 import { storage } from "../storage";
 import { sendDocumentToPatient } from "../utils/emailService";
 import { createFaxService } from "../utils/faxService";
+import { requireAuth } from "../middleware/auth";
 
 const router = Router();
+
+// All document routes require authentication - can email/fax patient documents
+router.use(requireAuth);
 
 // Initialize fax service (null if no authentic credentials)
 const faxService = createFaxService();

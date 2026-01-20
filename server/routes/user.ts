@@ -1,19 +1,15 @@
-import { Router, Request, Response } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { ZodError, z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { db } from "../db";
 import { users } from "@shared/schema";
 import { eq } from "drizzle-orm";
+import { requireAuth } from "../middleware/auth";
 
 export const router = Router();
 
-// Middleware to check if user is authenticated
-const ensureAuthenticated = (req: Request, res: Response, next: Function) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  return res.status(401).json({ error: "Not authenticated" });
-};
+// Use centralized auth middleware that supports both Passport.js and Supabase JWT
+const ensureAuthenticated = requireAuth;
 
 // Route to get current user
 router.get("/user", ensureAuthenticated, (req, res) => {
@@ -112,10 +108,11 @@ router.patch("/user/scheduler", ensureAuthenticated, async (req, res) => {
     const validatedData = schedulerPreferencesSchema.parse(req.body);
 
     // Update user preferences in database
+    // Note: schedulerPreferences not yet added to schema - storing in navPreferences temporarily
     const [updatedUser] = await db
       .update(users)
       .set({
-        schedulerPreferences: validatedData.schedulerPreferences,
+        navPreferences: { schedulerPreferences: validatedData.schedulerPreferences },
       })
       .where(eq(users.id, userId))
       .returning();

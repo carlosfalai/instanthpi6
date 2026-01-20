@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import DOMPurify from "dompurify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -150,7 +151,7 @@ export function PseudonymLookup() {
                 <ScrollArea className="h-[500px] pr-4">
                   <div
                     className="prose prose-sm dark:prose-invert max-w-none prose-headings:text-blue-400"
-                    dangerouslySetInnerHTML={{ __html: lookupResult.aiProcessedContent }}
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(lookupResult.aiProcessedContent) }}
                   />
                 </ScrollArea>
               </TabsContent>

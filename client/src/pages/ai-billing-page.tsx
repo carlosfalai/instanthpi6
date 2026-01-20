@@ -211,7 +211,9 @@ export default function AiBillingPage() {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-md font-semibold mb-1 text-[#e6e6e6]">Today's Encounters</h3>
+                    <h3 className="text-md font-semibold mb-1 text-[#e6e6e6]">
+                      Today's Encounters
+                    </h3>
                     <div className="text-2xl font-bold text-[#e6e6e6]">
                       {isLoading ? (
                         <div className="h-7 w-12 bg-[#1a1a1a] rounded animate-pulse"></div>
@@ -236,7 +238,9 @@ export default function AiBillingPage() {
                     </div>
                   </div>
                   <div>
-                    <h3 className="text-md font-semibold mb-1 text-[#e6e6e6]">Processed This Month</h3>
+                    <h3 className="text-md font-semibold mb-1 text-[#e6e6e6]">
+                      Processed This Month
+                    </h3>
                     <div className="text-2xl font-bold text-[#e6e6e6]">
                       {isLoading ? (
                         <div className="h-7 w-12 bg-[#1a1a1a] rounded animate-pulse"></div>
@@ -460,7 +464,7 @@ export default function AiBillingPage() {
                     {!(searchTerm || filterStatus !== "all") && (
                       <Button
                         variant="default"
-                      className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
+                        className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
                         onClick={() => {
                           // Sample entry for testing
                           const newEntry = {

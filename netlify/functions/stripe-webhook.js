@@ -1,21 +1,21 @@
 // Stripe Webhook Handler
 // Processes Stripe events for subscription management
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // Webhook secret from Stripe Dashboard
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 exports.handler = async (event, context) => {
   const headers = {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   };
 
-  if (event.httpMethod !== 'POST') {
+  if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
       headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
+      body: JSON.stringify({ error: "Method not allowed" }),
     };
   }
 
@@ -24,15 +24,15 @@ exports.handler = async (event, context) => {
   try {
     // Verify webhook signature if secret is configured
     if (endpointSecret) {
-      const sig = event.headers['stripe-signature'];
+      const sig = event.headers["stripe-signature"];
       stripeEvent = stripe.webhooks.constructEvent(event.body, sig, endpointSecret);
     } else {
       // For development/testing without signature verification
       stripeEvent = JSON.parse(event.body);
-      console.warn('[Stripe Webhook] No endpoint secret configured - signature not verified');
+      console.warn("[Stripe Webhook] No endpoint secret configured - signature not verified");
     }
   } catch (err) {
-    console.error('[Stripe Webhook] Signature verification failed:', err.message);
+    console.error("[Stripe Webhook] Signature verification failed:", err.message);
     return {
       statusCode: 400,
       headers,
@@ -47,7 +47,7 @@ exports.handler = async (event, context) => {
 
   try {
     switch (eventType) {
-      case 'checkout.session.completed': {
+      case "checkout.session.completed": {
         // Payment successful, subscription created
         const session = eventData;
         console.log(`[Stripe] Checkout completed: ${session.id}`);
@@ -61,7 +61,7 @@ exports.handler = async (event, context) => {
         break;
       }
 
-      case 'customer.subscription.created': {
+      case "customer.subscription.created": {
         const subscription = eventData;
         console.log(`[Stripe] Subscription created: ${subscription.id}`);
         console.log(`[Stripe] Status: ${subscription.status}`);
@@ -71,7 +71,7 @@ exports.handler = async (event, context) => {
         break;
       }
 
-      case 'customer.subscription.updated': {
+      case "customer.subscription.updated": {
         const subscription = eventData;
         console.log(`[Stripe] Subscription updated: ${subscription.id}`);
         console.log(`[Stripe] Status: ${subscription.status}`);
@@ -82,7 +82,7 @@ exports.handler = async (event, context) => {
         break;
       }
 
-      case 'customer.subscription.deleted': {
+      case "customer.subscription.deleted": {
         const subscription = eventData;
         console.log(`[Stripe] Subscription deleted: ${subscription.id}`);
         console.log(`[Stripe] Customer: ${subscription.customer}`);
@@ -91,16 +91,18 @@ exports.handler = async (event, context) => {
         break;
       }
 
-      case 'invoice.payment_succeeded': {
+      case "invoice.payment_succeeded": {
         const invoice = eventData;
         console.log(`[Stripe] Invoice paid: ${invoice.id}`);
-        console.log(`[Stripe] Amount: ${invoice.amount_paid / 100} ${invoice.currency.toUpperCase()}`);
+        console.log(
+          `[Stripe] Amount: ${invoice.amount_paid / 100} ${invoice.currency.toUpperCase()}`
+        );
 
         // TODO: Send receipt email, update billing history
         break;
       }
 
-      case 'invoice.payment_failed': {
+      case "invoice.payment_failed": {
         const invoice = eventData;
         console.log(`[Stripe] Invoice payment failed: ${invoice.id}`);
         console.log(`[Stripe] Customer: ${invoice.customer}`);
@@ -109,7 +111,7 @@ exports.handler = async (event, context) => {
         break;
       }
 
-      case 'customer.created': {
+      case "customer.created": {
         const customer = eventData;
         console.log(`[Stripe] Customer created: ${customer.id}`);
         console.log(`[Stripe] Email: ${customer.email}`);
@@ -128,12 +130,12 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({ received: true }),
     };
   } catch (error) {
-    console.error('[Stripe Webhook] Error processing event:', error);
+    console.error("[Stripe Webhook] Error processing event:", error);
 
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: 'Webhook handler failed' }),
+      body: JSON.stringify({ error: "Webhook handler failed" }),
     };
   }
 };

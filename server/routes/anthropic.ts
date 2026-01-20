@@ -149,4 +149,3 @@ router.post("/generate-clinical-draft", async (req, res) => {
     res.status(500).json({ error: error.message || "Unknown error" });
   }
 });
-

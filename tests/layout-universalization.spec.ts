@@ -1,5 +1,5 @@
-import { test, expect, Page } from '@playwright/test';
-import * as fs from 'fs';
+import { test, expect, Page } from "@playwright/test";
+import * as fs from "fs";
 
 /**
  * LAYOUT UNIVERSALIZATION TEST SUITE
@@ -14,34 +14,34 @@ import * as fs from 'fs';
  * 5. Generates a comprehensive report with recommendations
  */
 
-const SCREENSHOT_DIR = 'screenshots/layout-audit';
-const REPORT_DIR = 'test-results/layout-reports';
+const SCREENSHOT_DIR = "screenshots/layout-audit";
+const REPORT_DIR = "test-results/layout-reports";
 
 // Define the intended design system (Linear/GitHub style from all_our_conversations.md)
 const DESIGN_SYSTEM = {
   colors: {
-    primaryBg: '#0d0d0d',
-    secondaryBg: '#1a1a1a',
-    hoverBg: '#222222',
-    borders: ['#2a2a2a', '#333333'],
-    textPrimary: '#e6e6e6',
-    textSecondary: '#999999',
-    textTertiary: '#666666',
+    primaryBg: "#0d0d0d",
+    secondaryBg: "#1a1a1a",
+    hoverBg: "#222222",
+    borders: ["#2a2a2a", "#333333"],
+    textPrimary: "#e6e6e6",
+    textSecondary: "#999999",
+    textTertiary: "#666666",
   },
   typography: {
-    headingFont: 'font-medium',
-    bodySize: 'text-sm',
-    labelSize: 'text-xs',
+    headingFont: "font-medium",
+    bodySize: "text-sm",
+    labelSize: "text-xs",
   },
   components: {
-    buttons: 'bg-[#1a1a1a] border-[#333] hover:bg-[#222]',
-    cards: 'bg-[#1a1a1a] border-[#2a2a2a]',
-    inputs: 'bg-[#1a1a1a] border-[#333] text-[#e6e6e6]',
+    buttons: "bg-[#1a1a1a] border-[#333] hover:bg-[#222]",
+    cards: "bg-[#1a1a1a] border-[#2a2a2a]",
+    inputs: "bg-[#1a1a1a] border-[#333] text-[#e6e6e6]",
   },
 };
 
 const PATIENT_THEME = {
-  backgrounds: ['#ffffff', '#f8fafc', '#f1f5f9', '#e6e0f2', '#eef2ff', '#f4f4ff'],
+  backgrounds: ["#ffffff", "#f8fafc", "#f1f5f9", "#e6e0f2", "#eef2ff", "#f4f4ff"],
 };
 
 const DOCTOR_THEME_BACKGROUNDS = [
@@ -55,21 +55,21 @@ type RGB = { r: number; g: number; b: number };
 
 // Pages to audit (aligned with routes registered in client/src/App.tsx)
 const PAGES_TO_AUDIT = [
-  { path: '/', name: 'landing', category: 'public' as const },
-  { path: '/login', name: 'multi-login', category: 'public' as const },
-  { path: '/patient-intake', name: 'patient-intake', category: 'patient' as const },
-  { path: '/patient-login', name: 'patient-login', category: 'patient' as const },
-  { path: '/patient-dashboard', name: 'patient-dashboard', category: 'patient' as const },
-  { path: '/doctor-login', name: 'doctor-login', category: 'doctor' as const },
-  { path: '/doctor-dashboard', name: 'doctor-dashboard', category: 'doctor' as const },
-  { path: '/doctor-profile', name: 'doctor-profile', category: 'doctor' as const },
-  { path: '/patients', name: 'patients-page', category: 'doctor' as const },
-  { path: '/documents', name: 'documents-page', category: 'doctor' as const },
-  { path: '/messages', name: 'messages-page', category: 'doctor' as const },
-  { path: '/ai-billing', name: 'ai-billing', category: 'doctor' as const },
-  { path: '/knowledge-base', name: 'knowledge-base', category: 'doctor' as const },
-  { path: '/association', name: 'association', category: 'doctor' as const },
-  { path: '/tier-35', name: 'tier-35', category: 'doctor' as const },
+  { path: "/", name: "landing", category: "public" as const },
+  { path: "/login", name: "multi-login", category: "public" as const },
+  { path: "/patient-intake", name: "patient-intake", category: "patient" as const },
+  { path: "/patient-login", name: "patient-login", category: "patient" as const },
+  { path: "/patient-dashboard", name: "patient-dashboard", category: "patient" as const },
+  { path: "/doctor-login", name: "doctor-login", category: "doctor" as const },
+  { path: "/doctor-dashboard", name: "doctor-dashboard", category: "doctor" as const },
+  { path: "/doctor-profile", name: "doctor-profile", category: "doctor" as const },
+  { path: "/patients", name: "patients-page", category: "doctor" as const },
+  { path: "/documents", name: "documents-page", category: "doctor" as const },
+  { path: "/messages", name: "messages-page", category: "doctor" as const },
+  { path: "/ai-billing", name: "ai-billing", category: "doctor" as const },
+  { path: "/knowledge-base", name: "knowledge-base", category: "doctor" as const },
+  { path: "/association", name: "association", category: "doctor" as const },
+  { path: "/tier-35", name: "tier-35", category: "doctor" as const },
 ];
 
 interface LayoutAudit {
@@ -84,7 +84,7 @@ interface LayoutAudit {
     hasHeader: boolean;
     hasSidebar: boolean;
     hasFooter: boolean;
-    navigationPattern: 'top' | 'side' | 'mixed' | 'none';
+    navigationPattern: "top" | "side" | "mixed" | "none";
   };
   typography: {
     headings: { tag: string; size: string; weight: string }[];
@@ -95,7 +95,7 @@ interface LayoutAudit {
     cardGaps: string[];
   };
   palette: {
-    expectedTheme: 'dark' | 'patient';
+    expectedTheme: "dark" | "patient";
     mismatchRatio: number;
     mismatchedSamples: string[];
   };
@@ -103,7 +103,7 @@ interface LayoutAudit {
 }
 
 function hexToRgb(hex: string): RGB | null {
-  const normalized = hex.replace('#', '').trim();
+  const normalized = hex.replace("#", "").trim();
   if (normalized.length !== 6) return null;
   const r = parseInt(normalized.slice(0, 2), 16);
   const g = parseInt(normalized.slice(2, 4), 16);
@@ -116,7 +116,7 @@ function hexToRgb(hex: string): RGB | null {
 
 function parseColorString(color: string): RGB | null {
   if (!color) return null;
-  if (color.startsWith('#')) {
+  if (color.startsWith("#")) {
     return hexToRgb(color);
   }
 
@@ -130,23 +130,20 @@ function parseColorString(color: string): RGB | null {
 }
 
 function colorDistance(a: RGB, b: RGB): number {
-  return Math.sqrt(
-    Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2),
-  );
+  return Math.sqrt(Math.pow(a.r - b.r, 2) + Math.pow(a.g - b.g, 2) + Math.pow(a.b - b.b, 2));
 }
 
 function analyzePalette(backgrounds: string[], category: string) {
-  const expectedTheme = category === 'patient' ? 'patient' : 'dark';
-  const paletteHex = expectedTheme === 'dark' ? DOCTOR_THEME_BACKGROUNDS : PATIENT_THEME.backgrounds;
+  const expectedTheme = category === "patient" ? "patient" : "dark";
+  const paletteHex =
+    expectedTheme === "dark" ? DOCTOR_THEME_BACKGROUNDS : PATIENT_THEME.backgrounds;
   const palette = paletteHex
     .map((hex) => parseColorString(hex))
     .filter((value): value is RGB => Boolean(value));
 
   const samples = backgrounds
     .map((color) => ({ raw: color, rgb: parseColorString(color) }))
-    .filter(
-      (entry): entry is { raw: string; rgb: RGB } => Boolean(entry.rgb),
-    );
+    .filter((entry): entry is { raw: string; rgb: RGB } => Boolean(entry.rgb));
 
   if (!samples.length || !palette.length) {
     return {
@@ -157,22 +154,22 @@ function analyzePalette(backgrounds: string[], category: string) {
     };
   }
 
-  const tolerance = expectedTheme === 'dark' ? 28 : 40;
+  const tolerance = expectedTheme === "dark" ? 28 : 40;
   const mismatched = samples.filter(
-    (sample) => !palette.some((color) => colorDistance(sample.rgb, color) <= tolerance),
+    (sample) => !palette.some((color) => colorDistance(sample.rgb, color) <= tolerance)
   );
   const mismatchRatio = mismatched.length / samples.length;
   const mismatchedSamples = Array.from(new Set(mismatched.map((item) => item.raw)));
 
-  const threshold = expectedTheme === 'dark' ? 0.4 : 0.6;
+  const threshold = expectedTheme === "dark" ? 0.4 : 0.6;
   const warnings: string[] = [];
 
   if (mismatchRatio > threshold) {
-    const exampleSwatches = mismatchedSamples.slice(0, 4).join(', ');
+    const exampleSwatches = mismatchedSamples.slice(0, 4).join(", ");
     warnings.push(
       `⚠️ Palette drift: ${Math.round(
-        mismatchRatio * 100,
-      )}% of sampled backgrounds fall outside the ${expectedTheme === 'dark' ? 'Linear-inspired dark' : 'patient light'} theme (examples: ${exampleSwatches})`,
+        mismatchRatio * 100
+      )}% of sampled backgrounds fall outside the ${expectedTheme === "dark" ? "Linear-inspired dark" : "patient light"} theme (examples: ${exampleSwatches})`
     );
   }
 
@@ -185,7 +182,9 @@ function analyzePalette(backgrounds: string[], category: string) {
 }
 
 // Helper: Extract colors from a page
-async function extractColors(page: Page): Promise<{ backgrounds: string[]; texts: string[]; borders: string[] }> {
+async function extractColors(
+  page: Page
+): Promise<{ backgrounds: string[]; texts: string[]; borders: string[] }> {
   return await page.evaluate(() => {
     const colors = {
       backgrounds: new Set<string>(),
@@ -193,13 +192,13 @@ async function extractColors(page: Page): Promise<{ backgrounds: string[]; texts
       borders: new Set<string>(),
     };
 
-    const elements = document.querySelectorAll('*');
+    const elements = document.querySelectorAll("*");
     elements.forEach((el) => {
       const computed = window.getComputedStyle(el);
-      
+
       // Extract background colors
       const bg = computed.backgroundColor;
-      if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+      if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
         colors.backgrounds.add(bg);
       }
 
@@ -211,7 +210,7 @@ async function extractColors(page: Page): Promise<{ backgrounds: string[]; texts
 
       // Extract border colors
       const borderColor = computed.borderColor;
-      if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)') {
+      if (borderColor && borderColor !== "rgba(0, 0, 0, 0)") {
         colors.borders.add(borderColor);
       }
     });
@@ -227,20 +226,22 @@ async function extractColors(page: Page): Promise<{ backgrounds: string[]; texts
 // Helper: Detect layout pattern
 async function detectLayoutPattern(page: Page) {
   return await page.evaluate(() => {
-    const hasHeader = !!document.querySelector('header');
-    const hasSidebar = !!document.querySelector('aside, [role="complementary"], .sidebar, [class*="sidebar"]');
-    const hasFooter = !!document.querySelector('footer');
-    
-    let navigationPattern: 'top' | 'side' | 'mixed' | 'none' = 'none';
-    const nav = document.querySelector('nav');
+    const hasHeader = !!document.querySelector("header");
+    const hasSidebar = !!document.querySelector(
+      'aside, [role="complementary"], .sidebar, [class*="sidebar"]'
+    );
+    const hasFooter = !!document.querySelector("footer");
+
+    let navigationPattern: "top" | "side" | "mixed" | "none" = "none";
+    const nav = document.querySelector("nav");
     const sideNav = document.querySelector('aside nav, [class*="sidebar"] nav');
-    
+
     if (nav && sideNav) {
-      navigationPattern = 'mixed';
+      navigationPattern = "mixed";
     } else if (sideNav) {
-      navigationPattern = 'side';
+      navigationPattern = "side";
     } else if (nav) {
-      navigationPattern = 'top';
+      navigationPattern = "top";
     }
 
     return {
@@ -256,8 +257,8 @@ async function detectLayoutPattern(page: Page) {
 async function extractTypography(page: Page) {
   return await page.evaluate(() => {
     const headings: { tag: string; size: string; weight: string }[] = [];
-    const headingElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    
+    const headingElements = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
     headingElements.forEach((el) => {
       const computed = window.getComputedStyle(el);
       headings.push({
@@ -267,13 +268,15 @@ async function extractTypography(page: Page) {
       });
     });
 
-    const bodyElements = document.querySelectorAll('p, span, div');
+    const bodyElements = document.querySelectorAll("p, span, div");
     const bodyText = new Set<string>();
-    
-    Array.from(bodyElements).slice(0, 50).forEach((el) => {
-      const computed = window.getComputedStyle(el);
-      bodyText.add(computed.fontSize);
-    });
+
+    Array.from(bodyElements)
+      .slice(0, 50)
+      .forEach((el) => {
+        const computed = window.getComputedStyle(el);
+        bodyText.add(computed.fontSize);
+      });
 
     return {
       headings: headings.slice(0, 10),
@@ -284,7 +287,7 @@ async function extractTypography(page: Page) {
 
 // Helper: Take screenshot with annotations
 async function takeAnnotatedScreenshot(page: Page, name: string) {
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState("networkidle");
   await page.screenshot({
     path: `${SCREENSHOT_DIR}/${name}.png`,
     fullPage: true,
@@ -292,9 +295,9 @@ async function takeAnnotatedScreenshot(page: Page, name: string) {
 }
 
 // Main audit function
-async function auditPage(page: Page, pageInfo: typeof PAGES_TO_AUDIT[0]): Promise<LayoutAudit> {
+async function auditPage(page: Page, pageInfo: (typeof PAGES_TO_AUDIT)[0]): Promise<LayoutAudit> {
   console.log(`\n📊 Auditing: ${pageInfo.name} (${pageInfo.category})`);
-  
+
   try {
     await page.goto(pageInfo.path);
     await takeAnnotatedScreenshot(page, pageInfo.name);
@@ -304,10 +307,10 @@ async function auditPage(page: Page, pageInfo: typeof PAGES_TO_AUDIT[0]): Promis
       pageName: pageInfo.name,
       category: pageInfo.category,
       colors: { backgrounds: [], texts: [], borders: [] },
-      layout: { hasHeader: false, hasSidebar: false, hasFooter: false, navigationPattern: 'none' },
+      layout: { hasHeader: false, hasSidebar: false, hasFooter: false, navigationPattern: "none" },
       typography: { headings: [], bodyText: [] },
       spacing: { containerPadding: [], cardGaps: [] },
-      inconsistencies: ['Page could not be loaded'],
+      inconsistencies: ["Page could not be loaded"],
     };
   }
 
@@ -320,15 +323,17 @@ async function auditPage(page: Page, pageInfo: typeof PAGES_TO_AUDIT[0]): Promis
   const inconsistencies: string[] = [];
 
   // Check if using wrong color scheme
-  if (pageInfo.category === 'doctor' || pageInfo.category === 'public') {
-    const hasLightPurple = colors.backgrounds.some(c => c.includes('230') && c.includes('224') && c.includes('242')); // #E6E0F2
+  if (pageInfo.category === "doctor" || pageInfo.category === "public") {
+    const hasLightPurple = colors.backgrounds.some(
+      (c) => c.includes("230") && c.includes("224") && c.includes("242")
+    ); // #E6E0F2
     if (hasLightPurple) {
-      inconsistencies.push('❌ Using patient light-purple theme instead of dark theme');
+      inconsistencies.push("❌ Using patient light-purple theme instead of dark theme");
     }
   }
 
-  if (pageInfo.category === 'patient') {
-    const hasDarkTheme = colors.backgrounds.some(c => {
+  if (pageInfo.category === "patient") {
+    const hasDarkTheme = colors.backgrounds.some((c) => {
       const rgb = c.match(/\d+/g);
       if (rgb) {
         const r = parseInt(rgb[0]);
@@ -339,18 +344,20 @@ async function auditPage(page: Page, pageInfo: typeof PAGES_TO_AUDIT[0]): Promis
       return false;
     });
     if (hasDarkTheme) {
-      inconsistencies.push('⚠️  Patient page using dark theme - should use light/purple theme');
+      inconsistencies.push("⚠️  Patient page using dark theme - should use light/purple theme");
     }
   }
 
   // Check for mixed navigation patterns
-  if (layout.navigationPattern === 'mixed') {
-    inconsistencies.push('⚠️  Mixed navigation pattern detected (both top and side nav)');
+  if (layout.navigationPattern === "mixed") {
+    inconsistencies.push("⚠️  Mixed navigation pattern detected (both top and side nav)");
   }
 
   // Check for too many colors
   if (colors.backgrounds.length > 15) {
-    inconsistencies.push(`⚠️  Too many background colors (${colors.backgrounds.length}) - should use consistent palette`);
+    inconsistencies.push(
+      `⚠️  Too many background colors (${colors.backgrounds.length}) - should use consistent palette`
+    );
   }
 
   inconsistencies.push(...paletteAnalysis.warnings);
@@ -374,10 +381,10 @@ async function auditPage(page: Page, pageInfo: typeof PAGES_TO_AUDIT[0]): Promis
 // Generate HTML report
 function generateHTMLReport(audits: LayoutAudit[]) {
   const timestamp = new Date().toISOString();
-  
-  const doctorPages = audits.filter(a => a.category === 'doctor');
-  const patientPages = audits.filter(a => a.category === 'patient');
-  const publicPages = audits.filter(a => a.category === 'public');
+
+  const doctorPages = audits.filter((a) => a.category === "doctor");
+  const patientPages = audits.filter((a) => a.category === "patient");
+  const publicPages = audits.filter((a) => a.category === "public");
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -461,13 +468,13 @@ function generateHTMLReport(audits: LayoutAudit[]) {
     </div>
 
     <h2>Doctor Pages Audit</h2>
-    ${doctorPages.map(audit => renderAudit(audit)).join('')}
+    ${doctorPages.map((audit) => renderAudit(audit)).join("")}
 
     <h2>Patient Pages Audit</h2>
-    ${patientPages.map(audit => renderAudit(audit)).join('')}
+    ${patientPages.map((audit) => renderAudit(audit)).join("")}
 
     <h2>Public Pages Audit</h2>
-    ${publicPages.map(audit => renderAudit(audit)).join('')}
+    ${publicPages.map((audit) => renderAudit(audit)).join("")}
   </div>
 </body>
 </html>`;
@@ -480,19 +487,23 @@ function generateHTMLReport(audits: LayoutAudit[]) {
           <span class="category-badge category-${audit.category}">${audit.category}</span>
         </div>
 
-        ${audit.inconsistencies.length > 0 ? `
+        ${
+          audit.inconsistencies.length > 0
+            ? `
           <div class="section">
             <div class="section-title">⚠️  Inconsistencies Found</div>
-            ${audit.inconsistencies.map(inc => `<div class="inconsistency">${inc}</div>`).join('')}
+            ${audit.inconsistencies.map((inc) => `<div class="inconsistency">${inc}</div>`).join("")}
           </div>
-        ` : '<div class="section"><div style="color: #6ee7b7;">✅ No major inconsistencies detected</div></div>'}
+        `
+            : '<div class="section"><div style="color: #6ee7b7;">✅ No major inconsistencies detected</div></div>'
+        }
 
         <div class="section">
           <div class="section-title">Layout Pattern</div>
           <div class="layout-info">
-            <p><strong>Header:</strong> ${audit.layout.hasHeader ? '✅ Yes' : '❌ No'}</p>
-            <p><strong>Sidebar:</strong> ${audit.layout.hasSidebar ? '✅ Yes' : '❌ No'}</p>
-            <p><strong>Footer:</strong> ${audit.layout.hasFooter ? '✅ Yes' : '❌ No'}</p>
+            <p><strong>Header:</strong> ${audit.layout.hasHeader ? "✅ Yes" : "❌ No"}</p>
+            <p><strong>Sidebar:</strong> ${audit.layout.hasSidebar ? "✅ Yes" : "❌ No"}</p>
+            <p><strong>Footer:</strong> ${audit.layout.hasFooter ? "✅ Yes" : "❌ No"}</p>
             <p><strong>Navigation:</strong> ${audit.layout.navigationPattern}</p>
           </div>
         </div>
@@ -500,20 +511,25 @@ function generateHTMLReport(audits: LayoutAudit[]) {
         <div class="section">
           <div class="section-title">Color Palette</div>
           <div class="color-grid">
-            ${audit.colors.backgrounds.slice(0, 12).map(color => `
+            ${audit.colors.backgrounds
+              .slice(0, 12)
+              .map(
+                (color) => `
               <div class="color-swatch" style="background: ${color};">
                 <div class="color-label">${color}</div>
               </div>
-            `).join('')}
+            `
+              )
+              .join("")}
           </div>
         </div>
 
         <div class="section">
           <div class="section-title">Palette Check</div>
           <div class="layout-info">
-            <p><strong>Expected Theme:</strong> ${audit.palette.expectedTheme === 'dark' ? 'Dark (Linear-inspired)' : 'Patient Light'}</p>
+            <p><strong>Expected Theme:</strong> ${audit.palette.expectedTheme === "dark" ? "Dark (Linear-inspired)" : "Patient Light"}</p>
             <p><strong>Mismatch Ratio:</strong> ${(audit.palette.mismatchRatio * 100).toFixed(0)}%</p>
-            ${audit.palette.mismatchedSamples.length ? `<p><strong>Outliers:</strong> ${audit.palette.mismatchedSamples.slice(0, 4).join(', ')}</p>` : '<p><strong>Outliers:</strong> None detected</p>'}
+            ${audit.palette.mismatchedSamples.length ? `<p><strong>Outliers:</strong> ${audit.palette.mismatchedSamples.slice(0, 4).join(", ")}</p>` : "<p><strong>Outliers:</strong> None detected</p>"}
           </div>
         </div>
 
@@ -530,7 +546,7 @@ function generateHTMLReport(audits: LayoutAudit[]) {
 
 // Create directories
 test.beforeAll(async () => {
-  [SCREENSHOT_DIR, REPORT_DIR].forEach(dir => {
+  [SCREENSHOT_DIR, REPORT_DIR].forEach((dir) => {
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
@@ -538,39 +554,41 @@ test.beforeAll(async () => {
 });
 
 // Main test suite
-test.describe('Layout Universalization Audit', () => {
+test.describe("Layout Universalization Audit", () => {
   let allAudits: LayoutAudit[] = [];
 
-  test('1. Audit All Pages', async ({ page }) => {
+  test("1. Audit All Pages", async ({ page }) => {
     for (const pageInfo of PAGES_TO_AUDIT) {
       const audit = await auditPage(page, pageInfo);
       allAudits.push(audit);
-      
-      console.log(`   Colors: ${audit.colors.backgrounds.length} backgrounds, ${audit.colors.texts.length} text colors`);
+
+      console.log(
+        `   Colors: ${audit.colors.backgrounds.length} backgrounds, ${audit.colors.texts.length} text colors`
+      );
       console.log(`   Layout: ${audit.layout.navigationPattern} navigation`);
       if (audit.inconsistencies.length > 0) {
         console.log(`   Issues: ${audit.inconsistencies.length} inconsistencies`);
-        audit.inconsistencies.forEach(inc => console.log(`     ${inc}`));
+        audit.inconsistencies.forEach((inc) => console.log(`     ${inc}`));
       }
     }
   });
 
-  test('2. Generate Comprehensive Report', async () => {
+  test("2. Generate Comprehensive Report", async () => {
     const html = generateHTMLReport(allAudits);
     const reportPath = `${REPORT_DIR}/layout-audit-${Date.now()}.html`;
     fs.writeFileSync(reportPath, html);
     console.log(`\n✅ Report generated: ${reportPath}`);
-    
+
     // Also save JSON for programmatic access
     const jsonPath = `${REPORT_DIR}/layout-audit-${Date.now()}.json`;
     fs.writeFileSync(jsonPath, JSON.stringify(allAudits, null, 2));
     console.log(`✅ JSON data saved: ${jsonPath}`);
   });
 
-  test('3. Verify Design System Compliance', async () => {
-    const doctorPages = allAudits.filter(a => a.category === 'doctor');
-    
-    doctorPages.forEach(audit => {
+  test("3. Verify Design System Compliance", async () => {
+    const doctorPages = allAudits.filter((a) => a.category === "doctor");
+
+    doctorPages.forEach((audit) => {
       const totalIssues = audit.inconsistencies.length;
       expect(totalIssues).toBeLessThan(5); // Should have minimal inconsistencies
     });

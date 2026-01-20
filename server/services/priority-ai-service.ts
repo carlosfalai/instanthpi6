@@ -15,6 +15,23 @@ import {
 } from "@shared/schema";
 import { v4 as uuidv4 } from "uuid";
 
+// Type definitions for priority model JSONB fields
+interface TaskTypeWeights {
+  [key: string]: number;
+}
+
+interface UrgencyWeights {
+  [key: string]: number;
+}
+
+interface TimePatternWeights {
+  [taskType: string]: {
+    morning: number;
+    afternoon: number;
+    evening: number;
+  };
+}
+
 // Priority AI Service - Handles physician behavior tracking and task prioritization
 export class PriorityAIService {
   /**
@@ -81,7 +98,7 @@ export class PriorityAIService {
       taskTypeWeights[interaction.taskType] = (taskTypeWeights[interaction.taskType] || 0) + 1;
 
       // For time patterns (simplified)
-      const hour = new Date(interaction.timestamp).getHours();
+      const hour = interaction.timestamp ? new Date(interaction.timestamp).getHours() : 12;
       let timeOfDay: "morning" | "afternoon" | "evening";
 
       if (hour < 12) timeOfDay = "morning";
@@ -159,19 +176,24 @@ export class PriorityAIService {
     // Get all tasks that need to be prioritized
     const tasks = await this.getAllTasks(userId);
 
+    // Cast JSONB fields to proper types
+    const taskTypeWeights = (model.taskTypeWeights || {}) as TaskTypeWeights;
+    const urgencyWeights = (model.urgencyWeights || {}) as UrgencyWeights;
+    const timePatternWeights = (model.timePatternWeights || {}) as TimePatternWeights;
+
     // Score each task based on the model
     const scoredTasks = tasks.map((task) => {
       const baseScore = 50; // Start with a baseline score out of 100
       let finalScore = baseScore;
 
       // Apply task type weight
-      if (model.taskTypeWeights[task.taskType]) {
-        finalScore += model.taskTypeWeights[task.taskType] * 20;
+      if (taskTypeWeights[task.taskType]) {
+        finalScore += taskTypeWeights[task.taskType] * 20;
       }
 
       // Apply urgency weight
-      if (task.urgency && model.urgencyWeights[task.urgency]) {
-        finalScore += model.urgencyWeights[task.urgency] * 15;
+      if (task.urgency && urgencyWeights[task.urgency]) {
+        finalScore += urgencyWeights[task.urgency] * 15;
       }
 
       // Apply time pattern weight
@@ -182,8 +204,8 @@ export class PriorityAIService {
       else if (hour < 18) timeOfDay = "afternoon";
       else timeOfDay = "evening";
 
-      if (model.timePatternWeights[task.taskType]?.[timeOfDay]) {
-        finalScore += model.timePatternWeights[task.taskType][timeOfDay] * 10;
+      if (timePatternWeights[task.taskType]?.[timeOfDay]) {
+        finalScore += timePatternWeights[task.taskType][timeOfDay] * 10;
       }
 
       // Apply any additional factors based on context
@@ -215,8 +237,8 @@ export class PriorityAIService {
             timeOfDay: new Date().getHours(),
           },
           modelFactors: {
-            taskTypeWeight: model.taskTypeWeights[task.taskType] || 0,
-            timePatternInfluence: model.timePatternWeights[task.taskType] || {},
+            taskTypeWeight: taskTypeWeights[task.taskType] || 0,
+            timePatternInfluence: timePatternWeights[task.taskType] || {},
           },
         },
         suggestedAction: this.getSuggestedAction(task),

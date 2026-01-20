@@ -10,7 +10,7 @@ const router = Router();
 router.get("/:userId", async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
-    
+
     if (isNaN(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
@@ -49,7 +49,7 @@ router.get("/:userId", async (req, res) => {
     }
 
     const userSettings = settings[0];
-    
+
     res.json({
       ...userSettings,
       openaiApiKey: null, // Don't return the actual key for security
@@ -68,7 +68,7 @@ router.get("/:userId", async (req, res) => {
 router.put("/:userId", async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
-    
+
     if (isNaN(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
@@ -93,7 +93,7 @@ router.put("/:userId", async (req, res) => {
     } = req.body;
 
     // Validate provider
-    if (preferredAiProvider && !['openai', 'claude'].includes(preferredAiProvider)) {
+    if (preferredAiProvider && !["openai", "claude"].includes(preferredAiProvider)) {
       return res.status(400).json({ error: "Invalid AI provider. Must be 'openai' or 'claude'" });
     }
 
@@ -130,14 +130,11 @@ router.put("/:userId", async (req, res) => {
       await db.insert(aiSettings).values(updateData);
     } else {
       // Update existing settings
-      await db
-        .update(aiSettings)
-        .set(updateData)
-        .where(eq(aiSettings.userId, userId));
+      await db.update(aiSettings).set(updateData).where(eq(aiSettings.userId, userId));
     }
 
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       message: "AI settings updated successfully",
       // Don't return the actual API keys
       updatedSettings: {
@@ -146,7 +143,7 @@ router.put("/:userId", async (req, res) => {
         claudeApiKey: null,
         hasOpenaiKey: !!openaiApiKey,
         hasClaudeKey: !!claudeApiKey,
-      }
+      },
     });
   } catch (error: any) {
     console.error("Error updating AI settings:", error);
@@ -158,7 +155,7 @@ router.put("/:userId", async (req, res) => {
 router.post("/:userId/test", async (req, res) => {
   try {
     const userId = parseInt(req.params.userId);
-    
+
     if (isNaN(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
@@ -167,28 +164,35 @@ router.post("/:userId/test", async (req, res) => {
     const aiClient = await createUserAIClient(userId);
 
     if (!aiClient) {
-      return res.status(400).json({ 
-        error: "No AI configuration found. Please configure your API keys first." 
+      return res.status(400).json({
+        error: "No AI configuration found. Please configure your API keys first.",
       });
     }
 
     // Test the AI client
-    const testResponse = await aiClient.generateCompletion([
-      { role: "user", content: "Hello, please respond with 'AI connection successful' to confirm everything is working." }
-    ], "You are a helpful medical AI assistant. Respond briefly to confirm the connection.");
+    const testResponse = await aiClient.generateCompletion(
+      [
+        {
+          role: "user",
+          content:
+            "Hello, please respond with 'AI connection successful' to confirm everything is working.",
+        },
+      ],
+      "You are a helpful medical AI assistant. Respond briefly to confirm the connection."
+    );
 
     res.json({
       success: true,
       provider: aiClient.provider,
       model: aiClient.model,
       testResponse: testResponse.substring(0, 200), // Limit response length
-      message: "AI configuration test successful"
+      message: "AI configuration test successful",
     });
   } catch (error: any) {
     console.error("Error testing AI configuration:", error);
-    res.status(500).json({ 
-      error: "AI configuration test failed", 
-      details: error.message 
+    res.status(500).json({
+      error: "AI configuration test failed",
+      details: error.message,
     });
   }
 });

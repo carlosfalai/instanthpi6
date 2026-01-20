@@ -32,16 +32,16 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
   useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { getTemplatesByPopularity, FormTemplate } from '../data/form-templates';
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { getTemplatesByPopularity, FormTemplate } from "../data/form-templates";
 
 interface Question {
   id: string;
@@ -60,14 +60,9 @@ interface SortableQuestionProps {
 }
 
 function SortableQuestionCard({ question, updateQuestion, removeQuestion }: SortableQuestionProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: question.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: question.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -80,7 +75,7 @@ function SortableQuestionCard({ question, updateQuestion, removeQuestion }: Sort
     <Card
       ref={setNodeRef}
       style={style}
-      className={`glass-dark border-white/10 hover:border-primary/30 transition-all group overflow-hidden rounded-3xl ${isDragging ? 'shadow-2xl ring-2 ring-primary' : ''}`}
+      className={`glass-dark border-white/10 hover:border-primary/30 transition-all group overflow-hidden rounded-3xl ${isDragging ? "shadow-2xl ring-2 ring-primary" : ""}`}
     >
       <div className="absolute top-0 left-0 w-1 h-full bg-primary/20 group-hover:bg-primary transition-colors" />
       <CardContent className="p-8">
@@ -131,7 +126,9 @@ export default function FormBuilder() {
     { id: "1", type: "text", label: "Nom complet du client", placeholder: "Saisissez le nom..." },
   ]);
   const [formTitle, setFormTitle] = useState("Nouveau Formulaire de Consultation");
-  const [formDescription, setFormDescription] = useState("Collecte structurée pour consultation InstantHPI.");
+  const [formDescription, setFormDescription] = useState(
+    "Collecte structurée pour consultation InstantHPI."
+  );
   const [preferredTemplates, setPreferredTemplates] = useState("");
   const [formId, setFormId] = useState<string | null>(null);
   const [shareSlug, setShareSlug] = useState<string | null>(null);
@@ -166,10 +163,12 @@ export default function FormBuilder() {
   function loadTemplate(template: FormTemplate) {
     setFormTitle(template.name);
     setFormDescription(template.description);
-    setQuestions(template.questions.map((q, i) => ({
-      ...q,
-      id: Math.random().toString(36).substring(2, 9), // Generate new IDs
-    })));
+    setQuestions(
+      template.questions.map((q, i) => ({
+        ...q,
+        id: Math.random().toString(36).substring(2, 9), // Generate new IDs
+      }))
+    );
     setShowTemplates(false);
     toast({
       title: "Modèle chargé",
@@ -188,7 +187,9 @@ export default function FormBuilder() {
   };
 
   const updateQuestion = (id: string, updates: Partial<Question>) => {
-    setQuestions((prev) => prev.map((question) => (question.id === id ? { ...question, ...updates } : question)));
+    setQuestions((prev) =>
+      prev.map((question) => (question.id === id ? { ...question, ...updates } : question))
+    );
   };
 
   const removeQuestion = (id: string) => {
@@ -243,7 +244,10 @@ export default function FormBuilder() {
   const publicUrl = shareSlug && origin ? `${origin}/f/${shareSlug}` : null;
 
   return (
-    <ModernLayout title="Elite Form Builder" description="Créez des expériences de collecte d'informations d'exception">
+    <ModernLayout
+      title="Elite Form Builder"
+      description="Créez des expériences de collecte d'informations d'exception"
+    >
       <div className="max-w-6xl mx-auto space-y-8 pb-20">
         {/* Header Actions */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 glass p-6 rounded-3xl border-primary/20 sticky top-4 z-20 backdrop-blur-xl">
@@ -308,7 +312,9 @@ export default function FormBuilder() {
           <div className="lg:col-span-3 space-y-6 hidden lg:block">
             <Card className="glass border-white/5 sticky top-32">
               <CardHeader className="pb-4">
-                <CardTitle className="text-sm font-black uppercase tracking-widest text-primary/80">Question Types</CardTitle>
+                <CardTitle className="text-sm font-black uppercase tracking-widest text-primary/80">
+                  Question Types
+                </CardTitle>
               </CardHeader>
               <CardContent className="space-y-2 p-4">
                 {[
@@ -336,8 +342,15 @@ export default function FormBuilder() {
 
           {/* Builder Area */}
           <div className="lg:col-span-9 space-y-6">
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={questions.map(q => q.id)} strategy={verticalListSortingStrategy}>
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={questions.map((q) => q.id)}
+                strategy={verticalListSortingStrategy}
+              >
                 {questions.map((q) => (
                   <SortableQuestionCard
                     key={q.id}
@@ -360,7 +373,8 @@ export default function FormBuilder() {
               <CardHeader>
                 <CardTitle className="text-lg font-bold">Préférences de génération IA</CardTitle>
                 <CardDescription>
-                  Collez ici vos styles de SOAP notes, messages patients et modèles que l'IA doit suivre (voir liste fournie).
+                  Collez ici vos styles de SOAP notes, messages patients et modèles que l'IA doit
+                  suivre (voir liste fournie).
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -376,6 +390,6 @@ export default function FormBuilder() {
           </div>
         </div>
       </div>
-    </ModernLayout >
+    </ModernLayout>
   );
 }

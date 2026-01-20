@@ -1,27 +1,27 @@
-import * as React from "react"
-import { cn } from "../../lib/utils"
-import { ChevronRightIcon } from "@radix-ui/react-icons"
+import * as React from "react";
+import { cn } from "../../lib/utils";
+import { ChevronRightIcon } from "@radix-ui/react-icons";
 
 interface HeroSectionProps extends React.HTMLAttributes<HTMLDivElement> {
-  title?: string
+  title?: string;
   subtitle?: {
-    regular: string
-    gradient: string
-  }
-  description?: string
-  ctaText?: string
-  ctaHref?: string
+    regular: string;
+    gradient: string;
+  };
+  description?: string;
+  ctaText?: string;
+  ctaHref?: string;
   bottomImage?: {
-    light: string
-    dark: string
-  }
+    light: string;
+    dark: string;
+  };
   gridOptions?: {
-    angle?: number
-    cellSize?: number
-    opacity?: number
-    lightLineColor?: string
-    darkLineColor?: string
-  }
+    angle?: number;
+    cellSize?: number;
+    opacity?: number;
+    lightLineColor?: string;
+    darkLineColor?: string;
+  };
 }
 
 const RetroGrid = ({
@@ -37,13 +37,13 @@ const RetroGrid = ({
     "--opacity": opacity,
     "--light-line": lightLineColor,
     "--dark-line": darkLineColor,
-  } as React.CSSProperties
+  } as React.CSSProperties;
 
   return (
     <div
       className={cn(
         "pointer-events-none absolute size-full overflow-hidden [perspective:200px]",
-        `opacity-[var(--opacity)]`,
+        `opacity-[var(--opacity)]`
       )}
       style={gridStyles}
     >
@@ -52,8 +52,8 @@ const RetroGrid = ({
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent to-90% dark:from-black" />
     </div>
-  )
-}
+  );
+};
 
 const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
   (
@@ -74,7 +74,7 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
       gridOptions,
       ...props
     },
-    ref,
+    ref
   ) => {
     return (
       <div className={cn("relative", className)} ref={ref} {...props}>
@@ -93,9 +93,7 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
                   {subtitle.gradient}
                 </span>
               </h2>
-              <p className="max-w-2xl mx-auto text-gray-600 dark:text-gray-300">
-                {description}
-              </p>
+              <p className="max-w-2xl mx-auto text-gray-600 dark:text-gray-300">{description}</p>
               <div className="items-center justify-center gap-x-3 space-y-3 sm:flex sm:space-y-0">
                 <span className="relative inline-block overflow-hidden rounded-full p-[1.5px]">
                   <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#E2CBFF_0%,#393BB2_50%,#E2CBFF_100%)]" />
@@ -127,9 +125,9 @@ const HeroSection = React.forwardRef<HTMLDivElement, HeroSectionProps>(
           </div>
         </section>
       </div>
-    )
-  },
-)
-HeroSection.displayName = "HeroSection"
+    );
+  }
+);
+HeroSection.displayName = "HeroSection";
 
-export { HeroSection }
+export { HeroSection };

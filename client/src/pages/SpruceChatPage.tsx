@@ -1,10 +1,18 @@
-import React, { useState } from "react";
+import React from "react";
 import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { getQueryFn } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
 
 import ModernLayout from "@/components/layout/ModernLayout";
 import SpruceConversation from "@/components/conversation/SpruceConversation";
+
+// Use ModernLayout as AppLayoutSpruce
+const AppLayoutSpruce = ({ children }: { children: React.ReactNode }) => (
+  <ModernLayout title="Spruce Chat" description="Patient messaging">
+    {children}
+  </ModernLayout>
+);
 
 export default function SpruceChatPage() {
   const [, setLocation] = useLocation();
@@ -18,6 +26,7 @@ export default function SpruceChatPage() {
     error,
   } = useQuery({
     queryKey: [`/api/patients/${patientId}`],
+    queryFn: getQueryFn(),
     enabled: !!patientId,
   });
 

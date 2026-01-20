@@ -128,8 +128,8 @@ export default function PublicFormPage() {
           <CardHeader>
             <CardTitle>Merci 🎉</CardTitle>
             <CardDescription>
-              Votre questionnaire a été transmis à l'équipe InstantHPI. Vous recevrez un message dès que le médecin
-              aura traité votre dossier.
+              Votre questionnaire a été transmis à l'équipe InstantHPI. Vous recevrez un message dès
+              que le médecin aura traité votre dossier.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -200,7 +200,10 @@ export default function PublicFormPage() {
                     ) : question.type === "checkbox" && question.options ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         {question.options.map((option) => (
-                          <label key={option} className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <label
+                            key={option}
+                            className="flex items-center gap-2 text-sm text-muted-foreground"
+                          >
                             <Checkbox
                               checked={(answers[question.id] || []).includes(option)}
                               onCheckedChange={(checked) => {
@@ -209,7 +212,9 @@ export default function PublicFormPage() {
                                   : [];
                                 updateAnswer(
                                   question.id,
-                                  checked ? [...current, option] : current.filter((val: string) => val !== option)
+                                  checked
+                                    ? [...current, option]
+                                    : current.filter((val: string) => val !== option)
                                 );
                               }}
                             />

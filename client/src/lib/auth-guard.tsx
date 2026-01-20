@@ -8,18 +8,22 @@ interface ProtectedRouteProps {
 }
 
 // Check if we're in local development - instant bypass
-const isLocalDev = typeof window !== 'undefined' &&
-  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const isLocalDev =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
 
 // Set auth immediately for local dev
-if (isLocalDev && typeof localStorage !== 'undefined') {
+if (isLocalDev && typeof localStorage !== "undefined") {
   if (!localStorage.getItem("doctor_authenticated")) {
     localStorage.setItem("doctor_authenticated", "true");
-    localStorage.setItem("doctor_info", JSON.stringify({
-      name: "Carlos Faviel Font",
-      email: "cff@centremedicalfont.ca",
-      specialty: "Médecine Générale"
-    }));
+    localStorage.setItem(
+      "doctor_info",
+      JSON.stringify({
+        name: "Carlos Faviel Font",
+        email: "cff@centremedicalfont.ca",
+        specialty: "Médecine Générale",
+      })
+    );
   }
 }
 
@@ -43,18 +47,18 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
         // Check URL query parameter first (for testing/debugging)
         const urlParams = new URLSearchParams(window.location.search);
-        const authParam = urlParams.get('auth');
-        const hasAuthParam = authParam === 'demo';
-        console.log('[ProtectedRoute] URL auth parameter check:', { authParam, hasAuthParam });
+        const authParam = urlParams.get("auth");
+        const hasAuthParam = authParam === "demo";
+        console.log("[ProtectedRoute] URL auth parameter check:", { authParam, hasAuthParam });
 
         if (hasAuthParam) {
-          console.log('[ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true');
-          logAuthDecision('url_param', { param: authParam });
+          console.log("[ProtectedRoute] ✓ Auth parameter found, setting isAuthed=true");
+          logAuthDecision("url_param", { param: authParam });
           if (isMounted) {
             setDebugInfo({
               timestamp: new Date().toISOString(),
-              result: 'URL_AUTH_PARAM_SUCCESS',
-              authParam
+              result: "URL_AUTH_PARAM_SUCCESS",
+              authParam,
             });
             setIsAuthed(true);
             setIsChecking(false);
@@ -71,13 +75,16 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
           checkTime1Ms: (checkTime1 - checkStartTime).toFixed(2),
         };
 
-        console.log('[ProtectedRoute] Local auth check:', { localAuth, timingMs: (checkTime1 - checkStartTime).toFixed(2) });
+        console.log("[ProtectedRoute] Local auth check:", {
+          localAuth,
+          timingMs: (checkTime1 - checkStartTime).toFixed(2),
+        });
 
         if (localAuth) {
-          console.log('[ProtectedRoute] ✓ Local auth found, setting isAuthed=true');
-          logAuthDecision('local', { localStorage: true });
+          console.log("[ProtectedRoute] ✓ Local auth found, setting isAuthed=true");
+          logAuthDecision("local", { localStorage: true });
           if (isMounted) {
-            setDebugInfo({ ...debugData, result: 'LOCAL_AUTH_SUCCESS' });
+            setDebugInfo({ ...debugData, result: "LOCAL_AUTH_SUCCESS" });
             setIsAuthed(true);
             setIsChecking(false);
           }
@@ -105,22 +112,25 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
           // If expired but within refresh window (5 minutes), try to refresh
           if (!isValid && expiresAt > now - 300) {
-            console.log('[ProtectedRoute] Session expired, attempting refresh...');
+            console.log("[ProtectedRoute] Session expired, attempting refresh...");
             try {
-              const { data: { session: refreshedSession }, error: refreshError } = await supabase.auth.refreshSession();
+              const {
+                data: { session: refreshedSession },
+                error: refreshError,
+              } = await supabase.auth.refreshSession();
               if (!refreshError && refreshedSession?.user && refreshedSession.expires_at) {
                 const newExpiresAt = refreshedSession.expires_at;
                 if (newExpiresAt > now) {
-                  console.log('[ProtectedRoute] Session refreshed successfully');
+                  console.log("[ProtectedRoute] Session refreshed successfully");
                   isValid = true;
                 } else {
-                  console.log('[ProtectedRoute] Refreshed session also expired');
+                  console.log("[ProtectedRoute] Refreshed session also expired");
                 }
               } else {
-                console.log('[ProtectedRoute] Session refresh failed:', refreshError?.message);
+                console.log("[ProtectedRoute] Session refresh failed:", refreshError?.message);
               }
             } catch (refreshErr) {
-              console.error('[ProtectedRoute] Session refresh error:', refreshErr);
+              console.error("[ProtectedRoute] Session refresh error:", refreshErr);
             }
           }
         }
@@ -131,18 +141,18 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         debugData.supabaseSessionExists = hasSession;
         debugData.supabaseSessionFresh = isFresh;
         debugData.supabaseSessionValid = isValid;
-        debugData.supabaseUserEmail = session?.user?.email || 'none';
-        debugData.supabaseError = sessionError?.message || 'none';
-        debugData.supabaseExpiresAt = session?.expires_at || 'none';
+        debugData.supabaseUserEmail = session?.user?.email || "none";
+        debugData.supabaseError = sessionError?.message || "none";
+        debugData.supabaseExpiresAt = session?.expires_at || "none";
 
-        console.log('[ProtectedRoute] Supabase session check:', {
+        console.log("[ProtectedRoute] Supabase session check:", {
           hasSession,
           isValid,
           isFresh,
           userEmail: session?.user?.email,
           expiresAt: session?.expires_at,
           error: sessionError?.message,
-          timingMs: (checkTime3 - checkTime2).toFixed(2)
+          timingMs: (checkTime3 - checkTime2).toFixed(2),
         });
 
         if (isMounted) {
@@ -152,21 +162,25 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
         }
 
         if (isValid) {
-          logAuthDecision('supabase', { email: session?.user?.email, valid: true, fresh: isFresh });
+          logAuthDecision("supabase", { email: session?.user?.email, valid: true, fresh: isFresh });
         } else if (hasSession) {
-          logAuthDecision('supabase', { email: session?.user?.email, valid: false, rejected: 'expired' });
+          logAuthDecision("supabase", {
+            email: session?.user?.email,
+            valid: false,
+            rejected: "expired",
+          });
         } else {
-          logAuthDecision('none', { sessionError: sessionError?.message });
+          logAuthDecision("none", { sessionError: sessionError?.message });
         }
       } catch (err: any) {
         const errorTime = performance.now();
-        console.error('[ProtectedRoute] Auth guard check failed:', err);
+        console.error("[ProtectedRoute] Auth guard check failed:", err);
         if (isMounted) {
           setDebugInfo((prev: any) => ({
             ...prev,
             error: err?.message,
-            result: 'ERROR',
-            totalMs: (errorTime - startTime).toFixed(2)
+            result: "ERROR",
+            totalMs: (errorTime - startTime).toFixed(2),
           }));
           setIsAuthed(false);
           setIsChecking(false);

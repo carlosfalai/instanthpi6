@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiRequest, getAuthHeaders } from "@/lib/queryClient";
+import { useSavedMessages, type SavedMessage } from "@/hooks/useSavedMessages";
 import {
   DndContext,
   DragOverlay,
@@ -49,6 +51,15 @@ import {
   ScanLine,
   GripVertical,
   RotateCcw,
+  ChevronLeft,
+  ChevronRight,
+  Smartphone,
+  Lock,
+  Mail,
+  Video,
+  FileAudio,
+  Hash,
+  MessageSquare,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -89,12 +100,13 @@ interface MedicalTemplate {
 
 // Template category config - all same color for consistency
 const TEMPLATE_CATEGORIES = {
-  soap_note: { label: 'SOAP', icon: Stethoscope, color: 'bg-[#333]' },
-  specialist_referral: { label: 'Referrals', icon: Send, color: 'bg-[#333]' },
-  imaging_requisition: { label: 'Imaging', icon: ScanLine, color: 'bg-[#333]' },
-  patient_message: { label: 'Meds', icon: Pill, color: 'bg-[#333]' },
-  case_discussion: { label: 'Labs', icon: FlaskConical, color: 'bg-[#333]' },
-  work_leave: { label: 'Work Leave', icon: Briefcase, color: 'bg-[#333]' },
+  saved_messages: { label: "Quick", icon: Zap, color: "bg-[#d4af37]" },
+  soap_note: { label: "SOAP", icon: Stethoscope, color: "bg-[#333]" },
+  specialist_referral: { label: "Referrals", icon: Send, color: "bg-[#333]" },
+  imaging_requisition: { label: "Imaging", icon: ScanLine, color: "bg-[#333]" },
+  patient_message: { label: "Meds", icon: Pill, color: "bg-[#333]" },
+  case_discussion: { label: "Labs", icon: FlaskConical, color: "bg-[#333]" },
+  work_leave: { label: "Work Leave", icon: Briefcase, color: "bg-[#333]" },
 };
 
 interface Conversation {
@@ -111,12 +123,15 @@ interface ChatMessage {
   content: string;
   isFromPatient: boolean;
   timestamp: string;
+  channelType?: "sms" | "secure" | "email" | "unknown";
+  senderName?: string;
   attachments?: Array<{
     id: string;
-    type: 'image' | 'document' | 'other';
+    type: "image" | "video" | "document" | "audio" | "other";
     url: string;
     name?: string;
     mimeType?: string;
+    size?: number;
   }>;
 }
 
@@ -133,7 +148,7 @@ interface PatientInfo {
 
 interface ClaudeMessage {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: Date;
 }
@@ -142,8 +157,8 @@ interface ClaudeMessage {
 const TEMPLATES = [
   // === CLINICAL DOCUMENTS ===
   {
-    id: 'soap_note',
-    name: 'SOAP Note',
+    id: "soap_note",
+    name: "SOAP Note",
     icon: FileText,
     systemPrompt: `You are a medical documentation specialist for Truck Stop Sante clinic.
 Based on the patient conversation, generate a complete SOAP note in French.
@@ -172,12 +187,12 @@ Format:
 - Education au patient
 
 Extraire toutes les informations cliniques pertinentes de la conversation.`,
-    color: 'bg-slate-600',
-    isPDF: true
+    color: "bg-slate-600",
+    isPDF: true,
   },
   {
-    id: 'referral',
-    name: 'Referrals',
+    id: "referral",
+    name: "Referrals",
     icon: Send,
     systemPrompt: `You are a medical consultation request generator for Truck Stop Sante clinic.
 Based on the patient conversation, generate a REQUETE (consultation request) document in French.
@@ -193,12 +208,12 @@ Format the output as a professional medical consultation request including:
 8. "Consultation prioritaire recommandee" if urgent
 
 Write in formal medical French. Be thorough but concise. Extract all relevant clinical details from the conversation.`,
-    color: 'bg-blue-600',
-    isPDF: true
+    color: "bg-blue-600",
+    isPDF: true,
   },
   {
-    id: 'imaging_requisition',
-    name: 'Imaging',
+    id: "imaging_requisition",
+    name: "Imaging",
     icon: Activity,
     systemPrompt: `You are a radiology requisition specialist for Truck Stop Sante clinic.
 Based on the patient conversation, generate a REQUETE D'IMAGERIE (imaging requisition) in French.
@@ -218,12 +233,12 @@ Include:
 6. **QUESTION CLINIQUE SPECIFIQUE:** What are we looking for?
 
 Format clearly for radiology department review.`,
-    color: 'bg-purple-600',
-    isPDF: true
+    color: "bg-purple-600",
+    isPDF: true,
   },
   {
-    id: 'meds_prescription',
-    name: 'Meds',
+    id: "meds_prescription",
+    name: "Meds",
     icon: Pill,
     systemPrompt: `You are a prescription generator for Truck Stop Sante clinic.
 Based on the patient conversation, generate an ORDONNANCE (prescription) in French.
@@ -246,12 +261,12 @@ Instructions speciales: [Any special instructions]
 Substitution generique: Permise / Non permise
 
 Extract all medication details from the conversation including dosage, frequency, duration.`,
-    color: 'bg-green-600',
-    isPDF: true
+    color: "bg-green-600",
+    isPDF: true,
   },
   {
-    id: 'labs_requisition',
-    name: 'Labs',
+    id: "labs_requisition",
+    name: "Labs",
     icon: Activity,
     systemPrompt: `You are a laboratory requisition specialist for Truck Stop Sante clinic.
 Based on the patient conversation, generate a REQUETE DE LABORATOIRE (lab requisition) in French.
@@ -283,12 +298,12 @@ Include:
 **URGENCE:** Routine / Urgent
 
 Check the boxes that apply based on the clinical context from the conversation.`,
-    color: 'bg-amber-600',
-    isPDF: true
+    color: "bg-amber-600",
+    isPDF: true,
   },
   {
-    id: 'work_leave',
-    name: 'Work Leave',
+    id: "work_leave",
+    name: "Work Leave",
     icon: Calendar,
     systemPrompt: `You are generating a medical certificate for Truck Stop Sante clinic.
 Based on the patient conversation, generate a CERTIFICAT MEDICAL / BILLET DE TRAVAIL (work leave certificate) in French.
@@ -324,13 +339,13 @@ Duree totale: [X] jours
 Ce certificat est delivre a la demande du patient pour fins administratives.
 
 Note: Keep medical details confidential - only state inability to work, not diagnosis.`,
-    color: 'bg-rose-600',
-    isPDF: true
+    color: "bg-rose-600",
+    isPDF: true,
   },
   // === COMMUNICATION TEMPLATES ===
   {
-    id: 'patient_edu',
-    name: 'Edu/Reply',
+    id: "patient_edu",
+    name: "Edu/Reply",
     icon: MessageCircle,
     systemPrompt: `You are a caring medical office assistant for Truck Stop Sante.
 Based on the patient conversation, generate a warm, professional message to the patient explaining what you will prepare for them.
@@ -356,18 +371,19 @@ Cordialement,
 L'equipe Truck Stop Sante"
 
 Adapt the list based on what was actually discussed in the conversation. Be warm and reassuring.`,
-    color: 'bg-cyan-600'
+    color: "bg-cyan-600",
   },
   {
-    id: 'general_response',
-    name: 'Reply',
+    id: "general_response",
+    name: "Reply",
     icon: Zap,
-    systemPrompt: 'You are a helpful medical office assistant. Based on the patient conversation, generate an appropriate professional response addressing their inquiry or concern. Be empathetic and clear.',
-    color: 'bg-gray-600'
+    systemPrompt:
+      "You are a helpful medical office assistant. Based on the patient conversation, generate an appropriate professional response addressing their inquiry or concern. Be empathetic and clear.",
+    color: "bg-gray-600",
   },
   {
-    id: 'fax_pharmacy',
-    name: 'Fax Rx',
+    id: "fax_pharmacy",
+    name: "Fax Rx",
     icon: Printer,
     systemPrompt: `You are a pharmacy fax coordinator for Truck Stop Sante clinic.
 Based on the patient conversation, prepare a prescription for faxing to pharmacy in French.
@@ -386,13 +402,13 @@ Rx:
 [Medication details as extracted from conversation]
 
 Merci de confirmer reception.`,
-    color: 'bg-indigo-600',
-    isFax: true
+    color: "bg-indigo-600",
+    isFax: true,
   },
   // === BATCH GENERATION ===
   {
-    id: 'prepare_all',
-    name: 'Prepare All',
+    id: "prepare_all",
+    name: "Prepare All",
     icon: CheckCircle,
     systemPrompt: `You are a comprehensive medical documentation assistant for Truck Stop Sante clinic.
 Based on the patient conversation, generate ALL applicable documents in one response.
@@ -429,9 +445,9 @@ Generate each section that applies to this patient case:
 
 Only include sections that are relevant based on the conversation. Skip sections that don't apply.
 Write all clinical documents in formal medical French.`,
-    color: 'bg-gradient-to-r from-teal-600 to-blue-600',
+    color: "bg-gradient-to-r from-teal-600 to-blue-600",
     isPDF: true,
-    isBatch: true
+    isBatch: true,
   },
 ];
 
@@ -453,17 +469,24 @@ interface SortablePanelHeaderProps {
   subtitle?: string;
   actions?: React.ReactNode;
   onNameChange?: (newName: string) => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-function SortablePanelHeader({ id, name, icon, badge, subtitle, actions, onNameChange }: SortablePanelHeaderProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+function SortablePanelHeader({
+  id,
+  name,
+  icon,
+  badge,
+  subtitle,
+  actions,
+  onNameChange,
+  isCollapsed,
+  onToggleCollapse,
+}: SortablePanelHeaderProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+  });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -484,10 +507,10 @@ function SortablePanelHeader({ id, name, icon, badge, subtitle, actions, onNameC
         {...attributes}
         {...listeners}
         className={cn(
-          'flex-shrink-0 p-0.5 rounded cursor-grab active:cursor-grabbing',
-          'hover:bg-[#222] transition-colors',
-          'focus:outline-none focus:ring-1 focus:ring-[#d4af37]/50',
-          isDragging && 'cursor-grabbing'
+          "flex-shrink-0 p-0.5 rounded cursor-grab active:cursor-grabbing",
+          "hover:bg-[#222] transition-colors",
+          "focus:outline-none focus:ring-1 focus:ring-[#d4af37]/50",
+          isDragging && "cursor-grabbing"
         )}
         title="Drag to reorder panels"
       >
@@ -498,27 +521,33 @@ function SortablePanelHeader({ id, name, icon, badge, subtitle, actions, onNameC
       <div className="flex-1 min-w-0">
         <h2 className="text-[10px] font-bold text-[#d4af37] uppercase tracking-widest flex items-center gap-1">
           {icon}
-          {onNameChange ? (
-            <EditableTitle
-              value={name}
-              onChange={onNameChange}
-            />
-          ) : (
+          {!isCollapsed && onNameChange ? (
+            <EditableTitle value={name} onChange={onNameChange} />
+          ) : !isCollapsed ? (
             <span className="truncate">{name}</span>
-          )}
-          {badge}
+          ) : null}
+          {!isCollapsed && badge}
         </h2>
-        {subtitle && (
-          <p className="text-[8px] text-[#555] mt-0.5">{subtitle}</p>
-        )}
+        {!isCollapsed && subtitle && <p className="text-[8px] text-[#555] mt-0.5">{subtitle}</p>}
       </div>
 
-      {/* Header Actions */}
-      {actions && (
-        <div className="flex-shrink-0">
-          {actions}
-        </div>
+      {/* Collapse/Expand Button */}
+      {onToggleCollapse && (
+        <button
+          onClick={onToggleCollapse}
+          className="flex-shrink-0 p-0.5 rounded hover:bg-[#222] transition-colors focus:outline-none"
+          title={isCollapsed ? "Expand panel" : "Collapse panel"}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-3 w-3 text-[#555] hover:text-[#888]" />
+          ) : (
+            <ChevronLeft className="h-3 w-3 text-[#555] hover:text-[#888]" />
+          )}
+        </button>
       )}
+
+      {/* Header Actions */}
+      {!isCollapsed && actions && <div className="flex-shrink-0">{actions}</div>}
     </div>
   );
 }
@@ -543,7 +572,11 @@ export default function CommandCenter() {
 
   const stagingQueue = useStagingQueue();
   const panelLayout = usePanelLayout();
-  const [selectedTemplateCategory, setSelectedTemplateCategory] = useState<string>("soap_note");
+  const savedMessages = useSavedMessages();
+  const [selectedTemplateCategory, setSelectedTemplateCategory] = useState<string>("saved_messages");
+  const [showSavedMessageEditor, setShowSavedMessageEditor] = useState(false);
+  const [editingSavedMessage, setEditingSavedMessage] = useState<SavedMessage | null>(null);
+  const [draggedMessageId, setDraggedMessageId] = useState<string | null>(null);
 
   // DnD sensors configuration
   const sensors = useSensors(
@@ -558,13 +591,12 @@ export default function CommandCenter() {
   );
 
   // Fetch medical templates from database
-  const {
-    data: dbTemplates = [],
-    isLoading: isLoadingTemplates,
-  } = useQuery<MedicalTemplate[]>({
+  const { data: dbTemplates = [], isLoading: isLoadingTemplates } = useQuery<MedicalTemplate[]>({
     queryKey: ["medical-templates"],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return [];
 
       const { data, error } = await supabase
@@ -585,15 +617,18 @@ export default function CommandCenter() {
   });
 
   // Group templates by category
-  const templatesByCategory = dbTemplates.reduce((acc, template) => {
-    if (!acc[template.template_category]) {
-      acc[template.template_category] = [];
-    }
-    acc[template.template_category].push(template);
-    return acc;
-  }, {} as Record<string, MedicalTemplate[]>);
+  const templatesByCategory = dbTemplates.reduce(
+    (acc, template) => {
+      if (!acc[template.template_category]) {
+        acc[template.template_category] = [];
+      }
+      acc[template.template_category].push(template);
+      return acc;
+    },
+    {} as Record<string, MedicalTemplate[]>
+  );
 
-  // Fetch all Spruce conversations (sorted by latest first)
+  // Fetch all Spruce conversations (sorted by latest first) with localStorage caching
   const {
     data: conversations = [],
     isLoading,
@@ -602,50 +637,123 @@ export default function CommandCenter() {
   } = useQuery<Conversation[]>({
     queryKey: ["/api/spruce-conversations-all"],
     queryFn: async () => {
-      const response = await fetch("/api/spruce-conversations-all");
-      if (!response.ok) throw new Error("Failed to fetch conversations");
-      const data = await response.json();
-      if (data.error) throw new Error(data.message || data.error);
-      const convs = Array.isArray(data) ? data : [];
-      return convs.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+      try {
+        const headers = await getAuthHeaders();
+        const response = await fetch("/api/spruce-conversations-all", { headers });
+        if (!response.ok) {
+          // Try to use cached data if API fails
+          const cached = localStorage.getItem("instanthpi_conversations");
+          if (cached) {
+            console.log("[CommandCenter] Using cached conversations (API failed)");
+            return JSON.parse(cached);
+          }
+          throw new Error("Failed to fetch conversations");
+        }
+        const data = await response.json();
+        if (data.error) throw new Error(data.message || data.error);
+        const convs = Array.isArray(data) ? data : [];
+        const sorted = convs.sort(
+          (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        );
+        // Cache conversations to localStorage
+        try {
+          localStorage.setItem("instanthpi_conversations", JSON.stringify(sorted));
+          localStorage.setItem("instanthpi_conversations_updated", new Date().toISOString());
+          console.log(`[CommandCenter] Cached ${sorted.length} conversations to localStorage`);
+        } catch (e) {
+          console.warn("[CommandCenter] Failed to cache conversations:", e);
+        }
+        return sorted;
+      } catch (err) {
+        // Fallback to cached data
+        const cached = localStorage.getItem("instanthpi_conversations");
+        if (cached) {
+          console.log("[CommandCenter] Using cached conversations (fetch error)");
+          return JSON.parse(cached);
+        }
+        throw err;
+      }
     },
     refetchInterval: 30000,
+    // Use cached data while loading
+    placeholderData: () => {
+      const cached = localStorage.getItem("instanthpi_conversations");
+      return cached ? JSON.parse(cached) : [];
+    },
   });
 
   // Get selected conversation - must be defined before callbacks that use it
-  const selectedConversation = conversations.find(c => c.id === selectedId);
+  const selectedConversation = conversations.find((c) => c.id === selectedId);
 
-  // Fetch conversation messages when selected
-  const {
-    data: chatMessages = [],
-    isLoading: isLoadingMessages,
-  } = useQuery<ChatMessage[]>({
+  // Fetch conversation messages when selected with localStorage caching
+  const { data: chatMessages = [], isLoading: isLoadingMessages } = useQuery<ChatMessage[]>({
     queryKey: ["/api/spruce/conversation", selectedId, "messages"],
     queryFn: async () => {
       if (!selectedId) return [];
-      const response = await fetch(`/api/spruce/conversations/${selectedId}/history`);
-      if (!response.ok) throw new Error("Failed to fetch messages");
-      const data = await response.json();
-      if (Array.isArray(data)) return data;
-      if (data.messages) return data.messages;
-      return [];
+      const cacheKey = `instanthpi_messages_${selectedId}`;
+      try {
+        const headers = await getAuthHeaders();
+        const response = await fetch(`/api/spruce/conversations/${selectedId}/history`, { headers });
+        if (!response.ok) {
+          // Try cached messages if API fails
+          const cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            console.log(`[CommandCenter] Using cached messages for ${selectedId}`);
+            return JSON.parse(cached);
+          }
+          throw new Error("Failed to fetch messages");
+        }
+        const data = await response.json();
+        const messages = Array.isArray(data) ? data : (data.messages || []);
+        // Cache messages
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(messages));
+          console.log(`[CommandCenter] Cached ${messages.length} messages for ${selectedId}`);
+        } catch (e) {
+          console.warn("[CommandCenter] Failed to cache messages:", e);
+        }
+        return messages;
+      } catch (err) {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          console.log(`[CommandCenter] Using cached messages for ${selectedId} (fetch error)`);
+          return JSON.parse(cached);
+        }
+        throw err;
+      }
     },
     enabled: !!selectedId,
+    placeholderData: () => {
+      if (!selectedId) return [];
+      const cached = localStorage.getItem(`instanthpi_messages_${selectedId}`);
+      return cached ? JSON.parse(cached) : [];
+    },
   });
 
   // Send message mutation
   const sendMessageMutation = useMutation({
-    mutationFn: async ({ conversationId, message }: { conversationId: string; message: string }) => {
-      const response = await fetch(`/api/spruce/patients/${conversationId}/messages`, {
+    mutationFn: async ({
+      conversationId,
+      message,
+    }: {
+      conversationId: string;
+      message: string;
+    }) => {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`/api/spruce/messages`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: message }),
+        headers,
+        body: JSON.stringify({ conversationId, message }),
       });
-      if (!response.ok) throw new Error("Failed to send message");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to send message");
+      }
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/spruce/conversation"] });
+      // Invalidate conversation messages to refresh
+      queryClient.invalidateQueries({ queryKey: ["/api/spruce/conversation", selectedId, "messages"] });
       toast({ title: "Message sent" });
     },
     onError: (error: Error) => {
@@ -654,177 +762,199 @@ export default function CommandCenter() {
   });
 
   // Generate AI response using template
-  const generateWithTemplate = useCallback(async (template: typeof TEMPLATES[0]) => {
-    if (!selectedId || !selectedConversation) {
-      toast({ title: "Select a patient first", variant: "destructive" });
-      return;
-    }
+  const generateWithTemplate = useCallback(
+    async (template: (typeof TEMPLATES)[0]) => {
+      if (!selectedId || !selectedConversation) {
+        toast({ title: "Select a patient first", variant: "destructive" });
+        return;
+      }
 
-    setIsGenerating(true);
+      setIsGenerating(true);
 
-    // Build conversation context as user prompt
-    const conversationContext = chatMessages.map(m =>
-      `${m.isFromPatient ? 'Patient' : 'Provider'}: ${m.content}`
-    ).join('\n');
+      // Build conversation context as user prompt
+      const conversationContext = chatMessages
+        .map((m) => `${m.isFromPatient ? "Patient" : "Provider"}: ${m.content}`)
+        .join("\n");
 
-    const userPrompt = `Patient: ${selectedConversation.patient_name}
+      const userPrompt = `Patient: ${selectedConversation.patient_name}
 
 Recent conversation:
-${conversationContext || selectedConversation.last_message || 'No conversation history'}
+${conversationContext || selectedConversation.last_message || "No conversation history"}
 
 Please generate an appropriate response.`;
 
-    // Add user message to Claude chat
-    const userMsg: ClaudeMessage = {
-      id: `user_${Date.now()}`,
-      role: 'user',
-      content: `[Using template: ${template.name}]\n\nPatient conversation loaded for ${selectedConversation.patient_name}`,
-      timestamp: new Date(),
-    };
-    setClaudeMessages(prev => [...prev, userMsg]);
-
-    try {
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: userPrompt,
-          model: 'claude-3-5-haiku-20241022',
-          systemPrompt: template.systemPrompt + `\n\nPatient name: ${selectedConversation.patient_name}. Generate a professional, empathetic message ready to send.`,
-        }),
-      });
-
-      if (!response.ok) throw new Error('AI request failed');
-
-      const data = await response.json();
-      const aiContent = data.content || data.message || data.response || 'Unable to generate response';
-
-      // Format the response
-      const formattedResponse = `Dear ${selectedConversation.patient_name},\n\n${aiContent}\n\nBest regards,\nInstantHPI Team`;
-
-      // Add AI response to Claude chat
-      const aiMsg: ClaudeMessage = {
-        id: `ai_${Date.now()}`,
-        role: 'assistant',
-        content: formattedResponse,
+      // Add user message to Claude chat
+      const userMsg: ClaudeMessage = {
+        id: `user_${Date.now()}`,
+        role: "user",
+        content: `[Using template: ${template.name}]\n\nPatient conversation loaded for ${selectedConversation.patient_name}`,
         timestamp: new Date(),
       };
-      setClaudeMessages(prev => [...prev, aiMsg]);
+      setClaudeMessages((prev) => [...prev, userMsg]);
 
-      // Set pending approval with template type flags
-      setPendingApproval({
-        content: formattedResponse,
-        templateName: template.name,
-        isPDF: template.isPDF,
-        isFax: template.isFax,
-      });
+      try {
+        const headers = await getAuthHeaders();
+        const response = await fetch("/api/ai/chat", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            prompt: userPrompt,
+            model: "claude-3-5-haiku-20241022",
+            systemPrompt:
+              template.systemPrompt +
+              `\n\nPatient name: ${selectedConversation.patient_name}. Generate a professional, empathetic message ready to send.`,
+          }),
+        });
 
-      // Handle PDF generation
-      if (template.isPDF) {
-        toast({ title: "PDF Ready", description: "Review the prescription and click approve to generate PDF" });
+        if (!response.ok) throw new Error("AI request failed");
+
+        const data = await response.json();
+        const aiContent =
+          data.content || data.message || data.response || "Unable to generate response";
+
+        // Format the response
+        const formattedResponse = `Dear ${selectedConversation.patient_name},\n\n${aiContent}\n\nBest regards,\nInstantHPI Team`;
+
+        // Add AI response to Claude chat
+        const aiMsg: ClaudeMessage = {
+          id: `ai_${Date.now()}`,
+          role: "assistant",
+          content: formattedResponse,
+          timestamp: new Date(),
+        };
+        setClaudeMessages((prev) => [...prev, aiMsg]);
+
+        // Set pending approval with template type flags
+        setPendingApproval({
+          content: formattedResponse,
+          templateName: template.name,
+          isPDF: template.isPDF,
+          isFax: template.isFax,
+        });
+
+        // Handle PDF generation
+        if (template.isPDF) {
+          toast({
+            title: "PDF Ready",
+            description: "Review the prescription and click approve to generate PDF",
+          });
+        }
+
+        // Handle Fax
+        if (template.isFax) {
+          toast({
+            title: "Fax Prepared",
+            description: "Review and approve to send fax to pharmacy",
+          });
+        }
+      } catch (error) {
+        console.error("AI generation error:", error);
+        toast({ title: "Generation failed", variant: "destructive" });
+      } finally {
+        setIsGenerating(false);
       }
-
-      // Handle Fax
-      if (template.isFax) {
-        toast({ title: "Fax Prepared", description: "Review and approve to send fax to pharmacy" });
-      }
-
-    } catch (error) {
-      console.error('AI generation error:', error);
-      toast({ title: "Generation failed", variant: "destructive" });
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [selectedId, chatMessages, toast]);
+    },
+    [selectedId, chatMessages, toast]
+  );
 
   // Generate with database template
-  const generateWithDbTemplate = useCallback(async (dbTemplate: MedicalTemplate) => {
-    if (!selectedId || !selectedConversation) {
-      toast({ title: "Select a patient first", variant: "destructive" });
-      return;
-    }
+  const generateWithDbTemplate = useCallback(
+    async (dbTemplate: MedicalTemplate) => {
+      if (!selectedId || !selectedConversation) {
+        toast({ title: "Select a patient first", variant: "destructive" });
+        return;
+      }
 
-    setIsGenerating(true);
+      setIsGenerating(true);
 
-    // Build conversation context as user prompt
-    const conversationContext = chatMessages.map(m =>
-      `${m.isFromPatient ? 'Patient' : 'Provider'}: ${m.content}`
-    ).join('\n');
+      // Build conversation context as user prompt
+      const conversationContext = chatMessages
+        .map((m) => `${m.isFromPatient ? "Patient" : "Provider"}: ${m.content}`)
+        .join("\n");
 
-    // Determine if this is a PDF-generating template
-    const isPdfCategory = ['soap_note', 'specialist_referral', 'imaging_requisition', 'work_leave'].includes(dbTemplate.template_category);
+      // Determine if this is a PDF-generating template
+      const isPdfCategory = [
+        "soap_note",
+        "specialist_referral",
+        "imaging_requisition",
+        "work_leave",
+      ].includes(dbTemplate.template_category);
 
-    const userPrompt = `Patient: ${selectedConversation.patient_name}
+      const userPrompt = `Patient: ${selectedConversation.patient_name}
 
 Recent conversation:
-${conversationContext || selectedConversation.last_message || 'No conversation history'}
+${conversationContext || selectedConversation.last_message || "No conversation history"}
 
 Reference template to follow (adapt to this patient's case):
 ${dbTemplate.template_content}
 
 Please generate appropriate content based on the template style and patient conversation.`;
 
-    // Add user message to Claude chat
-    const userMsg: ClaudeMessage = {
-      id: `user_${Date.now()}`,
-      role: 'user',
-      content: `[Using template: ${dbTemplate.template_name}]\n\nGenerating for ${selectedConversation.patient_name}`,
-      timestamp: new Date(),
-    };
-    setClaudeMessages(prev => [...prev, userMsg]);
+      // Add user message to Claude chat
+      const userMsg: ClaudeMessage = {
+        id: `user_${Date.now()}`,
+        role: "user",
+        content: `[Using template: ${dbTemplate.template_name}]\n\nGenerating for ${selectedConversation.patient_name}`,
+        timestamp: new Date(),
+      };
+      setClaudeMessages((prev) => [...prev, userMsg]);
 
-    try {
-      const categoryConfig = TEMPLATE_CATEGORIES[dbTemplate.template_category as keyof typeof TEMPLATE_CATEGORIES];
-      const systemPrompt = `You are a medical documentation assistant for Truck Stop Sante clinic (Dr Carlos Faviel Font, CMQ: 16812).
-Based on the patient conversation and reference template provided, generate appropriate ${categoryConfig?.label || 'medical'} documentation.
+      try {
+        const categoryConfig =
+          TEMPLATE_CATEGORIES[dbTemplate.template_category as keyof typeof TEMPLATE_CATEGORIES];
+        const systemPrompt = `You are a medical documentation assistant for Truck Stop Sante clinic (Dr Carlos Faviel Font, CMQ: 16812).
+Based on the patient conversation and reference template provided, generate appropriate ${categoryConfig?.label || "medical"} documentation.
 Write in formal medical French. Follow the style and format of the reference template but adapt the content to this specific patient case.
 Extract all relevant clinical information from the conversation.`;
 
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: userPrompt,
-          model: 'claude-3-5-haiku-20241022',
-          systemPrompt,
-        }),
-      });
+        const aiHeaders = await getAuthHeaders();
+        const response = await fetch("/api/ai/chat", {
+          method: "POST",
+          headers: aiHeaders,
+          body: JSON.stringify({
+            prompt: userPrompt,
+            model: "claude-3-5-haiku-20241022",
+            systemPrompt,
+          }),
+        });
 
-      if (!response.ok) throw new Error('AI request failed');
+        if (!response.ok) throw new Error("AI request failed");
 
-      const data = await response.json();
-      const aiContent = data.content || data.message || data.response || 'Unable to generate response';
+        const data = await response.json();
+        const aiContent =
+          data.content || data.message || data.response || "Unable to generate response";
 
-      // Add AI response to Claude chat
-      const aiMsg: ClaudeMessage = {
-        id: `ai_${Date.now()}`,
-        role: 'assistant',
-        content: aiContent,
-        timestamp: new Date(),
-      };
-      setClaudeMessages(prev => [...prev, aiMsg]);
+        // Add AI response to Claude chat
+        const aiMsg: ClaudeMessage = {
+          id: `ai_${Date.now()}`,
+          role: "assistant",
+          content: aiContent,
+          timestamp: new Date(),
+        };
+        setClaudeMessages((prev) => [...prev, aiMsg]);
 
-      // Set pending approval with PDF flag for clinical documents
-      setPendingApproval({
-        content: aiContent,
-        templateName: dbTemplate.template_name,
-        isPDF: isPdfCategory,
-      });
+        // Set pending approval with PDF flag for clinical documents
+        setPendingApproval({
+          content: aiContent,
+          templateName: dbTemplate.template_name,
+          isPDF: isPdfCategory,
+        });
 
-      // Update usage count in database
-      supabase
-        .from("medical_templates")
-        .update({ usage_count: (dbTemplate.usage_count || 0) + 1 })
-        .eq("id", dbTemplate.id)
-        .then(() => {});
-
-    } catch (error) {
-      console.error('AI generation error:', error);
-      toast({ title: "Generation failed", variant: "destructive" });
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [selectedId, chatMessages, selectedConversation, toast]);
+        // Update usage count in database
+        supabase
+          .from("medical_templates")
+          .update({ usage_count: (dbTemplate.usage_count || 0) + 1 })
+          .eq("id", dbTemplate.id)
+          .then(() => {});
+      } catch (error) {
+        console.error("AI generation error:", error);
+        toast({ title: "Generation failed", variant: "destructive" });
+      } finally {
+        setIsGenerating(false);
+      }
+    },
+    [selectedId, chatMessages, selectedConversation, toast]
+  );
 
   // Free chat with Claude
   const sendToClaudeChat = useCallback(async () => {
@@ -832,42 +962,43 @@ Extract all relevant clinical information from the conversation.`;
 
     const userMsg: ClaudeMessage = {
       id: `user_${Date.now()}`,
-      role: 'user',
+      role: "user",
       content: claudeInput,
       timestamp: new Date(),
     };
-    setClaudeMessages(prev => [...prev, userMsg]);
+    setClaudeMessages((prev) => [...prev, userMsg]);
     setClaudeInput("");
     setIsGenerating(true);
 
     try {
       const conversationContext = selectedConversation
         ? `Current patient: ${selectedConversation.patient_name}\nRecent message: ${selectedConversation.last_message}`
-        : 'No patient selected';
+        : "No patient selected";
 
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const chatHeaders = await getAuthHeaders();
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: chatHeaders,
         body: JSON.stringify({
           prompt: `Context: ${conversationContext}\n\nUser request: ${claudeInput}`,
-          model: 'claude-3-5-haiku-20241022',
-          systemPrompt: 'You are a helpful medical office AI assistant. Help with patient communications, scheduling, and administrative tasks. Be concise and professional.',
+          model: "claude-3-5-haiku-20241022",
+          systemPrompt:
+            "You are a helpful medical office AI assistant. Help with patient communications, scheduling, and administrative tasks. Be concise and professional.",
         }),
       });
 
-      if (!response.ok) throw new Error('AI request failed');
+      if (!response.ok) throw new Error("AI request failed");
 
       const data = await response.json();
-      const aiContent = data.content || data.message || 'No response';
+      const aiContent = data.content || data.message || "No response";
 
       const aiMsg: ClaudeMessage = {
         id: `ai_${Date.now()}`,
-        role: 'assistant',
+        role: "assistant",
         content: aiContent,
         timestamp: new Date(),
       };
-      setClaudeMessages(prev => [...prev, aiMsg]);
-
+      setClaudeMessages((prev) => [...prev, aiMsg]);
     } catch (error) {
       toast({ title: "Chat error", variant: "destructive" });
     } finally {
@@ -898,8 +1029,12 @@ Extract all relevant clinical information from the conversation.`;
         setPendingApproval(null);
         return;
       } catch (error) {
-        console.error('PDF generation error:', error);
-        toast({ title: "PDF Error", description: "Failed to generate PDF", variant: "destructive" });
+        console.error("PDF generation error:", error);
+        toast({
+          title: "PDF Error",
+          description: "Failed to generate PDF",
+          variant: "destructive",
+        });
         return;
       }
     }
@@ -912,10 +1047,7 @@ Extract all relevant clinical information from the conversation.`;
           selectedConversation.patient_name
         );
 
-        await generateAndDownloadRequete(
-          patientData,
-          pendingApproval.content
-        );
+        await generateAndDownloadRequete(patientData, pendingApproval.content);
 
         toast({
           title: "Fax Document Ready",
@@ -924,8 +1056,12 @@ Extract all relevant clinical information from the conversation.`;
         setPendingApproval(null);
         return;
       } catch (error) {
-        console.error('Fax document error:', error);
-        toast({ title: "Error", description: "Failed to generate fax document", variant: "destructive" });
+        console.error("Fax document error:", error);
+        toast({
+          title: "Error",
+          description: "Failed to generate fax document",
+          variant: "destructive",
+        });
         return;
       }
     }
@@ -951,8 +1087,8 @@ Extract all relevant clinical information from the conversation.`;
   // Handle staged message countdown and auto-send
   useEffect(() => {
     const interval = setInterval(() => {
-      stagingQueue.messages.forEach(msg => {
-        if (msg.status === 'pending' && msg.countdown > 0) {
+      stagingQueue.messages.forEach((msg) => {
+        if (msg.status === "pending" && msg.countdown > 0) {
           stagingQueue.updateCountdown(msg.id, msg.countdown - 1);
 
           if (msg.countdown <= 1) {
@@ -961,7 +1097,7 @@ Extract all relevant clinical information from the conversation.`;
               { conversationId: msg.conversationId, message: msg.content },
               {
                 onSuccess: () => stagingQueue.markAsSent(msg.id),
-                onError: () => stagingQueue.markAsError(msg.id, 'Failed to send'),
+                onError: () => stagingQueue.markAsError(msg.id, "Failed to send"),
               }
             );
           }
@@ -988,7 +1124,7 @@ Extract all relevant clinical information from the conversation.`;
   }, [selectedId]);
 
   const filteredConversations = searchQuery
-    ? conversations.filter(c => c.patient_name?.toLowerCase().includes(searchQuery.toLowerCase()))
+    ? conversations.filter((c) => c.patient_name?.toLowerCase().includes(searchQuery.toLowerCase()))
     : conversations;
 
   const formatTime = (dateStr: string) => {
@@ -1002,9 +1138,17 @@ Extract all relevant clinical information from the conversation.`;
     return date.toLocaleDateString();
   };
 
-  const getInitials = (name: string) => name?.split(" ").map(p => p[0]).join("").toUpperCase().slice(0, 2) || "?";
+  const getInitials = (name: string) =>
+    name
+      ?.split(" ")
+      .map((p) => p[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2) || "?";
 
-  const pendingMessages = stagingQueue.messages.filter(m => m.status === 'pending' || m.status === 'sending');
+  const pendingMessages = stagingQueue.messages.filter(
+    (m) => m.status === "pending" || m.status === "sending"
+  );
 
   // Drag handlers
   const handleDragStart = (event: DragStartEvent) => {
@@ -1027,14 +1171,14 @@ Extract all relevant clinical information from the conversation.`;
   // Panel content renderers
   const renderPanelContent = (panelId: PanelId) => {
     switch (panelId) {
-      case 'inbox':
+      case "inbox":
         return (
           <>
             <SortablePanelHeader
               id="inbox"
               name={panelLayout.panelNames.inbox}
               icon={PANEL_ICONS.inbox}
-              onNameChange={(name) => panelLayout.updatePanelName('inbox', name)}
+              onNameChange={(name) => panelLayout.updatePanelName("inbox", name)}
             />
             <div className="p-2 border-b border-[#1a1a1a]">
               <div className="relative">
@@ -1050,7 +1194,9 @@ Extract all relevant clinical information from the conversation.`;
 
             <ScrollArea className="flex-1">
               {isLoading ? (
-                <div className="p-4 text-center"><Loader2 className="h-4 w-4 animate-spin mx-auto text-[#d4af37]" /></div>
+                <div className="p-4 text-center">
+                  <Loader2 className="h-4 w-4 animate-spin mx-auto text-[#d4af37]" />
+                </div>
               ) : error ? (
                 <div className="p-4 text-center text-[10px] text-[#ef4444]">Connection error</div>
               ) : (
@@ -1061,20 +1207,30 @@ Extract all relevant clinical information from the conversation.`;
                       onClick={() => setSelectedId(conv.id)}
                       className={cn(
                         "w-full p-1.5 mb-0.5 rounded text-left transition-all",
-                        selectedId === conv.id ? "bg-[#d4af37]/10 border-l-2 border-l-[#d4af37]" : "hover:bg-[#111]"
+                        selectedId === conv.id
+                          ? "bg-[#d4af37]/10 border-l-2 border-l-[#d4af37]"
+                          : "hover:bg-[#111]"
                       )}
                     >
                       <div className="flex items-center gap-1.5">
-                        <div className={cn(
-                          "h-6 w-6 rounded flex items-center justify-center text-[9px] font-bold flex-shrink-0",
-                          conv.unread_count > 0 ? "bg-[#d4af37] text-[#0a0908]" : "bg-[#222] text-[#666]"
-                        )}>
+                        <div
+                          className={cn(
+                            "h-6 w-6 rounded flex items-center justify-center text-[9px] font-bold flex-shrink-0",
+                            conv.unread_count > 0
+                              ? "bg-[#d4af37] text-[#0a0908]"
+                              : "bg-[#222] text-[#666]"
+                          )}
+                        >
                           {getInitials(conv.patient_name)}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-medium text-[#fafafa] truncate">{conv.patient_name}</span>
-                            <span className="text-[8px] text-[#555] ml-1">{formatTime(conv.updated_at)}</span>
+                            <span className="text-[10px] font-medium text-[#fafafa] truncate">
+                              {conv.patient_name}
+                            </span>
+                            <span className="text-[8px] text-[#555] ml-1">
+                              {formatTime(conv.updated_at)}
+                            </span>
                           </div>
                           <p className="text-[9px] text-[#555] truncate">{conv.last_message}</p>
                         </div>
@@ -1087,12 +1243,14 @@ Extract all relevant clinical information from the conversation.`;
 
             <div className="p-1.5 border-t border-[#1a1a1a] text-[8px] text-[#444] flex justify-between items-center">
               <span>{conversations.length} total</span>
-              <button onClick={() => refetch()} className="hover:text-[#d4af37] p-1"><RefreshCw className="h-3 w-3" /></button>
+              <button onClick={() => refetch()} className="hover:text-[#d4af37] p-1">
+                <RefreshCw className="h-3 w-3" />
+              </button>
             </div>
           </>
         );
 
-      case 'history':
+      case "history":
         return (
           <>
             <SortablePanelHeader
@@ -1100,7 +1258,7 @@ Extract all relevant clinical information from the conversation.`;
               name={panelLayout.panelNames.history}
               icon={PANEL_ICONS.history}
               subtitle={selectedConversation?.patient_name}
-              onNameChange={(name) => panelLayout.updatePanelName('history', name)}
+              onNameChange={(name) => panelLayout.updatePanelName("history", name)}
             />
 
             <ScrollArea className="flex-1 p-2">
@@ -1112,47 +1270,148 @@ Extract all relevant clinical information from the conversation.`;
                   </div>
                 </div>
               ) : isLoadingMessages ? (
-                <div className="flex items-center justify-center h-20"><Loader2 className="h-4 w-4 animate-spin text-[#d4af37]" /></div>
+                <div className="flex items-center justify-center h-20">
+                  <Loader2 className="h-4 w-4 animate-spin text-[#d4af37]" />
+                </div>
               ) : chatMessages.length === 0 ? (
                 <div className="text-center text-[#555] text-[10px] py-4">No messages</div>
               ) : (
                 <div className="space-y-1.5">
-                  {chatMessages.map((msg) => (
-                    <div key={msg.id} className={cn("flex flex-col", msg.isFromPatient ? "items-start" : "items-end")}>
-                      <div className={cn(
-                        "max-w-[90%] p-1.5 rounded text-[10px]",
-                        msg.isFromPatient ? "bg-[#1a1a1a] text-[#e6e6e6]" : "bg-[#d4af37] text-[#0a0908]"
-                      )}>
+                  {[...chatMessages].reverse().map((msg) => (
+                    <div
+                      key={msg.id}
+                      className={cn(
+                        "flex flex-col",
+                        msg.isFromPatient ? "items-start" : "items-end"
+                      )}
+                    >
+                      {/* Channel type indicator */}
+                      <div
+                        className={cn(
+                          "flex items-center gap-1 mb-0.5",
+                          msg.isFromPatient ? "ml-1" : "mr-1"
+                        )}
+                      >
+                        {msg.channelType === "sms" && (
+                          <Badge className="h-4 px-1 text-[7px] bg-blue-600/80 flex items-center gap-0.5">
+                            <Smartphone className="h-2.5 w-2.5" />
+                            SMS
+                          </Badge>
+                        )}
+                        {msg.channelType === "secure" && (
+                          <Badge className="h-4 px-1 text-[7px] bg-green-600/80 flex items-center gap-0.5">
+                            <Lock className="h-2.5 w-2.5" />
+                            Secure
+                          </Badge>
+                        )}
+                        {msg.channelType === "email" && (
+                          <Badge className="h-4 px-1 text-[7px] bg-purple-600/80 flex items-center gap-0.5">
+                            <Mail className="h-2.5 w-2.5" />
+                            Email
+                          </Badge>
+                        )}
+                        {msg.senderName && (
+                          <span className="text-[8px] text-[#666]">{msg.senderName}</span>
+                        )}
+                      </div>
+
+                      <div
+                        className={cn(
+                          "max-w-[90%] p-1.5 rounded text-[10px]",
+                          msg.isFromPatient
+                            ? msg.channelType === "sms"
+                              ? "bg-blue-900/30 border border-blue-700/30 text-[#e6e6e6]"
+                              : "bg-[#1a1a1a] text-[#e6e6e6]"
+                            : "bg-[#d4af37] text-[#0a0908]"
+                        )}
+                      >
                         {msg.content && <p className="whitespace-pre-wrap">{msg.content}</p>}
 
-                        {/* Render attachments/images */}
+                        {/* Render attachments/images/videos */}
                         {msg.attachments && msg.attachments.length > 0 && (
                           <div className="mt-1.5 space-y-1">
                             {msg.attachments.map((attachment) => (
                               <div key={attachment.id} className="rounded overflow-hidden">
-                                {attachment.type === 'image' ? (
+                                {attachment.type === "image" ? (
                                   <div className="relative group">
                                     <img
                                       src={attachment.url}
-                                      alt={attachment.name || 'Patient image'}
-                                      className="max-w-full max-h-[150px] rounded cursor-pointer hover:opacity-90 transition-opacity"
-                                      onClick={() => window.open(attachment.url, '_blank')}
+                                      alt={attachment.name || "Patient image"}
+                                      className="max-w-full max-h-[200px] rounded cursor-pointer hover:opacity-90 transition-opacity"
+                                      onClick={() => window.open(attachment.url, "_blank")}
+                                      onError={(e) => {
+                                        (e.target as HTMLImageElement).style.display = "none";
+                                        (
+                                          e.target as HTMLImageElement
+                                        ).nextElementSibling?.classList.remove("hidden");
+                                      }}
                                     />
+                                    <div className="hidden p-2 bg-[#222] rounded text-[9px] text-[#888]">
+                                      <ImageIcon className="h-4 w-4 mx-auto mb-1 opacity-50" />
+                                      Image unavailable
+                                    </div>
                                     <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5">
                                       <button
                                         onClick={(e) => {
                                           e.stopPropagation();
-                                          window.open(attachment.url, '_blank');
+                                          window.open(attachment.url, "_blank");
                                         }}
                                         className="p-1 bg-black/50 rounded hover:bg-black/70"
                                         title="Open full size"
                                       >
                                         <ExternalLink className="h-3 w-3 text-white" />
                                       </button>
+                                      <a
+                                        href={attachment.url}
+                                        download={attachment.name || "image"}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="p-1 bg-black/50 rounded hover:bg-black/70"
+                                        title="Download"
+                                      >
+                                        <Download className="h-3 w-3 text-white" />
+                                      </a>
                                     </div>
                                     <div className="flex items-center gap-1 mt-0.5 text-[8px] opacity-70">
                                       <ImageIcon className="h-2.5 w-2.5" />
-                                      <span>{attachment.name || 'Image'}</span>
+                                      <span>{attachment.name || "Image"}</span>
+                                    </div>
+                                  </div>
+                                ) : attachment.type === "video" ? (
+                                  <div className="relative group">
+                                    <video
+                                      src={attachment.url}
+                                      controls
+                                      className="max-w-full max-h-[200px] rounded"
+                                      preload="metadata"
+                                    >
+                                      Your browser does not support video playback.
+                                    </video>
+                                    <div className="flex items-center gap-1 mt-0.5 text-[8px] opacity-70">
+                                      <Video className="h-2.5 w-2.5" />
+                                      <span>{attachment.name || "Video"}</span>
+                                      <a
+                                        href={attachment.url}
+                                        download={attachment.name || "video"}
+                                        className="ml-auto hover:text-[#d4af37]"
+                                        title="Download video"
+                                      >
+                                        <Download className="h-2.5 w-2.5" />
+                                      </a>
+                                    </div>
+                                  </div>
+                                ) : attachment.type === "audio" ? (
+                                  <div className="p-1.5 bg-black/20 rounded">
+                                    <audio
+                                      src={attachment.url}
+                                      controls
+                                      className="w-full h-8"
+                                      preload="metadata"
+                                    >
+                                      Your browser does not support audio playback.
+                                    </audio>
+                                    <div className="flex items-center gap-1 mt-0.5 text-[8px] opacity-70">
+                                      <FileAudio className="h-2.5 w-2.5" />
+                                      <span>{attachment.name || "Audio"}</span>
                                     </div>
                                   </div>
                                 ) : (
@@ -1163,8 +1422,15 @@ Extract all relevant clinical information from the conversation.`;
                                     className="flex items-center gap-1 p-1 bg-black/20 rounded hover:bg-black/30 transition-colors"
                                   >
                                     <FileText className="h-3 w-3" />
-                                    <span className="text-[8px] truncate">{attachment.name || 'Document'}</span>
-                                    <Download className="h-2.5 w-2.5 ml-auto" />
+                                    <span className="text-[8px] truncate flex-1">
+                                      {attachment.name || "Document"}
+                                    </span>
+                                    {attachment.size && (
+                                      <span className="text-[7px] opacity-60">
+                                        {(attachment.size / 1024).toFixed(1)}KB
+                                      </span>
+                                    )}
+                                    <Download className="h-2.5 w-2.5" />
                                   </a>
                                 )}
                               </div>
@@ -1183,18 +1449,22 @@ Extract all relevant clinical information from the conversation.`;
           </>
         );
 
-      case 'queue':
+      case "queue":
         return (
           <>
             <SortablePanelHeader
               id="queue"
               name={panelLayout.panelNames.queue}
               icon={PANEL_ICONS.queue}
-              badge={pendingMessages.length > 0 ? (
-                <Badge className="ml-auto h-4 px-1 text-[8px] bg-[#ef4444]">{pendingMessages.length}</Badge>
-              ) : undefined}
+              badge={
+                pendingMessages.length > 0 ? (
+                  <Badge className="ml-auto h-4 px-1 text-[8px] bg-[#ef4444]">
+                    {pendingMessages.length}
+                  </Badge>
+                ) : undefined
+              }
               subtitle="60s countdown → auto-send"
-              onNameChange={(name) => panelLayout.updatePanelName('queue', name)}
+              onNameChange={(name) => panelLayout.updatePanelName("queue", name)}
             />
 
             <ScrollArea className="flex-1 p-1.5">
@@ -1211,28 +1481,43 @@ Extract all relevant clinical information from the conversation.`;
                   {pendingMessages.map((msg) => {
                     const progress = (msg.countdown / DEFAULT_TIMER_CONFIG.initialCountdown) * 100;
                     const isUrgent = msg.countdown <= 10;
-                    const isSending = msg.status === 'sending';
+                    const isSending = msg.status === "sending";
 
                     return (
-                      <Card key={msg.id} className={cn(
-                        "border",
-                        isUrgent && !isSending && "border-[#ef4444]/50 bg-[#ef4444]/5",
-                        isSending && "border-[#d4af37]/50 bg-[#d4af37]/5",
-                        !isUrgent && !isSending && "bg-[#111] border-[#222]"
-                      )}>
+                      <Card
+                        key={msg.id}
+                        className={cn(
+                          "border",
+                          isUrgent && !isSending && "border-[#ef4444]/50 bg-[#ef4444]/5",
+                          isSending && "border-[#d4af37]/50 bg-[#d4af37]/5",
+                          !isUrgent && !isSending && "bg-[#111] border-[#222]"
+                        )}
+                      >
                         <CardContent className="p-2">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-[9px] text-[#888] truncate">{msg.patientName}</span>
+                            <span className="text-[9px] text-[#888] truncate">
+                              {msg.patientName}
+                            </span>
                             {isSending ? (
                               <Loader2 className="h-3 w-3 animate-spin text-[#d4af37]" />
                             ) : (
-                              <span className={cn("text-xs font-bold", isUrgent ? "text-[#ef4444]" : "text-[#fafafa]")}>
+                              <span
+                                className={cn(
+                                  "text-xs font-bold",
+                                  isUrgent ? "text-[#ef4444]" : "text-[#fafafa]"
+                                )}
+                              >
                                 {msg.countdown}s
                               </span>
                             )}
                           </div>
-                          <p className="text-[9px] text-[#aaa] line-clamp-2 mb-1.5">{msg.content}</p>
-                          <Progress value={progress} className={cn("h-0.5 mb-1.5", isUrgent && "[&>div]:bg-[#ef4444]")} />
+                          <p className="text-[9px] text-[#aaa] line-clamp-2 mb-1.5">
+                            {msg.content}
+                          </p>
+                          <Progress
+                            value={progress}
+                            className={cn("h-0.5 mb-1.5", isUrgent && "[&>div]:bg-[#ef4444]")}
+                          />
                           <div className="flex gap-1">
                             <Button
                               size="sm"
@@ -1251,7 +1536,7 @@ Extract all relevant clinical information from the conversation.`;
                                   { conversationId: msg.conversationId, message: msg.content },
                                   {
                                     onSuccess: () => stagingQueue.markAsSent(msg.id),
-                                    onError: () => stagingQueue.markAsError(msg.id, 'Failed'),
+                                    onError: () => stagingQueue.markAsError(msg.id, "Failed"),
                                   }
                                 );
                               }}
@@ -1271,16 +1556,20 @@ Extract all relevant clinical information from the conversation.`;
           </>
         );
 
-      case 'ai':
+      case "ai":
         return (
           <>
             <SortablePanelHeader
               id="ai"
               name={panelLayout.panelNames.ai}
               icon={PANEL_ICONS.ai}
-              badge={<Badge variant="secondary" className="ml-auto text-[8px] h-4">Haiku 4.5</Badge>}
+              badge={
+                <Badge variant="secondary" className="ml-auto text-[8px] h-4">
+                  Haiku 4.5
+                </Badge>
+              }
               subtitle="Review & approve AI responses"
-              onNameChange={(name) => panelLayout.updatePanelName('ai', name)}
+              onNameChange={(name) => panelLayout.updatePanelName("ai", name)}
             />
 
             <ScrollArea className="flex-1 p-2">
@@ -1295,11 +1584,18 @@ Extract all relevant clinical information from the conversation.`;
               ) : (
                 <div className="space-y-2">
                   {claudeMessages.map((msg) => (
-                    <div key={msg.id} className={cn("flex", msg.role === 'user' ? "justify-end" : "justify-start")}>
-                      <div className={cn(
-                        "max-w-[90%] p-2 rounded text-[10px]",
-                        msg.role === 'user' ? "bg-[#1a1a1a] text-[#e6e6e6]" : "bg-[#0a1a0a] border border-[#22c55e]/30 text-[#e6e6e6]"
-                      )}>
+                    <div
+                      key={msg.id}
+                      className={cn("flex", msg.role === "user" ? "justify-end" : "justify-start")}
+                    >
+                      <div
+                        className={cn(
+                          "max-w-[90%] p-2 rounded text-[10px]",
+                          msg.role === "user"
+                            ? "bg-[#1a1a1a] text-[#e6e6e6]"
+                            : "bg-[#0a1a0a] border border-[#22c55e]/30 text-[#e6e6e6]"
+                        )}
+                      >
                         <p className="whitespace-pre-wrap">{msg.content}</p>
                       </div>
                     </div>
@@ -1321,8 +1617,12 @@ Extract all relevant clinical information from the conversation.`;
               <div className="p-2 border-t border-[#1a1a1a] bg-[#0a1a0a]">
                 <p className="text-[9px] text-[#22c55e] mb-1.5">
                   Ready to approve: {pendingApproval.templateName}
-                  {pendingApproval.isPDF && <Badge className="ml-1 h-3 text-[7px] bg-teal-600">PDF</Badge>}
-                  {pendingApproval.isFax && <Badge className="ml-1 h-3 text-[7px] bg-indigo-600">FAX</Badge>}
+                  {pendingApproval.isPDF && (
+                    <Badge className="ml-1 h-3 text-[7px] bg-teal-600">PDF</Badge>
+                  )}
+                  {pendingApproval.isFax && (
+                    <Badge className="ml-1 h-3 text-[7px] bg-indigo-600">FAX</Badge>
+                  )}
                 </p>
                 <div className="flex gap-2">
                   <Button
@@ -1339,11 +1639,17 @@ Extract all relevant clinical information from the conversation.`;
                     className="h-7 flex-1 text-[10px] bg-[#22c55e] hover:bg-[#16a34a]"
                   >
                     {pendingApproval.isPDF ? (
-                      <><FileDown className="h-3 w-3 mr-1" /> Generate PDF</>
+                      <>
+                        <FileDown className="h-3 w-3 mr-1" /> Generate PDF
+                      </>
                     ) : pendingApproval.isFax ? (
-                      <><Printer className="h-3 w-3 mr-1" /> Generate & Fax</>
+                      <>
+                        <Printer className="h-3 w-3 mr-1" /> Generate & Fax
+                      </>
                     ) : (
-                      <><Check className="h-3 w-3 mr-1" /> Approve → Queue</>
+                      <>
+                        <Check className="h-3 w-3 mr-1" /> Approve → Queue
+                      </>
                     )}
                   </Button>
                 </div>
@@ -1358,7 +1664,7 @@ Extract all relevant clinical information from the conversation.`;
                   value={claudeInput}
                   onChange={(e) => setClaudeInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
+                    if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
                       sendToClaudeChat();
                     }
@@ -1379,7 +1685,7 @@ Extract all relevant clinical information from the conversation.`;
           </>
         );
 
-      case 'templates':
+      case "templates":
         return (
           <>
             <SortablePanelHeader
@@ -1387,7 +1693,7 @@ Extract all relevant clinical information from the conversation.`;
               name={panelLayout.panelNames.templates}
               icon={PANEL_ICONS.templates}
               subtitle="Click any template to generate"
-              onNameChange={(name) => panelLayout.updatePanelName('templates', name)}
+              onNameChange={(name) => panelLayout.updatePanelName("templates", name)}
               actions={
                 <button
                   onClick={panelLayout.resetLayout}
@@ -1404,25 +1710,30 @@ Extract all relevant clinical information from the conversation.`;
               <div className="flex flex-wrap gap-1">
                 {Object.entries(TEMPLATE_CATEGORIES).map(([key, config]) => {
                   const Icon = config.icon;
-                  const hasTemplates = templatesByCategory[key]?.length > 0;
+                  // saved_messages always available from localStorage
+                  const hasTemplates = key === "saved_messages"
+                    ? savedMessages.messages.length > 0
+                    : templatesByCategory[key]?.length > 0;
+                  const count = key === "saved_messages"
+                    ? savedMessages.messages.length
+                    : templatesByCategory[key]?.length || 0;
                   return (
                     <button
                       key={key}
                       onClick={() => setSelectedTemplateCategory(key)}
-                      disabled={!hasTemplates}
                       className={cn(
                         "flex items-center gap-1 px-2 py-1 rounded text-[9px] transition-all",
                         selectedTemplateCategory === key
                           ? `${config.color} text-white`
                           : "bg-[#1a1a1a] text-[#888] hover:bg-[#222]",
-                        !hasTemplates && "opacity-30 cursor-not-allowed"
+                        !hasTemplates && key !== "saved_messages" && "opacity-30"
                       )}
                     >
                       <Icon className="h-3 w-3" />
                       {config.label}
-                      {hasTemplates && (
+                      {count > 0 && (
                         <span className="ml-0.5 bg-white/20 px-1 rounded text-[8px]">
-                          {templatesByCategory[key].length}
+                          {count}
                         </span>
                       )}
                     </button>
@@ -1431,9 +1742,197 @@ Extract all relevant clinical information from the conversation.`;
               </div>
             </div>
 
-            {/* Templates list from database */}
+            {/* Templates list - Saved Messages or DB templates */}
             <ScrollArea className="flex-1 p-2">
-              {isLoadingTemplates ? (
+              {selectedTemplateCategory === "saved_messages" ? (
+                /* Saved Messages - Split into AI (top) and Patient (bottom) */
+                savedMessages.isLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-5 w-5 animate-spin text-[#d4af37]" />
+                  </div>
+                ) : savedMessages.messages.length === 0 ? (
+                  <div className="text-center py-8 text-[#555] text-[10px]">
+                    <Zap className="h-6 w-6 mx-auto mb-2 opacity-50" />
+                    No saved messages yet
+                    <p className="text-[8px] mt-1">Click + to add quick replies</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col h-full gap-2">
+                    {/* TOP HALF: AI Prompts (messages NOT starting with ".") */}
+                    <div
+                      className="flex-1 min-h-0"
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.classList.add("bg-purple-500/10");
+                      }}
+                      onDragLeave={(e) => {
+                        e.currentTarget.classList.remove("bg-purple-500/10");
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.classList.remove("bg-purple-500/10");
+                        if (draggedMessageId) {
+                          const msg = savedMessages.messages.find(m => m.id === draggedMessageId);
+                          if (msg?.shortcut?.startsWith(".")) {
+                            // Move from Patient to AI: remove "." prefix
+                            const newShortcut = msg.shortcut.substring(1) || null;
+                            savedMessages.updateMessage(draggedMessageId, { shortcut: newShortcut });
+                            toast({ title: "Moved to AI Prompts" });
+                          }
+                          setDraggedMessageId(null);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-1 mb-1 px-1">
+                        <Bot className="h-3 w-3 text-purple-400" />
+                        <span className="text-[8px] text-purple-400 font-medium">AI Prompts</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1 overflow-y-auto max-h-[calc(50%-20px)]">
+                        {savedMessages.sortedByUsage
+                          .filter((msg) => !msg.shortcut?.startsWith("."))
+                          .map((msg) => (
+                          <button
+                            key={msg.id}
+                            draggable
+                            onDragStart={() => setDraggedMessageId(msg.id)}
+                            onDragEnd={() => setDraggedMessageId(null)}
+                            onClick={() => {
+                              setAiPrompt(msg.content);
+                              savedMessages.incrementUsage(msg.id);
+                              toast({ title: "AI Chat", description: msg.title });
+                            }}
+                            onContextMenu={(e) => {
+                              e.preventDefault();
+                              setEditingSavedMessage(msg);
+                              setShowSavedMessageEditor(true);
+                            }}
+                            className="group relative p-1.5 rounded bg-purple-500/10 border border-purple-500/30 hover:bg-purple-500/20 hover:border-purple-500/50 transition-all cursor-grab active:cursor-grabbing"
+                            title={msg.content}
+                          >
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                savedMessages.deleteMessage(msg.id);
+                                toast({ title: "Deleted", description: msg.title });
+                              }}
+                              className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-red-600 z-10"
+                            >
+                              <X className="h-2 w-2 text-white" />
+                            </span>
+                            <p className="text-[7px] font-medium text-purple-300 truncate text-center">
+                              {msg.title}
+                            </p>
+                            {msg.shortcut && (
+                              <p className="text-[5px] text-purple-500/60 font-mono text-center">
+                                {msg.shortcut}
+                              </p>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="border-t border-[#333] my-1" />
+
+                    {/* BOTTOM HALF: Patient Messages (messages starting with ".") */}
+                    <div
+                      className="flex-1 min-h-0"
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.classList.add("bg-[#d4af37]/10");
+                      }}
+                      onDragLeave={(e) => {
+                        e.currentTarget.classList.remove("bg-[#d4af37]/10");
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.currentTarget.classList.remove("bg-[#d4af37]/10");
+                        if (draggedMessageId) {
+                          const msg = savedMessages.messages.find(m => m.id === draggedMessageId);
+                          if (msg && !msg.shortcut?.startsWith(".")) {
+                            // Move from AI to Patient: add "." prefix
+                            const newShortcut = "." + (msg.shortcut || msg.title.toLowerCase().replace(/\s+/g, ""));
+                            savedMessages.updateMessage(draggedMessageId, { shortcut: newShortcut });
+                            toast({ title: "Moved to Patient Messages" });
+                          }
+                          setDraggedMessageId(null);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center gap-1 mb-1 px-1">
+                        <User className="h-3 w-3 text-[#d4af37]" />
+                        <span className="text-[8px] text-[#d4af37] font-medium">Patient Messages</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-1 overflow-y-auto max-h-[calc(50%-20px)]">
+                        {savedMessages.sortedByUsage
+                          .filter((msg) => msg.shortcut?.startsWith("."))
+                          .map((msg) => (
+                          <button
+                            key={msg.id}
+                            draggable
+                            onDragStart={() => setDraggedMessageId(msg.id)}
+                            onDragEnd={() => setDraggedMessageId(null)}
+                            onClick={() => {
+                              if (!selectedId) {
+                                toast({ title: "Select a conversation first" });
+                                return;
+                              }
+                              // Add to 1-minute queue on single click
+                              stagingQueue.addToQueue(
+                                msg.content,
+                                selectedId,
+                                selectedConversation?.patient_name || "Patient",
+                                selectedId,
+                                false
+                              );
+                              savedMessages.incrementUsage(msg.id);
+                              toast({ title: "Queued (60s)", description: msg.title });
+                            }}
+                            onContextMenu={(e) => {
+                              e.preventDefault();
+                              setEditingSavedMessage(msg);
+                              setShowSavedMessageEditor(true);
+                            }}
+                            className="group relative p-1.5 rounded bg-[#d4af37]/10 border border-[#d4af37]/30 hover:bg-[#d4af37]/20 hover:border-[#d4af37]/50 transition-all cursor-grab active:cursor-grabbing"
+                            title={msg.content}
+                          >
+                            <span
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                savedMessages.deleteMessage(msg.id);
+                                toast({ title: "Deleted", description: msg.title });
+                              }}
+                              className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:bg-red-600 z-10"
+                            >
+                              <X className="h-2 w-2 text-white" />
+                            </span>
+                            <p className="text-[7px] font-medium text-[#d4af37] truncate text-center">
+                              {msg.title}
+                            </p>
+                            {msg.shortcut && (
+                              <p className="text-[5px] text-[#d4af37]/60 font-mono text-center">
+                                {msg.shortcut}
+                              </p>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Add new button */}
+                    <button
+                      onClick={() => {
+                        setEditingSavedMessage(null);
+                        setShowSavedMessageEditor(true);
+                      }}
+                      className="w-full p-1.5 rounded border border-dashed border-[#333] text-[#555] hover:border-[#d4af37] hover:text-[#d4af37] transition-all text-[8px] mt-1"
+                    >
+                      + Add
+                    </button>
+                  </div>
+                )
+              ) : isLoadingTemplates ? (
                 <div className="flex items-center justify-center py-8">
                   <Loader2 className="h-5 w-5 animate-spin text-[#d4af37]" />
                 </div>
@@ -1446,7 +1945,10 @@ Extract all relevant clinical information from the conversation.`;
               ) : (
                 <div className="space-y-1.5">
                   {templatesByCategory[selectedTemplateCategory].map((template) => {
-                    const categoryConfig = TEMPLATE_CATEGORIES[selectedTemplateCategory as keyof typeof TEMPLATE_CATEGORIES];
+                    const categoryConfig =
+                      TEMPLATE_CATEGORIES[
+                        selectedTemplateCategory as keyof typeof TEMPLATE_CATEGORIES
+                      ];
                     return (
                       <button
                         key={template.id}
@@ -1454,7 +1956,7 @@ Extract all relevant clinical information from the conversation.`;
                         disabled={!selectedId || isGenerating}
                         className={cn(
                           "w-full p-2 rounded-lg transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed",
-                          categoryConfig?.color || 'bg-[#333]',
+                          categoryConfig?.color || "bg-[#333]",
                           "hover:opacity-90 hover:scale-[1.01] active:scale-[0.99]"
                         )}
                       >
@@ -1468,7 +1970,9 @@ Extract all relevant clinical information from the conversation.`;
                             </p>
                           </div>
                           {template.is_default && (
-                            <Badge className="h-4 text-[7px] bg-white/20 flex-shrink-0">Default</Badge>
+                            <Badge className="h-4 text-[7px] bg-white/20 flex-shrink-0">
+                              Default
+                            </Badge>
                           )}
                         </div>
                         {template.case_type && (
@@ -1522,7 +2026,7 @@ Extract all relevant clinical information from the conversation.`;
   };
 
   // Get active panel name for drag overlay
-  const activePanelName = activeDragId ? panelLayout.panelNames[activeDragId] : '';
+  const activePanelName = activeDragId ? panelLayout.panelNames[activeDragId] : "";
 
   return (
     <ModernLayout hideSidebar noPadding fullHeight>
@@ -1533,10 +2037,7 @@ Extract all relevant clinical information from the conversation.`;
         onDragEnd={handleDragEnd}
         modifiers={[restrictToHorizontalAxis]}
       >
-        <SortableContext
-          items={panelLayout.panelOrder}
-          strategy={horizontalListSortingStrategy}
-        >
+        <SortableContext items={panelLayout.panelOrder} strategy={horizontalListSortingStrategy}>
           <PanelGroup
             direction="horizontal"
             className="h-full bg-[#080808] overflow-hidden"
@@ -1573,10 +2074,7 @@ Extract all relevant clinical information from the conversation.`;
         {/* Drag Overlay */}
         <DragOverlay>
           {activeDragId ? (
-            <DragOverlayPanel
-              name={activePanelName}
-              icon={PANEL_ICONS[activeDragId]}
-            />
+            <DragOverlayPanel name={activePanelName} icon={PANEL_ICONS[activeDragId]} />
           ) : null}
         </DragOverlay>
       </DndContext>

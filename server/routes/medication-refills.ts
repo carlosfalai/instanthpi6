@@ -5,8 +5,12 @@ import { medicationRefills } from "@shared/schema";
 import { v4 as uuidv4 } from "uuid";
 import { processEmailAttachments } from "../utils/emailProcessor.js";
 import * as OpenAI from "openai";
+import { requireAuth } from "../middleware/auth";
 
 const router = Router();
+
+// All medication refill routes require authentication - PHI
+router.use(requireAuth);
 const openai = new OpenAI.default({
   apiKey: process.env.OPENAI_API_KEY,
 });

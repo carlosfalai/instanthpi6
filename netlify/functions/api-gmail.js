@@ -5,7 +5,8 @@ const { createClient } = require("@supabase/supabase-js");
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI || `${process.env.CLIENT_URL || "https://instanthpi.ca"}/auth/gmail/callback`
+  process.env.GOOGLE_REDIRECT_URI ||
+    `${process.env.CLIENT_URL || "https://instanthpi.ca"}/auth/gmail/callback`
 );
 
 // Supabase client
@@ -19,7 +20,7 @@ function getSupabase() {
 // Get Gmail access token for a user
 async function getGmailAccessToken(doctorId = "default-doctor") {
   const supabase = getSupabase();
-  
+
   if (!supabase) {
     throw new Error("Supabase not configured");
   }
@@ -39,7 +40,7 @@ async function getGmailAccessToken(doctorId = "default-doctor") {
     // Refresh the token
     oauth2Client.setCredentials({ refresh_token: physician.gmail_refresh_token });
     const { credentials } = await oauth2Client.refreshAccessToken();
-    
+
     // Update stored token
     await supabase
       .from("physicians")
@@ -73,7 +74,7 @@ exports.handler = async (event, context) => {
   }
 
   // Parse the path to determine which endpoint
-  const pathParts = event.path.split("/").filter(p => p);
+  const pathParts = event.path.split("/").filter((p) => p);
   const endpoint = pathParts[pathParts.length - 1];
   const isAuthUrl = event.path.includes("/auth/url");
   const isAuthCallback = event.path.includes("/auth/callback");
@@ -115,13 +116,14 @@ exports.handler = async (event, context) => {
         return {
           statusCode: 500,
           headers,
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             error: "Gmail OAuth not configured",
-            message: "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables are required. Please configure them in Netlify environment variables.",
+            message:
+              "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables are required. Please configure them in Netlify environment variables.",
             details: {
               hasClientId: !!process.env.GOOGLE_CLIENT_ID,
               hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
-            }
+            },
           }),
         };
       }
@@ -132,23 +134,23 @@ exports.handler = async (event, context) => {
       ];
 
       try {
-      const authUrl = oauth2Client.generateAuthUrl({
-        access_type: "offline",
-        scope: scopes,
-        prompt: "consent",
-      });
+        const authUrl = oauth2Client.generateAuthUrl({
+          access_type: "offline",
+          scope: scopes,
+          prompt: "consent",
+        });
 
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ authUrl }),
-      };
+        return {
+          statusCode: 200,
+          headers,
+          body: JSON.stringify({ authUrl }),
+        };
       } catch (error) {
         console.error("Error generating Gmail auth URL:", error);
         return {
           statusCode: 500,
           headers,
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             error: "Failed to generate auth URL",
             message: error.message || "An error occurred while generating the Gmail OAuth URL",
           }),
@@ -170,7 +172,7 @@ exports.handler = async (event, context) => {
 
       try {
         const { tokens } = await oauth2Client.getToken(code);
-        
+
         // Store tokens securely in Supabase
         const supabase = getSupabase();
         const doctorId = "default-doctor";
@@ -228,7 +230,7 @@ exports.handler = async (event, context) => {
         const instanthpiLabel = labelsResponse.data.labels?.find(
           (label) => label.name?.toLowerCase() === "instanthpi"
         );
-        
+
         if (instanthpiLabel) {
           labelFilter = [instanthpiLabel.id];
           console.log(`Found Instanthpi label: ${instanthpiLabel.id}`);
@@ -246,18 +248,16 @@ exports.handler = async (event, context) => {
       const maxPages = 10; // Fetch up to 10 pages (2000 emails)
 
       // Construct search query if label not found
-      const query = labelFilter 
-        ? `label:instanthpi` 
-        : `subject:instanthpi OR from:instanthpi`;
+      const query = labelFilter ? `label:instanthpi` : `subject:instanthpi OR from:instanthpi`;
 
       do {
         const params = {
           userId: "me",
           maxResults: 50, // Reduced batch size for better reliability
           pageToken: pageToken,
-          q: query
+          q: query,
         };
-        
+
         // Only add labelIds if we found the label
         if (labelFilter) {
           params.labelIds = labelFilter;
@@ -270,7 +270,9 @@ exports.handler = async (event, context) => {
         pageToken = messagesResponse.data.nextPageToken;
         pageCount++;
 
-        console.log(`Page ${pageCount}: Fetched ${messageIds.length} messages. Total: ${allMessageIds.length}`);
+        console.log(
+          `Page ${pageCount}: Fetched ${messageIds.length} messages. Total: ${allMessageIds.length}`
+        );
 
         if (!pageToken || pageCount >= maxPages) break;
       } while (pageToken);
@@ -347,7 +349,7 @@ exports.handler = async (event, context) => {
     };
   } catch (error) {
     console.error("Gmail API error:", error);
-    
+
     if (error.message?.includes("Gmail not connected")) {
       return {
         statusCode: 401,
@@ -369,4 +371,3 @@ exports.handler = async (event, context) => {
     };
   }
 };
-

@@ -21,13 +21,13 @@ exports.handler = async (event) => {
   }
 
   try {
-    const { 
+    const {
       section_name,
       custom_request,
       patient_data,
       writing_style_template,
       api_key,
-      api_provider = "claude"
+      api_provider = "claude",
     } = JSON.parse(event.body);
 
     if (!section_name || !api_key) {
@@ -43,22 +43,38 @@ exports.handler = async (event) => {
 
 SECTION TO GENERATE: ${section_name}
 
-${patient_data ? `PATIENT INFORMATION:
+${
+  patient_data
+    ? `PATIENT INFORMATION:
 ${JSON.stringify(patient_data, null, 2)}
-` : ''}
+`
+    : ""
+}
 
-${writing_style_template ? `PHYSICIAN'S WRITING STYLE PREFERENCES:
+${
+  writing_style_template
+    ? `PHYSICIAN'S WRITING STYLE PREFERENCES:
 ${writing_style_template.template_text}
 
-${writing_style_template.example_text ? `EXAMPLE OF PREFERRED STYLE:
-${writing_style_template.example_text}` : ''}
+${
+  writing_style_template.example_text
+    ? `EXAMPLE OF PREFERRED STYLE:
+${writing_style_template.example_text}`
+    : ""
+}
 
-TONE: ${writing_style_template.tone || 'professional'}
-` : ''}
+TONE: ${writing_style_template.tone || "professional"}
+`
+    : ""
+}
 
-${custom_request ? `SPECIFIC REQUEST FROM PHYSICIAN:
+${
+  custom_request
+    ? `SPECIFIC REQUEST FROM PHYSICIAN:
 ${custom_request}
-` : ''}
+`
+    : ""
+}
 
 Generate the ${section_name} section following the physician's style preferences and the specific request. 
 Return ONLY the content text, no code, no markdown formatting, no explanations.
@@ -66,14 +82,16 @@ Be concise, clinically appropriate, and match the requested tone and style exact
 
     if (api_provider === "claude") {
       const anthropic = new Anthropic({ apiKey: api_key });
-      
+
       const message = await anthropic.messages.create({
         model: "claude-3-5-haiku-20241022",
         max_tokens: 2048,
-        messages: [{
-          role: "user",
-          content: prompt,
-        }],
+        messages: [
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
       });
 
       const generatedText = message.content[0].text;
@@ -94,11 +112,15 @@ Be concise, clinically appropriate, and match the requested tone and style exact
       const chat = await openai.chat.completions.create({
         model: "gpt-4o-mini", // lightweight, adjust if needed
         messages: [
-          { role: "system", content: "You are a medical AI assistant that writes concise, clinically appropriate text. Return plain text only." },
-          { role: "user", content: prompt }
+          {
+            role: "system",
+            content:
+              "You are a medical AI assistant that writes concise, clinically appropriate text. Return plain text only.",
+          },
+          { role: "user", content: prompt },
         ],
         temperature: 0.3,
-        max_tokens: 1200
+        max_tokens: 1200,
       });
 
       const generatedText = chat.choices?.[0]?.message?.content || "";
@@ -119,7 +141,6 @@ Be concise, clinically appropriate, and match the requested tone and style exact
         body: JSON.stringify({ error: "Unsupported provider" }),
       };
     }
-
   } catch (error) {
     console.error("AI generation error:", error);
     return {
@@ -131,4 +152,3 @@ Be concise, clinically appropriate, and match the requested tone and style exact
     };
   }
 };
-

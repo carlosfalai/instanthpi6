@@ -5,14 +5,12 @@ import { z } from "zod";
 import { db } from "../db";
 import { eq, and } from "drizzle-orm";
 import { taskInteractions, priorityModels } from "@shared/schema";
-
-// Define the authenticated request type
-interface AuthRequest extends Request {
-  isAuthenticated(): boolean;
-  user?: any;
-}
+import { requireAuth, getAuthenticatedUserId } from "../middleware/auth";
 
 const priorityAIRouter = Router();
+
+// Apply auth middleware to all routes
+priorityAIRouter.use(requireAuth);
 
 // Schema for tracking task interactions
 const recordInteractionSchema = z.object({
@@ -25,13 +23,12 @@ const recordInteractionSchema = z.object({
 });
 
 // Get prioritized tasks for the current user
-priorityAIRouter.get("/priority/tasks", async (req: AuthRequest, res: Response) => {
+priorityAIRouter.get("/priority/tasks", async (req: Request, res: Response) => {
   try {
-    if (!req.isAuthenticated()) {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-
-    const userId = req.user!.id;
     const prioritizedTasks = await priorityAIService.getPrioritizedTasksForUser(userId);
 
     res.json({
@@ -49,13 +46,12 @@ priorityAIRouter.get("/priority/tasks", async (req: AuthRequest, res: Response) 
 });
 
 // Record a task interaction for learning
-priorityAIRouter.post("/priority/interaction", async (req: AuthRequest, res: Response) => {
+priorityAIRouter.post("/priority/interaction", async (req: Request, res: Response) => {
   try {
-    if (!req.isAuthenticated()) {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-
-    const userId = req.user!.id;
     const validatedData = recordInteractionSchema.parse(req.body);
 
     // Get or create a session ID
@@ -88,13 +84,12 @@ priorityAIRouter.post("/priority/interaction", async (req: AuthRequest, res: Res
 });
 
 // Get info about the current user's priority model
-priorityAIRouter.get("/priority/model", async (req: AuthRequest, res: Response) => {
+priorityAIRouter.get("/priority/model", async (req: Request, res: Response) => {
   try {
-    if (!req.isAuthenticated()) {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-
-    const userId = req.user!.id;
 
     // Get the active model for the user
     const [activeModel] = await db
@@ -125,13 +120,12 @@ priorityAIRouter.get("/priority/model", async (req: AuthRequest, res: Response) 
 });
 
 // Manually trigger model training (for testing)
-priorityAIRouter.post("/priority/train", async (req: AuthRequest, res: Response) => {
+priorityAIRouter.post("/priority/train", async (req: Request, res: Response) => {
   try {
-    if (!req.isAuthenticated()) {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-
-    const userId = req.user!.id;
 
     // Check if user has enough interactions for training
     const interactionCount = await priorityAIService.getInteractionCountForUser(userId);

@@ -12,12 +12,16 @@ import { ZodError } from "zod";
 import OpenAI from "openai";
 import path from "path";
 import fs from "fs";
+import { requireAuth } from "../middleware/auth";
 
 // Initialize OpenAI
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Create router
 const router = express.Router();
+
+// All insurance document routes require authentication - PII/PHI
+router.use(requireAuth);
 
 // Get all insurance documents
 router.get("/", async (req, res) => {

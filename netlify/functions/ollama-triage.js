@@ -1,6 +1,6 @@
 // Real AI API integration - no more fake Ollama
-const { OpenAI } = require('openai');
-const { Anthropic } = require('@anthropic-ai/sdk');
+const { OpenAI } = require("openai");
+const { Anthropic } = require("@anthropic-ai/sdk");
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -139,27 +139,28 @@ exports.handler = async (event) => {
     try {
       // Try OpenAI first, then Anthropic, then fallback to rules
       let aiResponse = null;
-      
+
       try {
         const openaiResponse = await openai.chat.completions.create({
           model: "gpt-4o",
           messages: [
             {
               role: "system",
-              content: "You are an expert emergency medicine physician. Analyze patient data and provide triage assessment in JSON format with: triage_level, urgency_score, reasoning, recommended_action, hpi_summary, follow_up_questions"
+              content:
+                "You are an expert emergency medicine physician. Analyze patient data and provide triage assessment in JSON format with: triage_level, urgency_score, reasoning, recommended_action, hpi_summary, follow_up_questions",
             },
             {
-              role: "user", 
-              content: fullPrompt
-            }
+              role: "user",
+              content: fullPrompt,
+            },
           ],
           temperature: 0.1,
-          max_tokens: 1000
+          max_tokens: 1000,
         });
         aiResponse = openaiResponse.choices[0].message.content;
       } catch (openaiError) {
         console.log("OpenAI failed, trying Anthropic:", openaiError.message);
-        
+
         try {
           const anthropicResponse = await anthropic.messages.create({
             model: "claude-3-5-haiku-20241022",
@@ -167,16 +168,16 @@ exports.handler = async (event) => {
             messages: [
               {
                 role: "user",
-                content: fullPrompt
-              }
-            ]
+                content: fullPrompt,
+              },
+            ],
           });
           aiResponse = anthropicResponse.content[0].text;
         } catch (anthropicError) {
           console.log("Anthropic failed:", anthropicError.message);
         }
       }
-      
+
       // If AI worked, try to parse it, otherwise use rule-based
       if (aiResponse) {
         try {
@@ -190,7 +191,8 @@ exports.handler = async (event) => {
         } catch (parseError) {
           console.log("AI response not JSON, trying to extract content:", aiResponse);
           // Try to extract JSON from the response if it's wrapped in markdown
-          const jsonMatch = aiResponse.match(/```json\s*([\s\S]*?)\s*```/) || aiResponse.match(/\{[\s\S]*\}/);
+          const jsonMatch =
+            aiResponse.match(/```json\s*([\s\S]*?)\s*```/) || aiResponse.match(/\{[\s\S]*\}/);
           if (jsonMatch) {
             try {
               const extracted = JSON.parse(jsonMatch[1] || jsonMatch[0]);
@@ -206,7 +208,7 @@ exports.handler = async (event) => {
           }
         }
       }
-      
+
       // Fallback to rule-based
       console.log("Using rule-based fallback");
       const result = ruleBasedTriage(patientData);

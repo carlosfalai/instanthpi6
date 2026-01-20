@@ -48,7 +48,8 @@ const ClaudeProfileAssistant = () => {
     {
       id: "1",
       role: "assistant",
-      content: "Hello! I'm your AI assistant. I can help you manage your doctor profile. I can view and update your information like name, specialty, phone, address, education, certifications, and signature. What would you like to do?",
+      content:
+        "Hello! I'm your AI assistant. I can help you manage your doctor profile. I can view and update your information like name, specialty, phone, address, education, certifications, and signature. What would you like to do?",
       timestamp: new Date(),
     },
   ]);
@@ -260,14 +261,11 @@ Be helpful and conversational.`,
               Profile Assistant
             </CardTitle>
             <CardDescription>
-              Chat with Claude to manage your doctor profile. I can view and update your information.
+              Chat with Claude to manage your doctor profile. I can view and update your
+              information.
             </CardDescription>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowApiCalls(!showApiCalls)}
-          >
+          <Button variant="outline" size="sm" onClick={() => setShowApiCalls(!showApiCalls)}>
             <Code className="h-4 w-4 mr-2" />
             {showApiCalls ? "Hide" : "Show"} API Calls
           </Button>
@@ -305,15 +303,11 @@ Be helpful and conversational.`,
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex ${
-                    message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
+                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   <div
                     className={`max-w-[80%] rounded-lg p-3 ${
-                      message.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
+                      message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
                     }`}
                   >
                     <div className="whitespace-pre-wrap">{message.content}</div>
@@ -432,4 +426,3 @@ Be helpful and conversational.`,
 };
 
 export default ClaudeProfileAssistant;
-

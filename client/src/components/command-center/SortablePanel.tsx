@@ -1,10 +1,10 @@
-import React from 'react';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { Panel } from 'react-resizable-panels';
-import { GripVertical } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { PanelId } from '@/hooks/usePanelLayout';
+import React from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Panel } from "react-resizable-panels";
+import { GripVertical } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { PanelId } from "@/hooks/usePanelLayout";
 
 interface SortablePanelProps {
   id: PanelId;
@@ -35,15 +35,8 @@ export function SortablePanel({
   className,
   isLast = false,
 }: SortablePanelProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-    isOver,
-  } = useSortable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } =
+    useSortable({ id });
 
   const style: React.CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -58,18 +51,14 @@ export function SortablePanel({
       minSize={minSize}
       maxSize={maxSize}
       className={cn(
-        'flex flex-col overflow-hidden',
-        !isLast && 'border-r border-[#1a1a1a]',
-        isDragging && 'opacity-50',
-        isOver && 'bg-[#d4af37]/5',
+        "flex flex-col overflow-hidden",
+        !isLast && "border-r border-[#1a1a1a]",
+        isDragging && "opacity-50",
+        isOver && "bg-[#d4af37]/5",
         className
       )}
     >
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="flex flex-col h-full"
-      >
+      <div ref={setNodeRef} style={style} className="flex flex-col h-full">
         {/* Panel Header with Drag Handle */}
         <div className="p-2 border-b border-[#1a1a1a] flex items-start gap-1">
           {/* Drag Handle */}
@@ -77,10 +66,10 @@ export function SortablePanel({
             {...attributes}
             {...listeners}
             className={cn(
-              'flex-shrink-0 p-0.5 rounded cursor-grab active:cursor-grabbing',
-              'hover:bg-[#222] transition-colors',
-              'focus:outline-none focus:ring-1 focus:ring-[#d4af37]/50',
-              isDragging && 'cursor-grabbing'
+              "flex-shrink-0 p-0.5 rounded cursor-grab active:cursor-grabbing",
+              "hover:bg-[#222] transition-colors",
+              "focus:outline-none focus:ring-1 focus:ring-[#d4af37]/50",
+              isDragging && "cursor-grabbing"
             )}
             title="Drag to reorder"
           >
@@ -94,23 +83,15 @@ export function SortablePanel({
               <span className="truncate">{name}</span>
               {badge}
             </h2>
-            {subtitle && (
-              <p className="text-[8px] text-[#555] mt-0.5">{subtitle}</p>
-            )}
+            {subtitle && <p className="text-[8px] text-[#555] mt-0.5">{subtitle}</p>}
           </div>
 
           {/* Header Actions */}
-          {headerActions && (
-            <div className="flex-shrink-0">
-              {headerActions}
-            </div>
-          )}
+          {headerActions && <div className="flex-shrink-0">{headerActions}</div>}
         </div>
 
         {/* Panel Content */}
-        <div className="flex-1 overflow-hidden flex flex-col">
-          {children}
-        </div>
+        <div className="flex-1 overflow-hidden flex flex-col">{children}</div>
       </div>
     </Panel>
   );
@@ -166,10 +147,10 @@ export function PanelHeader({
           {...dragHandleProps.attributes}
           {...(dragHandleProps.listeners as React.ButtonHTMLAttributes<HTMLButtonElement>)}
           className={cn(
-            'flex-shrink-0 p-0.5 rounded cursor-grab active:cursor-grabbing',
-            'hover:bg-[#222] transition-colors',
-            'focus:outline-none focus:ring-1 focus:ring-[#d4af37]/50',
-            isDragging && 'cursor-grabbing'
+            "flex-shrink-0 p-0.5 rounded cursor-grab active:cursor-grabbing",
+            "hover:bg-[#222] transition-colors",
+            "focus:outline-none focus:ring-1 focus:ring-[#d4af37]/50",
+            isDragging && "cursor-grabbing"
           )}
           title="Drag to reorder"
         >
@@ -182,9 +163,7 @@ export function PanelHeader({
           <span className="truncate">{name}</span>
           {badge}
         </h2>
-        {subtitle && (
-          <p className="text-[8px] text-[#555] mt-0.5">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-[8px] text-[#555] mt-0.5">{subtitle}</p>}
       </div>
       {actions && <div className="flex-shrink-0">{actions}</div>}
     </div>

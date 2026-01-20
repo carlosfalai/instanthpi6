@@ -1,6 +1,6 @@
-import { SpruceHealthClient } from '../spruce-health-client';
-import { supabase } from '../supabase-server';
-import { decryptCredential } from '../utils/encryption';
+import { SpruceHealthClient } from "../spruce-health-client";
+import { supabase } from "../supabase-server";
+import { decryptCredential } from "../utils/encryption";
 
 // Cache for Spruce clients to avoid repeated decryption
 const clientCache = new Map<string, SpruceHealthClient>();
@@ -16,13 +16,13 @@ interface DoctorSpruceCredentials {
 async function getDoctorSpruceCredentials(userId: string): Promise<DoctorSpruceCredentials | null> {
   try {
     const { data, error } = await supabase
-      .from('doctor_credentials')
-      .select('spruce_access_id, spruce_api_key')
-      .eq('user_id', userId)
+      .from("doctor_credentials")
+      .select("spruce_access_id, spruce_api_key")
+      .eq("user_id", userId)
       .single();
 
     if (error) {
-      if (error.code === 'PGRST116') {
+      if (error.code === "PGRST116") {
         // No credentials found
         return null;
       }
@@ -31,14 +31,14 @@ async function getDoctorSpruceCredentials(userId: string): Promise<DoctorSpruceC
 
     return data;
   } catch (error) {
-    console.error('Error fetching Spruce credentials:', error);
+    console.error("Error fetching Spruce credentials:", error);
     return null;
   }
 }
 
 /**
  * Gets configured Spruce client for a doctor
- * 
+ *
  * @param userId - The doctor's user ID
  * @param forceRefresh - Skip cache and get fresh credentials
  * @returns SpruceHealthClient instance or throws if not configured
@@ -56,7 +56,7 @@ export async function getSpruceClient(
   const credentials = await getDoctorSpruceCredentials(userId);
 
   if (!credentials || !credentials.spruce_access_id || !credentials.spruce_api_key) {
-    throw new Error('SPRUCE_CREDENTIALS_NOT_CONFIGURED');
+    throw new Error("SPRUCE_CREDENTIALS_NOT_CONFIGURED");
   }
 
   // Decrypt credentials
@@ -64,7 +64,7 @@ export async function getSpruceClient(
   const apiKey = decryptCredential(credentials.spruce_api_key);
 
   if (!accessId || !apiKey) {
-    throw new Error('SPRUCE_CREDENTIALS_DECRYPT_FAILED');
+    throw new Error("SPRUCE_CREDENTIALS_DECRYPT_FAILED");
   }
 
   // Create Spruce client

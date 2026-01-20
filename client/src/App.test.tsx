@@ -1,40 +1,59 @@
-import { describe, it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import App from "./App";
 
 // Mock wouter router
 vi.mock("wouter", () => ({
   Router: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  Route: ({ path, component: Component }: { path: string; component: React.ComponentType }) => {
-    if (path === "/") {
+  Route: ({ children, component: Component }: { children?: React.ReactNode; path: string; component?: React.ComponentType }) => {
+    if (Component) {
       return <Component />;
     }
-    return null;
+    return <div>{children}</div>;
   },
   Switch: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   useLocation: () => ["/", vi.fn()],
+  Redirect: () => null,
+}));
+
+// Mock Supabase
+vi.mock("@/lib/supabase", () => ({
+  supabase: {
+    auth: {
+      onAuthStateChange: () => ({
+        data: { subscription: { unsubscribe: vi.fn() } },
+      }),
+    },
+  },
 }));
 
 // Mock components
-vi.mock("@/components/auth/LoginPage", () => ({
-  LoginPage: () => <div>Login Page</div>,
-}));
-
-vi.mock("@/pages/doctor-dashboard", () => ({
-  default: () => <div>Doctor Dashboard</div>,
-}));
-
 vi.mock("@/pages/doctor-login", () => ({
   default: () => <div>Doctor Login</div>,
 }));
 
-vi.mock("@/pages/public-patient-intake", () => ({
-  default: () => <div>Patient Intake</div>,
+vi.mock("@/pages/auth-callback", () => ({
+  default: () => <div>Auth Callback</div>,
+}));
+
+vi.mock("@/pages/command-center", () => ({
+  default: () => <div data-testid="command-center">Command Center</div>,
+}));
+
+vi.mock("@/pages/settings-page", () => ({
+  default: () => <div>Settings Page</div>,
+}));
+
+vi.mock("@/lib/auth-guard", () => ({
+  ProtectedRoute: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 describe("App", () => {
-  it("renders without crashing", () => {
+  it("renders without crashing", async () => {
     render(<App />);
-    expect(screen.getByText("Patient Intake")).toBeInTheDocument();
+    // Wait for lazy-loaded component to appear
+    await waitFor(() => {
+      expect(screen.getByTestId("command-center")).toBeInTheDocument();
+    });
   });
 });

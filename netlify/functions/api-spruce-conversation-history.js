@@ -31,7 +31,7 @@ exports.handler = async (event, context) => {
 
   // Extract conversation ID from path
   // Path format: /api/spruce/conversations/{id}/history
-  const pathParts = event.path.split("/").filter(p => p);
+  const pathParts = event.path.split("/").filter((p) => p);
   let conversationId = null;
 
   // Find the conversation ID (should be before "history")
@@ -51,7 +51,7 @@ exports.handler = async (event, context) => {
       body: JSON.stringify({
         error: "Conversation ID is required",
         path: event.path,
-        parts: pathParts
+        parts: pathParts,
       }),
     };
   }
@@ -81,7 +81,10 @@ exports.handler = async (event, context) => {
     }
 
     // Fallback to headers if provided
-    if (!spruceAccessId && (event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"])) {
+    if (
+      !spruceAccessId &&
+      (event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"])
+    ) {
       spruceAccessId = event.headers["x-spruce-access-id"] || event.headers["X-Spruce-Access-Id"];
     }
     if (!spruceApiKey && (event.headers["x-spruce-api-key"] || event.headers["X-Spruce-Api-Key"])) {
@@ -106,7 +109,8 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           error: "Spruce credentials not configured",
-          message: "Please add Spruce Access ID and API Key in Doctor Profile → API Integrations, then try again.",
+          message:
+            "Please add Spruce Access ID and API Key in Doctor Profile → API Integrations, then try again.",
         }),
       };
     }
@@ -130,7 +134,9 @@ exports.handler = async (event, context) => {
     );
 
     console.log(`Spruce API response status: ${conversationResponse.status}`);
-    console.log(`Spruce API response keys: ${Object.keys(conversationResponse.data || {}).join(', ')}`);
+    console.log(
+      `Spruce API response keys: ${Object.keys(conversationResponse.data || {}).join(", ")}`
+    );
 
     const conversation = conversationResponse.data;
     console.log(`Conversation details:`, JSON.stringify(conversation).substring(0, 500));
@@ -150,43 +156,59 @@ exports.handler = async (event, context) => {
     console.log(`Found ${spruceMessages.length} items in conversation`);
 
     // Transform Spruce messages to inbox format
-    const transformedMessages = (Array.isArray(spruceMessages) ? spruceMessages : []).map((msg) => {
-      // Determine if message is from patient (external participant)
-      const isFromPatient = msg.actor?.type === "external" ||
-                           msg.actor?.isExternal === true ||
-                           msg.sender?.type === "external" ||
-                           msg.sender?.isExternal === true ||
-                           (!msg.actor?.isInternal && !msg.sender?.isInternal);
+    const transformedMessages = (Array.isArray(spruceMessages) ? spruceMessages : [])
+      .map((msg) => {
+        // Determine if message is from patient (external participant)
+        const isFromPatient =
+          msg.actor?.type === "external" ||
+          msg.actor?.isExternal === true ||
+          msg.sender?.type === "external" ||
+          msg.sender?.isExternal === true ||
+          (!msg.actor?.isInternal && !msg.sender?.isInternal);
 
-      // Get message content - can be in different fields depending on item type
-      let content = "";
-      if (msg.message) {
-        content = msg.message.text || msg.message.content || msg.message.body || "";
-      } else {
-        content = msg.content || msg.text || msg.body || msg.summary || "";
-      }
+        // Get message content - can be in different fields depending on item type
+        let content = "";
+        if (msg.message) {
+          content = msg.message.text || msg.message.content || msg.message.body || "";
+        } else {
+          content = msg.content || msg.text || msg.body || msg.summary || "";
+        }
 
-      return {
-        id: msg.id || msg.messageId || msg.conversationItemId,
-        content: content,
-        timestamp: msg.timestamp || msg.createdAt || msg.sentAt || msg.occurredAt || new Date().toISOString(),
-        isFromPatient: isFromPatient,
-        senderName: msg.actor?.displayName || msg.actor?.name || msg.sender?.displayName || msg.sender?.name || (isFromPatient ? "Patient" : "Dr. Font"),
-        type: msg.type || "message",
-      };
-    }).filter(msg => msg.content); // Only include messages with content
+        return {
+          id: msg.id || msg.messageId || msg.conversationItemId,
+          content: content,
+          timestamp:
+            msg.timestamp ||
+            msg.createdAt ||
+            msg.sentAt ||
+            msg.occurredAt ||
+            new Date().toISOString(),
+          isFromPatient: isFromPatient,
+          senderName:
+            msg.actor?.displayName ||
+            msg.actor?.name ||
+            msg.sender?.displayName ||
+            msg.sender?.name ||
+            (isFromPatient ? "Patient" : "Dr. Font"),
+          type: msg.type || "message",
+        };
+      })
+      .filter((msg) => msg.content); // Only include messages with content
 
     // Sort by timestamp (oldest first)
     transformedMessages.sort((a, b) => {
       return new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
     });
 
-    console.log(`Returning ${transformedMessages.length} transformed messages for conversation ${conversationId}`);
+    console.log(
+      `Returning ${transformedMessages.length} transformed messages for conversation ${conversationId}`
+    );
 
     // If no messages found, return helpful info about the conversation
     if (transformedMessages.length === 0) {
       // Include conversation metadata so frontend can show patient info
-      const lastActivity = conversation.lastActivity || conversation.updatedAt || conversation.createdAt;
+      const lastActivity =
+        conversation.lastActivity || conversation.updatedAt || conversation.createdAt;
       const subtitle = conversation.subtitle || conversation.lastMessage?.content || "";
 
       return {
@@ -199,8 +221,8 @@ exports.handler = async (event, context) => {
             title: conversation.title,
             lastActivity: lastActivity,
             subtitle: subtitle,
-            note: "Message history is managed through Spruce. View the full conversation in the Spruce app."
-          }
+            note: "Message history is managed through Spruce. View the full conversation in the Spruce app.",
+          },
         }),
       };
     }
@@ -217,7 +239,7 @@ exports.handler = async (event, context) => {
     console.error("Error fetching message history:", {
       status: errorStatus,
       data: errorData,
-      message: error.message
+      message: error.message,
     });
 
     // Return the actual error - no fake data
@@ -226,12 +248,16 @@ exports.handler = async (event, context) => {
       headers,
       body: JSON.stringify({
         error: "Failed to fetch message history",
-        message: errorStatus === 401 ? "Authentication failed. Please check your Spruce API credentials." :
-                 errorStatus === 403 ? "Access denied. Please verify your Spruce API permissions." :
-                 errorStatus === 404 ? "Conversation not found or no messages available." :
-                 error.message || "Unknown error",
+        message:
+          errorStatus === 401
+            ? "Authentication failed. Please check your Spruce API credentials."
+            : errorStatus === 403
+              ? "Access denied. Please verify your Spruce API permissions."
+              : errorStatus === 404
+                ? "Conversation not found or no messages available."
+                : error.message || "Unknown error",
         conversationId: conversationId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       }),
     };
   }

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import DOMPurify from "dompurify";
 import { queryClient } from "@/lib/queryClient";
 import ModernLayout from "@/components/layout/ModernLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -504,7 +505,7 @@ const FormsitePage: React.FC = () => {
                       <div
                         className="prose prose-invert max-w-none"
                         dangerouslySetInnerHTML={{
-                          __html: selectedSubmission.aiProcessedContent,
+                          __html: DOMPurify.sanitize(selectedSubmission.aiProcessedContent),
                         }}
                       />
                     ) : (
@@ -542,7 +543,7 @@ const FormsitePage: React.FC = () => {
                       <div
                         className="prose prose-invert max-w-none"
                         dangerouslySetInnerHTML={{
-                          __html: selectedSubmission.claudeContent,
+                          __html: DOMPurify.sanitize(selectedSubmission.claudeContent),
                         }}
                       />
                     ) : (

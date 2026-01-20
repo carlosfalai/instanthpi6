@@ -1,27 +1,27 @@
 // Stripe Subscription Status Checker
 // Returns the current subscription status for a customer
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 exports.handler = async (event, context) => {
   // CORS headers
   const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'GET, OPTIONS',
-    'Content-Type': 'application/json',
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Content-Type": "application/json",
   };
 
   // Handle preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 204, headers, body: '' };
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 204, headers, body: "" };
   }
 
-  if (event.httpMethod !== 'GET') {
+  if (event.httpMethod !== "GET") {
     return {
       statusCode: 405,
       headers,
-      body: JSON.stringify({ error: 'Method not allowed' }),
+      body: JSON.stringify({ error: "Method not allowed" }),
     };
   }
 
@@ -32,16 +32,16 @@ exports.handler = async (event, context) => {
       return {
         statusCode: 400,
         headers,
-        body: JSON.stringify({ error: 'customerId is required' }),
+        body: JSON.stringify({ error: "customerId is required" }),
       };
     }
 
     // Get customer's subscriptions
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      status: 'all',
+      status: "all",
       limit: 1,
-      expand: ['data.default_payment_method'],
+      expand: ["data.default_payment_method"],
     });
 
     if (subscriptions.data.length === 0) {
@@ -58,7 +58,7 @@ exports.handler = async (event, context) => {
     }
 
     const subscription = subscriptions.data[0];
-    const isActive = ['active', 'trialing'].includes(subscription.status);
+    const isActive = ["active", "trialing"].includes(subscription.status);
     const tier = subscription.metadata?.tierId || null;
 
     return {
@@ -74,13 +74,13 @@ exports.handler = async (event, context) => {
       }),
     };
   } catch (error) {
-    console.error('[Stripe] Subscription status error:', error);
+    console.error("[Stripe] Subscription status error:", error);
 
     return {
       statusCode: 500,
       headers,
       body: JSON.stringify({
-        error: error.message || 'Failed to get subscription status',
+        error: error.message || "Failed to get subscription status",
       }),
     };
   }

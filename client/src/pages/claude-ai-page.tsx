@@ -27,7 +27,8 @@ const ClaudeAIPage = () => {
               image recognition, and code generation.
             </p>
             <p className="mt-2">
-              Use the interfaces below to interact with Claude and explore its capabilities. The Profile Assistant can help you manage your doctor profile through conversation.
+              Use the interfaces below to interact with Claude and explore its capabilities. The
+              Profile Assistant can help you manage your doctor profile through conversation.
             </p>
           </CardContent>
         </Card>

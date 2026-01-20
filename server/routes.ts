@@ -56,6 +56,7 @@ import gmailRouter from "./routes/gmail";
 import medicalTemplatesRouter from "./routes/medical-templates";
 import intakeFormsRouter from "./routes/intake-forms";
 import clinicianProfilesRouter from "./routes/clinician-profiles";
+import { router as smsInvitationsRouter } from "./routes/sms-invitations";
 
 // Initialize OpenAI API
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -82,15 +83,20 @@ const getUserSpruceApi = () => {
   // For now, using environment variables as fallback
   const apiKey = process.env.SPRUCE_API_KEY || "";
   const accessId = process.env.SPRUCE_ACCESS_ID || "";
-  
+
   if (!apiKey || !accessId) {
     throw new Error("Spruce API credentials not configured for this user");
   }
-  
+
   return createSpruceApi(apiKey, accessId);
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Public health endpoint - no auth required
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", service: "InstantHPI Medical Platform" });
+  });
+
   // Register our API routers
   app.use("/api/ai", aiRouter);
   app.use("/api/anthropic", anthropicRouter);
@@ -144,6 +150,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/medical-templates", medicalTemplatesRouter);
   app.use("/api/intake-forms", intakeFormsRouter);
   app.use("/api/clinician-profiles", clinicianProfilesRouter);
+  // SMS Invitations API for bulk patient invitations via Twilio
+  app.use("/api/sms-invitations", smsInvitationsRouter);
 
   // Error handling middleware for Zod validation errors
   const handleZodError = (error: unknown, res: Response) => {
@@ -271,7 +279,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         // Get user's Spruce credentials from their profile
         const userSpruceApi = getUserSpruceApi();
-        
+
         // Call the Spruce Health API to get today's messages for this patient
         const response = await userSpruceApi.get(`/patients/${patientId}/messages`, {
           params: {
@@ -618,7 +626,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         // Get user's Spruce credentials from their profile
         const userSpruceApi = getUserSpruceApi();
-        
+
         // Send the message through Spruce API
         const spruceResponse = await userSpruceApi.post(`/messages`, {
           patient_id: patientId,

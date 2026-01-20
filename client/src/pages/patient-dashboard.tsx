@@ -26,7 +26,9 @@ export default function PatientDashboard() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         navigate("/patient-login");
         return;
@@ -40,44 +42,45 @@ export default function PatientDashboard() {
   const fetchConsultations = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch patient answers
       const { data: patientAnswers, error: answersError } = await supabase
-        .from('patient_answers')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("patient_answers")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (answersError) {
-        console.error('Error fetching patient answers:', answersError);
+        console.error("Error fetching patient answers:", answersError);
         return;
       }
 
       // Fetch consultations
       const { data: consultations, error: consultationsError } = await supabase
-        .from('consultations')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .from("consultations")
+        .select("*")
+        .order("created_at", { ascending: false });
 
       if (consultationsError) {
-        console.error('Error fetching consultations:', consultationsError);
+        console.error("Error fetching consultations:", consultationsError);
         return;
       }
 
       // Combine the data
-      const combinedData = patientAnswers?.map(answer => ({
-        id: answer.id,
-        patient_id: answer.patient_id,
-        created_at: answer.created_at,
-        hpi_confirmed: answer.hpi_confirmed,
-        hpi_corrections: answer.hpi_corrections,
-        answers: answer.answers,
-        enhanced_soap_note: answer.enhanced_soap_note,
-        doctor_hpi_summary: answer.doctor_hpi_summary
-      })) || [];
+      const combinedData =
+        patientAnswers?.map((answer) => ({
+          id: answer.id,
+          patient_id: answer.patient_id,
+          created_at: answer.created_at,
+          hpi_confirmed: answer.hpi_confirmed,
+          hpi_corrections: answer.hpi_corrections,
+          answers: answer.answers,
+          enhanced_soap_note: answer.enhanced_soap_note,
+          doctor_hpi_summary: answer.doctor_hpi_summary,
+        })) || [];
 
       setConsultations(combinedData);
     } catch (error) {
-      console.error('Error fetching consultations:', error);
+      console.error("Error fetching consultations:", error);
     } finally {
       setLoading(false);
     }
@@ -90,7 +93,7 @@ export default function PatientDashboard() {
 
   const handlePrint = (consultation: PatientConsultation) => {
     // Create a printable document
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (printWindow) {
       printWindow.document.write(`
         <!DOCTYPE html>
@@ -110,26 +113,30 @@ export default function PatientDashboard() {
         <body>
           <div class="header">
             <h1>Document Médical - ${consultation.patient_id}</h1>
-            <p>Date: ${format(new Date(consultation.created_at), 'dd/MM/yyyy HH:mm')}</p>
+            <p>Date: ${format(new Date(consultation.created_at), "dd/MM/yyyy HH:mm")}</p>
           </div>
           
           <div class="section">
             <h3>Résumé de consultation confirmé:</h3>
-            <p>${consultation.doctor_hpi_summary || 'Non disponible'}</p>
+            <p>${consultation.doctor_hpi_summary || "Non disponible"}</p>
           </div>
           
           <div class="section">
             <h3>Réponses aux questions de suivi:</h3>
-            ${Object.entries(consultation.answers || {}).map(([q, a]) => `
+            ${Object.entries(consultation.answers || {})
+              .map(
+                ([q, a]) => `
               <div class="question">
                 <strong>Q${q}:</strong> ${a}
               </div>
-            `).join('')}
+            `
+              )
+              .join("")}
           </div>
           
           <div class="section">
             <h3>Rapport médical pour votre médecin:</h3>
-            <pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${consultation.enhanced_soap_note || 'Non disponible'}</pre>
+            <pre style="white-space: pre-wrap; font-family: Arial, sans-serif;">${consultation.enhanced_soap_note || "Non disponible"}</pre>
           </div>
           
           <div class="warning">
@@ -148,7 +155,10 @@ export default function PatientDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{backgroundColor: '#E6E0F2'}}>
+      <div
+        className="min-h-screen flex items-center justify-center"
+        style={{ backgroundColor: "#E6E0F2" }}
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement de vos consultations...</p>
@@ -158,7 +168,7 @@ export default function PatientDashboard() {
   }
 
   return (
-    <div className="min-h-screen" style={{backgroundColor: '#E6E0F2'}}>
+    <div className="min-h-screen" style={{ backgroundColor: "#E6E0F2" }}>
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
@@ -179,11 +189,7 @@ export default function PatientDashboard() {
               >
                 Nouvelle Consultation
               </Button>
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="text-gray-600"
-              >
+              <Button onClick={handleLogout} variant="outline" className="text-gray-600">
                 <LogOut className="w-4 h-4 mr-2" />
                 Déconnexion
               </Button>
@@ -230,7 +236,7 @@ export default function PatientDashboard() {
                       </CardTitle>
                       <CardDescription>
                         <Calendar className="w-4 h-4 inline mr-1" />
-                        {format(new Date(consultation.created_at), 'dd/MM/yyyy HH:mm')}
+                        {format(new Date(consultation.created_at), "dd/MM/yyyy HH:mm")}
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-2">
@@ -257,7 +263,7 @@ export default function PatientDashboard() {
                         Résumé de consultation confirmé:
                       </h4>
                       <p className="text-sm text-blue-800">
-                        {consultation.doctor_hpi_summary || 'Non disponible'}
+                        {consultation.doctor_hpi_summary || "Non disponible"}
                       </p>
                       {consultation.hpi_corrections && (
                         <div className="mt-2 p-2 bg-yellow-50 rounded border border-yellow-200">

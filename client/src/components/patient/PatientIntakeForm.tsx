@@ -28,7 +28,7 @@ export function PatientIntakeForm() {
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [patientAnswers, setPatientAnswers] = useState<{[key: number]: string}>({});
+  const [patientAnswers, setPatientAnswers] = useState<{ [key: number]: string }>({});
   const [hpiConfirmed, setHpiConfirmed] = useState<boolean | null>(null);
   const [hpiCorrections, setHpiCorrections] = useState<string>("");
   const [enhancedSoapNote, setEnhancedSoapNote] = useState<string>("");
@@ -39,9 +39,9 @@ export function PatientIntakeForm() {
 
   // Handle patient answer input
   const handleAnswerChange = (questionIndex: number, answer: string) => {
-    setPatientAnswers(prev => ({
+    setPatientAnswers((prev) => ({
       ...prev,
-      [questionIndex]: answer
+      [questionIndex]: answer,
     }));
   };
 
@@ -49,24 +49,24 @@ export function PatientIntakeForm() {
   const generateSubjectivePrintable = async () => {
     try {
       const patientId = deIdentifiedId || generateDeIdentifiedId();
-      
-      const response = await fetch('/api/patient-hpi-print', {
-        method: 'POST',
+
+      const response = await fetch("/api/patient-hpi-print", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           patient_id: patientId,
-          language: 'fr',
+          language: "fr",
           demographics: {
             age: parseInt(age) || 0,
             gender: gender,
-            sex: gender
+            sex: gender,
           },
           hpi_summary: triageResult?.hpi_summary || "Résumé de consultation généré par l'IA",
           hpi_confirmed: hpiConfirmed,
           hpi_corrections: hpiCorrections,
-          follow_up_answers: patientAnswers
+          follow_up_answers: patientAnswers,
         }),
       });
 
@@ -77,7 +77,7 @@ export function PatientIntakeForm() {
         }
       }
     } catch (error) {
-      console.error('Error generating Subjective printable:', error);
+      console.error("Error generating Subjective printable:", error);
     }
   };
 
@@ -85,35 +85,33 @@ export function PatientIntakeForm() {
   const savePatientAnswers = async () => {
     try {
       const patientId = deIdentifiedId || generateDeIdentifiedId();
-      
+
       // Save patient answers to database
-      const { error: saveError } = await supabase
-        .from('patient_answers')
-        .insert({
-          patient_id: patientId,
-          answers: patientAnswers,
-          hpi_confirmed: hpiConfirmed,
-          hpi_corrections: hpiCorrections,
-          created_at: new Date().toISOString()
-        });
+      const { error: saveError } = await supabase.from("patient_answers").insert({
+        patient_id: patientId,
+        answers: patientAnswers,
+        hpi_confirmed: hpiConfirmed,
+        hpi_corrections: hpiCorrections,
+        created_at: new Date().toISOString(),
+      });
 
       if (saveError) {
-        console.error('Error saving patient answers:', saveError);
+        console.error("Error saving patient answers:", saveError);
         return;
       }
 
       // Generate enhanced SOAP note
-      const soapResponse = await fetch('/api/generate-enhanced-soap', {
-        method: 'POST',
+      const soapResponse = await fetch("/api/generate-enhanced-soap", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           patient_id: patientId,
           hpi_summary: triageResult?.hpi_summary || "Résumé de consultation généré par l'IA",
           patient_answers: patientAnswers,
           triage_result: triageResult,
-          hpi_corrections: hpiCorrections
+          hpi_corrections: hpiCorrections,
         }),
       });
 
@@ -123,7 +121,7 @@ export function PatientIntakeForm() {
         setDoctorHpiSummary(soapData.doctor_hpi_summary);
       }
     } catch (error) {
-      console.error('Error saving patient answers:', error);
+      console.error("Error saving patient answers:", error);
     }
   };
 
@@ -131,22 +129,20 @@ export function PatientIntakeForm() {
   const saveComprehensiveReportToDatabase = async (comprehensiveData: any) => {
     try {
       const patientId = deIdentifiedId || generateDeIdentifiedId();
-      
-      const { error } = await supabase
-        .from('comprehensive_reports')
-        .insert({
-          patient_id: patientId,
-          report_data: comprehensiveData,
-          created_at: new Date().toISOString()
-        });
+
+      const { error } = await supabase.from("comprehensive_reports").insert({
+        patient_id: patientId,
+        report_data: comprehensiveData,
+        created_at: new Date().toISOString(),
+      });
 
       if (error) {
-        console.error('Error saving comprehensive report:', error);
+        console.error("Error saving comprehensive report:", error);
       } else {
-        console.log('Comprehensive report saved successfully');
+        console.log("Comprehensive report saved successfully");
       }
     } catch (error) {
-      console.error('Error saving comprehensive report:', error);
+      console.error("Error saving comprehensive report:", error);
     }
   };
 
@@ -199,10 +195,10 @@ export function PatientIntakeForm() {
       const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout
 
       try {
-        const triageResponse = await fetch('/api/comprehensive-triage', {
-          method: 'POST',
+        const triageResponse = await fetch("/api/comprehensive-triage", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(patientData),
           signal: controller.signal,
@@ -213,32 +209,34 @@ export function PatientIntakeForm() {
         if (triageResponse.ok) {
           const triageData = await triageResponse.json();
           setTriageResult(triageData);
-          
+
           // Store comprehensive report for doctor
           setComprehensiveReport(triageData);
-          
+
           // Save comprehensive report to database for doctor access
           await saveComprehensiveReportToDatabase(triageData);
-          
+
           setSubmitted(true);
         } else {
           const errorText = await triageResponse.text();
-          console.error('Triage API failed:', triageResponse.status, errorText);
-          alert('Failed to process your intake form. Please try again or contact support.');
+          console.error("Triage API failed:", triageResponse.status, errorText);
+          alert("Failed to process your intake form. Please try again or contact support.");
         }
       } catch (fetchError: any) {
         clearTimeout(timeoutId);
-        if (fetchError.name === 'AbortError') {
-          console.error('Triage API timeout');
-          alert('The request took too long. Please try again or contact support if the problem persists.');
+        if (fetchError.name === "AbortError") {
+          console.error("Triage API timeout");
+          alert(
+            "The request took too long. Please try again or contact support if the problem persists."
+          );
         } else {
-          console.error('Error submitting form:', fetchError);
-          alert('An error occurred while submitting your form. Please try again.');
+          console.error("Error submitting form:", fetchError);
+          alert("An error occurred while submitting your form. Please try again.");
         }
         throw fetchError;
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
+      console.error("Error submitting form:", error);
       // Error already handled in the fetch block above
     } finally {
       setLoading(false);
@@ -247,11 +245,13 @@ export function PatientIntakeForm() {
 
   // Render submitted state with triage results
   if (submitted && triageResult) {
-    const hpiSummary = triageResult?.hpi_summary || triageResult?.full_analysis || 
-      `Niveau de triage: ${triageResult?.triage_level || 'N/A'}
-Score d'urgence: ${triageResult?.urgency_score || 'N/A'}/10
-Raison: ${triageResult?.reasoning || 'Analyse en cours'}
-Action recommandée: ${triageResult?.recommended_action || 'Consultation médicale requise'}`;
+    const hpiSummary =
+      triageResult?.hpi_summary ||
+      triageResult?.full_analysis ||
+      `Niveau de triage: ${triageResult?.triage_level || "N/A"}
+Score d'urgence: ${triageResult?.urgency_score || "N/A"}/10
+Raison: ${triageResult?.reasoning || "Analyse en cours"}
+Action recommandée: ${triageResult?.recommended_action || "Consultation médicale requise"}`;
 
     const followUpQuestions = triageResult?.follow_up_questions || [
       "Avez-vous des douleurs thoraciques ou des difficultés respiratoires?",
@@ -277,7 +277,7 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
                   🆔 ID Patient
                 </h3>
                 <p className="text-2xl font-mono font-bold text-blue-700 print:text-lg">
-                {deIdentifiedId}
+                  {deIdentifiedId}
                 </p>
               </div>
             </div>
@@ -354,7 +354,7 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
                     {index + 1}. {question}
                   </p>
                   <textarea
-                    value={patientAnswers[index] || ''}
+                    value={patientAnswers[index] || ""}
                     onChange={(e) => handleAnswerChange(index, e.target.value)}
                     placeholder="Votre réponse..."
                     className="w-full p-3 border border-green-300 rounded-lg resize-none print:p-1 print:text-xs print:border print:border-gray-400"
@@ -385,9 +385,10 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
                   📄 Document pour le Médecin (Sujet uniquement)
                 </h3>
                 <p className="text-sm text-cyan-800 mb-4">
-                  Ce document contient uniquement votre historique confirmé (Subjectif) pour le médecin.
+                  Ce document contient uniquement votre historique confirmé (Subjectif) pour le
+                  médecin.
                 </p>
-                
+
                 <div className="flex gap-4 justify-center">
                   <Button
                     onClick={() => {
@@ -412,7 +413,7 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
                 <h3 className="font-bold text-lg text-gray-900 mb-4 print:text-sm print:mb-2">
                   📄 Document médical pour votre médecin
                 </h3>
-                
+
                 {/* Enhanced SOAP Note for Doctor */}
                 <div className="bg-purple-50 p-4 rounded border mb-4 print:bg-white print:border print:border-gray-400 print:p-3 print:mb-3">
                   <h4 className="font-semibold text-gray-800 mb-2 print:text-xs print:mb-1">
@@ -435,7 +436,10 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
                         <li>Imprimez ce document</li>
                         <li>Apportez-le à votre rendez-vous médical</li>
                         <li>Remettez-le à l'infirmière de triage</li>
-                        <li>Ce document facilite votre prise en charge mais ne remplace PAS l'évaluation médicale</li>
+                        <li>
+                          Ce document facilite votre prise en charge mais ne remplace PAS
+                          l'évaluation médicale
+                        </li>
                         <li>En cas d'urgence, appelez le 911</li>
                       </ol>
                     </div>
@@ -471,14 +475,14 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
                   <pre className="text-sm leading-relaxed whitespace-pre-wrap print:text-xs print:leading-tight">
                     {enhancedSoapNote}
                   </pre>
-              </div>
+                </div>
                 <Button
                   onClick={() => window.print()}
                   className="w-full bg-purple-600 hover:bg-purple-700 text-white print:hidden"
                 >
                   Imprimer ce rapport pour votre médecin
                 </Button>
-            </div>
+              </div>
             )}
 
             {/* Doctor HPI Summary */}
@@ -494,7 +498,7 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
                     className="w-full h-32 p-3 border border-gray-300 rounded text-sm resize-none print:text-xs"
                     onClick={(e) => e.currentTarget.select()}
                   />
-            </div>
+                </div>
                 <p className="text-sm text-indigo-700 print:text-xs">
                   Copiez ce texte et collez-le dans votre conversation avec le médecin.
                 </p>
@@ -534,32 +538,35 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
   // Render normal form
   return (
     <div className="max-w-4xl mx-auto">
-      <form onSubmit={handleSubmit} className="space-y-8 bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-8 bg-white rounded-xl shadow-sm border border-gray-200 p-8"
+      >
         {/* Patient Identification */}
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-gray-900">Identification du Patient</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="patient-id">ID Patient (Généré automatiquement)</Label>
               <div className="flex gap-2">
-              <Input
+                <Input
                   id="patient-id"
-                value={deIdentifiedId}
-                readOnly
-                placeholder="Click generate to create ID"
-                className="flex-1 font-mono text-lg bg-gray-50"
-              />
-              <Button
-                type="button"
-                onClick={generateDeIdentifiedId}
+                  value={deIdentifiedId}
+                  readOnly
+                  placeholder="Click generate to create ID"
+                  className="flex-1 font-mono text-lg bg-gray-50"
+                />
+                <Button
+                  type="button"
+                  onClick={generateDeIdentifiedId}
                   variant="outline"
                   className="px-4"
-              >
+                >
                   Générer
-              </Button>
+                </Button>
+              </div>
             </div>
-          </div>
 
             <div className="space-y-2">
               <Label htmlFor="age">Âge</Label>
@@ -573,8 +580,8 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
                 max="120"
                 required
               />
+            </div>
           </div>
-        </div>
 
           <div className="space-y-2">
             <Label>Sexe</Label>
@@ -589,7 +596,7 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
               </div>
             </RadioGroup>
           </div>
-          </div>
+        </div>
 
         {/* Chief Complaint */}
         <div className="space-y-4">
@@ -605,41 +612,41 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
               rows={3}
             />
           </div>
-          </div>
+        </div>
 
         {/* Symptom Details */}
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-gray-900">Détails des Symptômes</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="start-date">Quand les symptômes ont-ils commencé?</Label>
-            <Input
+              <Input
                 id="start-date"
-              value={problemStartDate}
-              onChange={(e) => setProblemStartDate(e.target.value)}
-              placeholder="e.g., 3 days ago, last week, 2 months ago"
-            />
-          </div>
+                value={problemStartDate}
+                onChange={(e) => setProblemStartDate(e.target.value)}
+                placeholder="e.g., 3 days ago, last week, 2 months ago"
+              />
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="trigger">Y a-t-il eu un événement déclencheur?</Label>
-            <Input
+              <Input
                 id="trigger"
-              value={specificTrigger}
-              onChange={(e) => setSpecificTrigger(e.target.value)}
-              placeholder="e.g., injury, stress, food, activity"
-            />
-          </div>
+                value={specificTrigger}
+                onChange={(e) => setSpecificTrigger(e.target.value)}
+                placeholder="e.g., injury, stress, food, activity"
+              />
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="location">Où ressentez-vous les symptômes?</Label>
-            <Input
+              <Input
                 id="location"
-              value={symptomLocation}
-              onChange={(e) => setSymptomLocation(e.target.value)}
-              placeholder="e.g., chest, abdomen, head, back"
-            />
+                value={symptomLocation}
+                onChange={(e) => setSymptomLocation(e.target.value)}
+                placeholder="e.g., chest, abdomen, head, back"
+              />
             </div>
           </div>
 
@@ -657,30 +664,30 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="aggravators">Qu'est-ce qui aggrave vos symptômes?</Label>
-            <Input
+              <Input
                 id="aggravators"
-              value={symptomAggravators}
-              onChange={(e) => setSymptomAggravators(e.target.value)}
-              placeholder="e.g., movement, eating, stress, lying down"
-            />
-          </div>
+                value={symptomAggravators}
+                onChange={(e) => setSymptomAggravators(e.target.value)}
+                placeholder="e.g., movement, eating, stress, lying down"
+              />
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="relievers">Qu'est-ce qui soulage vos symptômes?</Label>
-            <Input
+              <Input
                 id="relievers"
-              value={symptomRelievers}
-              onChange={(e) => setSymptomRelievers(e.target.value)}
-              placeholder="e.g., rest, medication, heat, cold"
-            />
-          </div>
+                value={symptomRelievers}
+                onChange={(e) => setSymptomRelievers(e.target.value)}
+                placeholder="e.g., rest, medication, heat, cold"
+              />
             </div>
           </div>
+        </div>
 
         {/* Medical History */}
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-gray-900">Antécédents Médicaux</h2>
-          
+
           <div className="space-y-2">
             <Label htmlFor="treatments">Quels traitements avez-vous essayés?</Label>
             <Textarea
@@ -724,12 +731,12 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
               rows={2}
             />
           </div>
-          </div>
+        </div>
 
         {/* Additional Information */}
         <div className="space-y-6">
           <h2 className="text-2xl font-bold text-gray-900">Informations Supplémentaires</h2>
-          
+
           <div className="space-y-2">
             <Label htmlFor="notes">Y a-t-il autre chose que le médecin devrait savoir?</Label>
             <Textarea
@@ -744,21 +751,15 @@ Action recommandée: ${triageResult?.recommended_action || 'Consultation médica
 
         {/* Submit Button */}
         <div className="flex justify-center">
-          <Button
-            type="submit"
-            disabled={loading}
-            className="w-full max-w-md py-3 text-lg"
-          >
+          <Button type="submit" disabled={loading} className="w-full max-w-md py-3 text-lg">
             {loading ? "Traitement en cours..." : "Soumettre le Formulaire"}
           </Button>
         </div>
 
         {loading && (
           <div className="text-center">
-            <p className="text-sm text-gray-600">
-              Analyse de vos symptômes en cours...
-            </p>
-        </div>
+            <p className="text-sm text-gray-600">Analyse de vos symptômes en cours...</p>
+          </div>
         )}
       </form>
     </div>

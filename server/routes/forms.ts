@@ -1,12 +1,23 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import { storage } from "../storage";
 import { z } from "zod";
 import { insertFormTemplateSchema, insertFormResponseSchema } from "@shared/schema";
+import {
+  requireAuth,
+  requireAuthenticatedUserId,
+} from "../middleware/auth";
 
 const router = Router();
 
+// All form routes require authentication
+router.use(requireAuth);
+
+// ============================================================================
+// TEMPLATE ROUTES
+// ============================================================================
+
 // Get all form templates
-router.get("/templates", async (req, res) => {
+router.get("/templates", async (req: Request, res: Response) => {
   try {
     const category = req.query.category as string | undefined;
     let templates;
@@ -25,7 +36,7 @@ router.get("/templates", async (req, res) => {
 });
 
 // Get a specific form template
-router.get("/templates/:id", async (req, res) => {
+router.get("/templates/:id", async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const template = await storage.getFormTemplate(id);
@@ -42,11 +53,9 @@ router.get("/templates/:id", async (req, res) => {
 });
 
 // Create a new form template
-router.post("/templates", async (req, res) => {
+router.post("/templates", async (req: Request, res: Response) => {
   try {
-    // For now we'll use the first user (doctor) as our default user
-    // In a real app, this would come from authentication
-    const userId = 1;
+    const userId = requireAuthenticatedUserId(req);
 
     const validatedData = insertFormTemplateSchema.parse({
       ...req.body,
@@ -65,7 +74,7 @@ router.post("/templates", async (req, res) => {
 });
 
 // Update a form template
-router.put("/templates/:id", async (req, res) => {
+router.put("/templates/:id", async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const template = await storage.getFormTemplate(id);
@@ -88,7 +97,7 @@ router.put("/templates/:id", async (req, res) => {
 });
 
 // Delete a form template
-router.delete("/templates/:id", async (req, res) => {
+router.delete("/templates/:id", async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const success = await storage.deleteFormTemplate(id);
@@ -104,8 +113,12 @@ router.delete("/templates/:id", async (req, res) => {
   }
 });
 
+// ============================================================================
+// RESPONSE ROUTES
+// ============================================================================
+
 // Get form responses by patient ID
-router.get("/responses/patient/:patientId", async (req, res) => {
+router.get("/responses/patient/:patientId", async (req: Request, res: Response) => {
   try {
     const patientId = parseInt(req.params.patientId);
     const responses = await storage.getFormResponsesByPatientId(patientId);
@@ -117,7 +130,7 @@ router.get("/responses/patient/:patientId", async (req, res) => {
 });
 
 // Get form responses by template ID
-router.get("/responses/template/:templateId", async (req, res) => {
+router.get("/responses/template/:templateId", async (req: Request, res: Response) => {
   try {
     const templateId = parseInt(req.params.templateId);
     const responses = await storage.getFormResponsesByTemplateId(templateId);
@@ -129,7 +142,7 @@ router.get("/responses/template/:templateId", async (req, res) => {
 });
 
 // Get a specific form response
-router.get("/responses/:id", async (req, res) => {
+router.get("/responses/:id", async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const response = await storage.getFormResponse(id);
@@ -146,7 +159,7 @@ router.get("/responses/:id", async (req, res) => {
 });
 
 // Create a new form response
-router.post("/responses", async (req, res) => {
+router.post("/responses", async (req: Request, res: Response) => {
   try {
     const validatedData = insertFormResponseSchema.parse(req.body);
     const response = await storage.createFormResponse(validatedData);
@@ -161,7 +174,7 @@ router.post("/responses", async (req, res) => {
 });
 
 // Update a form response
-router.put("/responses/:id", async (req, res) => {
+router.put("/responses/:id", async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const response = await storage.getFormResponse(id);
@@ -184,7 +197,7 @@ router.put("/responses/:id", async (req, res) => {
 });
 
 // Delete a form response
-router.delete("/responses/:id", async (req, res) => {
+router.delete("/responses/:id", async (req: Request, res: Response) => {
   try {
     const id = parseInt(req.params.id);
     const success = await storage.deleteFormResponse(id);

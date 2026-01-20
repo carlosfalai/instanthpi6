@@ -22,7 +22,7 @@ const getReportsDir = () => {
 router.get("/list", async (req, res) => {
   try {
     const reportsDir = getReportsDir();
-    
+
     // Create directory if it doesn't exist
     if (!fs.existsSync(reportsDir)) {
       fs.mkdirSync(reportsDir, { recursive: true });
@@ -126,4 +126,3 @@ router.post("/cleanup", async (req, res) => {
 });
 
 export default router;
-

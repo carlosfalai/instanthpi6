@@ -44,41 +44,41 @@ const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
   : null;
 
+// Valid status and request type values
+type UrgentCareStatus = "new" | "in_progress" | "completed" | "cancelled";
+type UrgentCareRequestType = "new_problem" | "medication_refill" | "follow_up" | "symptom_check" | "other";
+
+const validStatuses: UrgentCareStatus[] = ["new", "in_progress", "completed", "cancelled"];
+const validRequestTypes: UrgentCareRequestType[] = ["new_problem", "medication_refill", "follow_up", "symptom_check", "other"];
+
 // Get all urgent care requests (with optional filtering)
 router.get("/", async (req, res) => {
   try {
     const { status, type, timeframe } = req.query;
-
-    let query = db.select().from(urgentCareRequests).orderBy(desc(urgentCareRequests.receivedAt));
-
-    // Build conditions for filters
-    const conditions = [];
 
     // Filter by timeframe (defaults to last 24 hours)
     const hours = timeframe ? parseInt(timeframe as string) : 24;
     const cutoffDate = new Date();
     cutoffDate.setHours(cutoffDate.getHours() - hours);
 
-    // Apply all conditions
-    if (conditions.length === 0) {
-      // Just apply the timeframe filter if no other filters
-      query = query.where(gte(urgentCareRequests.receivedAt, cutoffDate));
-    } else {
-      // Apply status filter if provided
-      if (status) {
-        query = query.where(eq(urgentCareRequests.status, status as string));
-      }
+    // Build conditions array
+    const conditions = [gte(urgentCareRequests.receivedAt, cutoffDate)];
 
-      // Apply type filter if provided
-      if (type) {
-        query = query.where(eq(urgentCareRequests.requestType, type as string));
-      }
-
-      // Apply timeframe filter
-      query = query.where(gte(urgentCareRequests.receivedAt, cutoffDate));
+    // Apply status filter if provided and valid
+    if (status && validStatuses.includes(status as UrgentCareStatus)) {
+      conditions.push(eq(urgentCareRequests.status, status as UrgentCareStatus));
     }
 
-    const requests = await query;
+    // Apply type filter if provided and valid
+    if (type && validRequestTypes.includes(type as UrgentCareRequestType)) {
+      conditions.push(eq(urgentCareRequests.requestType, type as UrgentCareRequestType));
+    }
+
+    const requests = await db
+      .select()
+      .from(urgentCareRequests)
+      .where(and(...conditions))
+      .orderBy(desc(urgentCareRequests.receivedAt));
 
     // Get associated patient information for each request
     const requestsWithPatients = await Promise.all(

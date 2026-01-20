@@ -1,6 +1,6 @@
 // Enhanced SOAP note generation - no database dependency needed
-const { OpenAI } = require('openai');
-const Anthropic = require('@anthropic-ai/sdk');
+const { OpenAI } = require("openai");
+const Anthropic = require("@anthropic-ai/sdk");
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -15,24 +15,26 @@ exports.handler = async (event) => {
     return {
       statusCode: 405,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Method not allowed" })
+      body: JSON.stringify({ error: "Method not allowed" }),
     };
   }
 
   try {
-    const { patient_id, hpi_summary, patient_answers, triage_result } = JSON.parse(event.body || "{}");
+    const { patient_id, hpi_summary, patient_answers, triage_result } = JSON.parse(
+      event.body || "{}"
+    );
 
     if (!patient_id || !hpi_summary || !patient_answers) {
       return {
         statusCode: 400,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ error: "Missing required fields" })
+        body: JSON.stringify({ error: "Missing required fields" }),
       };
     }
 
     // Generate enhanced SOAP note
     const enhancedSoapNote = generateEnhancedSoapNote(hpi_summary, patient_answers, triage_result);
-    
+
     // Generate doctor HPI summary with patient clarifications
     const doctorHpiSummary = generateDoctorHpiSummary(hpi_summary, patient_answers);
 
@@ -45,16 +47,15 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         enhanced_soap_note: enhancedSoapNote,
         doctor_hpi_summary: doctorHpiSummary,
-        stepwise_strategy: stepwiseStrategy
-      })
+        stepwise_strategy: stepwiseStrategy,
+      }),
     };
-
   } catch (error) {
-    console.error('Error generating enhanced SOAP note:', error);
+    console.error("Error generating enhanced SOAP note:", error);
     return {
       statusCode: 500,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ error: "Internal server error" })
+      body: JSON.stringify({ error: "Internal server error" }),
     };
   }
 };
@@ -62,9 +63,9 @@ exports.handler = async (event) => {
 function generateEnhancedSoapNote(hpiSummary, patientAnswers, triageResult) {
   const answersText = Object.entries(patientAnswers)
     .map(([index, answer]) => `Q${parseInt(index) + 1}: ${answer}`)
-    .join('\n');
+    .join("\n");
 
-  return `RAPPORT MÉDICAL COMPLET - PATIENT ID: ${triageResult?.patient_id || 'N/A'}
+  return `RAPPORT MÉDICAL COMPLET - PATIENT ID: ${triageResult?.patient_id || "N/A"}
 
 === HISTOIRE DE LA MALADIE ACTUELLE (HMA) ===
 ${hpiSummary}
@@ -73,10 +74,10 @@ ${hpiSummary}
 ${answersText}
 
 === ÉVALUATION DE TRIAGE ===
-Niveau de priorité: ${triageResult?.triage_level || 'N/A'}
-Score d'urgence: ${triageResult?.urgency_score || 'N/A'}/10
-Raisonnement: ${triageResult?.reasoning || 'N/A'}
-Action recommandée: ${triageResult?.recommended_action || 'N/A'}
+Niveau de priorité: ${triageResult?.triage_level || "N/A"}
+Score d'urgence: ${triageResult?.urgency_score || "N/A"}/10
+Raisonnement: ${triageResult?.reasoning || "N/A"}
+Action recommandée: ${triageResult?.recommended_action || "N/A"}
 
 === PLAN DE SOINS PROPOSÉ ===
 1. Évaluation médicale immédiate requise
@@ -91,8 +92,8 @@ Action recommandée: ${triageResult?.recommended_action || 'N/A'}
 - Planifier le suivi selon la priorité établie
 
 === INFORMATIONS DE CONTACT ===
-Patient ID: ${triageResult?.patient_id || 'N/A'}
-Date de génération: ${new Date().toLocaleDateString('fr-CA')}
+Patient ID: ${triageResult?.patient_id || "N/A"}
+Date de génération: ${new Date().toLocaleDateString("fr-CA")}
 Système InstantHPI - Rapport généré automatiquement`;
 }
 
@@ -100,9 +101,9 @@ function generateDoctorHpiSummary(hpiSummary, patientAnswers) {
   const clarifications = Object.entries(patientAnswers)
     .filter(([_, answer]) => answer && answer.trim())
     .map(([index, answer]) => `Clarification ${parseInt(index) + 1}: ${answer}`)
-    .join(' ');
+    .join(" ");
 
-  return `${hpiSummary} ${clarifications ? `Clarifications supplémentaires: ${clarifications}` : ''}`;
+  return `${hpiSummary} ${clarifications ? `Clarifications supplémentaires: ${clarifications}` : ""}`;
 }
 
 async function generateStepwiseStrategy(enhancedSoapNote, doctorHpiSummary) {
@@ -166,21 +167,21 @@ Return ONLY the formatted text, no code or markdown.`;
           messages: [
             {
               role: "system",
-              content: "You are an expert emergency medicine physician."
+              content: "You are an expert emergency medicine physician.",
             },
             {
               role: "user",
-              content: STEPWISE_STRATEGY_PROMPT
-            }
+              content: STEPWISE_STRATEGY_PROMPT,
+            },
           ],
           temperature: 0.3,
-          max_tokens: 2000
+          max_tokens: 2000,
         });
 
         return openaiResponse.choices[0].message.content.trim();
       } catch (openaiError) {
         console.log("OpenAI failed for stepwise strategy:", openaiError.message);
-        
+
         // Try Anthropic as fallback
         if (process.env.ANTHROPIC_API_KEY) {
           try {
@@ -191,9 +192,9 @@ Return ONLY the formatted text, no code or markdown.`;
               messages: [
                 {
                   role: "user",
-                  content: STEPWISE_STRATEGY_PROMPT
-                }
-              ]
+                  content: STEPWISE_STRATEGY_PROMPT,
+                },
+              ],
             });
 
             return anthropicResponse.content[0].text.trim();
@@ -207,7 +208,7 @@ Return ONLY the formatted text, no code or markdown.`;
     // Fallback if AI fails
     return `1. Symptoms\nAnalysez les symptômes décrits dans le rapport SOAP amélioré ci-dessus.\n\n2. Physical Red Flags\nIdentifiez les signes d'alarme basés sur les symptômes rapportés.\n\n3. Labs\nTests de laboratoire indiqués selon la présentation clinique.\n\n4. Imaging\nÉtudes d'imagerie nécessaires selon les symptômes.\n\n5. Treatment\nPlan de traitement basé sur l'évaluation clinique.\n\n6. Follow-Up\nSuivi recommandé selon le niveau de triage et la condition.`;
   } catch (error) {
-    console.error('Error generating stepwise strategy:', error);
+    console.error("Error generating stepwise strategy:", error);
     return `1. Symptoms\nAnalysez les symptômes du rapport SOAP amélioré.\n\n2. Physical Red Flags\nSignes d'alarme à surveiller.\n\n3. Labs\nTests de laboratoire indiqués.\n\n4. Imaging\nÉtudes d'imagerie nécessaires.\n\n5. Treatment\nPlan de traitement.\n\n6. Follow-Up\nSuivi recommandé.`;
   }
 }

@@ -10,33 +10,33 @@
 export function setDemoAuth(email: string, name?: string, specialty?: string) {
   const timestamp = new Date().toISOString();
   console.log(`[AuthUtils] Setting demo auth at ${timestamp}`, { email });
-  
+
   // Set auth flags
   localStorage.setItem("doctor_authenticated", "true");
   sessionStorage.setItem("doctor_authenticated", "true");
-  
+
   // Set doctor info
   const doctorInfo = {
     email,
     name: name || "Doctor",
     specialty: specialty || "General Medicine",
     authType: "demo",
-    timestamp
+    timestamp,
   };
-  
+
   localStorage.setItem("doctor_info", JSON.stringify(doctorInfo));
   sessionStorage.setItem("doctor_info", JSON.stringify(doctorInfo));
-  
+
   // Verify both were set
   const verifyLocal = localStorage.getItem("doctor_authenticated");
   const verifySession = sessionStorage.getItem("doctor_authenticated");
-  
-  console.log('[AuthUtils] Auth flags verified:', {
+
+  console.log("[AuthUtils] Auth flags verified:", {
     localStorage: verifyLocal === "true",
     sessionStorage: verifySession === "true",
-    timestamp
+    timestamp,
   });
-  
+
   return verifyLocal === "true" && verifySession === "true";
 }
 
@@ -59,7 +59,7 @@ export function getLocalAuthInfo() {
     try {
       return JSON.parse(info);
     } catch (e) {
-      console.error('[AuthUtils] Failed to parse doctor_info:', e);
+      console.error("[AuthUtils] Failed to parse doctor_info:", e);
       return null;
     }
   }
@@ -74,7 +74,7 @@ export function clearLocalAuth() {
   sessionStorage.removeItem("doctor_authenticated");
   localStorage.removeItem("doctor_info");
   sessionStorage.removeItem("doctor_info");
-  console.log('[AuthUtils] Local auth cleared');
+  console.log("[AuthUtils] Local auth cleared");
 }
 
 /**
@@ -85,20 +85,23 @@ export function isSupabaseSessionFresh(session: any, maxAgeMinutes: number = 60)
   if (!session?.user?.created_at) {
     return false;
   }
-  
+
   const createdAt = new Date(session.user.created_at).getTime();
   const now = new Date().getTime();
   const ageMinutes = (now - createdAt) / (1000 * 60);
-  
+
   return ageMinutes < maxAgeMinutes;
 }
 
 /**
  * Log auth decision for debugging
  */
-export function logAuthDecision(source: 'url_param' | 'local' | 'supabase' | 'none', details?: any) {
-  console.log(`[AuthUtils] Auth decision: ${source}`, { 
+export function logAuthDecision(
+  source: "url_param" | "local" | "supabase" | "none",
+  details?: any
+) {
+  console.log(`[AuthUtils] Auth decision: ${source}`, {
     timestamp: new Date().toISOString(),
-    ...details 
+    ...details,
   });
 }

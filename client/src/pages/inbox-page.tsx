@@ -39,27 +39,27 @@ export default function InboxPage() {
     queryFn: async () => {
       console.log("[Inbox] Fetching conversations from /api/spruce-conversations-all");
       const response = await fetch("/api/spruce-conversations-all");
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error("[Inbox] Failed to fetch conversations:", response.status, errorText);
         throw new Error(`Failed to fetch conversations: ${response.status} ${errorText}`);
       }
-      
+
       const data = await response.json();
       console.log(`[Inbox] Received ${data?.length || 0} conversations`);
-      
+
       // Handle error response format
       if (data.error) {
         throw new Error(data.message || data.error);
       }
-      
+
       // Transform Spruce API format to expected format
       if (!Array.isArray(data)) {
         console.error("[Inbox] Expected array but got:", typeof data, data);
         return [];
       }
-      
+
       return data.map((conv: any) => ({
         id: conv.id,
         entityId: conv.id, // Use conversation ID
@@ -84,21 +84,19 @@ export default function InboxPage() {
     queryKey: ["/api/spruce/conversation", selectedConversation, "messages"],
     queryFn: async () => {
       if (!selectedConversation) return [];
-      
+
       console.log(`[Inbox] Fetching messages for conversation ${selectedConversation}`);
-      const response = await fetch(
-        `/api/spruce/conversations/${selectedConversation}/history`
-      );
-      
+      const response = await fetch(`/api/spruce/conversations/${selectedConversation}/history`);
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error(`[Inbox] Failed to fetch messages:`, response.status, errorText);
         throw new Error(`Failed to fetch messages: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log(`[Inbox] Received ${Array.isArray(data) ? data.length : 0} messages`);
-      
+
       // Handle both array and object with messages property
       if (Array.isArray(data)) {
         return data;
@@ -213,7 +211,8 @@ export default function InboxPage() {
                     Spruce API Credentials Required
                   </p>
                   <p className="text-xs text-yellow-700 dark:text-yellow-300 mb-3">
-                    {(error as Error).message || "Please configure your Spruce API credentials to access conversations."}
+                    {(error as Error).message ||
+                      "Please configure your Spruce API credentials to access conversations."}
                   </p>
                   <Link href="/doctor-profile">
                     <Button
@@ -231,7 +230,9 @@ export default function InboxPage() {
                   variant="outline"
                   size="sm"
                   className="mt-2"
-                  onClick={() => queryClient.invalidateQueries({ queryKey: ["/api/spruce/conversations"] })}
+                  onClick={() =>
+                    queryClient.invalidateQueries({ queryKey: ["/api/spruce/conversations"] })
+                  }
                 >
                   Retry
                 </Button>

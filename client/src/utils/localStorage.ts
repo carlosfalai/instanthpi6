@@ -6,7 +6,7 @@ export function saveToLocalStorage<T>(key: string, data: T): boolean {
     localStorage.setItem(key, serialized);
     return true;
   } catch (error) {
-    console.error('localStorage save failed:', error);
+    console.error("localStorage save failed:", error);
     return false;
   }
 }
@@ -17,7 +17,7 @@ export function loadFromLocalStorage<T>(key: string): T | null {
     if (!item) return null;
     return JSON.parse(item) as T;
   } catch (error) {
-    console.error('localStorage load failed:', error);
+    console.error("localStorage load failed:", error);
     localStorage.removeItem(key); // Clear corrupted data
     return null;
   }
@@ -28,7 +28,7 @@ export function removeFromLocalStorage(key: string): boolean {
     localStorage.removeItem(key);
     return true;
   } catch (error) {
-    console.error('localStorage remove failed:', error);
+    console.error("localStorage remove failed:", error);
     return false;
   }
 }

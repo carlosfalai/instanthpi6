@@ -68,9 +68,13 @@ router.post("/get-or-create-subscription", async (req, res) => {
       try {
         const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
 
+        const invoice = subscription.latest_invoice as Stripe.Invoice | null | undefined;
+        const paymentIntent = invoice && typeof invoice === 'object' && 'payment_intent' in invoice
+          ? (invoice.payment_intent as Stripe.PaymentIntent | null)
+          : null;
         return res.json({
           subscriptionId: subscription.id,
-          clientSecret: subscription.latest_invoice?.payment_intent?.client_secret || null,
+          clientSecret: paymentIntent?.client_secret || null,
           status: subscription.status,
         });
       } catch (subscriptionError) {
@@ -197,10 +201,11 @@ router.post("/webhook", async (req, res) => {
 
           if (user) {
             // Update user to premium status, update subscription end date, etc.
+            const sub = updatedSubscription as Stripe.Subscription & { current_period_end: number };
             await db
               .update(users)
               .set({
-                premiumUntil: new Date(updatedSubscription.current_period_end * 1000),
+                premiumUntil: new Date(sub.current_period_end * 1000),
                 isPremium: true,
               })
               .where(eq(users.id, user.id));
@@ -257,7 +262,7 @@ router.get("/plans", async (req, res) => {
         name: product.name,
         description: product.description,
         image: product.images?.length ? product.images[0] : null,
-        amount: price.unit_amount / 100, // Convert cents to dollars
+        amount: (price.unit_amount ?? 0) / 100, // Convert cents to dollars
         currency: price.currency,
         interval: price.recurring?.interval,
         intervalCount: price.recurring?.interval_count,

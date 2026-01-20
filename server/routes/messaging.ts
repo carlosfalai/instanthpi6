@@ -1,5 +1,6 @@
 import { Router } from "express";
 import crypto from "crypto";
+import { requireAuth } from "../middleware/auth";
 
 // Sample message templates for demonstration
 const messageTemplates = [
@@ -47,6 +48,9 @@ const messageHistory: {
 }[] = [];
 
 export const messagingRouter = Router();
+
+// All messaging routes require authentication - can send mass messages
+messagingRouter.use(requireAuth);
 
 // Get all message templates
 messagingRouter.get("/templates", (req, res) => {

@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
-import { saveToLocalStorage, loadFromLocalStorage } from '@/utils/localStorage';
-import { arrayMove } from '@dnd-kit/sortable';
+import { useState, useEffect, useCallback } from "react";
+import { saveToLocalStorage, loadFromLocalStorage } from "@/utils/localStorage";
+import { arrayMove } from "@dnd-kit/sortable";
 
 // Panel configuration types
-export type PanelId = 'inbox' | 'history' | 'queue' | 'ai' | 'templates';
+export type PanelId = "inbox" | "history" | "queue" | "ai" | "templates";
 
 export interface PanelConfig {
   id: PanelId;
@@ -17,44 +17,45 @@ export interface PanelLayoutState {
   order: PanelId[];
   names: Record<PanelId, string>;
   sizes: Record<PanelId, number>;
+  collapsed: PanelId[];
 }
 
 // Storage key for persistence
-const STORAGE_KEY = 'instanthpi_panel_layout';
+const STORAGE_KEY = "instanthpi_panel_layout";
 
 // Default panel configurations
 export const DEFAULT_PANEL_CONFIGS: Record<PanelId, PanelConfig> = {
   inbox: {
-    id: 'inbox',
-    name: 'Spruce Inbox',
+    id: "inbox",
+    name: "Spruce Inbox",
     defaultSize: 15,
     minSize: 10,
     maxSize: 25,
   },
   history: {
-    id: 'history',
-    name: 'Conversation',
+    id: "history",
+    name: "Conversation",
     defaultSize: 20,
     minSize: 15,
     maxSize: 35,
   },
   queue: {
-    id: 'queue',
-    name: 'Staging Queue',
+    id: "queue",
+    name: "Staging Queue",
     defaultSize: 15,
     minSize: 10,
     maxSize: 25,
   },
   ai: {
-    id: 'ai',
-    name: 'Claude Chat',
+    id: "ai",
+    name: "Claude Chat",
     defaultSize: 25,
     minSize: 15,
     maxSize: 40,
   },
   templates: {
-    id: 'templates',
-    name: 'Templates',
+    id: "templates",
+    name: "Templates",
     defaultSize: 25,
     minSize: 15,
     maxSize: 40,
@@ -62,15 +63,15 @@ export const DEFAULT_PANEL_CONFIGS: Record<PanelId, PanelConfig> = {
 };
 
 // Default panel order
-const DEFAULT_ORDER: PanelId[] = ['inbox', 'history', 'queue', 'ai', 'templates'];
+const DEFAULT_ORDER: PanelId[] = ["inbox", "history", "queue", "ai", "templates"];
 
 // Default names
 const DEFAULT_NAMES: Record<PanelId, string> = {
-  inbox: 'Spruce Inbox',
-  history: 'Conversation',
-  queue: 'Staging Queue',
-  ai: 'Claude Chat',
-  templates: 'Templates',
+  inbox: "Spruce Inbox",
+  history: "Conversation",
+  queue: "Staging Queue",
+  ai: "Claude Chat",
+  templates: "Templates",
 };
 
 // Default sizes
@@ -87,6 +88,7 @@ function getDefaultState(): PanelLayoutState {
     order: [...DEFAULT_ORDER],
     names: { ...DEFAULT_NAMES },
     sizes: { ...DEFAULT_SIZES },
+    collapsed: [],
   };
 }
 
@@ -99,12 +101,13 @@ export function usePanelLayout() {
     const saved = loadFromLocalStorage<PanelLayoutState>(STORAGE_KEY);
     if (saved) {
       // Validate saved state has all required panels
-      const hasAllPanels = DEFAULT_ORDER.every(id => saved.order?.includes(id));
+      const hasAllPanels = DEFAULT_ORDER.every((id) => saved.order?.includes(id));
       if (hasAllPanels && saved.order?.length === DEFAULT_ORDER.length) {
         setState({
           order: saved.order,
           names: { ...DEFAULT_NAMES, ...saved.names },
           sizes: { ...DEFAULT_SIZES, ...saved.sizes },
+          collapsed: saved.collapsed || [],
         });
       }
     }
@@ -120,7 +123,7 @@ export function usePanelLayout() {
 
   // Reorder panels after drag end
   const reorderPanels = useCallback((activeId: PanelId, overId: PanelId) => {
-    setState(prev => {
+    setState((prev) => {
       const oldIndex = prev.order.indexOf(activeId);
       const newIndex = prev.order.indexOf(overId);
 
@@ -135,7 +138,7 @@ export function usePanelLayout() {
 
   // Update panel name
   const updatePanelName = useCallback((panelId: PanelId, name: string) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       names: {
         ...prev.names,
@@ -146,7 +149,7 @@ export function usePanelLayout() {
 
   // Update panel size
   const updatePanelSize = useCallback((panelId: PanelId, size: number) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       sizes: {
         ...prev.sizes,
@@ -157,7 +160,7 @@ export function usePanelLayout() {
 
   // Update all panel sizes at once (from PanelGroup onLayout)
   const updateAllSizes = useCallback((sizes: number[]) => {
-    setState(prev => {
+    setState((prev) => {
       const newSizes = { ...prev.sizes };
       prev.order.forEach((panelId, index) => {
         if (sizes[index] !== undefined) {
@@ -176,9 +179,30 @@ export function usePanelLayout() {
     setState(getDefaultState());
   }, []);
 
+  // Toggle panel collapse/expand
+  const togglePanelCollapse = useCallback((panelId: PanelId) => {
+    setState((prev) => {
+      const isCollapsed = prev.collapsed.includes(panelId);
+      return {
+        ...prev,
+        collapsed: isCollapsed
+          ? prev.collapsed.filter((id) => id !== panelId)
+          : [...prev.collapsed, panelId],
+      };
+    });
+  }, []);
+
+  // Check if panel is collapsed
+  const isPanelCollapsed = useCallback(
+    (panelId: PanelId) => {
+      return state.collapsed.includes(panelId);
+    },
+    [state.collapsed]
+  );
+
   // Get ordered panels with their configs
   const getOrderedPanels = useCallback(() => {
-    return state.order.map(id => ({
+    return state.order.map((id) => ({
       ...DEFAULT_PANEL_CONFIGS[id],
       name: state.names[id],
       size: state.sizes[id],
@@ -186,19 +210,23 @@ export function usePanelLayout() {
   }, [state]);
 
   // Get panel config by ID
-  const getPanelConfig = useCallback((panelId: PanelId) => {
-    return {
-      ...DEFAULT_PANEL_CONFIGS[panelId],
-      name: state.names[panelId],
-      size: state.sizes[panelId],
-    };
-  }, [state]);
+  const getPanelConfig = useCallback(
+    (panelId: PanelId) => {
+      return {
+        ...DEFAULT_PANEL_CONFIGS[panelId],
+        name: state.names[panelId],
+        size: state.sizes[panelId],
+      };
+    },
+    [state]
+  );
 
   return {
     // State
     panelOrder: state.order,
     panelNames: state.names,
     panelSizes: state.sizes,
+    collapsedPanels: state.collapsed,
     isInitialized,
 
     // Actions
@@ -207,10 +235,12 @@ export function usePanelLayout() {
     updatePanelSize,
     updateAllSizes,
     resetLayout,
+    togglePanelCollapse,
 
     // Helpers
     getOrderedPanels,
     getPanelConfig,
+    isPanelCollapsed,
   };
 }
 

@@ -1,61 +1,68 @@
 exports.handler = async (event) => {
   const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json'
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Content-Type": "application/json",
   };
 
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+  if (event.httpMethod === "OPTIONS") {
+    return { statusCode: 200, headers, body: "" };
   }
 
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+  if (event.httpMethod !== "POST") {
+    return { statusCode: 405, headers, body: JSON.stringify({ error: "Method not allowed" }) };
   }
 
   try {
     const {
       patient_id,
-      language = 'fr',
+      language = "fr",
       demographics = {},
       hpi_summary,
       hpi_confirmed,
       hpi_corrections,
-      follow_up_answers = {}
-    } = JSON.parse(event.body || '{}');
+      follow_up_answers = {},
+    } = JSON.parse(event.body || "{}");
 
     // Build final S (Subjective) text
     const parts = [];
     if (hpi_summary) parts.push(hpi_summary.trim());
     if (hpi_confirmed === false && hpi_corrections) {
-      parts.push((language === 'fr'
-        ? "Corrections du patient: "
-        : "Patient corrections: ") + hpi_corrections.trim());
+      parts.push(
+        (language === "fr" ? "Corrections du patient: " : "Patient corrections: ") +
+          hpi_corrections.trim()
+      );
     }
 
     const answersKeys = Object.keys(follow_up_answers || {});
     if (answersKeys.length > 0) {
-      parts.push(language === 'fr' ? 'Réponses aux questions:' : 'Answers to follow-up questions:');
-      answersKeys.sort((a, b) => Number(a) - Number(b)).slice(0, 10).forEach((k, i) => {
-        const val = (follow_up_answers[k] || '').toString().trim();
-        if (val) parts.push(`${i + 1}. ${val}`);
-      });
+      parts.push(language === "fr" ? "Réponses aux questions:" : "Answers to follow-up questions:");
+      answersKeys
+        .sort((a, b) => Number(a) - Number(b))
+        .slice(0, 10)
+        .forEach((k, i) => {
+          const val = (follow_up_answers[k] || "").toString().trim();
+          if (val) parts.push(`${i + 1}. ${val}`);
+        });
     }
 
-    const S_text = parts.join('\n\n');
+    const S_text = parts.join("\n\n");
 
     const nameAgeSex = (() => {
-      const age = demographics.age ? `${demographics.age} ${language === 'fr' ? 'ans' : 'yrs'}` : '';
-      const sex = demographics.gender || demographics.sex || '';
-      const sep = age && sex ? ' · ' : '';
+      const age = demographics.age
+        ? `${demographics.age} ${language === "fr" ? "ans" : "yrs"}`
+        : "";
+      const sex = demographics.gender || demographics.sex || "";
+      const sep = age && sex ? " · " : "";
       return `${age}${sep}${sex}`.trim();
     })();
 
     const today = new Date();
     const dateStr = today.toISOString().slice(0, 10);
 
-    const title = language === 'fr' ? 'Résumé HPI - Pour la Consultation' : 'HPI Summary - For Consultation';
+    const title =
+      language === "fr" ? "Résumé HPI - Pour la Consultation" : "HPI Summary - For Consultation";
     const printHtml = `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>${title}</title>
 <style>
@@ -71,20 +78,26 @@ exports.handler = async (event) => {
 </style></head>
 <body>
   <div class="hdr">
-    <h2>${language === 'fr' ? 'Document pour le Médecin (Sujet uniquement)' : 'Document for Physician (Subjective Only)'}
-      <span class="badge">${patient_id || ''}</span>
+    <h2>${language === "fr" ? "Document pour le Médecin (Sujet uniquement)" : "Document for Physician (Subjective Only)"}
+      <span class="badge">${patient_id || ""}</span>
     </h2>
-    <div>${nameAgeSex ? nameAgeSex + ' · ' : ''}${dateStr}</div>
+    <div>${nameAgeSex ? nameAgeSex + " · " : ""}${dateStr}</div>
   </div>
-  <div class="sec">${language === 'fr' ? 'Sujet (HPI confirmé par le patient)' : 'Subjective (Patient-confirmed HPI)'}</div>
-  <div class="box"><pre>${S_text || ''}</pre></div>
-  <div class="print"><button onclick="window.print()">${language === 'fr' ? 'Imprimer' : 'Print'}</button></div>
+  <div class="sec">${language === "fr" ? "Sujet (HPI confirmé par le patient)" : "Subjective (Patient-confirmed HPI)"}</div>
+  <div class="box"><pre>${S_text || ""}</pre></div>
+  <div class="print"><button onclick="window.print()">${language === "fr" ? "Imprimer" : "Print"}</button></div>
 </body></html>`;
 
-    return { statusCode: 200, headers, body: JSON.stringify({ success: true, print_html: printHtml }) };
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ success: true, print_html: printHtml }),
+    };
   } catch (error) {
-    return { statusCode: 500, headers, body: JSON.stringify({ error: error.message || 'Failed to generate document' }) };
+    return {
+      statusCode: 500,
+      headers,
+      body: JSON.stringify({ error: error.message || "Failed to generate document" }),
+    };
   }
 };
-
-

@@ -15,5 +15,17 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunk for large dependencies
+          vendor: ["react", "react-dom", "wouter"],
+          // UI components chunk
+          ui: ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu", "@radix-ui/react-select", "@radix-ui/react-tabs"],
+          // PDF/export functionality
+          pdf: ["jspdf", "html2canvas"],
+        },
+      },
+    },
   },
 });

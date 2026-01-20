@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { getQueryFn } from "@/lib/queryClient";
 import ModernLayout from "@/components/layout/ModernLayout";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -39,17 +40,20 @@ export default function MessagesPage() {
   // Query for all patients
   const { data: patients = [], isLoading: patientsLoading } = useQuery<Patient[]>({
     queryKey: ["/api/patients"],
+    queryFn: getQueryFn(),
   });
 
   // Query for selected patient
   const { data: selectedPatient, isLoading: patientLoading } = useQuery<Patient>({
     queryKey: [`/api/patients/${selectedPatientId}`],
+    queryFn: getQueryFn(),
     enabled: !!selectedPatientId,
   });
 
   // Query for patient messages
   const { data: messages = [], isLoading: messagesLoading } = useQuery<Message[]>({
     queryKey: [`/api/patients/${selectedPatientId}/messages`],
+    queryFn: getQueryFn(),
     enabled: !!selectedPatientId,
   });
 
@@ -270,8 +274,8 @@ export default function MessagesPage() {
                       }
                     }}
                   />
-                  <Button 
-                    onClick={handleSendMessage} 
+                  <Button
+                    onClick={handleSendMessage}
                     disabled={!messageText.trim()}
                     className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
                   >

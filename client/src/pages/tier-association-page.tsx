@@ -167,18 +167,30 @@ export default function TierAssociationPage() {
     practiceType: "outpatient",
   });
   const [posts, setPosts] = useState<CommunityPost[]>(samplePosts);
-  
+
   // Doctor messaging state
   const [selectedDoctor, setSelectedDoctor] = useState<any>(null);
   const [messageText, setMessageText] = useState("");
   const [doctorMessages, setDoctorMessages] = useState<any[]>([]);
-  
+
   // Sample doctors in association
   const associationDoctors = [
     { id: "1", name: "Dr. Sarah Chen", specialty: "Cardiology", online: true, avatar: "SC" },
     { id: "2", name: "Dr. Marcus Rodriguez", specialty: "Pediatrics", online: false, avatar: "MR" },
-    { id: "3", name: "Dr. Aisha Patel", specialty: "Internal Medicine", online: true, avatar: "AP" },
-    { id: "4", name: "Dr. James Wilson", specialty: "Emergency Medicine", online: true, avatar: "JW" },
+    {
+      id: "3",
+      name: "Dr. Aisha Patel",
+      specialty: "Internal Medicine",
+      online: true,
+      avatar: "AP",
+    },
+    {
+      id: "4",
+      name: "Dr. James Wilson",
+      specialty: "Emergency Medicine",
+      online: true,
+      avatar: "JW",
+    },
     { id: "5", name: "Dr. Emily Zhang", specialty: "Family Medicine", online: true, avatar: "EZ" },
   ];
 
@@ -470,7 +482,7 @@ export default function TierAssociationPage() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-slate-100 text-base">Association Members</CardTitle>
                   <CardDescription className="text-slate-400 text-sm">
-                    {associationDoctors.filter(d => d.online).length} online
+                    {associationDoctors.filter((d) => d.online).length} online
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="p-0">
@@ -481,21 +493,25 @@ export default function TierAssociationPage() {
                         onClick={() => setSelectedDoctor(doctor)}
                         className={`w-full p-3 rounded-md text-left transition-all ${
                           selectedDoctor?.id === doctor.id
-                            ? 'bg-slate-800 border border-slate-700'
-                            : 'hover:bg-slate-800/50 border border-transparent'
+                            ? "bg-slate-800 border border-slate-700"
+                            : "hover:bg-slate-800/50 border border-transparent"
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div className="relative">
                             <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center border border-slate-700">
-                              <span className="text-sm font-medium text-slate-300">{doctor.avatar}</span>
+                              <span className="text-sm font-medium text-slate-300">
+                                {doctor.avatar}
+                              </span>
                             </div>
                             {doctor.online && (
                               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-slate-900"></div>
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-slate-200 truncate">{doctor.name}</p>
+                            <p className="text-sm font-medium text-slate-200 truncate">
+                              {doctor.name}
+                            </p>
                             <p className="text-xs text-slate-500">{doctor.specialty}</p>
                           </div>
                         </div>
@@ -512,44 +528,56 @@ export default function TierAssociationPage() {
                     <CardHeader className="border-b border-slate-800 pb-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center border border-slate-700">
-                          <span className="text-sm font-medium text-slate-300">{selectedDoctor.avatar}</span>
+                          <span className="text-sm font-medium text-slate-300">
+                            {selectedDoctor.avatar}
+                          </span>
                         </div>
                         <div>
-                          <CardTitle className="text-slate-100 text-base">{selectedDoctor.name}</CardTitle>
+                          <CardTitle className="text-slate-100 text-base">
+                            {selectedDoctor.name}
+                          </CardTitle>
                           <CardDescription className="text-slate-400 text-xs">
-                            {selectedDoctor.specialty} • {selectedDoctor.online ? 'Online' : 'Offline'}
+                            {selectedDoctor.specialty} •{" "}
+                            {selectedDoctor.online ? "Online" : "Offline"}
                           </CardDescription>
                         </div>
                       </div>
                     </CardHeader>
-                    
+
                     {/* Messages */}
                     <CardContent className="flex-1 overflow-y-auto p-4 space-y-3">
-                      {doctorMessages.filter(m => 
-                        m.to === selectedDoctor.id || m.from === selectedDoctor.id
+                      {doctorMessages.filter(
+                        (m) => m.to === selectedDoctor.id || m.from === selectedDoctor.id
                       ).length === 0 ? (
                         <div className="text-center py-12 text-slate-500">
                           <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-50" />
                           <p>No messages yet</p>
-                          <p className="text-xs mt-1">Start a conversation with {selectedDoctor.name}</p>
+                          <p className="text-xs mt-1">
+                            Start a conversation with {selectedDoctor.name}
+                          </p>
                         </div>
                       ) : (
-                        doctorMessages.filter(m => 
-                          m.to === selectedDoctor.id || m.from === selectedDoctor.id
-                        ).map((msg) => (
-                          <div key={msg.id} className={`flex ${msg.from === 'me' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-[70%] rounded-lg p-3 ${
-                              msg.from === 'me' 
-                                ? 'bg-slate-800 border border-slate-700' 
-                                : 'bg-slate-850 border border-slate-750'
-                            }`}>
-                              <p className="text-sm text-slate-200">{msg.text}</p>
-                              <p className="text-xs text-slate-500 mt-1">
-                                {new Date(msg.timestamp).toLocaleTimeString()}
-                              </p>
+                        doctorMessages
+                          .filter((m) => m.to === selectedDoctor.id || m.from === selectedDoctor.id)
+                          .map((msg) => (
+                            <div
+                              key={msg.id}
+                              className={`flex ${msg.from === "me" ? "justify-end" : "justify-start"}`}
+                            >
+                              <div
+                                className={`max-w-[70%] rounded-lg p-3 ${
+                                  msg.from === "me"
+                                    ? "bg-slate-800 border border-slate-700"
+                                    : "bg-slate-850 border border-slate-750"
+                                }`}
+                              >
+                                <p className="text-sm text-slate-200">{msg.text}</p>
+                                <p className="text-xs text-slate-500 mt-1">
+                                  {new Date(msg.timestamp).toLocaleTimeString()}
+                                </p>
+                              </div>
                             </div>
-                          </div>
-                        ))
+                          ))
                       )}
                     </CardContent>
 
@@ -563,32 +591,38 @@ export default function TierAssociationPage() {
                           className="bg-slate-800 border-slate-700 text-slate-200 resize-none"
                           rows={2}
                           onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
+                            if (e.key === "Enter" && !e.shiftKey) {
                               e.preventDefault();
                               if (messageText.trim()) {
-                                setDoctorMessages(prev => [...prev, {
-                                  id: Date.now(),
-                                  from: "me",
-                                  to: selectedDoctor.id,
-                                  text: messageText,
-                                  timestamp: new Date().toISOString()
-                                }]);
+                                setDoctorMessages((prev) => [
+                                  ...prev,
+                                  {
+                                    id: Date.now(),
+                                    from: "me",
+                                    to: selectedDoctor.id,
+                                    text: messageText,
+                                    timestamp: new Date().toISOString(),
+                                  },
+                                ]);
                                 setMessageText("");
                                 toast({ title: "Message sent" });
                               }
                             }
                           }}
                         />
-                        <Button 
+                        <Button
                           onClick={() => {
                             if (messageText.trim()) {
-                              setDoctorMessages(prev => [...prev, {
-                                id: Date.now(),
-                                from: "me",
-                                to: selectedDoctor.id,
-                                text: messageText,
-                                timestamp: new Date().toISOString()
-                              }]);
+                              setDoctorMessages((prev) => [
+                                ...prev,
+                                {
+                                  id: Date.now(),
+                                  from: "me",
+                                  to: selectedDoctor.id,
+                                  text: messageText,
+                                  timestamp: new Date().toISOString(),
+                                },
+                              ]);
                               setMessageText("");
                               toast({ title: "Message sent" });
                             }

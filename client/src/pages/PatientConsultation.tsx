@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, getQueryFn } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import ModernLayout from "@/components/layout/ModernLayout";
 import LeftPanel from "@/components/consultation/LeftPanel";
@@ -16,24 +16,28 @@ export default function PatientConsultation() {
   // Fetch patient details
   const { data: patient, isLoading: isLoadingPatient } = useQuery({
     queryKey: [`/api/patients/${patientId}`],
+    queryFn: getQueryFn(),
     enabled: !isNaN(patientId),
   });
 
   // Fetch patient messages
   const { data: messages, isLoading: isLoadingMessages } = useQuery({
     queryKey: [`/api/patients/${patientId}/messages`],
+    queryFn: getQueryFn(),
     enabled: !isNaN(patientId),
   });
 
   // Fetch form submission data
   const { data: formSubmissions } = useQuery({
     queryKey: [`/api/patients/${patientId}/formsubmissions`],
+    queryFn: getQueryFn(),
     enabled: !isNaN(patientId),
   });
 
   // Fetch current documentation if it exists
   const { data: documentation } = useQuery({
     queryKey: [`/api/patients/${patientId}/documentation`],
+    queryFn: getQueryFn({ on401: "returnNull" }),
     enabled: !isNaN(patientId),
   });
 

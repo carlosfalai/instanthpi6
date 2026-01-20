@@ -49,15 +49,69 @@ interface ActionButton {
 }
 
 const defaultButtons: ActionButton[] = [
-  { id: "1", label: "SOAP Note", command: "Generate a complete SOAP note for this patient case", icon: "FileText", color: "bg-blue-600" },
-  { id: "2", label: "Assessment", command: "Generate the Assessment section with clinical reasoning", icon: "Stethoscope", color: "bg-green-600" },
-  { id: "3", label: "Plan", command: "Generate a detailed treatment Plan", icon: "ClipboardList", color: "bg-purple-600" },
-  { id: "4", label: "Medications", command: "List recommended medications with dosages", icon: "Pill", color: "bg-orange-600" },
-  { id: "5", label: "Differential Dx", command: "Generate a differential diagnosis list", icon: "Brain", color: "bg-pink-600" },
-  { id: "6", label: "Risk Factors", command: "Identify and list patient risk factors", icon: "AlertCircle", color: "bg-red-600" },
-  { id: "7", label: "Follow-up", command: "Generate follow-up recommendations", icon: "Heart", color: "bg-cyan-600" },
-  { id: "8", label: "Summarize", command: "Summarize the key points concisely", icon: "Sparkles", color: "bg-amber-600" },
-  { id: "9", label: "Reformat", command: "Reformat the previous response in a cleaner structure", icon: "RotateCcw", color: "bg-indigo-600" },
+  {
+    id: "1",
+    label: "SOAP Note",
+    command: "Generate a complete SOAP note for this patient case",
+    icon: "FileText",
+    color: "bg-blue-600",
+  },
+  {
+    id: "2",
+    label: "Assessment",
+    command: "Generate the Assessment section with clinical reasoning",
+    icon: "Stethoscope",
+    color: "bg-green-600",
+  },
+  {
+    id: "3",
+    label: "Plan",
+    command: "Generate a detailed treatment Plan",
+    icon: "ClipboardList",
+    color: "bg-purple-600",
+  },
+  {
+    id: "4",
+    label: "Medications",
+    command: "List recommended medications with dosages",
+    icon: "Pill",
+    color: "bg-orange-600",
+  },
+  {
+    id: "5",
+    label: "Differential Dx",
+    command: "Generate a differential diagnosis list",
+    icon: "Brain",
+    color: "bg-pink-600",
+  },
+  {
+    id: "6",
+    label: "Risk Factors",
+    command: "Identify and list patient risk factors",
+    icon: "AlertCircle",
+    color: "bg-red-600",
+  },
+  {
+    id: "7",
+    label: "Follow-up",
+    command: "Generate follow-up recommendations",
+    icon: "Heart",
+    color: "bg-cyan-600",
+  },
+  {
+    id: "8",
+    label: "Summarize",
+    command: "Summarize the key points concisely",
+    icon: "Sparkles",
+    color: "bg-amber-600",
+  },
+  {
+    id: "9",
+    label: "Reformat",
+    command: "Reformat the previous response in a cleaner structure",
+    icon: "RotateCcw",
+    color: "bg-indigo-600",
+  },
 ];
 
 const iconMap: { [key: string]: React.ComponentType<any> } = {
@@ -207,9 +261,7 @@ export default function StreamDeckAI({
 
     setButtons((prev) =>
       prev.map((btn) =>
-        btn.id === editingButton
-          ? { ...btn, label: editLabel, command: editCommand }
-          : btn
+        btn.id === editingButton ? { ...btn, label: editLabel, command: editCommand } : btn
       )
     );
     setEditingButton(null);
@@ -270,7 +322,11 @@ export default function StreamDeckAI({
         </div>
         <Dialog open={isConfigOpen} onOpenChange={setIsConfigOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm" className="bg-[#1a1a1a] border-[#333] text-[#999] hover:bg-[#222]">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-[#1a1a1a] border-[#333] text-[#999] hover:bg-[#222]"
+            >
               <Settings className="h-4 w-4 mr-2" />
               Configure Buttons
             </Button>
@@ -308,19 +364,37 @@ export default function StreamDeckAI({
                   <div className="flex flex-col gap-2">
                     {editingButton === button.id ? (
                       <>
-                        <Button size="sm" onClick={saveButtonEdit} className="bg-green-600 hover:bg-green-700">
+                        <Button
+                          size="sm"
+                          onClick={saveButtonEdit}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
                           <Check className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="outline" onClick={cancelEdit} className="border-[#333]">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={cancelEdit}
+                          className="border-[#333]"
+                        >
                           <X className="h-4 w-4" />
                         </Button>
                       </>
                     ) : (
                       <>
-                        <Button size="sm" variant="outline" onClick={() => startEditingButton(button)} className="border-[#333]">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => startEditingButton(button)}
+                          className="border-[#333]"
+                        >
                           <Edit3 className="h-4 w-4" />
                         </Button>
-                        <Button size="sm" variant="destructive" onClick={() => deleteButton(button.id)}>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => deleteButton(button.id)}
+                        >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </>
@@ -330,11 +404,19 @@ export default function StreamDeckAI({
               ))}
             </div>
             <div className="flex justify-between mt-4 pt-4 border-t border-[#333]">
-              <Button variant="outline" onClick={addNewButton} className="border-[#333] text-[#999]">
+              <Button
+                variant="outline"
+                onClick={addNewButton}
+                className="border-[#333] text-[#999]"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Add Button
               </Button>
-              <Button variant="outline" onClick={resetToDefaults} className="border-[#333] text-[#999]">
+              <Button
+                variant="outline"
+                onClick={resetToDefaults}
+                className="border-[#333] text-[#999]"
+              >
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reset to Defaults
               </Button>
@@ -369,8 +451,9 @@ export default function StreamDeckAI({
                   <Sparkles className="h-12 w-12 text-[#8b5cf6] mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-[#e6e6e6] mb-2">Ready to Assist</h3>
                   <p className="text-sm text-[#666] max-w-md">
-                    Click any action button or type a message to start generating medical documentation.
-                    Your conversation history will maintain context for better results.
+                    Click any action button or type a message to start generating medical
+                    documentation. Your conversation history will maintain context for better
+                    results.
                   </p>
                 </div>
               </div>

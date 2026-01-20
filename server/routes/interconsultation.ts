@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { createClient } from "@supabase/supabase-js";
+import { requireAuth } from "../middleware/auth";
 
 const router = Router();
+
+// All interconsultation routes require authentication - PHI and specialist data
+router.use(requireAuth);
 
 const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_KEY!);
 
@@ -407,7 +411,9 @@ async function notifySpecialist(interconsultation: any): Promise<void> {
 
     if (specialist) {
       // Send email notification
-      console.log(`Notifying specialist: ${specialist.physicians.email}`);
+      const physicians = specialist.physicians as { email: string; name: string } | { email: string; name: string }[];
+      const email = Array.isArray(physicians) ? physicians[0]?.email : physicians.email;
+      console.log(`Notifying specialist: ${email}`);
       // Email sending logic would go here
     }
   } catch (error) {

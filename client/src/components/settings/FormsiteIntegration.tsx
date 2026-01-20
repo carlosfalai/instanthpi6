@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { queryClient } from "@/lib/queryClient";
+import { queryClient, getQueryFn } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,6 +34,7 @@ export default function FormsiteIntegration() {
   // Fetch existing credentials and form configuration
   const { data: credentials, isLoading } = useQuery({
     queryKey: ["/api/integrations/formsite"],
+    queryFn: getQueryFn({ on401: "returnNull" }),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 

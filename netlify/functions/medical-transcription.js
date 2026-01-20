@@ -46,18 +46,21 @@ exports.handler = async (event, context) => {
     // First, get the enhanced HPI summary from triage process
     let enhancedHpiSummary = "";
     try {
-      const triageResponse = await fetch(`${process.env.NETLIFY_URL || 'https://instanthpi.ca'}/api/triage-enhanced-output`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ patientId, variables })
-      });
-      
+      const triageResponse = await fetch(
+        `${process.env.NETLIFY_URL || "https://instanthpi.ca"}/api/triage-enhanced-output`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ patientId, variables }),
+        }
+      );
+
       if (triageResponse.ok) {
         const triageData = await triageResponse.json();
         enhancedHpiSummary = triageData.enhancedHpiSummary || "";
       }
     } catch (error) {
-      console.warn('Could not get enhanced HPI from triage, using original data');
+      console.warn("Could not get enhanced HPI from triage, using original data");
     }
 
     // Try to fetch Enhanced SOAP note (HPI + Q&A) if available
@@ -66,17 +69,20 @@ exports.handler = async (event, context) => {
     try {
       // Check if patient_answers exist in variables (from patient form submission)
       if (variables.patient_answers && variables.hpi_summary) {
-        const enhancedSoapResponse = await fetch(`${process.env.NETLIFY_URL || 'https://instanthpi.ca'}/api/generate-enhanced-soap`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            patient_id: patientId,
-            hpi_summary: variables.hpi_summary,
-            patient_answers: variables.patient_answers,
-            triage_result: variables.triage_result || {}
-          })
-        });
-        
+        const enhancedSoapResponse = await fetch(
+          `${process.env.NETLIFY_URL || "https://instanthpi.ca"}/api/generate-enhanced-soap`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              patient_id: patientId,
+              hpi_summary: variables.hpi_summary,
+              patient_answers: variables.patient_answers,
+              triage_result: variables.triage_result || {},
+            }),
+          }
+        );
+
         if (enhancedSoapResponse.ok) {
           const enhancedSoapData = await enhancedSoapResponse.json();
           enhancedSoapNote = enhancedSoapData.enhanced_soap_note || "";
@@ -84,21 +90,28 @@ exports.handler = async (event, context) => {
         }
       }
     } catch (error) {
-      console.warn('Could not fetch Enhanced SOAP note, Stepwise Strategy will use available data');
+      console.warn("Could not fetch Enhanced SOAP note, Stepwise Strategy will use available data");
     }
 
     // Detect case type from patient data
     const detectCaseType = (vars) => {
-      const allText = `${vars.ChiefComplaint || ''} ${vars.Description || ''} ${vars.AssociatedSymptoms || ''}`.toLowerCase();
-      if (allText.includes('vomissement') || allText.includes('diarrhée') || allText.includes('gastro')) return 'gastroenteritis';
-      if (allText.includes('toux') || allText.includes('cough')) return 'cough';
-      if (allText.includes('cystite') || allText.includes('dysurie')) return 'cystitis';
-      if (allText.includes('itss') || allText.includes('dépistage')) return 'sti_screening';
-      if (allText.includes('anxiété') || allText.includes('dépression')) return 'mental_health';
-      if (allText.includes('urgence') || allText.includes('douleur thoracique')) return 'emergency';
-      if (allText.includes('douleur abdominale') || allText.includes('biliaire')) return 'abdominal_pain';
-      if (allText.includes('tendon') || allText.includes('achille')) return 'orthopedic';
-      if (allText.includes('classe') || allText.includes('license')) return 'license_assessment';
+      const allText =
+        `${vars.ChiefComplaint || ""} ${vars.Description || ""} ${vars.AssociatedSymptoms || ""}`.toLowerCase();
+      if (
+        allText.includes("vomissement") ||
+        allText.includes("diarrhée") ||
+        allText.includes("gastro")
+      )
+        return "gastroenteritis";
+      if (allText.includes("toux") || allText.includes("cough")) return "cough";
+      if (allText.includes("cystite") || allText.includes("dysurie")) return "cystitis";
+      if (allText.includes("itss") || allText.includes("dépistage")) return "sti_screening";
+      if (allText.includes("anxiété") || allText.includes("dépression")) return "mental_health";
+      if (allText.includes("urgence") || allText.includes("douleur thoracique")) return "emergency";
+      if (allText.includes("douleur abdominale") || allText.includes("biliaire"))
+        return "abdominal_pain";
+      if (allText.includes("tendon") || allText.includes("achille")) return "orthopedic";
+      if (allText.includes("classe") || allText.includes("license")) return "license_assessment";
       return null;
     };
 
@@ -111,14 +124,14 @@ exports.handler = async (event, context) => {
       const physicianId = variables.physician_id || variables.userId;
       if (physicianId) {
         const templatesResponse = await fetch(
-          `${process.env.NETLIFY_URL || 'https://instanthpi.ca'}/api/medical-templates/${physicianId}?case_type=${caseType || ''}`,
-          { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+          `${process.env.NETLIFY_URL || "https://instanthpi.ca"}/api/medical-templates/${physicianId}?case_type=${caseType || ""}`,
+          { method: "GET", headers: { "Content-Type": "application/json" } }
         );
-        
+
         if (templatesResponse.ok) {
           const templatesData = await templatesResponse.json();
           // Organize templates by category
-          templatesData.templates?.forEach(template => {
+          templatesData.templates?.forEach((template) => {
             if (!enabledTemplates[template.template_category]) {
               enabledTemplates[template.template_category] = [];
             }
@@ -127,7 +140,7 @@ exports.handler = async (event, context) => {
         }
       }
     } catch (error) {
-      console.warn('Could not fetch templates, using defaults');
+      console.warn("Could not fetch templates, using defaults");
     }
 
     // Build the prompt for medical transcription using actual patient data
@@ -219,17 +232,21 @@ PATIENT_MESSAGE:
 STEPWISE_STRATEGY:
 CRITICAL: Analyze the Enhanced SOAP note provided below. The Enhanced SOAP note combines HPI summary + patient Q&A answers and contains the complete clinical picture.
 
-${enhancedSoapNote ? `Enhanced SOAP Note to Analyze:
+${
+  enhancedSoapNote
+    ? `Enhanced SOAP Note to Analyze:
 ${enhancedSoapNote}
 
 Doctor HPI Summary:
-${doctorHpiSummary || enhancedHpiSummary || 'N/A'}
+${doctorHpiSummary || enhancedHpiSummary || "N/A"}
 
-` : `Enhanced SOAP Note not yet available. Use the patient data below to construct a preliminary analysis:
+`
+    : `Enhanced SOAP Note not yet available. Use the patient data below to construct a preliminary analysis:
 Patient Data: ${JSON.stringify(variables, null, 2)}
-${enhancedHpiSummary ? `Enhanced HPI Summary: ${enhancedHpiSummary}` : ''}
+${enhancedHpiSummary ? `Enhanced HPI Summary: ${enhancedHpiSummary}` : ""}
 
-`}
+`
+}
 
 Generate a Stepwise Strategy discussion in Spartan Format by analyzing the Enhanced SOAP note (if available) with these exact subsections:
 1. Symptoms: Summarize key symptoms and clinical presentation from the Enhanced SOAP note (HPI + patient Q&A answers)
@@ -256,21 +273,22 @@ Use proper French medical terminology and ensure each section is comprehensive a
             messages: [
               {
                 role: "system",
-                content: "You are a medical AI assistant specializing in French medical documentation and clinical transcription."
+                content:
+                  "You are a medical AI assistant specializing in French medical documentation and clinical transcription.",
               },
               {
                 role: "user",
-                content: prompt
-              }
+                content: prompt,
+              },
             ],
             temperature: 0.3,
-            max_tokens: 4000
+            max_tokens: 4000,
           },
           {
             headers: {
-              "Authorization": `Bearer ${OPENAI_API_KEY}`,
-              "Content-Type": "application/json"
-            }
+              Authorization: `Bearer ${OPENAI_API_KEY}`,
+              "Content-Type": "application/json",
+            },
           }
         );
 
@@ -292,16 +310,16 @@ Use proper French medical terminology and ensure each section is comprehensive a
             messages: [
               {
                 role: "user",
-                content: prompt
-              }
-            ]
+                content: prompt,
+              },
+            ],
           },
           {
             headers: {
               "x-api-key": ANTHROPIC_API_KEY,
               "Content-Type": "application/json",
-              "anthropic-version": "2023-06-01"
-            }
+              "anthropic-version": "2023-06-01",
+            },
           }
         );
 
@@ -318,7 +336,7 @@ Use proper French medical terminology and ensure each section is comprehensive a
         headers,
         body: JSON.stringify({
           error: "AI service unavailable",
-          message: "Both OpenAI and Anthropic APIs are not responding"
+          message: "Both OpenAI and Anthropic APIs are not responding",
         }),
       };
     }
@@ -332,7 +350,7 @@ Use proper French medical terminology and ensure each section is comprehensive a
         statusCode: 200,
         headers,
         body: JSON.stringify({
-          customResponse: aiResponse
+          customResponse: aiResponse,
         }),
       };
     }
@@ -342,7 +360,6 @@ Use proper French medical terminology and ensure each section is comprehensive a
       headers,
       body: JSON.stringify(sections),
     };
-
   } catch (error) {
     console.error("Error in medical transcription:", error);
     return {
@@ -350,7 +367,7 @@ Use proper French medical terminology and ensure each section is comprehensive a
       headers,
       body: JSON.stringify({
         error: "Internal server error",
-        message: error.message
+        message: error.message,
       }),
     };
   }
@@ -371,26 +388,26 @@ function parseMedicalSections(text) {
     insuranceDocumentation: "",
     telemedicineNeedsInPerson: "",
     patientMessage: "",
-    stepwiseStrategy: ""
+    stepwiseStrategy: "",
   };
 
   // Split text into lines and process
-  const lines = text.split('\n');
-  let currentSection = '';
+  const lines = text.split("\n");
+  let currentSection = "";
   let currentContent = [];
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
-    
+
     // Check for section headers (format: SECTION_NAME:)
-    if (line.endsWith(':') && line.includes('_')) {
+    if (line.endsWith(":") && line.includes("_")) {
       // Save previous section
       if (currentSection) {
-        sections[currentSection] = currentContent.join('\n').trim();
+        sections[currentSection] = currentContent.join("\n").trim();
       }
-      
+
       // Start new section
-      const sectionKey = line.replace(':', '').toLowerCase();
+      const sectionKey = line.replace(":", "").toLowerCase();
       currentSection = mapSectionKey(sectionKey);
       currentContent = [];
     } else if (currentSection && line) {
@@ -401,11 +418,11 @@ function parseMedicalSections(text) {
 
   // Add the last section
   if (currentSection) {
-    sections[currentSection] = currentContent.join('\n').trim();
+    sections[currentSection] = currentContent.join("\n").trim();
   }
 
   // If no sections were found, try to extract from the raw text
-  if (Object.values(sections).every(section => !section.trim())) {
+  if (Object.values(sections).every((section) => !section.trim())) {
     // Fallback: return the raw text in the first section
     sections.hpiConfirmationSummary = text;
   }
@@ -415,33 +432,33 @@ function parseMedicalSections(text) {
 
 function mapSectionKey(sectionKey) {
   switch (sectionKey) {
-    case 'hpi_confirmation_summary':
-      return 'hpiConfirmationSummary';
-    case 'follow_up_questions':
-      return 'followUpQuestions';
-    case 'super_spartan_sap_note':
-      return 'superSpartanSAP';
-    case 'medications_ready_to_use':
-      return 'medicationsReadyToUse';
-    case 'lab_works':
-      return 'labWorks';
-    case 'imagerie_medicale':
-      return 'imagerieMedicale';
-    case 'reference_specialistes':
-      return 'referenceSpecialistes';
-    case 'work_leave_certificate':
-      return 'workLeaveCertificate';
-    case 'workplace_modifications':
-      return 'workplaceModifications';
-    case 'insurance_documentation':
-      return 'insuranceDocumentation';
-    case 'telemedicine_needs_in_person':
-      return 'telemedicineNeedsInPerson';
-    case 'patient_message':
-      return 'patientMessage';
-    case 'stepwise_strategy':
-      return 'stepwiseStrategy';
+    case "hpi_confirmation_summary":
+      return "hpiConfirmationSummary";
+    case "follow_up_questions":
+      return "followUpQuestions";
+    case "super_spartan_sap_note":
+      return "superSpartanSAP";
+    case "medications_ready_to_use":
+      return "medicationsReadyToUse";
+    case "lab_works":
+      return "labWorks";
+    case "imagerie_medicale":
+      return "imagerieMedicale";
+    case "reference_specialistes":
+      return "referenceSpecialistes";
+    case "work_leave_certificate":
+      return "workLeaveCertificate";
+    case "workplace_modifications":
+      return "workplaceModifications";
+    case "insurance_documentation":
+      return "insuranceDocumentation";
+    case "telemedicine_needs_in_person":
+      return "telemedicineNeedsInPerson";
+    case "patient_message":
+      return "patientMessage";
+    case "stepwise_strategy":
+      return "stepwiseStrategy";
     default:
-      return '';
+      return "";
   }
 }

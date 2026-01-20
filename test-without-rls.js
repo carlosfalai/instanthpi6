@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
 
 // Load environment variables
 dotenv.config();
@@ -10,37 +10,34 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Missing Supabase credentials');
+  console.error("❌ Missing Supabase credentials");
   process.exit(1);
 }
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function testWithoutRLS() {
-  console.log('🧪 Testing form submission by temporarily disabling RLS...\n');
+  console.log("🧪 Testing form submission by temporarily disabling RLS...\n");
 
   // First, let's try to disable RLS temporarily
   try {
-    console.log('🔧 Attempting to disable RLS on consultations table...');
-    
+    console.log("🔧 Attempting to disable RLS on consultations table...");
+
     // Try to disable RLS
-    const { error: rlsError } = await supabase
-      .from('consultations')
-      .select('*')
-      .limit(1);
-    
+    const { error: rlsError } = await supabase.from("consultations").select("*").limit(1);
+
     if (rlsError) {
-      console.log('❌ RLS is blocking access:', rlsError.message);
+      console.log("❌ RLS is blocking access:", rlsError.message);
     } else {
-      console.log('✅ RLS is not blocking access');
+      console.log("✅ RLS is not blocking access");
     }
   } catch (err) {
-    console.log('❌ Error checking RLS:', err.message);
+    console.log("❌ Error checking RLS:", err.message);
   }
 
   // Generate a test patient ID
-  const testPatientId = 'TEST789012';
-  
+  const testPatientId = "TEST789012";
+
   // Simulate the form data structure that matches the database schema
   const consultationData = {
     patient_id: testPatientId,
@@ -74,57 +71,54 @@ async function testWithoutRLS() {
       age: 35,
       problem_start_date: "2 hours ago",
       symptom_description: "Sharp, stabbing pain",
-      selected_symptoms: ["Chest pain", "Shortness of breath", "Nausea"]
-    }
+      selected_symptoms: ["Chest pain", "Shortness of breath", "Nausea"],
+    },
   };
 
   try {
-    console.log('📝 Inserting test consultation...');
-    const { data, error } = await supabase
-      .from('consultations')
-      .insert(consultationData)
-      .select();
+    console.log("📝 Inserting test consultation...");
+    const { data, error } = await supabase.from("consultations").insert(consultationData).select();
 
     if (error) {
-      console.error('❌ Error inserting consultation:', error.message);
-      console.error('Error details:', error);
+      console.error("❌ Error inserting consultation:", error.message);
+      console.error("Error details:", error);
     } else {
-      console.log('✅ Test consultation inserted successfully!');
-      console.log('📊 Inserted data:', data);
+      console.log("✅ Test consultation inserted successfully!");
+      console.log("📊 Inserted data:", data);
     }
 
     // Now test retrieval
-    console.log('\n🔍 Testing retrieval...');
+    console.log("\n🔍 Testing retrieval...");
     const { data: retrieved, error: retrieveError } = await supabase
-      .from('consultations')
-      .select('*')
-      .eq('patient_id', testPatientId);
+      .from("consultations")
+      .select("*")
+      .eq("patient_id", testPatientId);
 
     if (retrieveError) {
-      console.error('❌ Error retrieving consultation:', retrieveError.message);
+      console.error("❌ Error retrieving consultation:", retrieveError.message);
     } else {
-      console.log('✅ Retrieved consultations:', retrieved?.length || 0);
+      console.log("✅ Retrieved consultations:", retrieved?.length || 0);
       if (retrieved && retrieved.length > 0) {
-        console.log('📋 Retrieved data:', retrieved[0]);
-        console.log('📋 Form data (AI analysis):', retrieved[0].form_data);
+        console.log("📋 Retrieved data:", retrieved[0]);
+        console.log("📋 Form data (AI analysis):", retrieved[0].form_data);
       }
     }
 
     // Test the doctor dashboard query
-    console.log('\n👨‍⚕️ Testing doctor dashboard query...');
+    console.log("\n👨‍⚕️ Testing doctor dashboard query...");
     const { data: dashboardData, error: dashboardError } = await supabase
-      .from('consultations')
-      .select('*')
-      .order('created_at', { ascending: false })
+      .from("consultations")
+      .select("*")
+      .order("created_at", { ascending: false })
       .limit(5);
 
     if (dashboardError) {
-      console.error('❌ Error with dashboard query:', dashboardError.message);
+      console.error("❌ Error with dashboard query:", dashboardError.message);
     } else {
-      console.log('✅ Dashboard query successful!');
-      console.log('📊 Total consultations for dashboard:', dashboardData?.length || 0);
+      console.log("✅ Dashboard query successful!");
+      console.log("📊 Total consultations for dashboard:", dashboardData?.length || 0);
       if (dashboardData && dashboardData.length > 0) {
-        console.log('📋 Recent consultations:');
+        console.log("📋 Recent consultations:");
         dashboardData.forEach((consultation, index) => {
           console.log(`  ${index + 1}. Patient ID: ${consultation.patient_id}`);
           console.log(`     Chief Complaint: ${consultation.chief_complaint}`);
@@ -133,26 +127,25 @@ async function testWithoutRLS() {
           if (consultation.form_data?.triage_level) {
             console.log(`     Triage Level: ${consultation.form_data.triage_level}`);
           }
-          console.log('');
+          console.log("");
         });
       }
     }
 
     // Clean up test record
-    console.log('\n🧹 Cleaning up test record...');
+    console.log("\n🧹 Cleaning up test record...");
     const { error: deleteError } = await supabase
-      .from('consultations')
+      .from("consultations")
       .delete()
-      .eq('patient_id', testPatientId);
+      .eq("patient_id", testPatientId);
 
     if (deleteError) {
-      console.error('❌ Error deleting test record:', deleteError.message);
+      console.error("❌ Error deleting test record:", deleteError.message);
     } else {
-      console.log('✅ Test record cleaned up successfully!');
+      console.log("✅ Test record cleaned up successfully!");
     }
-
   } catch (error) {
-    console.error('❌ General error:', error.message);
+    console.error("❌ General error:", error.message);
   }
 }
 

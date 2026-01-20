@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Textarea } from '../components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import React, { useState, useEffect } from "react";
+import { useLocation } from "wouter";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 
 interface PatientProfile {
   id: string;
@@ -44,24 +50,24 @@ export default function PatientProfile() {
   const [, navigate] = useLocation();
   const [profile, setProfile] = useState<PatientProfile | null>(null);
   const [clinics, setClinics] = useState<Clinic[]>([]);
-  const [selectedClinic, setSelectedClinic] = useState<string>('');
-  const [selectedPhysician, setSelectedPhysician] = useState<string>('');
+  const [selectedClinic, setSelectedClinic] = useState<string>("");
+  const [selectedPhysician, setSelectedPhysician] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    dateOfBirth: '',
-    gender: '',
-    phone: '',
-    email: '',
-    emergencyContact: '',
-    emergencyPhone: '',
-    medicalHistory: '',
-    medications: '',
-    allergies: ''
+    firstName: "",
+    lastName: "",
+    dateOfBirth: "",
+    gender: "",
+    phone: "",
+    email: "",
+    emergencyContact: "",
+    emergencyPhone: "",
+    medicalHistory: "",
+    medications: "",
+    allergies: "",
   });
 
   useEffect(() => {
@@ -71,89 +77,89 @@ export default function PatientProfile() {
 
   const loadProfile = async () => {
     try {
-      const patientId = localStorage.getItem('patient_id');
+      const patientId = localStorage.getItem("patient_id");
       if (patientId) {
         const response = await fetch(`/api/patient-profile/${patientId}`);
         if (response.ok) {
           const data = await response.json();
           setProfile(data);
           setFormData({
-            firstName: data.firstName || '',
-            lastName: data.lastName || '',
-            dateOfBirth: data.dateOfBirth || '',
-            gender: data.gender || '',
-            phone: data.phone || '',
-            email: data.email || '',
-            emergencyContact: data.emergencyContact || '',
-            emergencyPhone: data.emergencyPhone || '',
-            medicalHistory: data.medicalHistory || '',
-            medications: data.medications || '',
-            allergies: data.allergies || ''
+            firstName: data.firstName || "",
+            lastName: data.lastName || "",
+            dateOfBirth: data.dateOfBirth || "",
+            gender: data.gender || "",
+            phone: data.phone || "",
+            email: data.email || "",
+            emergencyContact: data.emergencyContact || "",
+            emergencyPhone: data.emergencyPhone || "",
+            medicalHistory: data.medicalHistory || "",
+            medications: data.medications || "",
+            allergies: data.allergies || "",
           });
-          setSelectedClinic(data.clinicId || '');
-          setSelectedPhysician(data.physicianId || '');
+          setSelectedClinic(data.clinicId || "");
+          setSelectedPhysician(data.physicianId || "");
         }
       }
     } catch (error) {
-      console.error('Error loading profile:', error);
+      console.error("Error loading profile:", error);
     }
   };
 
   const loadClinics = async () => {
     try {
-      const response = await fetch('/api/clinics');
+      const response = await fetch("/api/clinics");
       if (response.ok) {
         const data = await response.json();
         setClinics(data);
       }
     } catch (error) {
-      console.error('Error loading clinics:', error);
+      console.error("Error loading clinics:", error);
     }
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const patientId = localStorage.getItem('patient_id') || generatePatientId();
-      localStorage.setItem('patient_id', patientId);
+      const patientId = localStorage.getItem("patient_id") || generatePatientId();
+      localStorage.setItem("patient_id", patientId);
 
       const profileData = {
         ...formData,
         clinicId: selectedClinic,
         physicianId: selectedPhysician,
-        id: patientId
+        id: patientId,
       };
 
-      const response = await fetch('/api/patient-profile', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profileData)
+      const response = await fetch("/api/patient-profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileData),
       });
 
       if (response.ok) {
         setProfile(profileData);
-        alert('Profile saved successfully!');
+        alert("Profile saved successfully!");
       } else {
-        throw new Error('Failed to save profile');
+        throw new Error("Failed to save profile");
       }
     } catch (error) {
-      console.error('Error saving profile:', error);
-      alert('Failed to save profile. Please try again.');
+      console.error("Error saving profile:", error);
+      alert("Failed to save profile. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
   const generatePatientId = () => {
-    return 'PAT-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    return "PAT-" + Math.random().toString(36).substr(2, 9).toUpperCase();
   };
 
   const handleClinicChange = (clinicId: string) => {
     setSelectedClinic(clinicId);
-    setSelectedPhysician(''); // Reset physician selection
+    setSelectedPhysician(""); // Reset physician selection
   };
 
-  const selectedClinicData = clinics.find(c => c.id === selectedClinic);
+  const selectedClinicData = clinics.find((c) => c.id === selectedClinic);
   const availablePhysicians = selectedClinicData?.physicians || [];
 
   return (
@@ -161,7 +167,9 @@ export default function PatientProfile() {
       <div className="max-w-4xl mx-auto p-6">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-800">Patient Profile</h1>
-          <p className="text-slate-600 mt-2">Complete your medical profile and select your clinic</p>
+          <p className="text-slate-600 mt-2">
+            Complete your medical profile and select your clinic
+          </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -178,7 +186,7 @@ export default function PatientProfile() {
                   <Input
                     id="firstName"
                     value={formData.firstName}
-                    onChange={(e) => setFormData({...formData, firstName: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                   />
                 </div>
                 <div>
@@ -186,7 +194,7 @@ export default function PatientProfile() {
                   <Input
                     id="lastName"
                     value={formData.lastName}
-                    onChange={(e) => setFormData({...formData, lastName: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                   />
                 </div>
               </div>
@@ -198,12 +206,15 @@ export default function PatientProfile() {
                     id="dateOfBirth"
                     type="date"
                     value={formData.dateOfBirth}
-                    onChange={(e) => setFormData({...formData, dateOfBirth: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
                   />
                 </div>
                 <div>
                   <Label htmlFor="gender">Gender</Label>
-                  <Select value={formData.gender} onValueChange={(value) => setFormData({...formData, gender: value})}>
+                  <Select
+                    value={formData.gender}
+                    onValueChange={(value) => setFormData({ ...formData, gender: value })}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select gender" />
                     </SelectTrigger>
@@ -222,7 +233,7 @@ export default function PatientProfile() {
                   <Input
                     id="phone"
                     value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />
                 </div>
                 <div>
@@ -231,7 +242,7 @@ export default function PatientProfile() {
                     id="email"
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   />
                 </div>
               </div>
@@ -250,7 +261,7 @@ export default function PatientProfile() {
                 <Input
                   id="emergencyContact"
                   value={formData.emergencyContact}
-                  onChange={(e) => setFormData({...formData, emergencyContact: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, emergencyContact: e.target.value })}
                 />
               </div>
               <div>
@@ -258,7 +269,7 @@ export default function PatientProfile() {
                 <Input
                   id="emergencyPhone"
                   value={formData.emergencyPhone}
-                  onChange={(e) => setFormData({...formData, emergencyPhone: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, emergencyPhone: e.target.value })}
                 />
               </div>
             </CardContent>
@@ -276,7 +287,7 @@ export default function PatientProfile() {
                 <Textarea
                   id="medicalHistory"
                   value={formData.medicalHistory}
-                  onChange={(e) => setFormData({...formData, medicalHistory: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, medicalHistory: e.target.value })}
                   placeholder="Describe your medical history, surgeries, chronic conditions, etc."
                   rows={3}
                 />
@@ -286,7 +297,7 @@ export default function PatientProfile() {
                 <Textarea
                   id="medications"
                   value={formData.medications}
-                  onChange={(e) => setFormData({...formData, medications: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, medications: e.target.value })}
                   placeholder="List all current medications, dosages, and frequency"
                   rows={3}
                 />
@@ -296,7 +307,7 @@ export default function PatientProfile() {
                 <Textarea
                   id="allergies"
                   value={formData.allergies}
-                  onChange={(e) => setFormData({...formData, allergies: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, allergies: e.target.value })}
                   placeholder="List all known allergies (medications, foods, environmental, etc.)"
                   rows={2}
                 />
@@ -349,8 +360,11 @@ export default function PatientProfile() {
                 <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                   <h4 className="font-semibold text-green-800">Selected Care Team</h4>
                   <p className="text-green-700">
-                    <strong>Clinic:</strong> {selectedClinicData?.name}<br/>
-                    <strong>Physician:</strong> Dr. {availablePhysicians.find(p => p.id === selectedPhysician)?.name} - {availablePhysicians.find(p => p.id === selectedPhysician)?.specialty}
+                    <strong>Clinic:</strong> {selectedClinicData?.name}
+                    <br />
+                    <strong>Physician:</strong> Dr.{" "}
+                    {availablePhysicians.find((p) => p.id === selectedPhysician)?.name} -{" "}
+                    {availablePhysicians.find((p) => p.id === selectedPhysician)?.specialty}
                   </p>
                 </div>
               )}
@@ -359,15 +373,14 @@ export default function PatientProfile() {
         </div>
 
         <div className="mt-8 flex justify-end space-x-4">
-          <Button variant="outline" onClick={() => navigate('/')}>
+          <Button variant="outline" onClick={() => navigate("/")}>
             Cancel
           </Button>
           <Button onClick={handleSave} disabled={saving}>
-            {saving ? 'Saving...' : 'Save Profile'}
+            {saving ? "Saving..." : "Save Profile"}
           </Button>
         </div>
       </div>
     </div>
   );
 }
-

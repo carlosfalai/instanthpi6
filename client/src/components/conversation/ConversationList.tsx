@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
@@ -73,22 +73,24 @@ export default function ConversationList({
     };
   }, []);
 
-  // Sort and filter conversations
-  const sortedAndFilteredConversations = [...conversations]
-    .filter((conversation) => {
-      if (filterOption === "unread") {
-        return conversation.hasUnread;
-      }
-      return true;
-    })
-    .sort((a, b) => {
-      const timeA = new Date(a.lastMessage.timestamp).getTime();
-      const timeB = new Date(b.lastMessage.timestamp).getTime();
-      return sortOption === "newest" ? timeB - timeA : timeA - timeB;
-    });
+  // Memoize sorted and filtered conversations to avoid recalculation on every render
+  const sortedAndFilteredConversations = useMemo(() => {
+    return [...conversations]
+      .filter((conversation) => {
+        if (filterOption === "unread") {
+          return conversation.hasUnread;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const timeA = new Date(a.lastMessage.timestamp).getTime();
+        const timeB = new Date(b.lastMessage.timestamp).getTime();
+        return sortOption === "newest" ? timeB - timeA : timeA - timeB;
+      });
+  }, [conversations, filterOption, sortOption]);
 
-  // Handle checkbox toggle
-  const handleCheckboxChange = (patientId: number) => {
+  // Memoize checkbox toggle handler
+  const handleCheckboxChange = useCallback((patientId: number) => {
     setSelectedIds((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(patientId)) {
@@ -98,24 +100,27 @@ export default function ConversationList({
       }
       return newSet;
     });
-  };
+  }, []);
 
-  // Select/deselect all
-  const handleSelectAll = () => {
-    if (selectedIds.size === sortedAndFilteredConversations.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(sortedAndFilteredConversations.map((c) => c.patientId)));
-    }
-  };
+  // Memoize select/deselect all handler
+  const handleSelectAll = useCallback(() => {
+    setSelectedIds((prev) => {
+      if (prev.size === sortedAndFilteredConversations.length) {
+        return new Set();
+      }
+      return new Set(sortedAndFilteredConversations.map((c) => c.patientId));
+    });
+  }, [sortedAndFilteredConversations]);
 
-  // Toggle selection mode
-  const toggleSelectMode = () => {
-    setSelectMode(!selectMode);
-    if (selectMode) {
-      setSelectedIds(new Set());
-    }
-  };
+  // Memoize toggle selection mode handler
+  const toggleSelectMode = useCallback(() => {
+    setSelectMode((prev) => {
+      if (prev) {
+        setSelectedIds(new Set());
+      }
+      return !prev;
+    });
+  }, []);
 
   const bgColor = darkMode ? "bg-[#1a1a1a]" : "bg-white";
   const textColor = darkMode ? "text-white" : "text-gray-900";
@@ -271,7 +276,7 @@ interface ConversationItemProps {
   onRestore?: () => void;
 }
 
-function ConversationItem({
+const ConversationItem = memo(function ConversationItem({
   conversation,
   isSelected,
   darkMode,
@@ -363,4 +368,4 @@ function ConversationItem({
       </div>
     </div>
   );
-}
+});

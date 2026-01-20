@@ -1,14 +1,19 @@
 import { Router } from "express";
 import { google } from "googleapis";
 import { createClient } from "@supabase/supabase-js";
+import { requireAuth, requireAuthenticatedUserId } from "../middleware/auth";
 
 const router = Router();
+
+// All Gmail routes require authentication
+router.use(requireAuth);
 
 // OAuth2 client setup
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI || `${process.env.CLIENT_URL || "http://localhost:5173"}/auth/gmail/callback`
+  process.env.GOOGLE_REDIRECT_URI ||
+    `${process.env.CLIENT_URL || "http://localhost:5173"}/auth/gmail/callback`
 );
 
 // Supabase client
@@ -50,10 +55,10 @@ router.get("/auth/callback", async (req, res) => {
     }
 
     const { tokens } = await oauth2Client.getToken(code as string);
-    
+
     // Store tokens securely (encrypted in Supabase)
     const supabase = getSupabase();
-    const doctorId = "default-doctor"; // TODO: Get from authenticated user session
+    const doctorId = String(requireAuthenticatedUserId(req));
 
     if (supabase && tokens.refresh_token) {
       // Store encrypted tokens in physicians table
@@ -78,7 +83,7 @@ router.get("/auth/callback", async (req, res) => {
 // Get Gmail access token for a user
 async function getGmailAccessToken(doctorId: string = "default-doctor") {
   const supabase = getSupabase();
-  
+
   if (!supabase) {
     throw new Error("Supabase not configured");
   }
@@ -98,7 +103,7 @@ async function getGmailAccessToken(doctorId: string = "default-doctor") {
     // Refresh the token
     oauth2Client.setCredentials({ refresh_token: physician.gmail_refresh_token });
     const { credentials } = await oauth2Client.refreshAccessToken();
-    
+
     // Update stored token
     await supabase
       .from("physicians")
@@ -117,7 +122,7 @@ async function getGmailAccessToken(doctorId: string = "default-doctor") {
 // Fetch emails from Gmail with "instanthpi" label
 router.get("/emails", async (req, res) => {
   try {
-    const doctorId = "default-doctor"; // TODO: Get from authenticated user session
+    const doctorId = String(requireAuthenticatedUserId(req));
     const accessToken = await getGmailAccessToken(doctorId);
 
     oauth2Client.setCredentials({ access_token: accessToken });
@@ -200,7 +205,7 @@ router.get("/emails", async (req, res) => {
     res.json({ emails: validEmails });
   } catch (error: any) {
     console.error("Error fetching Gmail emails:", error);
-    
+
     if (error.message?.includes("Gmail not connected")) {
       return res.status(401).json({
         error: "Gmail not connected",
@@ -241,4 +246,3 @@ router.get("/status", async (req, res) => {
 });
 
 export default router;
-

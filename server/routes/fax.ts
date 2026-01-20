@@ -7,8 +7,12 @@ import path from "path";
 import { storage } from "../storage";
 import { medicationRefills } from "@shared/schema";
 import multer from "multer";
+import { requireAuth } from "../middleware/auth";
 
 const router = Router();
+
+// All fax routes require authentication - can send documents to any fax number
+router.use(requireAuth);
 
 // Configure multer for file uploads
 const upload = multer({

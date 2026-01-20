@@ -76,7 +76,8 @@ router.post("/generate-report-free", async (req, res) => {
     });
   } catch (error) {
     console.error("Error generating report:", error);
-    res.status(500).json({ error: error.message });
+    const message = error instanceof Error ? error.message : "Unknown error generating report";
+    res.status(500).json({ error: message });
   }
 });
 
@@ -303,9 +304,10 @@ router.get("/ollama-status", async (req, res) => {
       });
     }
   } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
     res.json({
       status: "offline",
-      error: error.message,
+      error: message,
       instructions: "Run: ollama serve",
     });
   }

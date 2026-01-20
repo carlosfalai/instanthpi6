@@ -1,5 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback, useMemo, memo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getQueryFn } from "@/lib/queryClient";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -38,6 +39,7 @@ export default function SpruceConversation({
   // Fetch messages from API if not provided
   const { data: fetchedMessages } = useQuery({
     queryKey: [`/api/messages/${patientId}`],
+    queryFn: getQueryFn(),
     enabled: (!messages || !Array.isArray(messages) || messages.length === 0) && !!patientId,
   });
 
@@ -56,11 +58,11 @@ export default function SpruceConversation({
     }
   }, [displayMessages]);
 
-  // Format timestamp for display
-  const formatTimestamp = (timestamp: string) => {
+  // Format timestamp for display - memoized
+  const formatTimestamp = useCallback((timestamp: string) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
+  }, []);
 
   // Send message mutation
   const sendMessageMutation = useMutation({
@@ -77,22 +79,24 @@ export default function SpruceConversation({
     },
   });
 
-  // Handle message submission
-  const handleSubmit = (e: React.FormEvent) => {
+  // Handle message submission - memoized
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
 
     if (!newMessage.trim()) return;
 
     sendMessageMutation.mutate(newMessage.trim());
-  };
+  }, [newMessage, sendMessageMutation]);
 
-  // Handle textarea key press (Ctrl+Enter to submit)
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  // Handle textarea key press (Ctrl+Enter to submit) - memoized
+  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
-      handleSubmit(e);
+      if (newMessage.trim()) {
+        sendMessageMutation.mutate(newMessage.trim());
+      }
     }
-  };
+  }, [newMessage, sendMessageMutation]);
 
   return (
     <div className="flex flex-col h-full bg-[#121212] text-white">
@@ -109,23 +113,11 @@ export default function SpruceConversation({
             </div>
           ) : (
             displayMessages.map((message) => (
-              <div
+              <MessageItem
                 key={message.id}
-                className={`flex ${message.isFromPatient ? "justify-start" : "justify-end"}`}
-              >
-                <div
-                  className={`max-w-[75%] rounded-lg p-3 ${
-                    message.isFromPatient ? "bg-[#1e1e1e] text-white" : "bg-blue-600 text-white"
-                  }`}
-                >
-                  <div className="text-sm whitespace-pre-wrap">{message.content}</div>
-                  <div
-                    className={`text-xs mt-1 ${message.isFromPatient ? "text-gray-400" : "text-blue-200"}`}
-                  >
-                    {formatTimestamp(message.timestamp)}
-                  </div>
-                </div>
-              </div>
+                message={message}
+                formatTimestamp={formatTimestamp}
+              />
             ))
           )}
 
@@ -184,3 +176,30 @@ export default function SpruceConversation({
     </div>
   );
 }
+
+// Memoized MessageItem component to prevent unnecessary re-renders
+interface MessageItemProps {
+  message: Message;
+  formatTimestamp: (timestamp: string) => string;
+}
+
+const MessageItem = memo(function MessageItem({ message, formatTimestamp }: MessageItemProps) {
+  return (
+    <div
+      className={`flex ${message.isFromPatient ? "justify-start" : "justify-end"}`}
+    >
+      <div
+        className={`max-w-[75%] rounded-lg p-3 ${
+          message.isFromPatient ? "bg-[#1e1e1e] text-white" : "bg-blue-600 text-white"
+        }`}
+      >
+        <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+        <div
+          className={`text-xs mt-1 ${message.isFromPatient ? "text-gray-400" : "text-blue-200"}`}
+        >
+          {formatTimestamp(message.timestamp)}
+        </div>
+      </div>
+    </div>
+  );
+});

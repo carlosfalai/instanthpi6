@@ -13,12 +13,12 @@ export interface StagedMessage {
 }
 
 export type StagedMessageStatus =
-  | 'pending'    // waiting in queue with timer running
-  | 'paused'     // timer paused (editing)
-  | 'sending'    // currently being sent
-  | 'sent'       // successfully delivered
-  | 'cancelled'  // user cancelled
-  | 'error';     // send failed
+  | "pending" // waiting in queue with timer running
+  | "paused" // timer paused (editing)
+  | "sending" // currently being sent
+  | "sent" // successfully delivered
+  | "cancelled" // user cancelled
+  | "error"; // send failed
 
 export interface TimerState {
   countdown: number;
@@ -39,10 +39,10 @@ export interface SendResult {
 
 // Constants
 export const STORAGE_KEYS = {
-  STAGING_QUEUE: 'instanthpi_staging_queue',
+  STAGING_QUEUE: "instanthpi_staging_queue",
 } as const;
 
 export const DEFAULT_TIMER_CONFIG = {
   initialCountdown: 60, // 60 seconds before auto-send
-  tickInterval: 1000,   // 1 second
+  tickInterval: 1000, // 1 second
 } as const;

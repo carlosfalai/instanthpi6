@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Switch } from '../ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Alert, AlertDescription } from '../ui/alert';
-import { Badge } from '../ui/badge';
-import { CheckCircle, XCircle, AlertCircle, Settings, Key, Brain } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Switch } from "../ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Badge } from "../ui/badge";
+import { CheckCircle, XCircle, AlertCircle, Settings, Key, Brain } from "lucide-react";
 
 interface AISettings {
   userId: number;
-  preferredAiProvider: 'openai' | 'claude';
+  preferredAiProvider: "openai" | "claude";
   openaiModel: string;
   claudeModel: string;
   hasOpenaiKey: boolean;
@@ -42,13 +42,13 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState(false);
-  const [testResult, setTestResult] = useState<{success: boolean, message: string} | null>(null);
+  const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [formData, setFormData] = useState({
-    preferredAiProvider: 'openai' as 'openai' | 'claude',
-    openaiApiKey: '',
-    claudeApiKey: '',
-    openaiModel: 'gpt-4o',
-    claudeModel: 'claude-3-5-haiku-20241022',
+    preferredAiProvider: "openai" as "openai" | "claude",
+    openaiApiKey: "",
+    claudeApiKey: "",
+    openaiModel: "gpt-4o",
+    claudeModel: "claude-3-5-haiku-20241022",
   });
 
   useEffect(() => {
@@ -64,14 +64,14 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
         setSettings(data);
         setFormData({
           preferredAiProvider: data.preferredAiProvider,
-          openaiApiKey: '',
-          claudeApiKey: '',
+          openaiApiKey: "",
+          claudeApiKey: "",
           openaiModel: data.openaiModel,
           claudeModel: data.claudeModel,
         });
       }
     } catch (error) {
-      console.error('Error loading AI settings:', error);
+      console.error("Error loading AI settings:", error);
     } finally {
       setLoading(false);
     }
@@ -81,9 +81,9 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
     try {
       setSaving(true);
       const response = await fetch(`/api/ai-settings/${userId}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           ...settings,
@@ -93,13 +93,13 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
 
       if (response.ok) {
         await loadSettings();
-        setTestResult({ success: true, message: 'Settings saved successfully!' });
+        setTestResult({ success: true, message: "Settings saved successfully!" });
       } else {
-        setTestResult({ success: false, message: 'Failed to save settings' });
+        setTestResult({ success: false, message: "Failed to save settings" });
       }
     } catch (error) {
-      console.error('Error saving settings:', error);
-      setTestResult({ success: false, message: 'Error saving settings' });
+      console.error("Error saving settings:", error);
+      setTestResult({ success: false, message: "Error saving settings" });
     } finally {
       setSaving(false);
     }
@@ -109,29 +109,29 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
     try {
       setTesting(true);
       const response = await fetch(`/api/ai-settings/${userId}/test`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
       const result = await response.json();
       if (response.ok) {
-        setTestResult({ 
-          success: true, 
-          message: `AI test successful! Using ${result.provider} (${result.model})` 
+        setTestResult({
+          success: true,
+          message: `AI test successful! Using ${result.provider} (${result.model})`,
         });
       } else {
-        setTestResult({ 
-          success: false, 
-          message: result.error || 'AI test failed' 
+        setTestResult({
+          success: false,
+          message: result.error || "AI test failed",
         });
       }
     } catch (error) {
-      console.error('Error testing AI configuration:', error);
-      setTestResult({ 
-        success: false, 
-        message: 'Error testing AI configuration' 
+      console.error("Error testing AI configuration:", error);
+      setTestResult({
+        success: false,
+        message: "Error testing AI configuration",
       });
     } finally {
       setTesting(false);
@@ -180,9 +180,7 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
         <CardContent>
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Failed to load AI settings. Please try again.
-            </AlertDescription>
+            <AlertDescription>Failed to load AI settings. Please try again.</AlertDescription>
           </Alert>
         </CardContent>
       </Card>
@@ -198,9 +196,7 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
             <Settings className="h-5 w-5" />
             AI Provider Configuration
           </CardTitle>
-          <CardDescription>
-            Configure your preferred AI provider and API keys
-          </CardDescription>
+          <CardDescription>Configure your preferred AI provider and API keys</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -208,7 +204,7 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
               <Label htmlFor="provider">AI Provider</Label>
               <Select
                 value={formData.preferredAiProvider}
-                onValueChange={(value: 'openai' | 'claude') => 
+                onValueChange={(value: "openai" | "claude") =>
                   setFormData({ ...formData, preferredAiProvider: value })
                 }
               >
@@ -225,11 +221,16 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
             <div className="space-y-2">
               <Label htmlFor="model">Model</Label>
               <Select
-                value={formData.preferredAiProvider === 'openai' ? formData.openaiModel : formData.claudeModel}
-                onValueChange={(value) => 
+                value={
+                  formData.preferredAiProvider === "openai"
+                    ? formData.openaiModel
+                    : formData.claudeModel
+                }
+                onValueChange={(value) =>
                   setFormData({
                     ...formData,
-                    [formData.preferredAiProvider === 'openai' ? 'openaiModel' : 'claudeModel']: value
+                    [formData.preferredAiProvider === "openai" ? "openaiModel" : "claudeModel"]:
+                      value,
                   })
                 }
               >
@@ -281,21 +282,25 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
 
           <div className="flex gap-2">
             <Button onClick={saveSettings} disabled={saving}>
-              {saving ? 'Saving...' : 'Save Configuration'}
+              {saving ? "Saving..." : "Save Configuration"}
             </Button>
             <Button variant="outline" onClick={testConfiguration} disabled={testing}>
-              {testing ? 'Testing...' : 'Test Connection'}
+              {testing ? "Testing..." : "Test Connection"}
             </Button>
           </div>
 
           {testResult && (
-            <Alert className={testResult.success ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}>
+            <Alert
+              className={
+                testResult.success ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"
+              }
+            >
               {testResult.success ? (
                 <CheckCircle className="h-4 w-4 text-green-600" />
               ) : (
                 <XCircle className="h-4 w-4 text-red-600" />
               )}
-              <AlertDescription className={testResult.success ? 'text-green-800' : 'text-red-800'}>
+              <AlertDescription className={testResult.success ? "text-green-800" : "text-red-800"}>
                 {testResult.message}
               </AlertDescription>
             </Alert>
@@ -307,9 +312,7 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
       <Card>
         <CardHeader>
           <CardTitle>AI Features</CardTitle>
-          <CardDescription>
-            Enable or disable specific AI-powered features
-          </CardDescription>
+          <CardDescription>Enable or disable specific AI-powered features</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -320,7 +323,7 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
               </div>
               <Switch
                 checked={settings.hpiConfirmationEnabled}
-                onCheckedChange={() => toggleSetting('hpiConfirmationEnabled')}
+                onCheckedChange={() => toggleSetting("hpiConfirmationEnabled")}
               />
             </div>
 
@@ -331,7 +334,7 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
               </div>
               <Switch
                 checked={settings.followUpQuestionsEnabled}
-                onCheckedChange={() => toggleSetting('followUpQuestionsEnabled')}
+                onCheckedChange={() => toggleSetting("followUpQuestionsEnabled")}
               />
             </div>
 
@@ -342,7 +345,7 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
               </div>
               <Switch
                 checked={settings.differentialDiagnosisEnabled}
-                onCheckedChange={() => toggleSetting('differentialDiagnosisEnabled')}
+                onCheckedChange={() => toggleSetting("differentialDiagnosisEnabled")}
               />
             </div>
 
@@ -353,7 +356,7 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
               </div>
               <Switch
                 checked={settings.labworkSuggestionsEnabled}
-                onCheckedChange={() => toggleSetting('labworkSuggestionsEnabled')}
+                onCheckedChange={() => toggleSetting("labworkSuggestionsEnabled")}
               />
             </div>
 
@@ -364,7 +367,7 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
               </div>
               <Switch
                 checked={settings.prescriptionSuggestionsEnabled}
-                onCheckedChange={() => toggleSetting('prescriptionSuggestionsEnabled')}
+                onCheckedChange={() => toggleSetting("prescriptionSuggestionsEnabled")}
               />
             </div>
 
@@ -375,14 +378,14 @@ export function AISettingsPanel({ userId }: AISettingsPanelProps) {
               </div>
               <Switch
                 checked={settings.medicalNotesDraftEnabled}
-                onCheckedChange={() => toggleSetting('medicalNotesDraftEnabled')}
+                onCheckedChange={() => toggleSetting("medicalNotesDraftEnabled")}
               />
             </div>
           </div>
 
           <div className="pt-4 border-t">
             <Button onClick={saveSettings} disabled={saving}>
-              {saving ? 'Saving...' : 'Save AI Features'}
+              {saving ? "Saving..." : "Save AI Features"}
             </Button>
           </div>
         </CardContent>

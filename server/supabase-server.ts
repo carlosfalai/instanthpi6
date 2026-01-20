@@ -15,6 +15,11 @@ dotenv.config({ path: ".env.production" });
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Helper to safely extract error message
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : "Unknown error occurred";
+}
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -46,7 +51,7 @@ app.get("/api/messages", async (req, res) => {
     if (error) throw error;
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -68,7 +73,7 @@ app.post("/api/messages", async (req, res) => {
     if (error) throw error;
     res.json(data[0]);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -80,7 +85,7 @@ app.get("/api/patients", async (req, res) => {
     if (error) throw error;
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -101,7 +106,7 @@ app.post("/api/patients", async (req, res) => {
     if (error) throw error;
     res.json(data[0]);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -116,7 +121,7 @@ app.get("/api/appointments", async (req, res) => {
     if (error) throw error;
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -137,7 +142,7 @@ app.post("/api/appointments", async (req, res) => {
     if (error) throw error;
     res.json(data[0]);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -152,7 +157,7 @@ app.get("/api/subscriptions", async (req, res) => {
     if (error) throw error;
     res.json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -178,7 +183,7 @@ app.post("/api/webhook/spruce", async (req, res) => {
 
     res.json({ success: true });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: getErrorMessage(error) });
   }
 });
 
@@ -187,7 +192,7 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
 });
 
-if (process.argv[1] && process.argv[1].endsWith('supabase-server.ts')) {
+if (process.argv[1] && process.argv[1].endsWith("supabase-server.ts")) {
   app.listen(PORT, () => {
     console.log(`🚀 InstantHPI Server running on port ${PORT}`);
     console.log(`🔐 Connected to Supabase: ${process.env.SUPABASE_URL}`);

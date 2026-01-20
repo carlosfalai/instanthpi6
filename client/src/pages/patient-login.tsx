@@ -17,7 +17,9 @@ export default function PatientLogin() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         navigate("/patient-dashboard");
       }
@@ -64,7 +66,6 @@ export default function PatientLogin() {
   return (
     <EliteLayout showAura={true}>
       <div className="min-h-[80vh] flex flex-col items-center justify-center p-4">
-
         {/* Brand Header */}
         <div className="text-center mb-8 relative z-10">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6 neon-glow-primary border border-primary/20">
@@ -73,13 +74,10 @@ export default function PatientLogin() {
           <h1 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary tracking-tight mb-2">
             CLIENT PORTAL
           </h1>
-          <p className="text-muted-foreground font-medium tracking-wide">
-            SECURE ACCESS SYSTEM
-          </p>
+          <p className="text-muted-foreground font-medium tracking-wide">SECURE ACCESS SYSTEM</p>
         </div>
 
         <div className="w-full max-w-4xl grid md:grid-cols-2 gap-8 items-center">
-
           {/* Login Form */}
           <EliteCard className="w-full max-w-md mx-auto relative overflow-hidden" glow>
             {/* Card Header */}
@@ -126,7 +124,9 @@ export default function PatientLogin() {
                     <span className="w-full border-t border-white/10" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-[#12110f] px-2 text-muted-foreground">Or continue with</span>
+                    <span className="bg-[#12110f] px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
                   </div>
                 </div>
 
@@ -201,7 +201,6 @@ export default function PatientLogin() {
               </p>
             </div>
           </div>
-
         </div>
       </div>
     </EliteLayout>

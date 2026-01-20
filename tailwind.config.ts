@@ -1,13 +1,12 @@
-
 import type { Config } from "tailwindcss";
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 // Read the additions generated from theme.css
-const additionsPath = path.join(__dirname, 'tailwind-config-additions.json');
+const additionsPath = path.join(__dirname, "tailwind-config-additions.json");
 let additions = { colors: {}, boxShadow: {}, borderRadius: {}, screens: {}, fontFamily: {} };
 if (fs.existsSync(additionsPath)) {
-  additions = JSON.parse(fs.readFileSync(additionsPath, 'utf8'));
+  additions = JSON.parse(fs.readFileSync(additionsPath, "utf8"));
 }
 
 export default {

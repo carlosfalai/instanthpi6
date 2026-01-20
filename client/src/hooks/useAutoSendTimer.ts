@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { DEFAULT_TIMER_CONFIG } from '@/types/staging';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { DEFAULT_TIMER_CONFIG } from "@/types/staging";
 
 interface UseAutoSendTimerOptions {
   messageId: string;
@@ -55,7 +55,7 @@ export function useAutoSendTimer({
     timerRef.current = setInterval(() => {
       if (!mountedRef.current) return;
 
-      setCountdown(prev => {
+      setCountdown((prev) => {
         const next = prev - 1;
         onTickRef.current?.(next);
 

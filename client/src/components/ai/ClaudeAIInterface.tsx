@@ -176,7 +176,8 @@ const ClaudeAIInterface = () => {
       <CardHeader>
         <CardTitle>Claude Haiku 4.5 Interface</CardTitle>
         <CardDescription>
-          Interact with Claude Haiku 4.5 to generate text, analyze images, summarize content, and more.
+          Interact with Claude Haiku 4.5 to generate text, analyze images, summarize content, and
+          more.
         </CardDescription>
       </CardHeader>
       <CardContent>

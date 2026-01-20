@@ -1,12 +1,21 @@
 import React from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Home, Users2, FileText, MessageSquare, Database, Settings, Users, Stethoscope } from "lucide-react";
+import {
+  Home,
+  Users2,
+  FileText,
+  MessageSquare,
+  Database,
+  Settings,
+  Users,
+  Stethoscope,
+} from "lucide-react";
 
 export default function DoctorDashboardSimple() {
   const [, navigate] = useLocation();
 
-  console.log('[DASHBOARD-SIMPLE] Component mounted');
+  console.log("[DASHBOARD-SIMPLE] Component mounted");
 
   return (
     <div className="min-h-screen bg-[#0d0d0d] flex">
@@ -26,27 +35,45 @@ export default function DoctorDashboardSimple() {
 
         {/* Navigation */}
         <nav className="space-y-1">
-          <button onClick={() => navigate("/doctor-dashboard")} className="flex items-center gap-3 px-3 py-2.5 bg-[#222] text-[#e6e6e6] rounded-md w-full text-left transition-colors border border-[#2a2a2a]">
+          <button
+            onClick={() => navigate("/doctor-dashboard")}
+            className="flex items-center gap-3 px-3 py-2.5 bg-[#222] text-[#e6e6e6] rounded-md w-full text-left transition-colors border border-[#2a2a2a]"
+          >
             <Home className="w-4 h-4" />
             <span className="text-sm font-medium">Dashboard</span>
           </button>
-          <button onClick={() => navigate("/patients")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
+          <button
+            onClick={() => navigate("/patients")}
+            className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors"
+          >
             <Users2 className="w-4 h-4" />
             <span className="text-sm">Patients</span>
           </button>
-          <button onClick={() => navigate("/documents")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
+          <button
+            onClick={() => navigate("/documents")}
+            className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors"
+          >
             <FileText className="w-4 h-4" />
             <span className="text-sm">Reports</span>
           </button>
-          <button onClick={() => navigate("/messages")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
+          <button
+            onClick={() => navigate("/messages")}
+            className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors"
+          >
             <MessageSquare className="w-4 h-4" />
             <span className="text-sm">Messages</span>
           </button>
-          <button onClick={() => navigate("/ai-billing")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
+          <button
+            onClick={() => navigate("/ai-billing")}
+            className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors"
+          >
             <Database className="w-4 h-4" />
             <span className="text-sm">Analytics</span>
           </button>
-          <button onClick={() => navigate("/doctor-profile")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
+          <button
+            onClick={() => navigate("/doctor-profile")}
+            className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors"
+          >
             <Settings className="w-4 h-4" />
             <span className="text-sm">Settings</span>
           </button>
@@ -58,7 +85,10 @@ export default function DoctorDashboardSimple() {
             Collaboration
           </p>
           <nav className="space-y-1">
-            <button onClick={() => navigate("/association")} className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors">
+            <button
+              onClick={() => navigate("/association")}
+              className="flex items-center gap-3 px-3 py-2.5 text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]/50 rounded-md w-full text-left transition-colors"
+            >
               <Users className="w-4 h-4" />
               <span className="text-sm">Association</span>
             </button>
@@ -67,7 +97,10 @@ export default function DoctorDashboardSimple() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 bg-[#0d0d0d] flex items-center justify-center" data-testid="dashboard-root">
+      <main
+        className="flex-1 bg-[#0d0d0d] flex items-center justify-center"
+        data-testid="dashboard-root"
+      >
         <div className="text-center space-y-4">
           <div className="w-12 h-12 mx-auto">
             <div className="animate-spin">

@@ -36,31 +36,31 @@ export default function DoctorProfileNew() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [testing, setTesting] = useState<string | null>(null);
-  
+
   // Profile state
   const [specialty, setSpecialty] = useState("");
-  
+
   // API Credentials state
   const [spruceAccessId, setSpruceAccessId] = useState("");
   const [spruceApiKey, setSpruceApiKey] = useState("");
   const [preferredAI, setPreferredAI] = useState<"openai" | "claude" | "none">("none");
   const [openaiKey, setOpenaiKey] = useState("");
   const [claudeKey, setClaudeKey] = useState("");
-  
+
   // Show/hide toggles
   const [showSpruceAccess, setShowSpruceAccess] = useState(false);
   const [showSpruceApi, setShowSpruceApi] = useState(false);
   const [showOpenAI, setShowOpenAI] = useState(false);
   const [showClaude, setShowClaude] = useState(false);
-  
+
   // Verification status
   const [hasCredentials, setHasCredentials] = useState(false);
-  
+
   // API Testing status
   const [apiStatus, setApiStatus] = useState({
-    spruce: 'unknown' as 'working' | 'broken' | 'unknown',
-    openai: 'unknown' as 'working' | 'broken' | 'unknown', 
-    claude: 'unknown' as 'working' | 'broken' | 'unknown'
+    spruce: "unknown" as "working" | "broken" | "unknown",
+    openai: "unknown" as "working" | "broken" | "unknown",
+    claude: "unknown" as "working" | "broken" | "unknown",
   });
   const [testingAll, setTestingAll] = useState(false);
   const [testResults, setTestResults] = useState<{
@@ -70,10 +70,10 @@ export default function DoctorProfileNew() {
   }>({
     spruce: null,
     openai: null,
-    claude: null
+    claude: null,
   });
   const [credentialsVerified, setCredentialsVerified] = useState(false);
-  
+
   // Diagnostic Templates state
   const [templates, setTemplates] = useState<any[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(false);
@@ -90,7 +90,9 @@ export default function DoctorProfileNew() {
 
   const loadProfile = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         navigate("/doctor-login");
         return;
@@ -102,7 +104,7 @@ export default function DoctorProfileNew() {
         .select("specialty")
         .eq("physician_id", user.id)
         .single();
-      
+
       if (profileData) {
         setSpecialty(profileData.specialty || "");
       }
@@ -123,22 +125,24 @@ export default function DoctorProfileNew() {
   };
 
   // Test individual API
-  const testAPI = async (provider: 'spruce' | 'openai' | 'claude') => {
+  const testAPI = async (provider: "spruce" | "openai" | "claude") => {
     setTesting(provider);
-    
-    const apiKey = provider === 'openai' ? openaiKey : 
-                   provider === 'claude' ? claudeKey : 
-                   spruceApiKey;
-    
-    console.log(`Testing ${provider} with key:`, apiKey ? `${apiKey.substring(0, 10)}...` : 'EMPTY');
-    
+
+    const apiKey =
+      provider === "openai" ? openaiKey : provider === "claude" ? claudeKey : spruceApiKey;
+
+    console.log(
+      `Testing ${provider} with key:`,
+      apiKey ? `${apiKey.substring(0, 10)}...` : "EMPTY"
+    );
+
     if (!apiKey) {
-      setApiStatus(prev => ({ ...prev, [provider]: 'broken' }));
-      setTestResults(prev => ({ ...prev, [provider]: 'No API key configured' }));
+      setApiStatus((prev) => ({ ...prev, [provider]: "broken" }));
+      setTestResults((prev) => ({ ...prev, [provider]: "No API key configured" }));
       setTesting(null);
       return;
     }
-    
+
     try {
       const response = await fetch(`/api-doctor-credentials/test-${provider}`, {
         method: "POST",
@@ -146,22 +150,22 @@ export default function DoctorProfileNew() {
         body: JSON.stringify({
           provider,
           api_key: apiKey,
-          spruce_access_id: provider === 'spruce' ? spruceAccessId : undefined
+          spruce_access_id: provider === "spruce" ? spruceAccessId : undefined,
         }),
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
-        setApiStatus(prev => ({ ...prev, [provider]: 'working' }));
-        setTestResults(prev => ({ ...prev, [provider]: data.message }));
+        setApiStatus((prev) => ({ ...prev, [provider]: "working" }));
+        setTestResults((prev) => ({ ...prev, [provider]: data.message }));
       } else {
-        setApiStatus(prev => ({ ...prev, [provider]: 'broken' }));
-        setTestResults(prev => ({ ...prev, [provider]: data.error }));
+        setApiStatus((prev) => ({ ...prev, [provider]: "broken" }));
+        setTestResults((prev) => ({ ...prev, [provider]: data.error }));
       }
     } catch (error) {
-      setApiStatus(prev => ({ ...prev, [provider]: 'broken' }));
-      setTestResults(prev => ({ ...prev, [provider]: 'Connection failed' }));
+      setApiStatus((prev) => ({ ...prev, [provider]: "broken" }));
+      setTestResults((prev) => ({ ...prev, [provider]: "Connection failed" }));
     } finally {
       setTesting(null);
     }
@@ -170,14 +174,14 @@ export default function DoctorProfileNew() {
   // Test all APIs
   const testAllAPIs = async () => {
     setTestingAll(true);
-    setApiStatus({ spruce: 'unknown', openai: 'unknown', claude: 'unknown' });
-    
+    setApiStatus({ spruce: "unknown", openai: "unknown", claude: "unknown" });
+
     // Test each API in parallel
     const tests: Promise<void>[] = [];
-    if (spruceAccessId && spruceApiKey) tests.push(testAPI('spruce'));
-    if (openaiKey) tests.push(testAPI('openai'));
-    if (claudeKey) tests.push(testAPI('claude'));
-    
+    if (spruceAccessId && spruceApiKey) tests.push(testAPI("spruce"));
+    if (openaiKey) tests.push(testAPI("openai"));
+    if (claudeKey) tests.push(testAPI("claude"));
+
     await Promise.all(tests);
     setTestingAll(false);
   };
@@ -187,8 +191,8 @@ export default function DoctorProfileNew() {
     try {
       const payload: any = {
         preferred_ai_provider: preferredAI,
-        doctor_id: 'default-doctor', // Use consistent ID
-        specialty: specialty
+        doctor_id: "default-doctor", // Use consistent ID
+        specialty: specialty,
       };
 
       if (spruceAccessId) payload.spruce_access_id = spruceAccessId;
@@ -196,17 +200,17 @@ export default function DoctorProfileNew() {
       if (openaiKey) payload.openai_api_key = openaiKey;
       if (claudeKey) payload.claude_api_key = claudeKey;
 
-      console.log('Saving credentials:', payload);
-      
+      console.log("Saving credentials:", payload);
+
       const response = await fetch("/api-doctor-credentials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      console.log('Response status:', response.status);
+      console.log("Response status:", response.status);
       const responseData = await response.json();
-      console.log('Response data:', responseData);
+      console.log("Response data:", responseData);
 
       if (!response.ok) {
         throw new Error(responseData.error || "Failed to save credentials");
@@ -259,17 +263,17 @@ export default function DoctorProfileNew() {
       const data = await response.json();
 
       if (data.success) {
-        setTestResults(prev => ({ ...prev, spruce: true }));
+        setTestResults((prev) => ({ ...prev, spruce: true }));
         toast({
           title: "✅ Connexion réussie",
           description: `Spruce Health connecté. ${data.conversation_count} conversations trouvées.`,
         });
       } else {
-        setTestResults(prev => ({ ...prev, spruce: false }));
+        setTestResults((prev) => ({ ...prev, spruce: false }));
         throw new Error(data.error || "Test failed");
       }
     } catch (error: any) {
-      setTestResults(prev => ({ ...prev, spruce: false }));
+      setTestResults((prev) => ({ ...prev, spruce: false }));
       toast({
         title: "Échec de connexion",
         description: error.message,
@@ -282,7 +286,7 @@ export default function DoctorProfileNew() {
 
   const handleTestAI = async (provider: "openai" | "claude") => {
     const apiKey = provider === "openai" ? openaiKey : claudeKey;
-    
+
     if (!apiKey) {
       toast({
         title: "Clé API manquante",
@@ -306,17 +310,17 @@ export default function DoctorProfileNew() {
       const data = await response.json();
 
       if (data.success) {
-        setTestResults(prev => ({ ...prev, [provider]: true }));
+        setTestResults((prev) => ({ ...prev, [provider]: true }));
         toast({
           title: "✅ Connexion réussie",
           description: `${provider === "openai" ? "OpenAI" : "Claude"} connecté avec succès.`,
         });
       } else {
-        setTestResults(prev => ({ ...prev, [provider]: false }));
+        setTestResults((prev) => ({ ...prev, [provider]: false }));
         throw new Error(data.error || "Test failed");
       }
     } catch (error: any) {
-      setTestResults(prev => ({ ...prev, [provider]: false }));
+      setTestResults((prev) => ({ ...prev, [provider]: false }));
       toast({
         title: "Échec de connexion",
         description: error.message,
@@ -330,15 +334,18 @@ export default function DoctorProfileNew() {
   const handleSaveSpecialty = async () => {
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { error } = await supabase
-        .from("physician_profiles")
-        .upsert({
+      const { error } = await supabase.from("physician_profiles").upsert(
+        {
           physician_id: user.id,
           specialty,
-        }, { onConflict: "physician_id" });
+        },
+        { onConflict: "physician_id" }
+      );
 
       if (error) throw error;
 
@@ -361,7 +368,9 @@ export default function DoctorProfileNew() {
   const loadTemplates = async () => {
     setLoadingTemplates(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data, error } = await supabase
@@ -445,7 +454,9 @@ export default function DoctorProfileNew() {
 
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const templateData = {
@@ -465,9 +476,7 @@ export default function DoctorProfileNew() {
         if (error) throw error;
       } else {
         // Create new
-        const { error } = await supabase
-          .from("diagnostic_templates")
-          .insert(templateData);
+        const { error } = await supabase.from("diagnostic_templates").insert(templateData);
         if (error) throw error;
       }
 
@@ -499,10 +508,7 @@ export default function DoctorProfileNew() {
     if (!confirm("Êtes-vous sûr de vouloir supprimer ce template ?")) return;
 
     try {
-      const { error } = await supabase
-        .from("diagnostic_templates")
-        .delete()
-        .eq("id", templateId);
+      const { error } = await supabase.from("diagnostic_templates").delete().eq("id", templateId);
 
       if (error) throw error;
 
@@ -547,7 +553,8 @@ export default function DoctorProfileNew() {
                 <div>
                   <p className="font-medium text-[#e6e6e6]">Configuration requise</p>
                   <p className="text-sm text-[#999] mt-1">
-                    Veuillez configurer vos identifiants API pour activer les fonctionnalités Spruce et IA.
+                    Veuillez configurer vos identifiants API pour activer les fonctionnalités Spruce
+                    et IA.
                   </p>
                 </div>
               </div>
@@ -557,11 +564,36 @@ export default function DoctorProfileNew() {
 
         <Tabs defaultValue="identity" className="space-y-6">
           <TabsList className="grid w-full grid-cols-5 bg-[#1a1a1a] border-[#2a2a2a]">
-            <TabsTrigger value="identity" className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]">Identité</TabsTrigger>
-            <TabsTrigger value="api" className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]">API Intégrations</TabsTrigger>
-            <TabsTrigger value="ai" className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]">IA Configuration</TabsTrigger>
-            <TabsTrigger value="templates" className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]">Diagnostics</TabsTrigger>
-            <TabsTrigger value="medical_templates" className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]">Writing Styles</TabsTrigger>
+            <TabsTrigger
+              value="identity"
+              className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]"
+            >
+              Identité
+            </TabsTrigger>
+            <TabsTrigger
+              value="api"
+              className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]"
+            >
+              API Intégrations
+            </TabsTrigger>
+            <TabsTrigger
+              value="ai"
+              className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]"
+            >
+              IA Configuration
+            </TabsTrigger>
+            <TabsTrigger
+              value="templates"
+              className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]"
+            >
+              Diagnostics
+            </TabsTrigger>
+            <TabsTrigger
+              value="medical_templates"
+              className="data-[state=active]:bg-[#222] data-[state=active]:text-[#e6e6e6] text-[#999]"
+            >
+              Writing Styles
+            </TabsTrigger>
           </TabsList>
 
           {/* Identity Tab */}
@@ -578,7 +610,9 @@ export default function DoctorProfileNew() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="specialty" className="text-[#e6e6e6]">Spécialité</Label>
+                  <Label htmlFor="specialty" className="text-[#e6e6e6]">
+                    Spécialité
+                  </Label>
                   <Input
                     id="specialty"
                     value={specialty}
@@ -587,7 +621,11 @@ export default function DoctorProfileNew() {
                     className="mt-1.5 bg-[#0d0d0d] border-[#333] text-[#e6e6e6] placeholder:text-[#666]"
                   />
                 </div>
-                <Button onClick={handleSaveSpecialty} disabled={saving} className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white">
+                <Button
+                  onClick={handleSaveSpecialty}
+                  disabled={saving}
+                  className="bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
+                >
                   {saving ? "Sauvegarde..." : "Sauvegarder"}
                 </Button>
               </CardContent>
@@ -609,7 +647,9 @@ export default function DoctorProfileNew() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="spruce-access" className="text-[#e6e6e6]">Access ID Spruce</Label>
+                  <Label htmlFor="spruce-access" className="text-[#e6e6e6]">
+                    Access ID Spruce
+                  </Label>
                   <div className="flex gap-2 mt-1.5">
                     <Input
                       id="spruce-access"
@@ -625,13 +665,19 @@ export default function DoctorProfileNew() {
                       onClick={() => setShowSpruceAccess(!showSpruceAccess)}
                       className="bg-[#1a1a1a] border-[#333] text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
                     >
-                      {showSpruceAccess ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showSpruceAccess ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="spruce-api" className="text-[#e6e6e6]">Clé API Spruce</Label>
+                  <Label htmlFor="spruce-api" className="text-[#e6e6e6]">
+                    Clé API Spruce
+                  </Label>
                   <div className="flex gap-2 mt-1.5">
                     <Input
                       id="spruce-api"
@@ -695,21 +741,30 @@ export default function DoctorProfileNew() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <RadioGroup value={preferredAI} onValueChange={(value: any) => setPreferredAI(value)}>
+                <RadioGroup
+                  value={preferredAI}
+                  onValueChange={(value: any) => setPreferredAI(value)}
+                >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="openai" id="openai" />
-                    <Label htmlFor="openai" className="text-[#e6e6e6]">OpenAI (GPT-4)</Label>
+                    <Label htmlFor="openai" className="text-[#e6e6e6]">
+                      OpenAI (GPT-4)
+                    </Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="claude" id="claude" />
-                    <Label htmlFor="claude" className="text-[#e6e6e6]">Claude (Anthropic)</Label>
+                    <Label htmlFor="claude" className="text-[#e6e6e6]">
+                      Claude (Anthropic)
+                    </Label>
                   </div>
                 </RadioGroup>
 
                 {preferredAI === "openai" && (
                   <div className="space-y-4 mt-4">
                     <div>
-                      <Label htmlFor="openai-key" className="text-[#e6e6e6]">Clé API OpenAI</Label>
+                      <Label htmlFor="openai-key" className="text-[#e6e6e6]">
+                        Clé API OpenAI
+                      </Label>
                       <div className="flex gap-2 mt-1.5">
                         <Input
                           id="openai-key"
@@ -725,45 +780,51 @@ export default function DoctorProfileNew() {
                           onClick={() => setShowOpenAI(!showOpenAI)}
                           className="bg-[#1a1a1a] border-[#333] text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
                         >
-                          {showOpenAI ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showOpenAI ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                     </div>
-                <Button
-                  variant="outline"
-                  onClick={() => handleTestAI("openai")}
-                  disabled={testing === "openai" || !openaiKey}
-                  className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
-                >
-                  {testing === "openai" ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Test en cours...
-                    </>
-                  ) : testResults.openai === true ? (
-                    <>
-                      <Check className="h-4 w-4 mr-2 text-emerald-500" />
-                      Connexion réussie
-                    </>
-                  ) : testResults.openai === false ? (
-                    <>
-                      <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
-                      Échec de connexion
-                    </>
-                  ) : (
-                    <>
-                      <TestTube className="h-4 w-4 mr-2" />
-                      Tester OpenAI
-                    </>
-                  )}
-                </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleTestAI("openai")}
+                      disabled={testing === "openai" || !openaiKey}
+                      className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
+                    >
+                      {testing === "openai" ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Test en cours...
+                        </>
+                      ) : testResults.openai === true ? (
+                        <>
+                          <Check className="h-4 w-4 mr-2 text-emerald-500" />
+                          Connexion réussie
+                        </>
+                      ) : testResults.openai === false ? (
+                        <>
+                          <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
+                          Échec de connexion
+                        </>
+                      ) : (
+                        <>
+                          <TestTube className="h-4 w-4 mr-2" />
+                          Tester OpenAI
+                        </>
+                      )}
+                    </Button>
                   </div>
                 )}
 
                 {preferredAI === "claude" && (
                   <div className="space-y-4 mt-4">
                     <div>
-                      <Label htmlFor="claude-key" className="text-[#e6e6e6]">Clé API Claude</Label>
+                      <Label htmlFor="claude-key" className="text-[#e6e6e6]">
+                        Clé API Claude
+                      </Label>
                       <div className="flex gap-2 mt-1.5">
                         <Input
                           id="claude-key"
@@ -779,38 +840,42 @@ export default function DoctorProfileNew() {
                           onClick={() => setShowClaude(!showClaude)}
                           className="bg-[#1a1a1a] border-[#333] text-[#999] hover:text-[#e6e6e6] hover:bg-[#222]"
                         >
-                          {showClaude ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showClaude ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </Button>
                       </div>
                     </div>
-                <Button
-                  variant="outline"
-                  onClick={() => handleTestAI("claude")}
-                  disabled={testing === "claude" || !claudeKey}
-                  className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
-                >
-                  {testing === "claude" ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Test en cours...
-                    </>
-                  ) : testResults.claude === true ? (
-                    <>
-                      <Check className="h-4 w-4 mr-2 text-emerald-500" />
-                      Connexion réussie
-                    </>
-                  ) : testResults.claude === false ? (
-                    <>
-                      <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
-                      Échec de connexion
-                    </>
-                  ) : (
-                    <>
-                      <TestTube className="h-4 w-4 mr-2" />
-                      Tester Claude
-                    </>
-                  )}
-                </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleTestAI("claude")}
+                      disabled={testing === "claude" || !claudeKey}
+                      className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
+                    >
+                      {testing === "claude" ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Test en cours...
+                        </>
+                      ) : testResults.claude === true ? (
+                        <>
+                          <Check className="h-4 w-4 mr-2 text-emerald-500" />
+                          Connexion réussie
+                        </>
+                      ) : testResults.claude === false ? (
+                        <>
+                          <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
+                          Échec de connexion
+                        </>
+                      ) : (
+                        <>
+                          <TestTube className="h-4 w-4 mr-2" />
+                          Tester Claude
+                        </>
+                      )}
+                    </Button>
                   </div>
                 )}
               </CardContent>
@@ -851,7 +916,7 @@ export default function DoctorProfileNew() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Button 
+                  <Button
                     onClick={testAllAPIs}
                     disabled={testingAll || (!spruceAccessId && !openaiKey && !claudeKey)}
                     className="w-full bg-[#8b5cf6] hover:bg-[#7c3aed] text-white"
@@ -886,19 +951,19 @@ export default function DoctorProfileNew() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {apiStatus.spruce === 'working' && (
+                          {apiStatus.spruce === "working" && (
                             <div className="flex items-center gap-1 text-emerald-500">
                               <Check className="h-4 w-4" />
                               <span className="text-sm">Fonctionnel</span>
                             </div>
                           )}
-                          {apiStatus.spruce === 'broken' && (
+                          {apiStatus.spruce === "broken" && (
                             <div className="flex items-center gap-1 text-red-500">
                               <AlertCircle className="h-4 w-4" />
                               <span className="text-sm">Erreur</span>
                             </div>
                           )}
-                          {apiStatus.spruce === 'unknown' && (
+                          {apiStatus.spruce === "unknown" && (
                             <div className="flex items-center gap-1 text-[#999]">
                               <span className="text-sm">Non testé</span>
                             </div>
@@ -906,14 +971,14 @@ export default function DoctorProfileNew() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => testAPI('spruce')}
-                            disabled={testing === 'spruce'}
+                            onClick={() => testAPI("spruce")}
+                            disabled={testing === "spruce"}
                             className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                           >
-                            {testing === 'spruce' ? (
+                            {testing === "spruce" ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                              'Test'
+                              "Test"
                             )}
                           </Button>
                         </div>
@@ -940,19 +1005,19 @@ export default function DoctorProfileNew() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {apiStatus.openai === 'working' && (
+                          {apiStatus.openai === "working" && (
                             <div className="flex items-center gap-1 text-emerald-500">
                               <Check className="h-4 w-4" />
                               <span className="text-sm">Fonctionnel</span>
                             </div>
                           )}
-                          {apiStatus.openai === 'broken' && (
+                          {apiStatus.openai === "broken" && (
                             <div className="flex items-center gap-1 text-red-500">
                               <AlertCircle className="h-4 w-4" />
                               <span className="text-sm">Erreur</span>
                             </div>
                           )}
-                          {apiStatus.openai === 'unknown' && (
+                          {apiStatus.openai === "unknown" && (
                             <div className="flex items-center gap-1 text-[#999]">
                               <span className="text-sm">Non testé</span>
                             </div>
@@ -960,14 +1025,14 @@ export default function DoctorProfileNew() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => testAPI('openai')}
-                            disabled={testing === 'openai'}
+                            onClick={() => testAPI("openai")}
+                            disabled={testing === "openai"}
                             className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                           >
-                            {testing === 'openai' ? (
+                            {testing === "openai" ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                              'Test'
+                              "Test"
                             )}
                           </Button>
                         </div>
@@ -994,19 +1059,19 @@ export default function DoctorProfileNew() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          {apiStatus.claude === 'working' && (
+                          {apiStatus.claude === "working" && (
                             <div className="flex items-center gap-1 text-emerald-500">
                               <Check className="h-4 w-4" />
                               <span className="text-sm">Fonctionnel</span>
                             </div>
                           )}
-                          {apiStatus.claude === 'broken' && (
+                          {apiStatus.claude === "broken" && (
                             <div className="flex items-center gap-1 text-red-500">
                               <AlertCircle className="h-4 w-4" />
                               <span className="text-sm">Erreur</span>
                             </div>
                           )}
-                          {apiStatus.claude === 'unknown' && (
+                          {apiStatus.claude === "unknown" && (
                             <div className="flex items-center gap-1 text-[#999]">
                               <span className="text-sm">Non testé</span>
                             </div>
@@ -1014,14 +1079,14 @@ export default function DoctorProfileNew() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => testAPI('claude')}
-                            disabled={testing === 'claude'}
+                            onClick={() => testAPI("claude")}
+                            disabled={testing === "claude"}
                             className="bg-[#1a1a1a] border-[#333] text-[#e6e6e6] hover:bg-[#222]"
                           >
-                            {testing === 'claude' ? (
+                            {testing === "claude" ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                              'Test'
+                              "Test"
                             )}
                           </Button>
                         </div>
@@ -1042,7 +1107,8 @@ export default function DoctorProfileNew() {
                       <AlertCircle className="h-12 w-12 text-[#666] mx-auto mb-4" />
                       <h3 className="font-semibold text-[#e6e6e6] mb-2">Aucune API configurée</h3>
                       <p className="text-[#999] mb-4">
-                        Configurez vos identifiants API dans l'onglet "API Intégrations" pour pouvoir les tester ici.
+                        Configurez vos identifiants API dans l'onglet "API Intégrations" pour
+                        pouvoir les tester ici.
                       </p>
                     </CardContent>
                   </Card>
@@ -1062,8 +1128,8 @@ export default function DoctorProfileNew() {
                     Templates de Plans de Traitement
                   </CardTitle>
                   <CardDescription className="text-[#999]">
-                    Créez et gérez vos templates de plans pour différents diagnostics. 
-                    Utilisez l'IA pour générer automatiquement des templates personnalisés.
+                    Créez et gérez vos templates de plans pour différents diagnostics. Utilisez l'IA
+                    pour générer automatiquement des templates personnalisés.
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -1078,7 +1144,9 @@ export default function DoctorProfileNew() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="diagnosis" className="text-[#e6e6e6]">Nom du Diagnostic *</Label>
+                      <Label htmlFor="diagnosis" className="text-[#e6e6e6]">
+                        Nom du Diagnostic *
+                      </Label>
                       <Input
                         id="diagnosis"
                         value={newDiagnosisName}
@@ -1088,7 +1156,9 @@ export default function DoctorProfileNew() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="template-name" className="text-[#e6e6e6]">Nom du Template</Label>
+                      <Label htmlFor="template-name" className="text-[#e6e6e6]">
+                        Nom du Template
+                      </Label>
                       <Input
                         id="template-name"
                         value={newTemplateName}
@@ -1100,7 +1170,9 @@ export default function DoctorProfileNew() {
                   </div>
 
                   <div>
-                    <Label htmlFor="specialty" className="text-[#e6e6e6]">Spécialité (optionnel)</Label>
+                    <Label htmlFor="specialty" className="text-[#e6e6e6]">
+                      Spécialité (optionnel)
+                    </Label>
                     <Input
                       id="specialty"
                       value={newTemplateSpecialty}
@@ -1167,17 +1239,23 @@ export default function DoctorProfileNew() {
                   {!claudeKey && (
                     <div className="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-4">
                       <p className="text-sm text-[#999]">
-                        💡 Configurez votre clé API Claude dans l'onglet "API Intégrations" pour utiliser la génération IA.
+                        💡 Configurez votre clé API Claude dans l'onglet "API Intégrations" pour
+                        utiliser la génération IA.
                       </p>
                     </div>
                   )}
 
                   {editingTemplate?.plan_items && editingTemplate.plan_items.length > 0 && (
                     <div className="mt-4 p-4 bg-[#0d0d0d] border border-[#333] rounded-lg">
-                      <h4 className="font-semibold mb-3 text-sm text-[#e6e6e6]">Plan Items Preview:</h4>
+                      <h4 className="font-semibold mb-3 text-sm text-[#e6e6e6]">
+                        Plan Items Preview:
+                      </h4>
                       <div className="space-y-2 max-h-60 overflow-y-auto">
                         {editingTemplate.plan_items.map((item: any, idx: number) => (
-                          <div key={idx} className="text-sm bg-[#1a1a1a] p-2 rounded border border-[#333]">
+                          <div
+                            key={idx}
+                            className="text-sm bg-[#1a1a1a] p-2 rounded border border-[#333]"
+                          >
                             <div className="flex items-start gap-2">
                               <span className="font-medium text-[#8b5cf6]">{item.category}:</span>
                               <span className="text-[#e6e6e6]">{item.item}</span>
@@ -1233,9 +1311,12 @@ export default function DoctorProfileNew() {
                         >
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
-                              <h4 className="font-semibold text-[#e6e6e6]">{template.template_name}</h4>
+                              <h4 className="font-semibold text-[#e6e6e6]">
+                                {template.template_name}
+                              </h4>
                               <p className="text-sm text-[#999] mt-1">
-                                Diagnostic: <span className="font-medium">{template.diagnosis_name}</span>
+                                Diagnostic:{" "}
+                                <span className="font-medium">{template.diagnosis_name}</span>
                               </p>
                               {template.specialty && (
                                 <p className="text-xs text-[#666] mt-1">
@@ -1243,8 +1324,8 @@ export default function DoctorProfileNew() {
                                 </p>
                               )}
                               <p className="text-xs text-[#666] mt-2">
-                                {template.plan_items?.length || 0} items • 
-                                Créé le {new Date(template.created_at).toLocaleDateString()}
+                                {template.plan_items?.length || 0} items • Créé le{" "}
+                                {new Date(template.created_at).toLocaleDateString()}
                               </p>
                             </div>
                             <div className="flex gap-2 ml-4">

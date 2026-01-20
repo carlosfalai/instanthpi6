@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback, memo } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -205,21 +205,21 @@ export default function ConversationDetail({
     }
   }, [isLoading, messages, patientId]);
 
-  // Handle sending a message
-  const handleSendMessage = () => {
+  // Handle sending a message - memoized to avoid recreation on every render
+  const handleSendMessage = useCallback(() => {
     if (!replyText.trim()) return;
     sendMessageMutation.mutate(replyText);
-  };
+  }, [replyText, sendMessageMutation]);
 
-  // Handle selecting a file
-  const handleSelectFile = () => {
+  // Handle selecting a file - memoized
+  const handleSelectFile = useCallback(() => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
-  };
+  }, []);
 
-  // Handle file upload
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle file upload - memoized
+  const handleFileUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
@@ -228,35 +228,39 @@ export default function ConversationDetail({
       title: "File selected",
       description: `Selected file: ${files[0].name}`,
     });
-  };
+  }, [toast]);
 
-  // Format date for message groups
-  const formatMessageDate = (date: Date) => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
+  // Format date for message groups - moved inside useMemo to avoid recreation
+  // Group messages by date - memoized to avoid recalculation on every render
+  const { messagesByDate, datesToShow } = useMemo(() => {
+    const formatMessageDate = (date: Date) => {
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
 
-    if (date.toDateString() === today.toDateString()) {
-      return "Today";
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return "Yesterday";
-    } else {
-      return date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
-    }
-  };
+      if (date.toDateString() === today.toDateString()) {
+        return "Today";
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        return "Yesterday";
+      } else {
+        return date.toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
+      }
+    };
 
-  // Group messages by date
-  const messagesByDate: Record<string, Message[]> = {};
-  messages.forEach((message) => {
-    const dateKey = formatMessageDate(new Date(message.timestamp));
-    if (!messagesByDate[dateKey]) {
-      messagesByDate[dateKey] = [];
-    }
-    messagesByDate[dateKey].push(message);
-  });
+    const grouped: Record<string, Message[]> = {};
+    messages.forEach((message) => {
+      const dateKey = formatMessageDate(new Date(message.timestamp));
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey].push(message);
+    });
 
-  // Dates sorted by newest first
-  const datesToShow = Object.keys(messagesByDate);
+    return {
+      messagesByDate: grouped,
+      datesToShow: Object.keys(grouped),
+    };
+  }, [messages]);
 
   return (
     <div className={`h-full flex flex-col ${bgColor}`}>
